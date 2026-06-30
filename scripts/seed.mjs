@@ -127,13 +127,27 @@ const sessions = programWorkouts.map((wk) => ({
   retest: wk.retest,
 }));
 
-const filters = Object.entries(lx.LX_FILTERS).map(([key, dim], i) => ({
-  key,
-  label: dim.label,
-  options: dim.options,
-  order: i,
-  editable: true,
-}));
+// Guarantee that value-based filter dimensions (theme/format/type) cover every
+// value the seeded videos actually use — keeps the library filters consistent
+// with the data where the prototype's taxonomy was incomplete (e.g. the
+// "📊 Visszamérő" retest tag was missing from LX_FILTERS.type).
+const allForTaxonomy = [...workoutVideos, ...bonusVideos];
+const usedValues = {
+  theme: new Set(allForTaxonomy.map((v) => v.theme)),
+  format: new Set(allForTaxonomy.map((v) => v.format)),
+  type: new Set(allForTaxonomy.flatMap((v) => v.types)),
+};
+const filters = Object.entries(lx.LX_FILTERS).map(([key, dim], i) => {
+  let options = dim.options;
+  if (usedValues[key]) {
+    const missing = [...usedValues[key]].filter((x) => !options.includes(x));
+    if (missing.length) {
+      console.log(`  filters/${key}: +${missing.length} missing option(s): ${missing.join(", ")}`);
+      options = [...options, ...missing];
+    }
+  }
+  return { key, label: dim.label, options, order: i, editable: true };
+});
 
 // ── write ───────────────────────────────────────────────────
 async function main() {
