@@ -8,6 +8,8 @@ import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { catWord, dayGrad, levelWord } from "@/lib/categories";
 import { ensureProgress } from "@/lib/progress";
+import { getMyList, setSaved } from "@/lib/mylist";
+import { NcardModal } from "@/components/NcardModal";
 import {
   dayState, loadFoundation, type FoundationData, type WeekGroup, type WorkoutItem,
 } from "@/lib/program";
@@ -17,6 +19,8 @@ export default function FoundationPage() {
   const router = useRouter();
   const [data, setData] = useState<FoundationData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [modalVideo, setModalVideo] = useState<WorkoutItem | null>(null);
+  const [myList, setMyList] = useState<Set<string>>(new Set());
 
   const reload = useCallback(async () => {
     if (!user) return;
@@ -31,7 +35,19 @@ export default function FoundationPage() {
 
   useEffect(() => {
     reload();
-  }, [reload]);
+    if (user) getMyList(user.uid).then(setMyList).catch(() => {});
+  }, [reload, user]);
+
+  async function toggleSave(code: string) {
+    if (!user) return;
+    const has = myList.has(code);
+    setMyList((m) => {
+      const n = new Set(m);
+      has ? n.delete(code) : n.add(code);
+      return n;
+    });
+    await setSaved(user.uid, code, !has);
+  }
 
   async function join() {
     if (!user) return;
@@ -68,9 +84,20 @@ export default function FoundationPage() {
         doneCount={doneCount}
         currentIndex={currentIndex}
         perWeek={program.perWeek ?? 5}
-        onPlay={play}
+        onOpen={setModalVideo}
       />
       <Stats program={program} />
+
+      {modalVideo && (
+        <NcardModal
+          video={{ ...modalVideo, phase: modalVideo.phaseIdx }}
+          pool={weeks.flatMap((w) => w.workouts).map((w) => ({ ...w, phase: w.phaseIdx }))}
+          saved={myList.has(modalVideo.code)}
+          onToggleSave={() => toggleSave(modalVideo.code)}
+          onClose={() => setModalVideo(null)}
+          onPlay={(c) => play(c)}
+        />
+      )}
     </div>
   );
 }
@@ -184,10 +211,10 @@ function Journey({
 }
 
 function ThisWeek({
-  week, joined, doneCount, currentIndex, perWeek, onPlay,
+  week, joined, doneCount, currentIndex, perWeek, onOpen,
 }: {
   week?: WeekGroup; joined: boolean; doneCount: number; currentIndex: number; perWeek: number;
-  onPlay: (code: string) => void;
+  onOpen: (v: WorkoutItem) => void;
 }) {
   if (!week) return null;
   const w = week.workouts;
@@ -210,7 +237,7 @@ function ThisWeek({
           "rest" in c ? (
             <div className="pgrest" key={`r${i}`}><span className="ic">🛌</span><span className="lb">Pihenő</span></div>
           ) : (
-            <DayCard key={c.v.code} v={c.v} st={dayState(c.v.order, joined, doneCount, currentIndex)} onClick={() => onPlay(c.v.code)} />
+            <DayCard key={c.v.code} v={c.v} st={dayState(c.v.order, joined, doneCount, currentIndex)} onClick={() => onOpen(c.v)} />
           ),
         )}
       </div>

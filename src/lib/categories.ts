@@ -17,4 +17,10 @@ export const dayGrad = (t: string) => {
   return `linear-gradient(135deg, oklch(from ${c} calc(l + 0.06) c h) 0%, ${c} 62%, oklch(from ${c} calc(l - 0.12) c h) 100%)`;
 };
 
+/** Netflix-card gradient (nxGrad). */
+export const cardGrad = (t: string) => {
+  const c = catOf(t).c;
+  return `linear-gradient(135deg, oklch(from ${c} calc(l + 0.07) c h) 0%, ${c} 100%)`;
+};
+
 export const levelWord = (n: number) => ["Kezdő", "Közepes", "Haladó"][n - 1] ?? "Kezdő";

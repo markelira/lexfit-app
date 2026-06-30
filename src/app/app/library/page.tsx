@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
-import { VideoCard } from "@/components/VideoCard";
+import { NCard } from "@/components/NCard";
 import { getMyList, setSaved } from "@/lib/mylist";
+import { getProgress } from "@/lib/progress";
 import {
   type ActiveFilters, type LibraryData, emptyFilters, filterVideos, loadLibrary,
 } from "@/lib/library";
@@ -21,10 +22,14 @@ export default function LibraryPage() {
   const [active, setActive] = useState<ActiveFilters>(emptyFilters);
   const [q, setQ] = useState("");
   const [refine, setRefine] = useState(false);
+  const [resumeMap, setResumeMap] = useState<Record<string, number>>({});
 
   useEffect(() => {
     loadLibrary().then(setData).catch(() => setFailed(true));
-    if (user) getMyList(user.uid).then(setMyList).catch(() => {});
+    if (user) {
+      getMyList(user.uid).then(setMyList).catch(() => {});
+      getProgress(user.uid).then((p) => p && setResumeMap(p.resume ?? {})).catch(() => {});
+    }
   }, [user]);
 
   const toggle = (group: keyof ActiveFilters, opt: string) =>
@@ -136,12 +141,15 @@ export default function LibraryPage() {
       ) : (
         <div className="lib-grid">
           {results.map((v) => (
-            <VideoCard
+            <NCard
               key={v.code}
               v={v}
+              resume={resumeMap[v.code] != null ? Math.min(1, resumeMap[v.code] / ((v.muxDuration || v.mins * 60) || 1)) : undefined}
               saved={myList.has(v.code)}
               onToggleSave={() => toggleSave(v.code)}
-              onClick={() => router.push(`/player/${v.code}`)}
+              onPlay={(c) => router.push(`/player/${c}`)}
+              pool={data.videos}
+              browse
             />
           ))}
         </div>
