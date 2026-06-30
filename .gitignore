@@ -45,3 +45,6 @@ serviceAccount*.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prototype reference (large; not built/deployed)
+/LEXFIT-design/

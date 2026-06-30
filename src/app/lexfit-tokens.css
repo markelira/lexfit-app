@@ -1,0 +1,100 @@
+/* LEXFIT — design tokens v2 · colors from szavazzmagadra.hu
+   Ported 1:1 from the prototype (LEXFIT-design/lexfit-tokens.css).
+   Fonts are loaded via next/font (see layout.tsx), so the Google Fonts
+   @import was removed and --font/--mono point at the next/font variables. */
+
+:root {
+  /* szavazzmagadra.hu palette: rose pink + warm plum-black + white */
+  --bg: oklch(0.955 0.015 0);            /* solid soft blush — no gradient, not white */
+  --surface: #ffffff;
+  --surface-2: oklch(0.952 0.014 0);
+  --line: oklch(0.91 0.018 0);
+  --ink: oklch(0.245 0.022 350);          /* #2a1f23 warm plum-black */
+  --ink-2: oklch(0.49 0.030 355);
+  --ink-3: oklch(0.63 0.030 355);
+
+  --accent: oklch(0.66 0.155 0);          /* brand rose ~#e5719b */
+  --accent-2: oklch(0.58 0.165 358);      /* deeper rose ~#d56487 */
+  --accent-soft: oklch(0.945 0.030 0);    /* soft pink panel */
+  --accent-ink: oklch(0.50 0.155 358);
+  --ok: oklch(0.63 0.130 152);            /* done green */
+  --ok-soft: oklch(0.945 0.035 152);
+
+  /* categorical cover colors — same family as the site's chip colors */
+  --cat-also: oklch(0.66 0.155 0);        /* alsótest — brand rose */
+  --cat-felso: oklch(0.45 0.085 320);     /* felsőtest — plum */
+  --cat-cardio: oklch(0.68 0.140 45);     /* cardio — warm coral */
+  --cat-teljes: oklch(0.52 0.150 355);    /* teljes test — deep rose */
+  --cat-mobility: oklch(0.66 0.090 155);  /* mobility — sage green */
+  --cat-tartas: oklch(0.62 0.105 295);    /* tartás — lavender */
+
+  /* dark (player) — the site's dark plum sections */
+  --d-bg: oklch(0.245 0.022 350);
+  --d-surface: oklch(0.295 0.025 350);
+  --d-surface-2: oklch(0.34 0.027 350);
+  --d-line: oklch(0.395 0.028 350);
+  --d-ink: oklch(0.965 0.008 0);
+  --d-ink-2: oklch(0.73 0.030 355);
+  --d-accent: oklch(0.72 0.140 0);
+
+  --grad-hero: linear-gradient(135deg, oklch(0.74 0.125 5) 0%, oklch(0.66 0.155 358) 100%);
+
+  --font: var(--font-poppins), "Poppins", "Helvetica Neue", sans-serif;
+  --mono: var(--font-plex-mono), "IBM Plex Mono", monospace;
+
+  --r-sm: 8px; --r-md: 14px; --r-lg: 20px;
+  --shadow-card: 0 1px 2px oklch(0.3 0.03 350 / 0.05), 0 6px 24px -8px oklch(0.45 0.08 0 / 0.13);
+}
+
+.lx { font-family: var(--font); color: var(--ink); background: var(--bg);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+.lx *, .lx *::before, .lx *::after { box-sizing: border-box; }
+.lx h1, .lx h2, .lx h3, .lx p { margin: 0; }
+.lx button { font-family: inherit; cursor: pointer; }
+
+/* ---- shared atoms ---- */
+.lx .mono { font-family: var(--mono); }
+.lx .chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); font-size: 13.5px; font-weight: 500; color: var(--ink-2);
+  white-space: nowrap;
+}
+.lx .chip.on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+
+/* striped placeholder (photos of Alexa etc.) */
+.lx .ph {
+  position: relative; overflow: hidden; background: var(--surface-2);
+  background-image: repeating-linear-gradient(135deg,
+    oklch(0.93 0.020 0) 0 10px, oklch(0.955 0.014 0) 10px 20px);
+  display: flex; align-items: center; justify-content: center;
+}
+.lx .ph span {
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink-3);
+  background: oklch(1 0 0 / 0.85); padding: 4px 9px; border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+.lx .ph.dark { background-image: repeating-linear-gradient(135deg,
+  oklch(0.32 0.025 350) 0 10px, oklch(0.355 0.026 350) 10px 20px); }
+.lx .ph.dark span { background: oklch(0.26 0.022 350 / 0.85); color: var(--d-ink-2); }
+
+/* typographic cover (Spotify-playlist style) */
+.lx .cover { position: relative; overflow: hidden; display: flex; }
+.lx .cover .cv-word {
+  position: absolute; left: 12px; bottom: -0.26em; line-height: 0.82;
+  font-weight: 900; letter-spacing: -0.03em; color: oklch(1 0 0 / 0.92);
+  white-space: nowrap; user-select: none;
+}
+.lx .cover .cv-code {
+  position: absolute; top: 10px; left: 12px; font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.08em; color: oklch(1 0 0 / 0.85);
+  background: oklch(0 0 0 / 0.18); padding: 3px 8px; border-radius: 6px;
+}
+.lx .cover .cv-meta {
+  position: absolute; top: 10px; right: 12px; font-family: var(--mono);
+  font-size: 11px; color: oklch(1 0 0 / 0.8);
+}
+.lx .cover .cv-ring {
+  position: absolute; right: -14%; top: -38%; width: 75%; aspect-ratio: 1;
+  border-radius: 50%; border: 28px solid oklch(1 0 0 / 0.13);
+}

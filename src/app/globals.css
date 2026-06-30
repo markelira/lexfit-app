@@ -1,21 +1,5 @@
-/* ─────────────────────────────────────────────────────────────
-   LEXFIT — global base styles.
-   Placeholder brand tokens below get replaced by the real
-   lexfit-tokens.css from the prototype (Build Plan §Phase 0).
-   ───────────────────────────────────────────────────────────── */
-:root {
-  --lx-bg: #faf7f2;
-  --lx-surface: #ffffff;
-  --lx-ink: #1c1a17;
-  --lx-muted: #6f675d;
-  --lx-line: #e7e0d6;
-  --lx-accent: #c4694f; /* warm terracotta — placeholder */
-  --lx-accent-soft: #f1e3dd;
-  --lx-ok: #4f8a6b;
-
-  --font-sans: var(--font-poppins), system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
-}
+/* LEXFIT global base — real brand tokens ported from the prototype. */
+@import "./lexfit-tokens.css";
 
 * {
   box-sizing: border-box;
@@ -35,11 +19,12 @@ body {
 
 body {
   min-height: 100%;
-  background: var(--lx-bg);
-  color: var(--lx-ink);
-  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   line-height: 1.5;
 }
 
