@@ -81,7 +81,11 @@ export async function markComplete(
     streak = 1;
   }
 
-  const doneCount = (cur.doneCount ?? 0) + 1;
+  // doneCount = number of DISTINCT workouts completed (so replaying one already
+  // done never inflates the count beyond the program's total).
+  const distinctCodes = new Set((cur.completed ?? []).map((c) => c.code));
+  distinctCodes.add(code);
+  const doneCount = distinctCodes.size;
 
   await setDoc(
     ref,
