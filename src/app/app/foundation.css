@@ -88,3 +88,72 @@
 .lx .pgrest .lb { font-size: 10.5px; font-weight: 600; }
 
 .lx .pg { display: flex; flex-direction: column; gap: 32px; }
+
+/* ── weekly split legend ── */
+.lx .pg-split { display: flex; align-items: stretch; gap: 7px; }
+.lx .pg-split .sp { flex: 1; border-radius: 13px; padding: 11px 10px 10px; text-align: center; background: oklch(1 0 0 / 0.66); border: 1px solid oklch(1 0 0 / 0.7); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.8); }
+.lx .pg-split .sp.rest { background: oklch(1 0 0 / 0.22); border-style: dashed; border-color: var(--line); box-shadow: none; }
+.lx .pg-split .sp .dd { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.04em; }
+.lx .pg-split .sp .dot { width: 10px; height: 10px; border-radius: 50%; margin: 8px auto 7px; }
+.lx .pg-split .sp .th { font-size: 11.5px; font-weight: 700; color: var(--ink); line-height: 1.15; text-wrap: balance; }
+.lx .pg-split .sp.rest .th { color: var(--ink-3); font-weight: 600; }
+
+/* ── retest module ── */
+.lx .pg-retest { border-radius: 20px; padding: 22px 24px 24px; background: oklch(1 0 0 / 0.72); border: 1px solid oklch(1 0 0 / 0.7); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.85), 0 8px 26px -18px oklch(0.45 0.08 0 / 0.18); }
+.lx .pg-retest .rt-head { display: flex; align-items: flex-start; gap: 14px; }
+.lx .pg-retest .rt-ic { width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; font-size: 21px; }
+.lx .pg-retest .rt-ttl { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+.lx .pg-retest .rt-sub { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); margin-top: 3px; text-wrap: pretty; max-width: 560px; }
+.lx .pg-retest .rt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+.lx .rt-card { border-radius: 14px; padding: 15px 16px; background: var(--accent-soft); border: 1px solid oklch(0.9 0.03 0); }
+.lx .rt-card .rc-wk { font-size: 11.5px; font-weight: 800; letter-spacing: 0.02em; color: var(--accent-ink); }
+.lx .rt-card .rc-h { font-size: 15.5px; font-weight: 800; margin-top: 7px; color: var(--ink); }
+.lx .rt-card .rc-p { font-size: 12.5px; line-height: 1.5; color: var(--ink-2); margin-top: 5px; text-wrap: pretty; }
+@media (max-width: 720px) { .lx .pg-retest .rt-grid { grid-template-columns: 1fr; } }
+
+/* ── preview-cinema (npview) ── */
+.lx .npview { display: grid; grid-template-columns: 1.3fr 1fr; border-radius: 20px; overflow: hidden; border: 1px solid oklch(1 0 0 / 0.7); background: oklch(1 0 0 / 0.72); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.85), 0 12px 36px -18px oklch(0.45 0.08 0 / 0.22); }
+@media (max-width: 720px) { .lx .npview { grid-template-columns: 1fr; } .lx .npv-stage { min-height: 200px; } }
+.lx .npv-stage { position: relative; min-height: 304px; overflow: hidden; cursor: pointer; border: none; padding: 0; display: flex; }
+.lx .npv-stage .ring { position: absolute; left: -10%; top: -42%; width: 50%; aspect-ratio: 1; border-radius: 50%; border: 26px solid oklch(1 0 0 / 0.13); }
+.lx .npv-stage .word { position: absolute; left: 18px; bottom: -0.22em; font-weight: 900; font-size: 120px; letter-spacing: -0.04em; line-height: 0.8; color: oklch(1 0 0 / 0.15); white-space: nowrap; user-select: none; }
+.lx .npv-stage .vig { position: absolute; inset: 0; background: radial-gradient(80% 80% at 50% 45%, transparent 50%, oklch(0.18 0.03 350 / 0.34) 100%); }
+.lx .npv-kb { position: absolute; inset: 0; transform-origin: 42% 46%; animation: npvKb 18s ease-in-out infinite alternate; }
+@keyframes npvKb { from { transform: scale(1.02); } to { transform: scale(1.16) translate(-2%, -2%); } }
+@media (prefers-reduced-motion: reduce) { .lx .npv-kb { animation: none; } }
+.lx .npv-badge { position: absolute; top: 14px; left: 16px; z-index: 2; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; font-weight: 600; color: white; background: oklch(0 0 0 / 0.28); padding: 5px 11px; border-radius: 999px; backdrop-filter: blur(6px); display: inline-flex; align-items: center; gap: 6px; }
+.lx .npv-dur { position: absolute; top: 14px; right: 16px; z-index: 2; font-family: var(--mono); font-size: 11px; color: white; background: oklch(1 0 0 / 0.16); border: 1px solid oklch(1 0 0 / 0.3); padding: 3px 9px; border-radius: 999px; backdrop-filter: blur(6px); }
+.lx .npv-play { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.16s ease; }
+.lx .npv-stage:hover .npv-play { opacity: 1; }
+.lx .npv-play i { width: 64px; height: 64px; border-radius: 50%; background: oklch(1 0 0 / 0.92); color: var(--ink); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 26px oklch(0.2 0.03 350 / 0.4), inset 0 1px 0 white; transition: transform 0.16s ease; }
+.lx .npv-stage:hover .npv-play i { transform: scale(1.08); }
+.lx .npv-live { position: absolute; bottom: 14px; left: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: oklch(1 0 0 / 0.9); background: oklch(0 0 0 / 0.3); padding: 5px 11px; border-radius: 999px; backdrop-filter: blur(6px); }
+.lx .npv-live .d { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.lx .npv-progress { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; height: 4px; background: oklch(1 0 0 / 0.25); }
+.lx .npv-progress > i { display: block; height: 100%; background: var(--accent); width: 35%; animation: npvProg 16s linear infinite; }
+@keyframes npvProg { from { width: 0; } to { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .lx .npv-progress > i { width: 35%; animation: none; } }
+.lx .npv-info { padding: 24px 28px; display: flex; flex-direction: column; justify-content: center; }
+.lx .npv-ey { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; color: var(--accent-ink); }
+.lx .npv-h { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; margin-top: 8px; line-height: 1.08; text-wrap: balance; }
+.lx .npv-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 13px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.lx .npv-meta i { width: 3px; height: 3px; border-radius: 50%; background: var(--line); font-style: normal; }
+.lx .npv-meta .lvl { font-size: 10px; font-weight: 800; letter-spacing: 0.04em; color: var(--ink-2); text-transform: uppercase; border: 1px solid var(--line); padding: 2px 7px; border-radius: 5px; }
+.lx .npv-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.lx .npv-tags span { font-size: 12px; font-weight: 600; color: var(--accent-ink); background: var(--accent-soft); padding: 5px 11px; border-radius: 999px; }
+.lx .npv-syn { font-size: 13.5px; line-height: 1.55; color: var(--ink-2); margin-top: 12px; text-wrap: pretty; }
+.lx .npv-struct { margin-top: 15px; }
+.lx .npv-struct .ns-h { font-size: 12px; font-weight: 800; letter-spacing: 0.02em; color: var(--ink-2); margin-bottom: 9px; }
+.lx .npv-struct .ns-rows { display: flex; flex-direction: column; gap: 6px; }
+.lx .npv-struct .ns-row { display: flex; align-items: center; gap: 11px; }
+.lx .npv-struct .ns-bar { width: 92px; flex-shrink: 0; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.lx .npv-struct .ns-bar > i { display: block; height: 100%; border-radius: 99px; }
+.lx .npv-struct .ns-nm { font-size: 12.5px; color: var(--ink); font-weight: 600; }
+.lx .npv-struct .ns-m { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.lx .npv-ctas { display: flex; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.lx .npv-play-btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 24px; border-radius: 999px; border: none; cursor: pointer; font-size: 14.5px; font-weight: 800; color: white; background: var(--accent-2); box-shadow: 0 10px 26px -10px oklch(0.58 0.165 358 / 0.55), inset 0 1px 0 oklch(1 0 0 / 0.25); white-space: nowrap; }
+.lx .npv-play-btn:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); transform: translateY(-1px); }
+.lx .npv-railhead { display: flex; align-items: center; gap: 11px; margin-bottom: 13px; }
+.lx .npv-railhead .mono { font-size: 12px; color: var(--ink-3); }
+.lx .npv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 920px) { .lx .npv-grid { grid-template-columns: repeat(2, 1fr); } }
