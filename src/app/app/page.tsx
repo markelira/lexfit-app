@@ -20,9 +20,13 @@ export default function FoundationPage() {
 
   const reload = useCallback(async () => {
     if (!user) return;
-    const d = await loadFoundation(user.uid);
-    setData(d);
-    setLoading(false);
+    try {
+      setData(await loadFoundation(user.uid));
+    } catch {
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {

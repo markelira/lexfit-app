@@ -16,14 +16,15 @@ export default function LibraryPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [data, setData] = useState<LibraryData | null>(null);
+  const [failed, setFailed] = useState(false);
   const [myList, setMyList] = useState<Set<string>>(new Set());
   const [active, setActive] = useState<ActiveFilters>(emptyFilters);
   const [q, setQ] = useState("");
   const [refine, setRefine] = useState(false);
 
   useEffect(() => {
-    loadLibrary().then(setData);
-    if (user) getMyList(user.uid).then(setMyList);
+    loadLibrary().then(setData).catch(() => setFailed(true));
+    if (user) getMyList(user.uid).then(setMyList).catch(() => {});
   }, [user]);
 
   const toggle = (group: keyof ActiveFilters, opt: string) =>
@@ -68,6 +69,7 @@ export default function LibraryPage() {
     setQ("");
   };
 
+  if (failed) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>Nem sikerült betölteni a videótárat. Frissítsd az oldalt.</p>;
   if (!data) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
 
   return (

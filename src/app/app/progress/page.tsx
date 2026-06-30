@@ -20,14 +20,14 @@ export default function HaladasomPage() {
 
   useEffect(() => {
     if (!user) return;
-    Promise.all([getProgress(user.uid), getOnboarding(user.uid), getPhotos(user.uid)]).then(
-      ([p, onb, ph]) => {
+    Promise.all([getProgress(user.uid), getOnboarding(user.uid), getPhotos(user.uid)])
+      .then(([p, onb, ph]) => {
         setProgress(p);
         setWhy(String((onb?.why ?? onb?.motiv ?? "") || ""));
         setPhotos(ph);
-        setLoading(false);
-      },
-    );
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [user]);
 
   if (loading) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
