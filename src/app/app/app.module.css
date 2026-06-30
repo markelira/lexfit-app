@@ -65,8 +65,24 @@
   max-width: 60%;
 }
 
+.play {
+  display: block;
+  margin-top: 1.75rem;
+  text-align: center;
+  padding: 0.85rem 1rem;
+  border-radius: 999px;
+  background: var(--accent-2);
+  color: white;
+  font-weight: 700;
+  font-size: 0.97rem;
+}
+
+.play:hover {
+  opacity: 0.92;
+}
+
 .signout {
-  margin-top: 1.9rem;
+  margin-top: 0.7rem;
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 999px;

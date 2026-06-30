@@ -34,6 +34,10 @@ function AppHome() {
           <Row label="A miértem" value={String(onb?.why ?? onb?.motiv ?? "—")} />
         </section>
 
+        <a className={styles.play} href="/player/F023">
+          ▶ Mai edzés indítása
+        </a>
+
         <button className={styles.signout} onClick={signOutUser}>
           Kijelentkezés
         </button>
