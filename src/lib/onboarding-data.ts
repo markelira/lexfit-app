@@ -39,6 +39,18 @@ export const STEP_OPTIONS = {
     { v: "hat", ic: "🔙", b: "Vigyázz a hátamra", s: "Óvatosan a gerinc-terheléssel." },
     { v: "none", ic: "👍", b: "Nincs külön kérésem", s: "Jöhet bármi, bírom." },
   ],
+  time: [
+    { v: "reggel", ic: "🌅", b: "Reggel", s: "Indítsuk a nappal a mozgást." },
+    { v: "napkozben", ic: "☀️", b: "Napközben", s: "Ebédszünet, vagy két meló közt." },
+    { v: "este", ic: "🌙", b: "Este", s: "A nap végén vezetem le a feszültséget." },
+  ],
+  obstacle: [
+    { v: "ido", ic: "⏳", b: "Nem volt rá időm", s: "Hosszú edzések, tele naptár." },
+    { v: "motiv", ic: "🌧️", b: "Elfogyott a motiváció", s: "Lelkesen kezdtem, aztán abbamaradt." },
+    { v: "hogyan", ic: "❓", b: "Nem tudtam, hogyan", s: "Mit, mennyit, milyen sorrendben?" },
+    { v: "egyedul", ic: "🤍", b: "Egyedül feladtam", s: "Nem volt, aki számon kérjen." },
+    { v: "faradt", ic: "🔋", b: "Túl fáradt voltam", s: "A nap végére semmi energiám." },
+  ],
 } satisfies Record<string, ChoiceOption[]>;
 
 export const AGES = ["18–29", "30–39", "40–49", "50–59", "60+"];
@@ -110,6 +122,7 @@ export const REVEAL = {
   hd: "Itt a heted, {n}.",
   sub: "Ez az 1. heted a Foundation programban. Nem kell kitalálnod semmit — csak kezdd el.",
   cta: "Aktiválom a programom",
+  alexa: "Összeraktam az első heted. Most már csak el kell kezdened — ott leszek végig.",
 };
 
 // Canonical Foundation week split shown on the reveal.

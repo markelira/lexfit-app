@@ -1,11 +1,12 @@
 "use client";
 
+import "../onboarding/onb.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { ensureUserDoc, hasOnboarded } from "@/lib/user";
 import { Loader } from "@/components/Protected";
-import styles from "./login.module.css";
+import { OnbAside } from "@/components/OnbAside";
 
 export default function LoginPage() {
   const { user, loading, signInWithGoogle } = useAuth();
@@ -13,7 +14,6 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Once a user is present, provision their doc and route onward.
   useEffect(() => {
     if (loading || !user) return;
     let active = true;
@@ -41,28 +41,40 @@ export default function LoginPage() {
   if (loading || user) return <Loader />;
 
   return (
-    <div className={styles.page}>
-      <main className={styles.card}>
-        <p className={styles.kicker}>LEXFIT · OTTHONI EDZÉS</p>
-        <h1 className={styles.title}>
-          Egyedül nehéz.
-          <br />
-          Együtt muszáj.
-        </h1>
-        <p className={styles.sub}>
-          Jelentkezz be, és összerakjuk a heted — 30 perc, csak egy matrac, és egy
-          közösség mögötted.
-        </p>
+    <div className="lx">
+      <div className="onb-stage">
+        <div className="onb-shell">
+          <OnbAside welcome />
 
-        <button className={styles.google} onClick={handleSignIn} disabled={busy}>
-          <GoogleMark />
-          {busy ? "Bejelentkezés…" : "Folytatás Google-fiókkal"}
-        </button>
+          <div className="onb-main">
+            <div className="onb-main-center">
+              <div className="onb-login step-in">
+                <h2>Hozz létre fiókot</h2>
+                <p className="onb-sub" style={{ marginTop: 0 }}>
+                  Pár másodperc, és összerakjuk a programod.
+                </p>
 
-        {error && <p className={styles.error}>{error}</p>}
+                <div className="sso-row">
+                  <button type="button" className="sso fb" disabled title="Hamarosan">
+                    <span style={{ fontWeight: 900, fontSize: 17 }}>f</span> Facebook — hamarosan
+                  </button>
+                  <button type="button" className="sso" onClick={handleSignIn} disabled={busy}>
+                    <GoogleMark />
+                    {busy ? "Bejelentkezés…" : "Folytatás Google-lel"}
+                  </button>
+                </div>
 
-        <p className={styles.note}>Apple és Facebook bejelentkezés hamarosan.</p>
-      </main>
+                {error && <p className="onb-err">{error}</p>}
+
+                <p className="onb-legal">
+                  A folytatással elfogadod az ÁSZF-et és az Adatkezelési tájékoztatót.
+                  Apple és Facebook bejelentkezés hamarosan.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,76 @@
+/* LEXFIT shared UI atoms — ported from the prototype's lexfit-app.css.
+   Scoped under .lx so they only apply inside a LEXFIT surface. */
+
+.lx a,
+.lx button {
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+/* ── buttons (capsules) ── */
+.lx .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: none;
+  border-radius: 999px;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font);
+  background: var(--ink);
+  color: var(--surface);
+  cursor: pointer;
+}
+.lx .btn:hover {
+  background: oklch(from var(--ink) calc(l + 0.08) c h);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+.lx .btn:active {
+  transform: translateY(0);
+}
+.lx .btn.accent {
+  background: var(--accent-2);
+  color: white;
+  box-shadow: 0 8px 24px -8px oklch(0.58 0.165 358 / 0.55), inset 0 1px 0 oklch(1 0 0 / 0.25);
+}
+.lx .btn.accent:hover {
+  background: oklch(from var(--accent-2) calc(l - 0.05) c h);
+}
+.lx .btn[disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── chips ── */
+.lx .chip {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: oklch(1 0 0 / 0.5);
+  border: 1px solid oklch(1 0 0 / 0.65);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.7);
+}
+.lx button.chip {
+  cursor: pointer;
+}
+.lx button.chip:hover {
+  background: oklch(1 0 0 / 0.85);
+  color: var(--ink);
+}
+.lx .chip.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
+  box-shadow: none;
+}
+
+/* ── content card ── */
+.lx .card {
+  background: oklch(1 0 0 / 0.72);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid oklch(1 0 0 / 0.7);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.85), 0 10px 36px -16px oklch(0.45 0.08 0 / 0.18);
+}

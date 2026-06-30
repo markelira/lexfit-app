@@ -1,9 +1,11 @@
 "use client";
 
+import "./onb.css";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Protected, Loader } from "@/components/Protected";
+import { OnbAside, Check } from "@/components/OnbAside";
 import {
   BLANK_ONBOARDING,
   hasOnboarded,
@@ -11,13 +13,12 @@ import {
   type OnboardingAnswers,
 } from "@/lib/user";
 import {
-  AGES, DAYS, FLOW, LIFESTAGE, REQUIRED, REVEAL, STEP_COPY, STEP_OPTIONS, WEEK, WELCOME,
+  AGES, DAYS, FLOW, LIFESTAGE, REQUIRED, REVEAL, STEP_COPY, STEP_OPTIONS, WEEK,
   type ChoiceOption,
 } from "@/lib/onboarding-data";
-import styles from "./onboarding.module.css";
 
 const LS_KEY = "lexfit_onb_v2";
-const SCREENS = ["welcome", ...FLOW, "reveal"] as const;
+const SCREENS = [...FLOW, "reveal"] as const;
 type Screen = (typeof SCREENS)[number];
 
 function OnboardingFlow() {
@@ -29,8 +30,6 @@ function OnboardingFlow() {
   const [idx, setIdx] = useState(0);
   const [saving, setSaving] = useState(false);
 
-  // If already onboarded, skip straight to the app. Otherwise restore any
-  // in-progress answers from localStorage.
   useEffect(() => {
     if (!user) return;
     let active = true;
@@ -72,6 +71,8 @@ function OnboardingFlow() {
   }, [screen, answers]);
   const showSkip = isSetup && REQUIRED[screen] === false;
 
+  const alexaLine = screen === "reveal" ? REVEAL.alexa : STEP_COPY[screen]?.alexa;
+
   async function activate() {
     if (!user) return;
     setSaving(true);
@@ -87,68 +88,65 @@ function OnboardingFlow() {
   if (!ready) return <Loader label="Onboarding…" />;
 
   return (
-    <div className={styles.stage}>
-      <div className={styles.shell}>
-        {screen === "welcome" ? (
-          <Welcome onNext={() => go(idx + 1)} />
-        ) : screen === "reveal" ? (
-          <Reveal
-            name={user?.displayName?.split(" ")[0] ?? "te"}
-            onActivate={activate}
-            saving={saving}
-            onBack={() => go(idx - 1)}
-          />
-        ) : (
-          <div className={styles.main}>
-            <div className={styles.top}>
-              <button className={styles.back} onClick={() => go(idx - 1)} aria-label="Vissza">
+    <div className="lx">
+      <div className="onb-stage">
+        <div className="onb-shell">
+          <OnbAside alexaLine={alexaLine} />
+
+          <div className="onb-main">
+            <div className="onb-top">
+              <button
+                className="onb-back"
+                onClick={() => go(idx - 1)}
+                disabled={idx === 0}
+                aria-label="Vissza"
+              >
                 ←
               </button>
-              <div className={styles.progress}>
-                <div className={styles.bar}>
-                  <i style={{ width: `${pct}%` }} />
+              {isSetup && (
+                <div className="onb-prog">
+                  <div className="pg-bar">
+                    <i style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="lbl">
+                    {setupStep}/{FLOW.length}
+                  </span>
                 </div>
-                <span className={styles.progLbl}>
-                  {setupStep}/{FLOW.length}
-                </span>
-              </div>
+              )}
             </div>
 
-            <div className={styles.scroll}>
-              <StepHeading id={screen} />
-              <StepFields screen={screen} answers={answers} set={set} />
+            <div className="onb-scroll">
+              {screen === "reveal" ? (
+                <RevealBody name={user?.displayName?.split(" ")[0] ?? "te"} />
+              ) : (
+                <div className="step-in" key={screen}>
+                  <StepHeading id={screen} />
+                  <StepFields screen={screen} answers={answers} set={set} />
+                </div>
+              )}
             </div>
 
-            <div className={styles.foot}>
-              <button className={styles.cta} disabled={!canNext} onClick={() => go(idx + 1)}>
-                Tovább →
-              </button>
-              {showSkip && (
-                <button className={styles.skip} onClick={() => go(idx + 1)}>
-                  Kihagyom most
+            <div className="onb-foot">
+              {screen === "reveal" ? (
+                <button className="btn accent" onClick={activate} disabled={saving}>
+                  {saving ? "Mentés…" : `${REVEAL.cta} →`}
                 </button>
+              ) : (
+                <>
+                  <button className="btn accent" disabled={!canNext} onClick={() => go(idx + 1)}>
+                    Tovább →
+                  </button>
+                  {showSkip && (
+                    <button className="onb-skip" onClick={() => go(idx + 1)}>
+                      Kihagyom most
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
-  );
-}
-
-function Welcome({ onNext }: { onNext: () => void }) {
-  return (
-    <div className={styles.center}>
-      <p className={styles.kicker}>{WELCOME.eyebrow}</p>
-      <h1 className={styles.welcomeTitle}>
-        {WELCOME.line1}
-        <br />
-        {WELCOME.line2}
-      </h1>
-      <p className={styles.welcomeSub}>{WELCOME.sub}</p>
-      <button className={styles.cta} onClick={onNext}>
-        {WELCOME.cta} →
-      </button>
     </div>
   );
 }
@@ -157,12 +155,52 @@ function StepHeading({ id }: { id: string }) {
   const c = STEP_COPY[id];
   if (!c) return null;
   return (
-    <div className={styles.heading}>
-      <h1 className={styles.q}>{c.hd}</h1>
-      <p className={styles.qsub}>{c.sub}</p>
-      <p className={styles.alexa}>
-        <span className={styles.alexaDot} /> {c.alexa}
-      </p>
+    <>
+      <h1 className="onb-q">{c.hd}</h1>
+      <p className="onb-sub">{c.sub}</p>
+      <div style={{ height: 20 }} />
+    </>
+  );
+}
+
+function OptionCards({
+  options,
+  multi = false,
+  value,
+  onToggle,
+}: {
+  options: ChoiceOption[];
+  multi?: boolean;
+  value: string | number | string[] | null;
+  onToggle: (v: string | number) => void;
+}) {
+  const isOn = (v: string | number) =>
+    multi ? Array.isArray(value) && value.includes(v as string) : value === v;
+  return (
+    <div className="opt-list">
+      {options.map((o) => {
+        const on = isOn(o.v);
+        return (
+          <button
+            key={String(o.v)}
+            className={`opt${multi ? " sq" : ""}${on ? " on" : ""}`}
+            onClick={() => onToggle(o.v)}
+            aria-pressed={on}
+          >
+            <span
+              className="ic"
+              style={o.flames ? { fontSize: o.flames === 3 ? 15 : o.flames === 2 ? 18 : 21, letterSpacing: "-1px" } : undefined}
+            >
+              {o.flames ? "🔥".repeat(o.flames) : o.ic}
+            </span>
+            <span className="tx">
+              <b>{o.b}</b>
+              {o.s && <small>{o.s}</small>}
+            </span>
+            <span className="mk">{on && <Check size={multi ? 13 : 14} />}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -178,204 +216,180 @@ function StepFields({
 }) {
   if (screen === "goal")
     return (
-      <ChoiceList
+      <OptionCards
         options={STEP_OPTIONS.goal}
-        selected={answers.goal}
-        onSelect={(v) => set("goal", v as string)}
+        value={answers.goal}
+        onToggle={(v) => set("goal", answers.goal === v ? null : (v as string))}
       />
     );
   if (screen === "level")
     return (
-      <ChoiceList
+      <OptionCards
         options={STEP_OPTIONS.level}
-        selected={answers.level}
-        onSelect={(v) => set("level", v as number)}
-      />
-    );
-  if (screen === "focus")
-    return (
-      <ChoiceList
-        options={STEP_OPTIONS.focus}
-        multi
-        selected={answers.focus}
-        onToggle={(v) => set("focus", toggle(answers.focus, v as string))}
+        value={answers.level}
+        onToggle={(v) => set("level", answers.level === v ? null : (v as number))}
       />
     );
   if (screen === "env")
     return (
-      <ChoiceList
+      <OptionCards
         options={STEP_OPTIONS.env}
         multi
-        selected={answers.env}
-        onToggle={(v) => set("env", toggle(answers.env, v as string))}
+        value={answers.env}
+        onToggle={(v) => set("env", toggleExclusive(answers.env, v as string, "none"))}
       />
+    );
+  if (screen === "focus")
+    return (
+      <div className="chip-wrap">
+        {STEP_OPTIONS.focus.map((f) => (
+          <button
+            key={f.v}
+            className={`chip${answers.focus.includes(f.v as string) ? " on" : ""}`}
+            onClick={() => set("focus", toggleExclusive(answers.focus, f.v as string, "egesz"))}
+          >
+            {f.ic} {f.b}
+          </button>
+        ))}
+      </div>
     );
   if (screen === "motiv")
     return (
-      <textarea
-        className={styles.textarea}
-        placeholder="Pl. hogy bírjam a gyerekek mellett, és jó legyen a tükörben…"
-        value={answers.motiv}
-        onChange={(e) => set("motiv", e.target.value)}
-        rows={4}
-      />
+      <>
+        <textarea
+          className="onb-textarea"
+          rows={3}
+          maxLength={160}
+          placeholder="Pl. Szeretném, ha a lépcső nem fárasztana ki, és jobban érezzem magam a bőrömben…"
+          value={answers.motiv}
+          onChange={(e) => set("motiv", e.target.value)}
+        />
+        <div className="onb-charcount">{answers.motiv.length}/160</div>
+        <div className="onb-grouphd">Mi állt eddig az utadban?</div>
+        <OptionCards
+          options={STEP_OPTIONS.obstacle}
+          value={answers.obstacle}
+          onToggle={(v) => set("obstacle", answers.obstacle === v ? null : (v as string))}
+        />
+      </>
     );
   if (screen === "schedule")
     return (
-      <div className={styles.segment}>
-        {DAYS.map((d) => (
-          <button
-            key={d.v}
-            className={`${styles.seg} ${answers.days === d.v ? styles.segOn : ""}`}
-            onClick={() => set("days", d.v)}
-          >
-            <span className={styles.segNum}>{d.v}</span>
-            <span className={styles.segLbl}>{d.label}</span>
-          </button>
-        ))}
-      </div>
+      <>
+        <div className="dayseg">
+          {DAYS.map((d) => (
+            <button
+              key={d.v}
+              className={answers.days === d.v ? "on" : ""}
+              onClick={() => set("days", d.v)}
+            >
+              {d.v}
+              <small>{d.label}</small>
+            </button>
+          ))}
+        </div>
+        <div className="onb-grouphd" style={{ marginTop: 22 }}>
+          Mikor a legjobb?
+        </div>
+        <OptionCards
+          options={STEP_OPTIONS.time}
+          value={answers.time}
+          onToggle={(v) => set("time", answers.time === v ? null : (v as string))}
+        />
+      </>
     );
-  if (screen === "about") return <AboutFields answers={answers} set={set} />;
+  if (screen === "about")
+    return (
+      <>
+        <div className="onb-grouphd" style={{ marginTop: 0 }}>
+          Korosztály
+        </div>
+        <div className="chip-wrap">
+          {AGES.map((a) => (
+            <button
+              key={a}
+              className={`chip${answers.age === a ? " on" : ""}`}
+              onClick={() => set("age", answers.age === a ? null : a)}
+            >
+              {a}
+            </button>
+          ))}
+        </div>
+
+        <div className="onb-grouphd">
+          Testadatok <span className="hd-opt">· opcionális</span>
+        </div>
+        <div className="num-row">
+          <div className="onb-field">
+            <label htmlFor="onb-h">Magasság</label>
+            <div className="unit-input">
+              <input
+                id="onb-h"
+                type="number"
+                inputMode="numeric"
+                placeholder="168"
+                value={answers.height}
+                onChange={(e) => set("height", e.target.value)}
+              />
+              <span>cm</span>
+            </div>
+          </div>
+          <div className="onb-field">
+            <label htmlFor="onb-w">Testsúly</label>
+            <div className="unit-input">
+              <input
+                id="onb-w"
+                type="number"
+                inputMode="numeric"
+                placeholder="64"
+                value={answers.weight}
+                onChange={(e) => set("weight", e.target.value)}
+              />
+              <span>kg</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="onb-grouphd">Van olyan, amire figyeljek?</div>
+        <OptionCards
+          options={LIFESTAGE}
+          value={answers.lifestage}
+          onToggle={(v) => set("lifestage", answers.lifestage === v ? null : (v as string))}
+        />
+      </>
+    );
   return null;
 }
 
-function AboutFields({
-  answers,
-  set,
-}: {
-  answers: OnboardingAnswers;
-  set: <K extends keyof OnboardingAnswers>(k: K, v: OnboardingAnswers[K]) => void;
-}) {
+function RevealBody({ name }: { name: string }) {
   return (
-    <div className={styles.about}>
-      <label className={styles.fieldLabel}>Korosztály</label>
-      <div className={styles.chips}>
-        {AGES.map((a) => (
-          <button
-            key={a}
-            className={`${styles.chip} ${answers.age === a ? styles.chipOn : ""}`}
-            onClick={() => set("age", a)}
-          >
-            {a}
-          </button>
+    <div className="step-in">
+      <div className="aside-eyebrow" style={{ color: "var(--accent-ink)" }}>
+        {REVEAL.eyebrow}
+      </div>
+      <h1 className="onb-q" style={{ marginTop: 6 }}>
+        {REVEAL.hd.replace("{n}", name)}
+      </h1>
+      <p className="onb-sub">{REVEAL.sub}</p>
+      <div className="rv-week">
+        {WEEK.map((d, i) => (
+          <div key={d.dd} className={`rv-day${d.work ? "" : " rest"}${i === 0 ? " start" : ""}`}>
+            <span className="dd">{d.dd}</span>
+            <span className="nm">{d.theme}</span>
+            {i === 0 && <span className="rv-pill">1. nap</span>}
+          </div>
         ))}
       </div>
-
-      <div className={styles.twoCol}>
-        <div>
-          <label className={styles.fieldLabel}>Magasság (cm)</label>
-          <input
-            className={styles.input}
-            type="number"
-            inputMode="numeric"
-            value={answers.height}
-            onChange={(e) => set("height", e.target.value)}
-            placeholder="168"
-          />
-        </div>
-        <div>
-          <label className={styles.fieldLabel}>Testsúly (kg)</label>
-          <input
-            className={styles.input}
-            type="number"
-            inputMode="numeric"
-            value={answers.weight}
-            onChange={(e) => set("weight", e.target.value)}
-            placeholder="64"
-          />
-        </div>
-      </div>
-
-      <label className={styles.fieldLabel}>Életszakasz (opcionális)</label>
-      <ChoiceList
-        options={LIFESTAGE}
-        selected={answers.lifestage}
-        onSelect={(v) => set("lifestage", v as string)}
-      />
     </div>
   );
 }
 
-function ChoiceList({
-  options,
-  selected,
-  multi = false,
-  onSelect,
-  onToggle,
-}: {
-  options: ChoiceOption[];
-  selected: string | number | string[] | null;
-  multi?: boolean;
-  onSelect?: (v: string | number) => void;
-  onToggle?: (v: string | number) => void;
-}) {
-  const isOn = (v: string | number) =>
-    multi ? Array.isArray(selected) && selected.includes(v as string) : selected === v;
-  return (
-    <div className={styles.choices}>
-      {options.map((o) => (
-        <button
-          key={o.v}
-          className={`${styles.choice} ${isOn(o.v) ? styles.choiceOn : ""}`}
-          onClick={() => (multi ? onToggle?.(o.v) : onSelect?.(o.v))}
-        >
-          {o.ic && <span className={styles.choiceIc}>{o.ic}</span>}
-          {o.flames != null && (
-            <span className={styles.choiceIc}>{"🔥".repeat(o.flames)}</span>
-          )}
-          <span className={styles.choiceText}>
-            <span className={styles.choiceB}>{o.b}</span>
-            {o.s && <span className={styles.choiceS}>{o.s}</span>}
-          </span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function Reveal({
-  name,
-  onActivate,
-  saving,
-  onBack,
-}: {
-  name: string;
-  onActivate: () => void;
-  saving: boolean;
-  onBack: () => void;
-}) {
-  return (
-    <div className={styles.main}>
-      <div className={styles.top}>
-        <button className={styles.back} onClick={onBack} aria-label="Vissza">
-          ←
-        </button>
-      </div>
-      <div className={styles.scroll}>
-        <p className={styles.kicker}>{REVEAL.eyebrow}</p>
-        <h1 className={styles.q}>{REVEAL.hd.replace("{n}", name)}</h1>
-        <p className={styles.qsub}>{REVEAL.sub}</p>
-
-        <div className={styles.week}>
-          {WEEK.map((d) => (
-            <div key={d.dd} className={`${styles.day} ${d.work ? "" : styles.dayRest}`}>
-              <span className={styles.dayDd}>{d.dd}</span>
-              <span className={styles.dayTheme}>{d.theme}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className={styles.foot}>
-        <button className={styles.cta} onClick={onActivate} disabled={saving}>
-          {saving ? "Mentés…" : `${REVEAL.cta} →`}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function toggle(arr: string[], v: string): string[] {
-  return arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
+// Toggle a value in a multi-select where `exclusive` (e.g. "none"/"egesz")
+// clears the rest, and selecting another clears the exclusive one.
+function toggleExclusive(arr: string[], v: string, exclusive: string): string[] {
+  if (v === exclusive) return arr.includes(exclusive) ? [] : [exclusive];
+  const base = arr.filter((x) => x !== exclusive);
+  return base.includes(v) ? base.filter((x) => x !== v) : [...base, v];
 }
 
 export default function Page() {

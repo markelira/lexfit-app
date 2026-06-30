@@ -1,5 +1,6 @@
 /* LEXFIT global base — real brand tokens ported from the prototype. */
 @import "./lexfit-tokens.css";
+@import "./lx-atoms.css";
 
 * {
   box-sizing: border-box;
