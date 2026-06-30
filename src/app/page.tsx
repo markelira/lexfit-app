@@ -1,34 +1,38 @@
+"use client";
+
+import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 import styles from "./page.module.css";
 
-const SYSTEMS = [
-  { label: "Next.js + TypeScript", state: "ok" as const },
-  { label: "Firebase · Firestore (europe-west3)", state: "ok" as const },
-  { label: "Vercel hosting", state: "ok" as const },
-  { label: "Mux video", state: "ok" as const },
-];
-
 export default function Home() {
+  const { user, loading } = useAuth();
+
   return (
     <div className={styles.page}>
       <main className={styles.card}>
-        <p className={styles.kicker}>Foundation · Live</p>
+        <p className={styles.kicker}>LEXFIT · OTTHONI EDZÉS</p>
 
         <h1 className={styles.wordmark}>
           LEXFIT<span className={styles.dot}>.</span>
         </h1>
         <p className={styles.tagline}>
-          Vezetett, nőközpontú edzésprogram. Az alapok készen állnak — a képernyők
-          következnek.
+          Vezetett, nőközpontú edzésprogram. 30 perc, csak egy matrac, és egy
+          közösség mögötted.
         </p>
 
-        <section className={styles.status} aria-label="System status">
-          {SYSTEMS.map((s) => (
-            <div key={s.label} className={styles.row}>
-              <span className={styles.pill}>● connected</span>
-              <span>{s.label}</span>
-            </div>
-          ))}
-        </section>
+        <div className={styles.cta}>
+          {loading ? (
+            <span className={styles.ctaGhost}>…</span>
+          ) : user ? (
+            <Link href="/app" className={styles.ctaBtn}>
+              Belépek az appba →
+            </Link>
+          ) : (
+            <Link href="/login" className={styles.ctaBtn}>
+              Belépés →
+            </Link>
+          )}
+        </div>
 
         <p className={styles.footer}>
           Prototype → Next.js · Firebase · Mux · Stripe · Vercel

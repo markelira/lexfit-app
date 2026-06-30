@@ -1,0 +1,87 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 2.75rem 2.5rem;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.kicker {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 1.1rem;
+}
+
+.title {
+  font-size: clamp(1.9rem, 6vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.sub {
+  margin-top: 0.9rem;
+  color: var(--ink-2);
+  font-size: 0.97rem;
+  line-height: 1.55;
+}
+
+.google {
+  margin-top: 1.9rem;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--surface);
+  font-family: var(--font);
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.google:hover {
+  opacity: 0.9;
+}
+
+.google:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.google svg {
+  background: white;
+  border-radius: 50%;
+  padding: 1px;
+}
+
+.error {
+  margin-top: 0.9rem;
+  color: var(--accent-2);
+  font-size: 0.85rem;
+}
+
+.note {
+  margin-top: 1.4rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+}

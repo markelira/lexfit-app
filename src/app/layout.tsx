@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth-context";
 
 // LEXFIT brand fonts (per Build Plan §Phase 0). Real design tokens from
 // lexfit-tokens.css get layered in once the prototype files are dropped in.
@@ -28,7 +29,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="hu" className={`${poppins.variable} ${plexMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
