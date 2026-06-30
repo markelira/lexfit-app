@@ -1,13 +1,26 @@
+/* ─────────────────────────────────────────────────────────────
+   LEXFIT — global base styles.
+   Placeholder brand tokens below get replaced by the real
+   lexfit-tokens.css from the prototype (Build Plan §Phase 0).
+   ───────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --lx-bg: #faf7f2;
+  --lx-surface: #ffffff;
+  --lx-ink: #1c1a17;
+  --lx-muted: #6f675d;
+  --lx-line: #e7e0d6;
+  --lx-accent: #c4694f; /* warm terracotta — placeholder */
+  --lx-accent-soft: #f1e3dd;
+  --lx-ok: #4f8a6b;
+
+  --font-sans: var(--font-poppins), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 html {
@@ -22,28 +35,15 @@ body {
 
 body {
   min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--lx-bg);
+  color: var(--lx-ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  line-height: 1.5;
 }
 
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }
