@@ -157,7 +157,9 @@
 .lx .szm-pl-finish .skip { background: none; border: none; color: oklch(1 0 0 / 0.7); font-size: 13px; margin-top: 4px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
 /* ── dark preview ── */
-.lx .szm-pl-prevwrap { align-items: center; justify-content: center; }
+/* match both the descendant case and our same-element case (lx + prevwrap) */
+.lx .szm-pl-prevwrap,
+.lx.szm-pl-prevwrap { align-items: center; justify-content: center; }
 .lx .szm-pl-prev { position: relative; z-index: 1; display: flex; align-items: center; gap: 44px; max-width: 980px; padding: 30px; }
 .lx .szm-pl-prev .prev-poster { position: relative; width: 460px; aspect-ratio: 16 / 9; border-radius: 26px; flex-shrink: 0; overflow: hidden; box-shadow: 0 34px 80px -26px oklch(0.05 0.03 350 / 0.8); }
 .lx .szm-pl-prev .prev-poster .ring { position: absolute; left: -16%; top: -34%; width: 56%; aspect-ratio: 1; border-radius: 50%; border: 26px solid oklch(1 0 0 / 0.12); }
