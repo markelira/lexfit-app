@@ -1,4 +1,6 @@
 // Firebase Admin SDK (server only). NEVER import this into a client component.
+// The `server-only` import makes a client-side import a hard build error.
+import "server-only";
 import { cert, getApp, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 import { getStorage, type Storage } from "firebase-admin/storage";
