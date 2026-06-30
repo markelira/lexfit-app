@@ -29,6 +29,19 @@ See `.env.example`. `.env.local` is git-ignored and mirrored into Vercel for all
 environments. Service-account private key is one line with literal `\n`; the admin init
 restores real newlines.
 
+## Local dev & mock data (IMPORTANT)
+Content (program, videos, filters) is **mock/preview only** and lives **only in the
+Firebase Local Emulator** — production Firestore is intentionally **empty** until real
+content is uploaded via the Phase 7 admin. The seeded Foundation program is throwaway
+preview filler, not real data.
+- `npm run emulators` — Firestore+Storage emulator, imports/exports `./.emulator-data`.
+- `npm run dev:local` — Next dev pointed at the emulator (`NEXT_PUBLIC_USE_EMULATORS=true`,
+  `FIRESTORE_EMULATOR_HOST=127.0.0.1:8080`). Real Google auth still used.
+- `npm run seed:local` — re-seed the emulator from `seed/source/` (+ `scripts/attach-emulator-video.mjs` for the F023 test video).
+- Client emulator wiring: `src/lib/firebase.ts` (guarded by `NEXT_PUBLIC_USE_EMULATORS`).
+- Do NOT seed production. Screens read Firestore at runtime — they are not hardcoded, so
+  they render emulator data in dev and admin-uploaded data in prod with no code changes.
+
 ## Build roadmap (do in order — see docs/build-plan.md)
 0. Foundations & design system  ← scaffold + services wired (current)
 1. Database architecture & content seed

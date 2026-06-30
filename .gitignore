@@ -48,3 +48,9 @@ next-env.d.ts
 
 # prototype reference (large; not built/deployed)
 /LEXFIT-design/
+
+# Firebase emulator local data (mock content — local only)
+/.emulator-data/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

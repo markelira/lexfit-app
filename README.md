@@ -7,11 +7,19 @@ library). Production rebuild of a finished prototype. Full spec: [`docs/build-pl
 - **Next.js 16** (App Router, TypeScript) · **Firebase** (Auth, Firestore `europe-west3`, Storage)
 - **Mux** (video, signed playback) · **Stripe** (subscriptions, Phase 6) · **Vercel** (hosting + auto-deploy)
 
-## Local development
+## Local development (mock data in the emulator)
+Mock/preview content (program, videos, filters) lives **only** in the Firebase
+Local Emulator — production Firestore stays empty until real content is uploaded
+via the admin. Auth stays on real Firebase (real Google sign-in).
+
+Two terminals:
 ```bash
-npm install
-npm run dev          # http://localhost:3000
+npm run emulators    # Firestore + Storage emulator, loads ./.emulator-data
+npm run dev:local    # Next dev pointed at the emulator  → http://localhost:3000
 ```
+Emulator UI: http://localhost:4000 · Re-seed mock data (with emulators running):
+`npm run seed:local`. Without emulators, `npm run dev` runs against real Firebase.
+
 Environment variables: copy `.env.example` → `.env.local` and fill in (see `CLAUDE.md`).
 `.env.local` is git-ignored and mirrored into Vercel for every environment.
 
