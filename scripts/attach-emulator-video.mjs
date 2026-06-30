@@ -6,6 +6,9 @@ import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
 const PLAYBACK = process.env.MUX_TEST_PLAYBACK || "Jesvqhi026cuUAacaHaElapfXVJ2RzuO6NRrzXTXtqqI";
+// Attach the (single real) test asset to a few codes so the home + player are
+// testable in dev without filming. F001 = week-1 first card, F018 = "today", F023.
+const CODES = ["F001", "F002", "F018", "F023"];
 
 const pk = process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, "\n");
 if (!getApps().length) {
@@ -19,15 +22,17 @@ if (!getApps().length) {
 }
 const db = getFirestore();
 
-await db.collection("videos").doc("F023").set(
-  {
-    muxPlaybackId: PLAYBACK,
-    muxStatus: "ready",
-    muxDuration: 24,
-    published: true,
-    updatedAt: FieldValue.serverTimestamp(),
-  },
-  { merge: true },
-);
-console.log("✅ emulator F023 → test playbackId", PLAYBACK);
+for (const code of CODES) {
+  await db.collection("videos").doc(code).set(
+    {
+      muxPlaybackId: PLAYBACK,
+      muxStatus: "ready",
+      muxDuration: 24,
+      published: true,
+      updatedAt: FieldValue.serverTimestamp(),
+    },
+    { merge: true },
+  );
+}
+console.log("✅ emulator test video attached to", CODES.join(", "));
 process.exit(0);

@@ -1,0 +1,206 @@
+/* LEXFIT app shell — glass sidebar, ported from lexfit-app.css. Scoped under .lx. */
+
+.lx .lx-sidebar {
+  width: 244px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 14px;
+  z-index: 10;
+  height: calc(100dvh - 28px);
+  margin: 14px 6px 14px 14px;
+  padding: 18px 13px 13px;
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  background: oklch(1 0 0 / 0.58);
+  backdrop-filter: blur(32px) saturate(1.9);
+  -webkit-backdrop-filter: blur(32px) saturate(1.9);
+  border: 1px solid oklch(1 0 0 / 0.7);
+  box-shadow: inset 0 1.5px 0 oklch(1 0 0 / 0.95), inset 0 0 0 1px oklch(1 0 0 / 0.22),
+    inset 0 -18px 40px -28px oklch(0.58 0.165 358 / 0.25),
+    0 26px 56px -24px oklch(0.45 0.08 0 / 0.4), 0 6px 18px -10px oklch(0.45 0.08 0 / 0.22);
+}
+.lx .lx-sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(135% 64% at 50% -14%, oklch(1 0 0 / 0.6), transparent 58%),
+    linear-gradient(180deg, oklch(from var(--accent) 0.92 0.06 h / 0.07), transparent 26%);
+}
+.lx .lx-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.lx .lx-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 4px 12px 0;
+}
+.lx .lx-brand .mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--accent-2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 14px -5px oklch(0.58 0.165 358 / 0.6), inset 0 1px 0 oklch(1 0 0 / 0.3);
+}
+.lx .lx-brand .wm {
+  font-weight: 900;
+  font-size: 21px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.lx .lx-brand .wm span {
+  color: var(--accent-2);
+}
+
+.lx .lx-navsec {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0 14px;
+  margin: 28px 0 9px;
+}
+.lx .lx-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.lx .nav2 {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  position: relative;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.lx .nav2 svg {
+  color: var(--ink-3);
+  flex-shrink: 0;
+  transition: color 0.14s ease;
+}
+.lx .nav2:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.lx .nav2:hover svg {
+  color: var(--ink-2);
+}
+.lx .nav2.on {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+.lx .nav2.on svg {
+  color: var(--accent-2);
+}
+.lx .nav2.on::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3.5px;
+  height: 19px;
+  border-radius: 3px;
+  background: var(--accent-2);
+  box-shadow: 0 0 8px -1px oklch(0.58 0.165 358 / 0.6);
+}
+
+.lx .lx-prof {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border-radius: 16px;
+  border: 1px solid oklch(1 0 0 / 0.6);
+  background: oklch(1 0 0 / 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.8);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+.lx .lx-prof:hover {
+  background: oklch(1 0 0 / 0.72);
+}
+.lx .lx-prof.on {
+  background: var(--accent-soft);
+  border-color: oklch(0.9 0.03 0);
+}
+.lx .lx-prof .av {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--accent-2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+}
+.lx .lx-prof .pi {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.lx .lx-prof .nm {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+.lx .lx-prof .sb {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+.lx .lx-prof .chev {
+  margin-left: auto;
+  color: var(--ink-3);
+}
+
+/* responsive: stack the sidebar on top on narrow screens */
+@media (max-width: 760px) {
+  .lx .lx-shell { flex-direction: column; }
+  .lx .lx-sidebar {
+    width: auto;
+    height: auto;
+    position: static;
+    margin: 12px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .lx .lx-navsec { display: none; }
+  .lx .lx-nav { flex-direction: row; flex: 1; }
+  .lx .nav2 { width: auto; }
+  .lx .lx-prof { margin-top: 0; width: auto; }
+  .lx .lx-prof .pi { display: none; }
+}
