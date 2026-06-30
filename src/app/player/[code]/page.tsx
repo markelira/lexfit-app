@@ -103,6 +103,11 @@ function PlayerScreen({ code }: { code: string }) {
       setPb(data);
       setStage("playing");
     } catch (e) {
+      // No active subscription → send to the paywall.
+      if (e instanceof Error && e.message === "forbidden") {
+        router.push("/subscribe");
+        return;
+      }
       setPbError(e instanceof Error ? e.message : "A videó nem elérhető.");
     }
   }

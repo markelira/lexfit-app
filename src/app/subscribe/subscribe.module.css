@@ -1,0 +1,121 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-card);
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+
+.title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.sub {
+  margin-top: 0.6rem;
+  color: var(--ink-2);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.plan {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 18px;
+  padding: 1.1rem 1.25rem;
+  background: var(--grad-hero);
+  color: white;
+  box-shadow: 0 14px 34px -16px oklch(0.66 0.155 0 / 0.55);
+}
+
+.planName { font-size: 1rem; font-weight: 800; }
+.planPer { font-size: 0.78rem; color: oklch(1 0 0 / 0.85); margin-top: 0.2rem; }
+.planPrice { text-align: right; white-space: nowrap; }
+.amt { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.01em; }
+.per { font-size: 0.85rem; color: oklch(1 0 0 / 0.85); margin-left: 0.2rem; }
+
+.feat {
+  list-style: none;
+  margin: 1.5rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.feat li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.fk {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--ok-soft);
+  color: var(--ok);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta {
+  width: 100%;
+  padding: 0.95rem 1.25rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent-2);
+  color: white;
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 26px -10px oklch(0.58 0.165 358 / 0.55);
+}
+
+.cta:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
+.cta:disabled { opacity: 0.6; cursor: default; }
+
+.ghost {
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.error { margin-top: 0.8rem; color: var(--accent-2); font-size: 0.85rem; text-align: center; }
+.note { margin-top: 1rem; font-size: 0.75rem; color: var(--ink-3); text-align: center; }
