@@ -214,11 +214,20 @@ function PlayerScreen({ code }: { code: string }) {
                 </div>
               ))}
             </div>
-            <button className="btn accent" style={{ fontSize: 17, padding: "16px 44px", marginTop: 4 }} onClick={start}>
-              ▶ {resumeAt > 1 ? "Folytatom" : "Kezdjük"}
-            </button>
-            {pbError && <span style={{ display: "block", marginTop: 10, color: "var(--accent)", fontSize: 13.5 }}>{pbError}</span>}
-            <span className="prev-note">Alexa végig veled csinálja.</span>
+            {video.muxPlaybackId ? (
+              <>
+                <button className="btn accent" style={{ fontSize: 17, padding: "16px 44px", marginTop: 4 }} onClick={start}>
+                  ▶ {resumeAt > 1 ? "Folytatom" : "Kezdjük"}
+                </button>
+                {pbError && <span style={{ display: "block", marginTop: 10, color: "var(--accent)", fontSize: 13.5 }}>{pbError}</span>}
+                <span className="prev-note">Alexa végig veled csinálja.</span>
+              </>
+            ) : (
+              <>
+                <span className="chip" style={{ marginTop: 4, padding: "12px 22px" }}>🎬 A videó hamarosan elérhető</span>
+                <span className="prev-note">Ez az edzés még készül — nézz vissza később.</span>
+              </>
+            )}
           </div>
         </div>
       </div>
