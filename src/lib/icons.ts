@@ -11,4 +11,6 @@ export const lxPaths: Record<string, string | string[]> = {
   plus: ["M12 5 V19", "M5 12 H19"],
   play: "M7 4 L19 12 L7 20 Z",
   lock: ["M6 11 H18 V20 H6 Z", "M9 11 V8 a3 3 0 0 1 6 0 V11"],
+  search: ["M11 18 a7 7 0 1 0 0-14 a7 7 0 0 0 0 14 Z", "M16 16 L21 21"],
+  filter: ["M4 5 H20", "M7 12 H17", "M10 19 H14"],
 };

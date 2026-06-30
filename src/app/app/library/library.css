@@ -1,0 +1,70 @@
+/* LEXFIT Videótár — ported from screen-library.css. Scoped under .lx. */
+.lx .lib-page { display: flex; flex-direction: column; gap: 30px; }
+
+/* sticky bar */
+.lx .lib-bar { display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 20;
+  padding: 14px 0; margin: -6px 0 -8px; background: linear-gradient(to bottom, var(--bg) 70%, transparent); }
+.lx .lib-bar h1 { font-size: 25px; font-weight: 800; letter-spacing: -0.01em; }
+.lx .lib-bar .mono { font-size: 11px; color: var(--ink-3); letter-spacing: 0.05em; }
+.lx .lib-search { margin-left: auto; position: relative; display: flex; align-items: center; }
+.lx .lib-search > svg { position: absolute; left: 14px; color: var(--ink-3); pointer-events: none; }
+.lx .lib-search input { width: 300px; padding: 11px 38px 11px 40px; border-radius: 999px;
+  border: 1px solid oklch(1 0 0 / 0.7); background: oklch(1 0 0 / 0.6);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.8); font-family: inherit; font-size: 14px; color: var(--ink); outline: none; }
+.lx .lib-search input:focus { box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.8), 0 0 0 3px var(--accent-soft); }
+.lx .lib-search .clr { position: absolute; right: 12px; cursor: pointer; color: var(--ink-3);
+  background: none; border: none; font-size: 17px; line-height: 1; display: flex; }
+.lx .lib-refine { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px;
+  cursor: pointer; font-size: 14px; font-weight: 700; color: var(--ink); border: 1px solid var(--line);
+  background: oklch(1 0 0 / 0.6); white-space: nowrap; }
+.lx .lib-refine:hover { background: oklch(1 0 0 / 0.85); }
+.lx .lib-refine.on { background: var(--ink); color: var(--surface); border-color: transparent; }
+.lx .lib-refine .cnt { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px;
+  padding: 0 5px; border-radius: 99px; background: var(--accent); color: white; font-size: 11px; font-weight: 700; }
+
+/* refine panel */
+.lx .lib-refinepanel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 22px;
+  padding: 22px 24px; border-radius: 20px; background: oklch(1 0 0 / 0.6);
+  border: 1px solid oklch(1 0 0 / 0.7); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.8); }
+.lx .frail-hd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.07em; margin-bottom: 7px; }
+.lx .frail-opt { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; padding: 7px 8px;
+  border-radius: 9px; border: none; background: none; cursor: pointer; font-size: 13.5px; color: var(--ink-2); }
+.lx .frail-opt:hover { background: var(--surface-2); }
+.lx .frail-opt.on { color: var(--accent-ink); font-weight: 700; }
+.lx .frail-opt .box { width: 18px; height: 18px; flex-shrink: 0; border-radius: 6px; border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center; color: white; }
+.lx .frail-opt.on .box { background: var(--accent); border-color: var(--accent); }
+
+/* results */
+.lx .lib-resmeta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.lx .lib-resmeta .linkish { background: none; border: none; color: var(--accent-ink); font-weight: 600; cursor: pointer; }
+.lx .lib-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 920px) { .lx .lib-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ── video card ── */
+.lx .lvcard { position: relative; }
+.lx .lvcard-art { position: relative; display: flex; width: 100%; aspect-ratio: 16/10; border-radius: 14px;
+  overflow: hidden; border: none; cursor: pointer; padding: 0; text-align: left;
+  box-shadow: 0 7px 20px -12px oklch(0.45 0.08 0 / 0.4); transition: transform 0.16s ease, box-shadow 0.16s ease; }
+.lx .lvcard-art:hover { transform: translateY(-3px); box-shadow: 0 16px 38px -14px oklch(0.45 0.10 0 / 0.45); }
+.lx .lvcard-art .ring { position: absolute; left: -12%; top: -44%; width: 56%; aspect-ratio: 1; border-radius: 50%;
+  border: 18px solid oklch(1 0 0 / 0.12); }
+.lx .lvcard-art .word { position: absolute; left: 12px; bottom: -0.2em; font-weight: 900; font-size: 40px;
+  letter-spacing: -0.04em; line-height: 0.8; color: oklch(1 0 0 / 0.16); white-space: nowrap; }
+.lx .lvcard-art::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, oklch(0.18 0.03 350 / 0.78) 0%, oklch(0.18 0.03 350 / 0.1) 45%, transparent 62%); }
+.lx .lvcard-dur { position: absolute; top: 9px; left: 10px; z-index: 2; font-family: var(--mono); font-size: 9.5px;
+  font-weight: 600; letter-spacing: 0.05em; color: oklch(1 0 0 / 0.92); background: oklch(0 0 0 / 0.22);
+  padding: 3px 8px; border-radius: 5px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.lx .lvcard-play { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center;
+  color: var(--ink); opacity: 0; transition: opacity 0.16s ease; }
+.lx .lvcard-art:hover .lvcard-play { opacity: 1; }
+.lx .lvcard-play svg { width: 46px; height: 46px; padding: 13px; border-radius: 50%; background: oklch(1 0 0 / 0.92);
+  box-shadow: 0 6px 18px oklch(0.2 0.03 350 / 0.4); }
+.lx .lvcard-title { position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 2; font-weight: 800;
+  font-size: 13px; line-height: 1.15; color: white; text-shadow: 0 1px 8px oklch(0 0 0 / 0.4); text-wrap: balance; }
+.lx .lvcard-save { position: absolute; top: 8px; right: 8px; z-index: 3; width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid oklch(1 0 0 / 0.4); background: oklch(0.2 0.03 350 / 0.4); color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.lx .lvcard-save:hover { background: oklch(0.2 0.03 350 / 0.7); }
+.lx .lvcard-save.on { background: var(--ok); border-color: var(--ok); }
