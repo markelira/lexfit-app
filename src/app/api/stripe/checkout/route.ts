@@ -1,33 +1,104 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { verifyRequest } from "@/lib/auth-server";
-import { getOrCreateCustomer, getStripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
+import { getOrCreateCustomer, subscriptionRef } from "@/lib/pricing/subscription";
+import {
+  priceIdForRole,
+  recordConsent,
+  validateConsent,
+  type ConsentInput,
+} from "@/lib/pricing/checkout-server";
+import { isCheckoutRole, isRecurringRole, type PriceRole } from "@/lib/pricing/config";
+import { logEvent } from "@/lib/pricing/events";
+import type { SubscriptionDoc } from "@/lib/pricing/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Create a subscription Checkout session for the signed-in user. */
+/**
+ * Create a Checkout session for a chosen product.
+ *
+ * Flow (F1.2): validate the two consents → persist an auditable consent record
+ * → only THEN create the Stripe session. No persisted consent, no checkout.
+ * Recurring = subscription mode (needs J1 + J2 consent); one-off = payment mode
+ * (needs J2 consent). The weekly recurring role enters on the intro price; the
+ * intro→standard schedule + once-per-user guard are F2.1.
+ */
 export async function POST(req: Request) {
   const token = await verifyRequest(req);
   if (!token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const price = process.env.STRIPE_PRICE_MONTHLY;
-  if (!price) return NextResponse.json({ error: "no price configured" }, { status: 500 });
+  const body = (await req.json().catch(() => ({}))) as {
+    role?: string;
+    autoRenew?: boolean;
+    immediateStart?: boolean;
+  };
+  const role = body.role;
+  if (!role || !isCheckoutRole(role)) {
+    return NextResponse.json({ error: "invalid_role" }, { status: 400 });
+  }
+
+  const consent: ConsentInput = {
+    autoRenew: isRecurringRole(role) ? body.autoRenew === true : null,
+    immediateStart: body.immediateStart === true,
+  };
+  const consentError = validateConsent(role, consent);
+  if (consentError) return NextResponse.json({ error: consentError }, { status: 400 });
+
+  // Persist consent BEFORE creating the session — if this throws, no checkout.
+  const consentId = await recordConsent(token.uid, role, consent, {
+    ip: req.headers.get("x-forwarded-for"),
+    userAgent: req.headers.get("user-agent"),
+  });
+
+  // F2.1 — the 490 Ft weekly intro is once per user. The guard is SERVER-SIDE,
+  // decided here at session creation (never trusted from the UI): a returning
+  // weekly buyer gets the standard price directly, with no intro schedule.
+  let priceRole: PriceRole = role;
+  let scheduleWeekly = false;
+  if (role === "week_intro") {
+    const existing = (await subscriptionRef(token.uid).get()).data() as
+      | SubscriptionDoc
+      | undefined;
+    if (existing?.weekIntroUsed) {
+      priceRole = "week_std"; // returning weekly buyer → straight to standard
+    } else {
+      scheduleWeekly = true; // first-timer → intro price now, step-up via schedule
+    }
+  }
 
   const origin = req.headers.get("origin") ?? "http://localhost:3000";
   const customer = await getOrCreateCustomer(token.uid, token.email);
+  const price = await priceIdForRole(priceRole);
+  const recurring = isRecurringRole(role);
+  const meta = {
+    uid: token.uid,
+    role,
+    priceRole,
+    consentId,
+    scheduleWeekly: String(scheduleWeekly),
+  };
 
   const session = await getStripe().checkout.sessions.create({
-    mode: "subscription",
+    mode: recurring ? "subscription" : "payment",
     customer,
     line_items: [{ price, quantity: 1 }],
     success_url: `${origin}/app?sub=success`,
     cancel_url: `${origin}/subscribe?canceled=1`,
     client_reference_id: token.uid,
-    subscription_data: { metadata: { uid: token.uid } },
-    allow_promotion_codes: true,
     locale: "hu",
+    // Collect name + billing address for the NAV-compliant invoice (F0.6),
+    // and persist them onto the Stripe customer.
+    billing_address_collection: "required",
+    customer_update: { address: "auto", name: "auto" },
+    metadata: meta,
+    ...(recurring
+      ? { subscription_data: { metadata: meta } }
+      : { payment_intent_data: { metadata: meta } }),
   });
+
+  await logEvent("checkout_started", { uid: token.uid, props: { role, consentId } });
 
   return NextResponse.json({ url: session.url });
 }

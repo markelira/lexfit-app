@@ -1,0 +1,156 @@
+import "server-only";
+import { adminDb } from "@/lib/firebase-admin";
+import { notifyAdmin } from "./events";
+
+// F0.6 — NAV-compliant invoicing via Billingo (v3 REST/JSON). Chosen over
+// Számlázz.hu for its modern JSON API. Every displayed price is GROSS HUF with
+// 27% ÁFA included (J5); Billingo derives the net/VAT split from `unit_price_type
+// = gross` + `vat = "27%"`.
+//
+// Idempotent per Stripe ref (invoice id / payment-intent id): a marker doc in
+// `issuedInvoices/{ref}` guarantees one legal invoice per payment even across
+// webhook retries. Failures are recorded (status "failed") for the cron retry.
+//
+// Without BILLINGO_API_KEY / BILLINGO_BLOCK_ID (local dev) issuance is skipped
+// and logged, so nothing breaks before the account is wired.
+
+const API = "https://api.billingo.hu/v3";
+
+export interface InvoiceParty {
+  name: string | null;
+  email: string | null;
+  address: {
+    line1?: string | null;
+    line2?: string | null;
+    city?: string | null;
+    postalCode?: string | null;
+    country?: string | null;
+  } | null;
+}
+
+export interface InvoicePayload {
+  party: InvoiceParty;
+  amountHuf: number; // gross forints (VAT included)
+  description: string;
+  fulfillmentDate: string; // YYYY-MM-DD
+}
+
+function config() {
+  const key = process.env.BILLINGO_API_KEY;
+  const blockId = process.env.BILLINGO_BLOCK_ID;
+  return key && blockId ? { key, blockId: Number(blockId) } : null;
+}
+
+async function billingo(key: string, path: string, body: unknown): Promise<Record<string, unknown>> {
+  const res = await fetch(`${API}${path}`, {
+    method: "POST",
+    headers: { "X-API-KEY": key, "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Billingo ${res.status}: ${await res.text().catch(() => "")}`);
+  return (await res.json().catch(() => ({}))) as Record<string, unknown>;
+}
+
+/** Find a partner by email, or create one. Returns the Billingo partner id. */
+async function upsertPartner(key: string, party: InvoiceParty): Promise<number> {
+  if (party.email) {
+    const q = await fetch(`${API}/partners?query=${encodeURIComponent(party.email)}`, {
+      headers: { "X-API-KEY": key, Accept: "application/json" },
+    });
+    if (q.ok) {
+      const data = (await q.json().catch(() => ({}))) as { data?: Array<{ id: number }> };
+      if (data.data?.[0]?.id) return data.data[0].id;
+    }
+  }
+  const created = await billingo(key, "/partners", {
+    name: party.name ?? party.email ?? "Vevő",
+    emails: party.email ? [party.email] : [],
+    address: {
+      country_code: (party.address?.country ?? "HU").toUpperCase(),
+      post_code: party.address?.postalCode ?? "",
+      city: party.address?.city ?? "",
+      address: [party.address?.line1, party.address?.line2].filter(Boolean).join(", "),
+    },
+  });
+  return created.id as number;
+}
+
+/**
+ * Issue exactly one invoice for a Stripe payment `ref`. Idempotent. Returns true
+ * if issued (or already issued), false if it failed (recorded for retry).
+ */
+export async function issueInvoice(ref: string, payload: InvoicePayload): Promise<boolean> {
+  const markerRef = adminDb.collection("issuedInvoices").doc(ref);
+
+  // Claim the ref atomically so retries/concurrent deliveries don't double-issue.
+  const claimed = await adminDb.runTransaction(async (tx) => {
+    const snap = await tx.get(markerRef);
+    if (snap.exists && snap.data()?.status === "issued") return false;
+    tx.set(markerRef, { status: "pending", ref, at: Date.now(), payload }, { merge: true });
+    return true;
+  });
+  if (!claimed) return true; // already issued
+
+  const cfg = config();
+  if (!cfg) {
+    console.log(`[invoice] skipped (no BILLINGO_API_KEY/BLOCK_ID) ref=${ref} ${payload.amountHuf} Ft`);
+    await markerRef.set({ status: "skipped_no_config" }, { merge: true });
+    return false;
+  }
+
+  try {
+    const partnerId = await upsertPartner(cfg.key, payload.party);
+    const doc = await billingo(cfg.key, "/documents", {
+      partner_id: partnerId,
+      block_id: cfg.blockId,
+      type: "invoice",
+      fulfillment_date: payload.fulfillmentDate,
+      due_date: payload.fulfillmentDate,
+      payment_method: "bankcard",
+      language: "hu",
+      currency: "HUF",
+      conversion_rate: 1,
+      electronic: true,
+      paid: true,
+      items: [
+        {
+          name: payload.description,
+          unit_price: payload.amountHuf,
+          unit_price_type: "gross", // 27% ÁFA already inside the gross price
+          quantity: 1,
+          unit: "db",
+          vat: "27%",
+        },
+      ],
+    });
+    // Best-effort: email the invoice to the buyer.
+    await billingo(cfg.key, `/documents/${doc.id}/send`, {}).catch(() => {});
+    await markerRef.set({ status: "issued", billingoId: doc.id, at: Date.now() }, { merge: true });
+    return true;
+  } catch (e) {
+    const error = e instanceof Error ? e.message : String(e);
+    await markerRef.set({ status: "failed", error, at: Date.now() }, { merge: true });
+    await notifyAdmin("invoice_failed", { ref, amountHuf: payload.amountHuf, error });
+    console.error(`[invoice] failed ref=${ref}:`, error);
+    return false;
+  }
+}
+
+/** Cron: retry invoices that previously failed. */
+export async function retryFailedInvoices(limit = 25): Promise<number> {
+  const snap = await adminDb
+    .collection("issuedInvoices")
+    .where("status", "==", "failed")
+    .limit(limit)
+    .get();
+  let ok = 0;
+  for (const d of snap.docs) {
+    const data = d.data() as { payload?: InvoicePayload };
+    if (!data.payload) continue;
+    // Reset to pending so issueInvoice re-attempts (its claim tx allows retry
+    // because status !== "issued").
+    await d.ref.set({ status: "pending" }, { merge: true });
+    if (await issueInvoice(d.id, data.payload)) ok++;
+  }
+  return ok;
+}

@@ -1,0 +1,155 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 2.4rem;
+  box-shadow: var(--shadow-card);
+}
+
+.back {
+  background: none;
+  border: none;
+  color: var(--ink-3);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+.title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: var(--ink);
+}
+.sub {
+  margin-top: 0.7rem;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* ── Three equal options (J3): identical styling, no emphasised choice ── */
+.options {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.opt {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  padding: 1.15rem 1.2rem;
+  background: var(--surface);
+}
+.optTitle { font-size: 1.02rem; font-weight: 700; color: var(--ink); }
+.optBody { margin-top: 0.3rem; font-size: 0.85rem; color: var(--ink-2); line-height: 1.45; }
+.optCta {
+  margin-top: 0.9rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2, oklch(0.98 0.004 300));
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.optCta:hover { border-color: var(--ink-3); }
+
+/* Primary action button — used identically on every confirm screen. */
+.primary {
+  margin-top: 1.4rem;
+  width: 100%;
+  padding: 0.95rem 1.25rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent-2);
+  color: white;
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 26px -10px oklch(0.58 0.165 358 / 0.55);
+}
+.primary:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
+.primary:disabled { opacity: 0.6; cursor: default; }
+
+/* Pause month selector. */
+.segmented {
+  margin-top: 1.3rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+.seg,
+.segActive {
+  padding: 0.7rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.segActive {
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+  background: oklch(from var(--accent-2) l c h / 0.08);
+}
+
+/* Post-cancel, skippable reason picker. */
+.reasonBox {
+  margin-top: 1.4rem;
+  padding: 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  background: var(--surface-2, oklch(0.98 0.004 300));
+}
+.reasonQ { font-size: 0.85rem; color: var(--ink-2); font-weight: 600; }
+.reasonList { margin-top: 0.7rem; display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.reasonBtn {
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.reasonBtn:hover { border-color: var(--ink-3); }
+.skip {
+  margin-top: 0.8rem;
+  background: none;
+  border: none;
+  color: var(--ink-3);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.error { margin-top: 0.8rem; color: var(--accent-2); font-size: 0.85rem; }
