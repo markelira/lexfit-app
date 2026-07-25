@@ -11,7 +11,9 @@ import { Protected, Loader } from "@/components/Protected";
 import { Check } from "@/components/OnbAside";
 import { getPlaybackTokens, type PlaybackResponse } from "@/lib/playback";
 import { ensureProgress, getProgress, markComplete, saveResume } from "@/lib/progress";
+import { normalizeExercise } from "@/lib/blocks";
 import type { Video, VideoBlock } from "@/lib/types";
+import { secToClock } from "@/lib/time";
 
 const CAT: Record<string, { c: string; word: string }> = {
   "Alsótest": { c: "var(--cat-also)", word: "ALSÓ" },
@@ -51,6 +53,8 @@ function PlayerScreen({ code }: { code: string }) {
   const [resumeAt, setResumeAt] = useState(0);
 
   const [stage, setStage] = useState<"preview" | "playing" | "finished">("preview");
+  const [wantAutostart, setWantAutostart] = useState(false);
+  const startedRef = useRef(false);
   const [pb, setPb] = useState<PlaybackResponse | null>(null);
   const [pbError, setPbError] = useState<string | null>(null);
   const [cur, setCur] = useState(0);
@@ -77,17 +81,64 @@ function PlayerScreen({ code }: { code: string }) {
     return () => { active = false; };
   }, [user, code]);
 
+  // Seed duration from the stored Mux duration so stamped block math is correct
+  // before the player's own `loadedmetadata` fires (which then sets the exact value).
+  useEffect(() => {
+    if (video?.muxDuration) setDur(video.muxDuration);
+  }, [video]);
+
+  // Skip the player's own preview stage when arrived via an explicit "play" action
+  // (e.g. the detail modal's "Edzés indítása") — go straight into playback.
+  useEffect(() => {
+    setWantAutostart(new URLSearchParams(window.location.search).get("autostart") === "1");
+  }, []);
+  useEffect(() => {
+    if (wantAutostart && !startedRef.current && stage === "preview" && video?.muxPlaybackId) {
+      startedRef.current = true;
+      void start();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wantAutostart, video, stage]);
+
+  // Prefetch the signed playback token the moment the preview is shown, so the
+  // token round-trip (auth verify → subscription check → Firestore read → JWT sign)
+  // is off the click path — clicking "Kezdjük" then jumps straight to the player.
+  // Tokens are valid 6h, so lingering on the preview never expires them. A 403 (no
+  // subscription) is swallowed here; the click path still routes to the paywall.
+  useEffect(() => {
+    if (stage !== "preview" || !user || !video?.muxPlaybackId || pb) return;
+    let active = true;
+    getPlaybackTokens(code).then(
+      (data) => { if (active) setPb(data); },
+      () => {},
+    );
+    return () => { active = false; };
+  }, [stage, user, video, code, pb]);
+
   const blocks = useMemo(() => (video ? planBlocks(video) : []), [video]);
   const totalMins = useMemo(() => blocks.reduce((n, b) => n + b.mins, 0), [blocks]);
   const frac = dur > 0 ? cur / dur : 0;
+  // "Stamped": every block has a real start time → use exact seconds; else fall back
+  // to proportional-minutes. `bounds` stays as fractions of `dur` so all the math below
+  // is identical for both paths.
+  const stamped = blocks.length > 0 && blocks.every((b) => typeof b.start === "number");
   const bounds = useMemo(() => {
+    if (stamped && dur > 0) {
+      return blocks.map((b, i) => {
+        const s = b.start as number;
+        const e = i + 1 < blocks.length ? (blocks[i + 1].start as number) : dur;
+        return { start: s / dur, end: e / dur, startSec: s, endSec: e };
+      });
+    }
     let acc = 0;
     return blocks.map((b) => {
       const start = acc / totalMins;
       acc += b.mins;
       return { start, end: acc / totalMins, startSec: 0, endSec: 0 };
     });
-  }, [blocks, totalMins]);
+  }, [blocks, totalMins, stamped, dur]);
+  // Layout weight for the segment/timeline widths: real block seconds when stamped.
+  const weight = (i: number) => (stamped ? Math.max(1, bounds[i].endSec - bounds[i].startSec) : blocks[i].mins);
   const cb = bounds.findIndex((b) => frac >= b.start && frac < b.end);
   const active = cb === -1 ? Math.max(0, bounds.length - 1) : cb;
   const blockEndSec = (bounds[active]?.end ?? 1) * dur;
@@ -95,10 +146,30 @@ function PlayerScreen({ code }: { code: string }) {
   const blockLeft = Math.max(0, Math.ceil(blockEndSec - cur));
   const nextBlock = blocks[active + 1];
 
+  // Active block's exercises, normalized. `start` (absolute seconds) is optional per
+  // exercise — these power the now-panel highlight, the next-exercise countdown, and
+  // the click-to-seek list. Everything below degrades to today's behavior when unstamped.
+  const activeItems = useMemo(() => (blocks[active]?.items ?? []).map(normalizeExercise), [blocks, active]);
+  const activeEx = useMemo(() => {
+    let idx = -1;
+    activeItems.forEach((ex, i) => { if (typeof ex.start === "number" && ex.start <= cur) idx = i; });
+    return idx;
+  }, [activeItems, cur]);
+  const hasExStamps = activeItems.some((ex) => typeof ex.start === "number");
+  const nextExStart = activeItems
+    .map((ex) => ex.start)
+    .filter((s): s is number => typeof s === "number" && s > cur)
+    .sort((a, b) => a - b)[0];
+  const exLeft = Math.max(0, Math.ceil((nextExStart ?? blockEndSec) - cur));
+  const nextExName = nextExStart != null ? activeItems.find((ex) => ex.start === nextExStart)?.name : undefined;
+  const currentMove = activeEx >= 0 ? activeItems[activeEx]?.name : activeItems[0]?.name;
+
   async function start() {
     setPbError(null);
     try {
-      const data = await getPlaybackTokens(code);
+      // Reuse the token prefetched while the preview was shown (see effect below);
+      // only fetch here if the prefetch hasn't landed (or was skipped).
+      const data = pb ?? (await getPlaybackTokens(code));
       if (user) await ensureProgress(user.uid);
       setPb(data);
       setStage("playing");
@@ -147,14 +218,18 @@ function PlayerScreen({ code }: { code: string }) {
       el.removeEventListener("pause", onPause);
       el.removeEventListener("ended", onEnd);
     };
+    // `stage` is required: the token is now prefetched during preview, so `pb` is
+    // already set before the player mounts. We must re-run when we enter "playing"
+    // (the point the MuxPlayer element actually exists) to attach the listeners.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pb, user, code, sessionOrder]);
+  }, [pb, stage, user, code, sessionOrder]);
 
   const togglePlay = () => {
     const el = playerRef.current;
     if (!el) return;
     el.paused ? el.play() : el.pause();
   };
+  const seekTo = (sec: number) => { const el = playerRef.current; if (el && dur) el.currentTime = Math.max(0, Math.min(dur - 0.1, sec)); };
   const rewind = () => { const el = playerRef.current; if (el) el.currentTime = Math.max(0, el.currentTime - 10); };
   const skip = () => { const el = playerRef.current; if (el && dur) el.currentTime = Math.min(dur - 0.1, blockEndSec); };
   const changeSpeed = () => {
@@ -181,6 +256,9 @@ function PlayerScreen({ code }: { code: string }) {
 
   // ── preview ──
   if (stage === "preview") {
+    // Arrived via an explicit play action → don't flash the redundant preview,
+    // show a loader until start() flips us into playback.
+    if (wantAutostart && video.muxPlaybackId) return <Loader label="Edzés…" />;
     return (
       <div className="lx szm-player szm-pl-prevwrap">
         <div className="szm-pl-stagebg" style={{ background: grad(video.theme) }} aria-hidden="true" />
@@ -250,8 +328,11 @@ function PlayerScreen({ code }: { code: string }) {
         {/* LEFT — live now/next */}
         <aside className="szm-pl-now">
           <div className="np-eyebrow">{blocks[active]?.name.toUpperCase()}</div>
-          <div className="np-move">{blocks[active]?.items[0]}</div>
-          <div className="np-clock">{fmt(blockLeft)}</div>
+          <div className="np-move">{currentMove}</div>
+          <div className="np-clock">{fmt(hasExStamps ? exLeft : blockLeft)}</div>
+          {hasExStamps && nextExName && (
+            <div className="np-cdlabel">KÖVETKEZŐ GYAKORLAT · {nextExName}</div>
+          )}
           <div className="np-blockprog">
             <i style={{ width: `${Math.max(0, Math.min(1, (cur - blockStartSec) / Math.max(1, blockEndSec - blockStartSec))) * 100}%` }} />
           </div>
@@ -269,11 +350,21 @@ function PlayerScreen({ code }: { code: string }) {
 
         {/* CENTER — video */}
         <div className="szm-pl-center">
+          {/* MOBILE — compact countdown above the player (desktop uses the left aside) */}
+          <div className="szm-pl-mnow">
+            <div className="mn-txt">
+              <span className="mn-block">{blocks[active]?.name}</span>
+              <span className="mn-move">{currentMove}</span>
+              {hasExStamps && nextExName && <span className="mn-next">KÖV · {nextExName}</span>}
+            </div>
+            <span className="mn-clock">{fmt(hasExStamps ? exLeft : blockLeft)}</span>
+          </div>
+
           <div className={`szm-pl-portrait wide${fs ? " fs" : ""}`} ref={frameRef}>
             <div className="szm-pl-segs">
               {blocks.map((b, i) => {
                 const fill = Math.max(0, Math.min(1, (frac - bounds[i].start) / (bounds[i].end - bounds[i].start)));
-                return <span key={b.name} className="sg" style={{ flex: b.mins }}><i style={{ width: `${fill * 100}%` }} /></span>;
+                return <span key={b.name} className="sg" style={{ flex: weight(i) }}><i style={{ width: `${fill * 100}%` }} /></span>;
               })}
             </div>
             {pb && (
@@ -286,11 +377,31 @@ function PlayerScreen({ code }: { code: string }) {
                 streamType="on-demand"
                 accentColor="#e5719b"
                 autoPlay
+                preload="auto"
+                // Fast-start ABR: HLS.js's default first estimate is derived from the
+                // first segment download, which TCP slow-start skews low — making quality
+                // ramp up sluggishly. Seed a realistic broadband estimate so ABR reaches
+                // good quality within a segment or two. Only used during init; HLS.js
+                // switches to measured bandwidth after `initialEstimateSegments`, so a bad
+                // guess self-corrects fast. TUNE these once real content/telemetry exists.
+                initialBandwidthEstimateKbps={3000}
+                initialEstimateSegments={2}
                 metadata={{ video_title: video.title, video_id: video.code }}
               />
             )}
             <div className="szm-pl-tint" style={{ background: `linear-gradient(to top, oklch(from ${cat(video.theme).c} 0.3 0.06 h / 0.5), transparent 46%)` }} />
             <button className="szm-pl-fs" onClick={toggleFs} aria-label="Teljes képernyő">⛶</button>
+
+            {stage === "playing" && paused && (
+              <div className="szm-pl-pause fade-in">
+                <div className="lbl">SZÜNET</div>
+                <div className="big">Levegő.<br />Innen folytatjuk.</div>
+                <div className="ctx">{blocks[active]?.name}</div>
+                <button className="btn glass-cta" style={{ marginTop: 6 }} onClick={togglePlay}>
+                  ▶ Folytatás
+                </button>
+              </div>
+            )}
 
             {stage === "finished" && (
               <div className="szm-pl-finish" style={{ background: "var(--grad-hero)" }}>
@@ -312,8 +423,8 @@ function PlayerScreen({ code }: { code: string }) {
             {blocks.map((b, i) => {
               const fill = Math.max(0, Math.min(1, (frac - bounds[i].start) / (bounds[i].end - bounds[i].start)));
               return (
-                <button key={b.name} className={`tl${i === active ? " on" : ""}`} style={{ flex: b.mins }}
-                  onClick={() => { const el = playerRef.current; if (el && dur) el.currentTime = bounds[i].start * dur; }}>
+                <button key={b.name} className={`tl${i === active ? " on" : ""}`} style={{ flex: weight(i) }}
+                  onClick={() => seekTo(bounds[i].start * dur)}>
                   <span className="bar"><i style={{ width: `${fill * 100}%` }} /></span>
                   <span className="lb">{b.name}</span>
                 </button>
@@ -329,6 +440,40 @@ function PlayerScreen({ code }: { code: string }) {
             <button onClick={skip} title="Blokk átugrása">⇥</button>
             <button className="spd" onClick={changeSpeed}>{speed === 1 ? "1×" : "0.75×"}</button>
           </div>
+
+          {/* MOBILE — horizontal "edzés menete" below the player (desktop uses the right aside) */}
+          <div className="szm-pl-msched">
+            <div className="ms-title">Az edzés menete</div>
+            {/* blocks — always seekable, like the timeline */}
+            <div className="ms-row ms-blocks">
+              {blocks.map((b, i) => (
+                <button
+                  key={b.name}
+                  type="button"
+                  className={`ms-blk${i === active ? " on" : ""}`}
+                  onClick={() => seekTo(bounds[i].start * dur)}
+                >
+                  <span className="i">{i + 1}</span>
+                  <span className="nm">{b.name}</span>
+                </button>
+              ))}
+            </div>
+            {/* exercises of the active block */}
+            <div className="ms-row">
+              {activeItems.map((ex, k) => (
+                <button
+                  key={k}
+                  type="button"
+                  className={`ms-ex${k === activeEx ? " on" : ""}`}
+                  disabled={ex.start == null}
+                  onClick={ex.start != null ? () => seekTo(ex.start!) : undefined}
+                >
+                  {ex.start != null && <span className="t">{secToClock(ex.start)}</span>}
+                  <span className="nm">{ex.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* RIGHT — schedule */}
@@ -340,16 +485,29 @@ function PlayerScreen({ code }: { code: string }) {
               const done = frac >= bounds[i].end;
               return (
                 <div key={b.name} className={`sb${now ? " now" : ""}`}>
-                  <div className="sb-hd">
+                  <button type="button" className="sb-hd" onClick={() => seekTo(bounds[i].start * dur)} title="Ugrás a blokkra">
                     <span className={`n${done ? " done" : now ? " now" : ""}`}>{done ? <Check size={11} /> : i + 1}</span>
                     <span className="nm">{b.name}</span>
                     <span className="mn">{b.mins}′</span>
-                  </div>
+                  </button>
                   {now && (
                     <ul>
-                      {b.items.map((it) => (
-                        <li key={it}><span className="bul">·</span>{it}</li>
-                      ))}
+                      {b.items.map(normalizeExercise).map((ex, k) =>
+                        ex.start != null ? (
+                          <li key={k}>
+                            <button
+                              type="button"
+                              className={`exseek${k === activeEx ? " on" : ""}`}
+                              onClick={() => seekTo(ex.start!)}
+                            >
+                              <span className="t">{secToClock(ex.start)}</span>
+                              <span className="nm">{ex.name}</span>
+                            </button>
+                          </li>
+                        ) : (
+                          <li key={k} className={k === activeEx ? "on" : ""}><span className="bul">·</span>{ex.name}</li>
+                        ),
+                      )}
                     </ul>
                   )}
                 </div>

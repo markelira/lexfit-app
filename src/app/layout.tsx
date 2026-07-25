@@ -8,7 +8,8 @@ import { AuthProvider } from "@/lib/auth-context";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  // 300 = thin lowercase headings (.h-thin, hero h1); 900 = cover category words.
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
@@ -29,6 +30,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="hu" className={`${poppins.variable} ${plexMono.variable}`}>
+      <head>
+        {/* Warm DNS+TCP+TLS to the Mux origins so the first HLS manifest/segment and
+            poster fetch skip connection setup (~100–500ms) when a video starts. */}
+        <link rel="preconnect" href="https://stream.mux.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://image.mux.com" crossOrigin="anonymous" />
+      </head>
       <body>
         <AuthProvider>{children}</AuthProvider>
       </body>

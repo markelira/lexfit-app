@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kutatás — Netflix &amp; Apple TV hero szekciók (UX/UI)</title>
+<link rel="stylesheet" href="lexfit-tokens.css">
+<link rel="stylesheet" href="sales/atv-audit.css">
+<style>
+  .lx a { color: var(--accent-ink); } .lx a:hover { color: var(--accent-2); }
+  /* anatómia-réteg diagram */
+  .anat { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 6px 0 4px; }
+  .anat .lyr { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 15px 17px; box-shadow: var(--shadow-card); }
+  .anat .lyr .n { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--accent-ink); text-transform: uppercase; }
+  .anat .lyr h4 { font-size: 15px; font-weight: 800; margin: 5px 0 5px; letter-spacing: -0.01em; }
+  .anat .lyr p { font-size: 13px; color: var(--ink-2); margin: 0; line-height: 1.45; }
+  /* vizuális billboard-vázlat */
+  .bbwrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bb { position: relative; aspect-ratio: 16/8; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-card); }
+  .bb .bb-art { position: absolute; inset: 0; }
+  .bb.nfx .bb-art { background: linear-gradient(105deg, oklch(0.22 0.02 350) 0%, oklch(0.32 0.03 350) 55%, oklch(0.5 0.1 355) 100%); }
+  .bb.atv .bb-art { background: linear-gradient(120deg, oklch(0.3 0.03 350) 0%, oklch(0.5 0.09 320) 100%); }
+  .bb .scrim { position: absolute; inset: 0; background: linear-gradient(90deg, oklch(0.15 0.02 350 / 0.82) 0%, oklch(0.15 0.02 350 / 0.45) 42%, transparent 68%); }
+  .bb .scrim.bot { background: linear-gradient(0deg, oklch(0.12 0.02 350 / 0.6) 0%, transparent 45%); }
+  .bb .lbl { position: absolute; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.05em; padding: 3px 7px; border-radius: 5px; background: oklch(1 0 0 / 0.14); color: white; border: 1px solid oklch(1 0 0 / 0.25); white-space: nowrap; }
+  .bb .content { position: absolute; left: 6%; top: 50%; transform: translateY(-50%); max-width: 58%; }
+  .bb .content .eye { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: oklch(1 0 0 / 0.75); text-transform: uppercase; }
+  .bb .content .ttl { font-size: 24px; font-weight: 900; letter-spacing: -0.02em; color: white; line-height: 0.98; margin: 5px 0 7px; }
+  .bb .content .syn { font-size: 10.5px; color: oklch(1 0 0 / 0.82); line-height: 1.35; margin-bottom: 9px; max-width: 34ch; }
+  .bb .content .ctas { display: flex; gap: 7px; }
+  .bb .content .c1 { font-size: 10px; font-weight: 700; color: var(--ink); background: white; padding: 6px 13px; border-radius: 7px; }
+  .bb .content .c2 { font-size: 10px; font-weight: 700; color: white; background: oklch(1 0 0 / 0.18); padding: 6px 13px; border-radius: 7px; }
+  .bb .cap { position: absolute; left: 12px; bottom: 10px; }
+  .bbcap { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 8px; text-align: center; }
+  .callout { background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; padding: 14px 18px; font-size: 14px; color: var(--ink); line-height: 1.55; margin: 4px 0 0; }
+  .callout b { font-weight: 700; }
+  @media (max-width: 760px){ .anat, .bbwrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="lx aud">
+
+  <header class="ad-hero">
+    <span class="ring"></span><span class="ring two"></span>
+    <span class="kick"><span class="dot"></span>UX/UI kutatás · hero-szekciók</span>
+    <h1>Hogyan épül a Netflix és az Apple TV hero szekció — és mit tanulhat belőle a LEXFIT kezdőlap</h1>
+    <p class="lede">Mélyfúrás a két legmeghatározóbb streaming-felület nyitóblokkjába: <strong>layout, struktúra és a mögöttes UX/UI logika</strong>. A cél nem másolás, hanem az <em>átvihető alapelvek</em> kinyerése — hogy a LEXFIT kezdőlap hero szekciója a <code>Foundation</code> programot állítsa a középpontba, ugyanazzal a „egy magabiztos ajánlat, tartalom mint felület" logikával, amit a streaming-óriások bizonyítottan használnak.</p>
+    <div class="meta">
+      <span class="m">2026. JÚLIUS 19.</span>
+      <span class="m">2 REFERENCIA-FELÜLET</span>
+      <span class="m">7 ÁTVIHETŐ ELV</span>
+      <span class="m">FORRÁSOLT</span>
+    </div>
+  </header>
+
+  <!-- 00 — miért a hero dönt -->
+  <section style="margin-top:8px">
+    <div class="sec-hd"><span class="no">00</span><h2>Miért a hero dönti el a munkamenetet</h2></div>
+    <p class="sub">A streaming-főoldal legfelső blokkja a legdrágább digitális ingatlan: a betöltés pillanatában elkezd dolgozni, és a „mit nézzek?" kérdést pár másodperc alatt meg akarja oldani. A Netflixen a megtekintett tartalom több mint 80%-a személyre szabott ajánlásból ered, nem keresésből — ez az egyetlen szám magyarázza az egész dizájnfilozófiát: a felület nem választékot ad, hanem <strong>egyetlen, magas meggyőződésű következő lépést</strong>.</p>
+    <div class="callout">A hero <b>nem banner, hanem döntés-motor</b>. Feladata: kevesebb kognitív teher, több azonnali elköteleződés — a felhasználónak egy világos kiindulópontot ad ahelyett, hogy a választás terhét ráterhelné. Ez pontosan a fitnesz-app problémája is: „mit edzek ma?"</div>
+  </section>
+
+  <!-- 01 — módszertan -->
+  <section>
+    <div class="sec-hd"><span class="no">01</span><h2>Módszertan &amp; vizsgálati tengelyek</h2></div>
+    <p class="sub">A két felületet ugyanazon hat tengely mentén bontottuk szét, majd kiemeltük a közös, termékfüggetlen alapelveket, végül leképeztük a LEXFIT kezdőlapra (jelenlegi <code>app/home-billboard.jsx</code>).</p>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><h4>Layout &amp; térhasználat</h4><p>Full-bleed vs. beágyazott; a tartalom-vizuál és a szöveg viszonya; olvasási minta (F/Z).</p></div>
+      <div class="step"><div class="n">02</div><h4>Vizuális hierarchia</h4><p>Mi a leghangosabb elem; scrim/gradiens az olvashatóságért; a többi UI „halkabb regiszterben".</p></div>
+      <div class="step"><div class="n">03</div><h4>Tartalom-logika</h4><p>Algoritmikus személyre szabás vs. szerkesztett kuráció; egy vs. sok ajánlat.</p></div>
+      <div class="step"><div class="n">04</div><h4>Interakció &amp; mozgás</h4><p>Autoplay-előnézet, némítás, fókusz-modell; a mozgás szerepe és mértéke.</p></div>
+      <div class="step"><div class="n">05</div><h4>CTA &amp; cselekvés</h4><p>Elsődleges (Lejátszás) + másodlagos (Részletek / Lista) hívás; a döntés súrlódásának csökkentése.</p></div>
+      <div class="step"><div class="n">06</div><h4>Újra-belépés</h4><p>„Folytatás" és „Listám" — a visszatérő felhasználó súrlódásának megszüntetése.</p></div>
+    </div>
+  </section>
+
+  <!-- 02 — Netflix anatómia -->
+  <section>
+    <div class="sec-hd"><span class="no">02</span><h2>Netflix — a „billboard" anatómiája</h2></div>
+    <p class="sub">A Netflix nyitóeleme egy teljes szélességű, mozgóképes hero, ami egy olyan címet játszik le automatikusan, amelyről az algoritmus úgy hiszi, nagy eséllyel megnéznéd. Ez a lap leghangosabb eleme — miközben a többi felület szándékosan alacsonyabb vizuális regiszterben marad.</p>
+
+    <div class="find">
+      <div class="fh"><span class="fid">NFX-1</span><span class="ft">Full-bleed mozgókép, egyetlen magas-meggyőződésű címmel</span><span class="sev p0" style="background:var(--ok)">MAG</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">A teljes felső sáv egyetlen tartalom trailerét/motion-artját mutatja — nem választékot. A cél: a „mit nézzek?" problémát a belépés után másodpercekkel megoldani, egy magabiztos ajánlattal.</span>
+        <span class="k">Logika</span><span class="val princ">Egy tiszta, csábító kiindulópont csökkenti a döntési súrlódást; a választék elrejtése <em>több</em> elköteleződést hoz, mint a lehetőségek falának mutatása.</span>
+      </div>
+    </div>
+
+    <div class="find">
+      <div class="fh"><span class="fid">NFX-2</span><span class="ft">Sötét szoba + scrim: a tartalom a felület, az UI másodlagos</span><span class="sev p0" style="background:var(--ok)">MAG</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">Fekete/mély háttér maximalizálja a poszter- és videó-kontrasztot; a hero bal oldalán sötétedő átmenet (scrim) ül, hogy a fehér cím és a CTA-k olvashatók legyenek a mozgókép fölött.</span>
+        <span class="k">Logika</span><span class="val princ">„Content-first, dark-room": minden gomb és címke csak azért van, hogy a következő tartalomhoz vezessen. A scrim nem dísz — ez teszi a szöveget olvashatóvá bármilyen képkocka fölött.</span>
+      </div>
+    </div>
+
+    <div class="find">
+      <div class="fh"><span class="fid">NFX-3</span><span class="ft">Metaadat-verem + elsődleges/másodlagos CTA</span><span class="sev p1" style="background:oklch(0.62 0.15 66)">SZERK</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">A hero bal oldalán logó/cím, rövid szinopszis, néhány metaadat, majd két gomb: <b>Lejátszás</b> (tömör, magas kontraszt, a márka-piros/fehér) és <b>Több infó</b>. A felső navigáció szikár, nem versenyez a tartalommal.</span>
+        <span class="k">Logika</span><span class="val princ">A hierarchia „squint-teszttel" is átmegy: cím → szinopszis → egy domináns akció. Két gomb = nincs választás-bénulás, de a habozónak is van útja (Több infó).</span>
+      </div>
+    </div>
+
+    <div class="find">
+      <div class="fh"><span class="fid">NFX-4</span><span class="ft">Autoplay-előnézet + némítás alapból</span><span class="sev p1" style="background:oklch(0.62 0.15 66)">SZERK</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">A hero videó a betöltéskor indul, alapból némán; a hang külön kapcsolható. A mozgás a figyelmet a statikus képnél erősebben vonzza — de a némítás és a vezérlő megadja a kontrollt.</span>
+        <span class="k">Logika</span><span class="val princ">A mozgás „ízelítőt" hoz előre, a kattintás előtti kipróbálás súrlódását nulláznia. A hang-alapértelmezett némítás nélkül a hero tolakodó lenne — a kontroll a felhasználóé marad.</span>
+      </div>
+    </div>
+
+    <div class="find">
+      <div class="fh"><span class="fid">NFX-5</span><span class="ft">Újra-belépés: „Folytatás" + „Listám" közvetlen a hero alatt</span><span class="sev p1" style="background:oklch(0.62 0.15 66)">SZERK</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">A billboard alatt azonnal a vízszintes sorok jönnek — legelöl a „Folytatás" (befejezetlen tartalom felszínre hozása) és a „Listám" (a felhasználó saját, időben épülő sora).</span>
+        <span class="k">Logika</span><span class="val princ">Ez a „re-entry friction" megszüntetése: a visszatérő felhasználónak nem kell emlékeznie, hol tartott. A hero a mai fókusz, a sorok a folytonosság.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 — Apple TV anatómia -->
+  <section>
+    <div class="sec-hd"><span class="no">03</span><h2>Apple TV — „Featured", „Up Next" és a fókusz-modell</h2></div>
+    <p class="sub">Az Apple TV kisebb, kevésbé algoritmikus, jobban szerkesztett felület. A „Watch Now" tetején a <b>Featured</b> (szerkesztők által választott, teljes szélességű bemutató) ül, alatta az <b>Up Next</b> — a felhasználó folytatandó / listázott tartalma. A hangsúly a nagy, tiszta poszter-arton (tvOS&nbsp;26: „Liquid Glass" + mozifilmes poszterek) és a fókusz-modellen van.</p>
+
+    <div class="find">
+      <div class="fh"><span class="fid">ATV-1</span><span class="ft">Szerkesztett „Featured" bemutató a személyes sor fölött</span><span class="sev p1" style="background:oklch(0.62 0.15 66)">SZERK</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">Egyetlen, kurált cím tölti ki a felső sávot, teljes szélességű kulcs-arttal / trailerrel. Alatta jön az Up Next személyes sora.</span>
+        <span class="k">Logika</span><span class="val princ">Kevesebb, de nagyobb: a szerkesztett kiemelés bizalmat és irányt ad, ahol az algoritmikus tömeg elveszne. <b>Tanulság a tervezéshez is:</b> amikor a Featured túlnyomta az Up Next-et, a felhasználók tiltakoztak — a kiemelés ne <em>takarja el</em> a személyes folytatást.</span>
+      </div>
+    </div>
+
+    <div class="find">
+      <div class="fh"><span class="fid">ATV-2</span><span class="ft">„Fewer, bigger": mozifilmes poszter-art mint elsődleges nyelv</span><span class="sev p0" style="background:var(--ok)">MAG</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">Nagy, egységes kulcs-art viszi a felismerést; a tvOS&nbsp;26 redesign kifejezetten a poszter-artot emelte, hogy „szórakoztató és könnyű legyen eldönteni, mit nézz". A cél: a fókusz mindig a tartalmon marad.</span>
+        <span class="k">Logika</span><span class="val princ">Felismerés a felidézés helyett: a következetes, karakteres kulcs-art egy pillantás alatt azonosítja a címet — a márka a képi rendszerben él, nem a UI-krómban.</span>
+      </div>
+    </div>
+
+    <div class="find">
+      <div class="fh"><span class="fid">ATV-3</span><span class="ft">A fókusz-modell: mindig egy elem „kiemelt"</span><span class="sev p1" style="background:oklch(0.62 0.15 66)">SZERK</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">A tévén nem mutatóval manipulálsz, hanem előre definiált fókusz-területek közt lépdelsz — mindig pontosan egy dolog van kiemelve, nagyobb/kiemeltebb állapotban. A képernyőn túlnyúló sorokból 10–20% látszik, jelezve: „van tovább".</span>
+        <span class="k">Logika</span><span class="val princ">Nagyobb, egyszerűbb, „szobán át" is kezelhető célok; a fókusz-állapot egyértelmű vizuális visszajelzés. A „kilógó" következő elem a görgethetőség affordanciája — a mi rail-jeinkre közvetlenül átvihető.</span>
+      </div>
+    </div>
+
+    <div class="find">
+      <div class="fh"><span class="fid">ATV-4</span><span class="ft">Személyre szabás profilonként, mértékkel</span><span class="sev p2" style="background:oklch(0.58 0.1 240)">FINOM</span></div>
+      <div class="fb">
+        <span class="k">Mi</span><span class="val">A profilváltás személyre szabja az Up Next-et és az ajánlásokat; az Apple inkább kevés, szerkesztett jelre épít, mint a végtelen algoritmikus sorra.</span>
+        <span class="k">Logika</span><span class="val princ">A személyre szabás „megértettségérzetet" ad, de az Apple visszafogottsága arra tanít: a kevés, jól időzített, releváns jel többet ér, mint a mindent-lefedő ajánlás-tömeg.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 — vizuális összevetés -->
+  <section>
+    <div class="sec-hd"><span class="no">04</span><h2>A két hero egymás mellett</h2></div>
+    <p class="sub">Ugyanaz a váz — a hangsúlyok mások. Bal: Netflix (algoritmikus, mozgó, „egy hangos ajánlat"). Jobb: Apple TV (szerkesztett, statikus-poszter, „kevés de nagy").</p>
+    <div class="bbwrap">
+      <div>
+        <div class="bb nfx">
+          <div class="bb-art"></div><span class="scrim"></span><span class="scrim bot"></span>
+          <span class="lbl" style="right:12px; top:10px;">▶ AUTOPLAY · NÉMÍTVA</span>
+          <div class="content">
+            <div class="eye">ÚJ SOROZAT</div>
+            <div class="ttl">Cím</div>
+            <div class="syn">Egy mondat szinopszis, ami a scrim fölött is olvasható marad.</div>
+            <div class="ctas"><span class="c1">▶ Lejátszás</span><span class="c2">ⓘ Több infó</span></div>
+          </div>
+        </div>
+        <div class="bbcap">Netflix — full-bleed, mozgó, bal-igazított szöveg-verem</div>
+      </div>
+      <div>
+        <div class="bb atv">
+          <div class="bb-art"></div><span class="scrim"></span><span class="scrim bot"></span>
+          <span class="lbl" style="left:12px; top:10px;">FEATURED · SZERKESZTETT</span>
+          <div class="content">
+            <div class="eye">MOST AJÁNLOTT</div>
+            <div class="ttl">Cím</div>
+            <div class="syn">Nagy, tiszta poszter-art; a szöveg kevesebb, a kép beszél.</div>
+            <div class="ctas"><span class="c1">▶ Lejátszás</span><span class="c2">+ Up Next</span></div>
+          </div>
+        </div>
+        <div class="bbcap">Apple TV — poszter-art, kevesebb szöveg, fókusz-kiemelés</div>
+      </div>
+    </div>
+
+    <table class="heur" style="margin-top:26px">
+      <thead><tr><th style="width:26%">Tengely</th><th style="width:37%">Netflix</th><th>Apple TV</th></tr></thead>
+      <tbody>
+        <tr><td><span class="h">Tartalom-választás</span></td><td>Algoritmikus, személyre szabott (>80% ajánlásból)</td><td>Szerkesztett kuráció + könnyű személyre szabás</td></tr>
+        <tr><td><span class="h">Vizuál</span></td><td>Mozgó trailer, sötét szoba, scrim</td><td>Nagy statikus poszter-art, „fewer bigger"</td></tr>
+        <tr><td><span class="h">Szöveg-mennyiség</span></td><td>Cím + szinopszis + metaadat</td><td>Minimális; a kép hordozza az üzenetet</td></tr>
+        <tr><td><span class="h">Elsődleges CTA</span></td><td>Lejátszás (magas kontraszt)</td><td>Lejátszás / Watchlist</td></tr>
+        <tr><td><span class="h">Interakció</span></td><td>Kurzor + hover-előnézet</td><td>Fókusz-modell, „mindig egy kiemelt"</td></tr>
+        <tr><td><span class="h">Újra-belépés</span></td><td>„Folytatás" + „Listám" a hero alatt</td><td>„Up Next" közvetlen a Featured alatt</td></tr>
+        <tr><td><span class="h">Kockázat</span></td><td>Autoplay = tolakodó lehet, kontroll kell</td><td>A Featured eltakarhatja a személyes sort</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 05 — átvihető elvek -->
+  <section>
+    <div class="sec-hd"><span class="no">05</span><h2>A 7 átvihető alap-elv</h2></div>
+    <p class="sub">A termékfüggetlen logika, ami mindkét felületben közös — és amit a LEXFIT kezdőlap hero a Foundation programra alkalmazhat.</p>
+    <div class="wins">
+      <div class="win"><span class="ic">1</span><span class="t"><b>Egy magabiztos ajánlat, nem választék.</b> A hero egyetlen, magas-meggyőződésű következő lépést mutasson — a „mit edzek ma?" kérdést oldja meg, ne terhelje választással.</span></div>
+      <div class="win"><span class="ic">2</span><span class="t"><b>Tartalom mint felület + scrim.</b> A kulcs-art a főszereplő; a sötétedő átmenet teszi a címet és a CTA-t olvashatóvá bármilyen vizuál fölött.</span></div>
+      <div class="win"><span class="ic">3</span><span class="t"><b>Bal-igazított szöveg-verem, F/Z-olvasás.</b> Eyebrow → cím → egy mondat → elsődleges + másodlagos CTA. Squint-teszttel is átmegy a hierarchia.</span></div>
+      <div class="win"><span class="ic">4</span><span class="t"><b>Mozgás mértékkel, kontrollal.</b> Rövid, néma előnézet-hurok; látható némítás/szünet; <code>prefers-reduced-motion</code> alatt statikus poszter.</span></div>
+      <div class="win"><span class="ic">5</span><span class="t"><b>Két gomb, egy domináns.</b> Elsődleges „Edzés indítása" + másodlagos „Részletek". Nincs choice-paralízis, de a habozónak is van útja.</span></div>
+      <div class="win"><span class="ic">6</span><span class="t"><b>Újra-belépés a hero alatt.</b> „Folytasd a programot" és „Listám" rögtön a billboard alatt — a visszatérő ne keresse, hol tartott.</span></div>
+      <div class="win"><span class="ic">7</span><span class="t"><b>Következetes kulcs-art rendszer.</b> A hero a programkártya-nyelv nagy testvére: a Foundation a kategória-színnel, nagy szóval és a saját ● ikon+név lockuppal ismerhető fel egy pillantás alatt.</span></div>
+    </div>
+  </section>
+
+  <!-- 06 — leképezés LEXFIT-re -->
+  <section>
+    <div class="sec-hd"><span class="no">06</span><h2>Leképezés a LEXFIT kezdőlapra</h2></div>
+    <p class="sub">A jó hír: a kezdőlap már ma egy állapot-tudatos billboard (<code>app/home-billboard.jsx</code>, N-minta). A kutatás nem új szerkezetet, hanem <strong>fókusz-váltást</strong> javasol: a hero a mai edzés helyett (vagy mellett) a <b>Foundation programot</b> mint utat állítsa középpontba — egyedi, de a programkártyákkal rokon kulcs-arttal.</p>
+    <div class="anat">
+      <div class="lyr"><div class="n">Van már</div><h4>Full-bleed billboard + scrim + vig</h4><p>A <code>.nhb-art</code>, <code>.nhb-scrim</code>, <code>.nhb-vig</code> pontosan a „tartalom mint felület + scrim" elvet valósítja meg. → Elv 2 kész.</p></div>
+      <div class="lyr"><div class="n">Van már</div><h4>Eyebrow → cím → szinopszis → 2 CTA</h4><p>A <code>.nhb-eyebrow / .nhb-title / .nhb-syn / .nhb-ctas</code> a bal-igazított F-verem. → Elv 3 &amp; 5 kész.</p></div>
+      <div class="lyr"><div class="n">Van már</div><h4>Némítás + előnézet-számláló</h4><p>A <code>.nhb-mute</code> és az „ELŐNÉZET · 0:NN" a kontrollált mozgás alapja. → Elv 4 részben.</p></div>
+      <div class="lyr"><div class="n">Van már</div><h4>Continue / Listám sorok a hero alatt</h4><p>A <code>SecContinue</code>, <code>SecMyList</code> a billboard alatt = re-entry. → Elv 6 kész.</p></div>
+      <div class="lyr" style="border-color:var(--accent); background:var(--accent-soft)"><div class="n" style="color:var(--accent-2)">Hiányzik</div><h4>Foundation-fókuszú hero-tartalom</h4><p>A hero jelenleg a napi edzést tolja. A kutatás „egy magabiztos ajánlat" elve szerint a <b>Foundation program</b> legyen az elsődleges hero-történet (az út, nem csak a mai lépés). → Elv 1.</p></div>
+      <div class="lyr" style="border-color:var(--accent); background:var(--accent-soft)"><div class="n" style="color:var(--accent-2)">Hiányzik</div><h4>Egyedi, de rokon Foundation kulcs-art</h4><p>Billboard-léptékű borító a program-thumbnail nyelvből: kategória-szín, nagy szó, és a Foundation ● ikon+név lockup. Egyedi, mégis a kártyákkal egy család. → Elv 7.</p></div>
+    </div>
+    <div class="callout" style="margin-top:16px">A részletes feladat-bontás — mit, melyik fájlban, milyen elfogadási feltétellel — a külön <b>„Kezdőlap Hero — Fejlesztési terv"</b> dokumentumban.</div>
+  </section>
+
+  <!-- 07 — akadálymentesség -->
+  <section>
+    <div class="sec-hd"><span class="no">07</span><h2>Akadálymentesség: az autoplay felelős használata</h2></div>
+    <p class="sub">A mozgó hero csak akkor működik, ha a kontroll a felhasználóé marad. A bevett gyakorlat és a WCAG világos elvárásokat ad — ezeket a LEXFIT hero-nak be kell tartania.</p>
+    <div class="find">
+      <div class="fh"><span class="fid">A11Y-H1</span><span class="ft">Néma alapértelmezés + látható szünet/hang vezérlő</span><span class="sev p0">KÖTELEZŐ</span></div>
+      <div class="fb">
+        <span class="k">Elv</span><span class="val">Autoplay csak némán; a hang külön, szándékos akció. Az automatikusan induló mozgásnak legyen látható, billentyűzettel elérhető <b>szünet/leállítás</b> vezérlője (WCAG 2.2.2 „Pause, Stop, Hide") — feliratozott ikon-gomb, max. 2 tab-lépésre.</span>
+      </div>
+    </div>
+    <div class="find">
+      <div class="fh"><span class="fid">A11Y-H2</span><span class="ft"><code>prefers-reduced-motion</code> → statikus poszter</span><span class="sev p0">KÖTELEZŐ</span></div>
+      <div class="fb">
+        <span class="k">Elv</span><span class="val">Ha a felhasználó rendszerszinten csökkentett mozgást kért, a hero <b>ne induljon</b> — statikus kulcs-artot mutasson, opcionális, felhasználó által indítható lejátszással. JS: <code>matchMedia('(prefers-reduced-motion: reduce)')</code>; a döntést localStorage-ben őrizzük, hogy visszatéréskor ne induljon újra.</span>
+      </div>
+    </div>
+    <div class="find">
+      <div class="fh"><span class="fid">A11Y-H3</span><span class="ft">Olvashatóság a vizuál fölött</span><span class="sev p1">MAGAS</span></div>
+      <div class="fb">
+        <span class="k">Elv</span><span class="val">A scrim garantálja a szöveg AA-kontrasztját bármelyik képkocka fölött; a cím és a CTA-k ne „ússzanak el" világos vizuálon. A hero üzenete némán, feliratból/overlay-copyból is érthető legyen.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 — források -->
+  <section>
+    <div class="sec-hd"><span class="no">08</span><h2>Források</h2></div>
+    <div class="sources">
+      <div class="s"><b>createbytes.com</b> (2025) — Netflix Design deep dive: billboard mint dinamikus, személyre szabott hero; a „mit nézzek?" problémát másodpercek alatt oldja; content-first, dark-room.</div>
+      <div class="s"><b>designrush.com</b> (2026) — Inside Netflix UX: full-width auto-playing hero mint a lap leghangosabb eleme; >80% a megtekintésből ajánlásból; „Continue Watching" és „My List" mint re-entry.</div>
+      <div class="s"><b>explainx.ai — Netflix DESIGN.md</b> — „Cinema in your Pocket": billboard, adaptív kulcs-art, dark room (#000), piros CTA a legkritikusabb akciókra.</div>
+      <div class="s"><b>raw.studio</b> (2026) — Netflix welcome page: egyetlen csábító kiindulópont csökkenti a döntési súrlódást; a hero-kép mindig promótált/trendi tartalom.</div>
+      <div class="s"><b>developer.apple.com — Designing for tvOS</b> / <b>apple.com/newsroom</b> (2023, 2025) — Featured &amp; Up Next; tvOS 26 „Liquid Glass" + mozifilmes poszter-art; profil-alapú személyre szabás.</div>
+      <div class="s"><b>macrumors.com / appleinsider.com</b> (2022) — a „Featured" bevezetése az „Up Next" fölé: tanulság, hogy a kiemelés ne takarja el a személyes folytatást.</div>
+      <div class="s"><b>medium.com/@flarup</b> (Designing for the Apple TV) — a fókusz-modell: mindig egy elem kiemelt; a kilógó 10–20% mint görgethetőség-jelzés; nagyobb, egyszerűbb célok.</div>
+      <div class="s"><b>smashingmagazine.com</b> (2021), <b>scottohara.me</b> (2019), <b>portfolioris.nl</b> (2025) — reduced-motion + autoplay: néma alapértelmezés, látható szünet/mute, statikus fallback, localStorage-perzisztencia.</div>
+      <div class="s"><b>WCAG 2.2</b> — 2.2.2 (Pause, Stop, Hide); 1.4.3 (Contrast); a mozgó tartalom szabályozott, felhasználó-kontrollált használata.</div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span class="mk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 L5 13 H11 L10 21 L18 10 H12 Z"></path></svg></span>
+    LEXFIT — Kezdőlap hero · Netflix &amp; Apple TV UX/UI kutatás · belső anyag
+  </div>
+
+</div>
+</body>
+</html>

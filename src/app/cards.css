@@ -7,8 +7,15 @@
 .lx .ncard-ring { position: absolute; left: -14%; top: -48%; width: 60%; aspect-ratio: 1; border-radius: 50%; border: 20px solid oklch(1 0 0 / 0.13); pointer-events: none; }
 .lx .ncard-art::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(92% 92% at 50% 45%, transparent 55%, oklch(0.2 0.04 350 / 0.26) 100%); }
 .lx .ncard-lockup { position: absolute; top: 50%; left: 0; right: 0; z-index: 1; text-align: center; transform: translateY(-62%); }
-.lx .ncard-lockup .wd { font-weight: 900; font-size: 20px; letter-spacing: -0.03em; line-height: 1; color: oklch(1 0 0 / 0.96); }
+.lx .ncard-lockup .ey { font-family: var(--mono); font-size: 8px; letter-spacing: 0.07em; color: oklch(1 0 0 / 0.8); margin-bottom: 4px; }
+.lx .ncard-lockup .wd { font-weight: 900; font-size: 20px; letter-spacing: -0.03em; line-height: 1.02; color: oklch(1 0 0 / 0.96);
+  max-width: 86%; margin: 0 auto; padding: 0 8px; white-space: normal; text-wrap: balance; }
 .lx .ncard-lockup .un { width: 20px; height: 2.5px; border-radius: 2px; background: oklch(1 0 0 / 0.55); margin: 6px auto 0; }
+/* trainer underlayer — her tones pick up the category color, the room dissolves at the edges */
+.lx .ncard-photo { position: absolute; inset: 0; z-index: 0; pointer-events: none; background-size: cover; background-position: 64% 18%;
+  mix-blend-mode: luminosity; opacity: 0.42;
+  -webkit-mask-image: radial-gradient(125% 105% at 66% 34%, #000 40%, transparent 82%);
+  mask-image: radial-gradient(125% 105% at 66% 34%, #000 40%, transparent 82%); }
 .lx .ncard-vig { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, oklch(0.18 0.03 350 / 0.74) 0%, oklch(0.18 0.03 350 / 0.12) 34%, transparent 52%); }
 .lx .ncard-badge { position: absolute; top: 8px; left: 8px; z-index: 2; font-size: 9.5px; font-weight: 800; letter-spacing: 0.04em; color: white; background: var(--accent); padding: 3px 7px; border-radius: 5px; white-space: nowrap; }
 .lx .ncard-chip { position: absolute; top: 8px; right: 8px; z-index: 2; font-family: var(--mono); font-size: 10px; color: white; background: oklch(1 0 0 / 0.18); border: 1px solid oklch(1 0 0 / 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 2px 8px; border-radius: 999px; }
@@ -46,11 +53,24 @@
 @media (prefers-reduced-motion: reduce) { .lx .nmod-kb { animation: none; } }
 .lx .nmod-ring { position: absolute; right: -10%; top: -34%; width: 52%; aspect-ratio: 1; border-radius: 50%; border: 30px solid oklch(1 0 0 / 0.13); }
 .lx .nmod-word { position: absolute; left: 26px; top: 24%; font-weight: 900; font-size: 88px; letter-spacing: -0.03em; line-height: 0.82; color: oklch(1 0 0 / 0.18); white-space: nowrap; user-select: none; }
-.lx .nmod-vig { position: absolute; inset: 0; background: linear-gradient(to top, oklch(0.18 0.03 350 / 0.8) 0%, oklch(0.18 0.03 350 / 0.24) 38%, transparent 62%); }
+.lx .nmod-vig { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(to top, oklch(0.18 0.03 350 / 0.8) 0%, oklch(0.18 0.03 350 / 0.24) 38%, transparent 62%); }
 .lx .nmod-close { position: absolute; top: 14px; right: 14px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; font-size: 15px; line-height: 1; background: oklch(0.2 0.03 350 / 0.55); color: white; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; }
 .lx .nmod-close:hover { background: oklch(0.2 0.03 350 / 0.75); }
-.lx .nmod-prevbadge { position: absolute; top: 16px; left: 16px; z-index: 2; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: white; background: oklch(0 0 0 / 0.32); padding: 4px 10px; border-radius: 999px; font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-.lx .nmod-herobottom { position: absolute; left: 22px; right: 22px; bottom: 16px; z-index: 2; }
+/* trainer underlayer for the modal hero (sits under the faded word) */
+.lx .nmod-photo { position: absolute; inset: 0; z-index: 0; pointer-events: none; background-size: cover; background-position: 64% 22%;
+  mix-blend-mode: luminosity; opacity: 0.4;
+  -webkit-mask-image: radial-gradient(120% 120% at 64% 30%, #000 42%, transparent 84%);
+  mask-image: radial-gradient(120% 120% at 64% 30%, #000 42%, transparent 84%); }
+.lx .nmod-hero .nmod-kb { z-index: 0; }
+/* preview video — replaces the cover thumbnail once it's actually playing; sits above
+   the cover art but below the vignette + controls/badges. */
+.lx .nmod-video { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 0.35s ease; background: #000; }
+.lx .nmod-video.on { opacity: 1; }
+.lx .nmod-video mux-player { width: 100%; height: 100%; display: block; --controls: none; --media-object-fit: cover; }
+/* preview countdown badge — moved to top-right so the program lockup owns the top-left */
+.lx .nmod-prevbadge { position: absolute; top: 16px; right: 60px; z-index: 3; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: white; background: oklch(0 0 0 / 0.32); padding: 4px 10px; border-radius: 999px; font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.lx .nmod-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: oklch(1 0 0 / 0.82); margin-bottom: 6px; }
+.lx .nmod-herobottom { position: absolute; left: 22px; right: 22px; bottom: 16px; z-index: 3; }
 .lx .nmod-title { font-size: 27px; font-weight: 900; letter-spacing: -0.015em; color: white; line-height: 1.1; text-wrap: balance; text-shadow: 0 2px 14px oklch(0 0 0 / 0.35); }
 .lx .nmod-actions { display: flex; align-items: center; gap: 9px; margin-top: 13px; }
 .lx .nmod-play { padding: 11px 22px; font-size: 14.5px; }

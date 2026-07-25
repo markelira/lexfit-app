@@ -21,8 +21,32 @@ export async function POST(req: Request) {
   const origin = req.headers.get("origin") ?? "*";
   const upload = await createDirectUpload(code, origin);
 
-  await adminDb.collection("videos").doc(code).set(
-    { muxUploadId: upload.id, muxStatus: "uploading", updatedAt: FieldValue.serverTimestamp() },
+  const ref = adminDb.collection("videos").doc(code);
+  const snap = await ref.get();
+  // If uploading before the metadata form was saved, seed a complete draft so we
+  // never persist a fields-less video doc.
+  const base = snap.exists
+    ? {}
+    : {
+        code,
+        kind: "workout",
+        series: null,
+        title: code,
+        theme: "",
+        level: 1,
+        format: "",
+        types: [],
+        blocks: [],
+        status: "draft",
+        published: false,
+        muxAssetId: null,
+        muxPlaybackId: null,
+        muxDuration: null,
+        thumb: null,
+        createdAt: FieldValue.serverTimestamp(),
+      };
+  await ref.set(
+    { ...base, muxUploadId: upload.id, muxStatus: "uploading", updatedAt: FieldValue.serverTimestamp() },
     { merge: true },
   );
 

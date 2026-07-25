@@ -19,11 +19,21 @@ export type RetestKind = "soft" | "final" | null;
 // videos/{code} — the global library item (intrinsic, reusable)
 // ─────────────────────────────────────────────────────────────
 
+/** One exercise (Gyakorlat) inside a block. */
+export interface VideoExercise {
+  name: string;
+  start?: number;      // absolute seconds into the video where this exercise begins (optional; same basis as block.start)
+}
+
+/** An exercise entry may be a bare name (legacy / unstamped) or a stamped object. */
+export type VideoExerciseItem = string | VideoExercise;
+
 /** One block of a session (warm-up, circuit, cool-down). */
 export interface VideoBlock {
   name: string;
-  mins: number;
-  items: string[];
+  mins: number;        // block length in minutes — auto-derived from `start` gaps when stamped
+  items: VideoExerciseItem[];  // exercises; a string (legacy/unstamped) or { name, start? }
+  start?: number;      // seconds into the video where this block begins (optional; enables exact player nav)
 }
 
 export interface Video {

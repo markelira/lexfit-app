@@ -42,6 +42,24 @@ preview filler, not real data.
 - Do NOT seed production. Screens read Firestore at runtime — they are not hardcoded, so
   they render emulator data in dev and admin-uploaded data in prod with no code changes.
 
+## Admin dashboard (Phase 7 — BUILT)
+A guarded `/admin` CMS is how real content gets authored (dev → emulator, prod → prod).
+- **Auth:** `src/lib/auth-server.ts` — `isAdmin(token)` = allowlisted email (`gorgeimarko@gmail.com`)
+  **that signed in with Google**. The `/admin` layout gates on `GET /api/admin/me`; every
+  admin write goes through `verifyRequest → isAdmin → Admin SDK` in `/api/admin/*` routes,
+  which bypass the read-only client rules — **rules were NOT loosened**.
+- **Screens:** Videók (metadata + Mux upload via `@mux/mux-uploader-react` → existing
+  `/api/mux/{upload,finalize,webhook}`, signed playback), Programok (metadata + a **playlist**
+  builder — link existing `videos/{code}` and drag-order them; week/day/phase are DERIVED from
+  order + the program's `perWeek`/`phases`), Szűrők (`filters/{key}` options), Tagok (read-only
+  members + subscription/onboarding/progress), Vezérlőpult (KPIs).
+- **Authoring content in dev:** `npm run dev:local`, sign in as the owner, go to `/admin`.
+  Server-side admin writes hit the **emulator** (`FIRESTORE_EMULATOR_HOST` set). Mux uploads
+  always hit real Mux. **Never run plain `npm run dev` for admin authoring** — that writes to
+  prod Firestore.
+- **Deferred (not built):** promo/comp codes, audit log, settings doc, notifications.
+- Research + plan: `docs/admin-migration-{research,plan}.md`.
+
 ## Build roadmap (do in order — see docs/build-plan.md)
 0. Foundations & design system  ← scaffold + services wired (current)
 1. Database architecture & content seed
@@ -50,7 +68,7 @@ preview filler, not real data.
 4. App shell + Foundation + Videótár
 5. Haladásom (progress & photos)
 6. Stripe subscriptions & sales pages
-7. Admin dashboard
+7. Admin dashboard  ← BUILT (content CMS; see "Admin dashboard" above)
 8. QA, polish & launch
 
 ## Conventions

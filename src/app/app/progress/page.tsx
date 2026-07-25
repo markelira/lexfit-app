@@ -71,7 +71,7 @@ export default function HaladasomPage() {
         onUploadNow={(f) => upload(nowMilestone, f)}
       />
 
-      <div className="halc-tip">📱 Álló (portré) telefonos képet tölts fel — azonos pózban, fényben és ruhában.</div>
+      <div className="halc-tip">📱 Álló (portré) telefonos képet tölts fel — azonos pózban, fényben és ruhában mindkétszer.</div>
 
       <div className="halc-miles">
         {miles.map((m) => {

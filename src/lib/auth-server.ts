@@ -14,9 +14,19 @@ export async function verifyRequest(req: Request): Promise<DecodedIdToken | null
   }
 }
 
-// Admin allowlist — the owner account. The Phase 7 dashboard will use this.
+// Admin allowlist — the owner account.
 const ADMIN_EMAILS = new Set(["gorgeimarko@gmail.com"]);
 
+/**
+ * Admin = allowlisted email that signed in with GOOGLE. Pinning the provider
+ * blocks a future risk (Phase 2 adds Facebook/Apple, where a non-Google account
+ * could present an unverified email matching the allowlist). The owner always
+ * uses Google, in dev (emulator) and prod alike.
+ */
 export function isAdmin(token: DecodedIdToken): boolean {
-  return token.email != null && ADMIN_EMAILS.has(token.email);
+  return (
+    token.firebase?.sign_in_provider === "google.com" &&
+    token.email != null &&
+    ADMIN_EMAILS.has(token.email)
+  );
 }

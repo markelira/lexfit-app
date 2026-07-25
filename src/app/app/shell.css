@@ -1,24 +1,36 @@
 /* LEXFIT app shell — glass sidebar, ported from lexfit-app.css. Scoped under .lx. */
 
+/* ambient color field — disabled by default: pages use a solid background */
+.lx .lx-ambient { display: none; }
+.lx .lx-ambient::before, .lx .lx-ambient::after {
+  content: ""; position: absolute; border-radius: 50%; filter: blur(110px);
+}
+.lx .lx-ambient::before {
+  width: 46vw; height: 46vw; left: -10%; top: -18%; background: var(--accent); opacity: 0.13;
+}
+.lx .lx-ambient::after {
+  width: 40vw; height: 40vw; right: -12%; bottom: -22%; background: var(--cat-cardio); opacity: 0.1;
+}
+
 .lx .lx-sidebar {
   width: 244px;
   flex-shrink: 0;
   position: sticky;
-  top: 14px;
+  top: 0;
   z-index: 10;
-  height: calc(100dvh - 28px);
-  margin: 14px 6px 14px 14px;
+  height: 100dvh;
+  margin: 0;
   padding: 18px 13px 13px;
-  border-radius: 28px;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
-  background: oklch(1 0 0 / 0.58);
+  background: oklch(1 0 0 / 0.66);
   backdrop-filter: blur(32px) saturate(1.9);
   -webkit-backdrop-filter: blur(32px) saturate(1.9);
-  border: 1px solid oklch(1 0 0 / 0.7);
-  box-shadow: inset 0 1.5px 0 oklch(1 0 0 / 0.95), inset 0 0 0 1px oklch(1 0 0 / 0.22),
-    inset 0 -18px 40px -28px oklch(0.58 0.165 358 / 0.25),
-    0 26px 56px -24px oklch(0.45 0.08 0 / 0.4), 0 6px 18px -10px oklch(0.45 0.08 0 / 0.22);
+  border: none;
+  border-right: 1px solid var(--line);
+  box-shadow: inset 0 1.5px 0 oklch(1 0 0 / 0.7), 5px 0 34px -20px oklch(0.45 0.08 0 / 0.3);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
 }
 .lx .lx-sidebar::before {
   content: "";
@@ -44,14 +56,12 @@
 .lx .lx-brand .mark {
   width: 32px;
   height: 32px;
-  border-radius: 10px;
-  background: var(--accent-2);
-  color: #fff;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 5px 14px -5px oklch(0.58 0.165 358 / 0.6), inset 0 1px 0 oklch(1 0 0 / 0.3);
 }
+.lx .lx-brand .mark img { width: 100%; height: 100%; object-fit: contain; }
 .lx .lx-brand .wm {
   font-weight: 900;
   font-size: 21px;
@@ -124,6 +134,18 @@
   border-radius: 3px;
   background: var(--accent-2);
   box-shadow: 0 0 8px -1px oklch(0.58 0.165 358 / 0.6);
+}
+/* "Szavazz Magadra" nav item — the MAI drop badge (renders on every page) */
+.lx .nav2 .szm-newdot {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: white;
+  background: var(--accent);
+  padding: 2px 7px;
+  border-radius: 999px;
 }
 
 .lx .lx-prof {

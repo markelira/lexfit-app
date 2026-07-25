@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dev Plan — LEXFIT kezdőlap hero (Foundation)</title>
+<link rel="stylesheet" href="lexfit-tokens.css">
+<link rel="stylesheet" href="sales/atv-devplan.css">
+<style>
+  .lx a { color: white; } .lx a:hover { color: oklch(1 0 0 / 0.8); }
+  /* előtte/utána mini-billboard vázlat */
+  .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0; }
+  .ba .col h4 { font-size: 13px; font-weight: 800; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+  .ba .col h4 .t { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 6px; color: white; }
+  .ba .now .t { background: var(--ink-3); } .ba .new .t { background: var(--accent-2); }
+  .mbb { position: relative; aspect-ratio: 16/8; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line); }
+  .mbb .art { position: absolute; inset: 0; }
+  .mbb.a-now .art { background: linear-gradient(125deg, oklch(0.52 0.13 40) 0%, oklch(0.68 0.14 45) 100%); }
+  .mbb.a-new .art { background: linear-gradient(125deg, oklch(0.4 0.09 0) 0%, oklch(0.6 0.16 358) 60%, oklch(0.68 0.15 5) 100%); }
+  .mbb .scr { position: absolute; inset: 0; background: linear-gradient(90deg, oklch(0.15 0.02 350 / 0.78) 0%, oklch(0.15 0.02 350 / 0.35) 45%, transparent 70%); }
+  .mbb .word { position: absolute; right: 4%; bottom: -0.22em; font-weight: 900; font-size: 46px; letter-spacing: -0.03em; color: oklch(1 0 0 / 0.14); line-height: 0.8; }
+  .mbb .ring { position: absolute; right: -8%; top: -40%; width: 42%; aspect-ratio: 1; border-radius: 50%; border: 14px solid oklch(1 0 0 / 0.12); }
+  .mbb .ct { position: absolute; left: 6%; top: 50%; transform: translateY(-50%); }
+  .mbb .ct .ey { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.08em; color: oklch(1 0 0 / 0.78); }
+  .mbb .ct .h { font-size: 20px; font-weight: 900; color: white; letter-spacing: -0.02em; line-height: 1; margin: 4px 0 6px; }
+  .mbb .ct .row { display: flex; gap: 6px; align-items: center; }
+  .mbb .ct .p1 { font-size: 9px; font-weight: 700; color: var(--ink); background: white; padding: 5px 11px; border-radius: 6px; }
+  .mbb .ct .lk { position: absolute; left: 6%; bottom: 8%; display: inline-flex; align-items: center; gap: 5px; font-size: 8px; font-weight: 700; color: white; }
+  .mbb .ct .lk .mk { width: 13px; height: 13px; border-radius: 4px; background: oklch(1 0 0 / 0.9); }
+  .mbb .prog { position: absolute; left: 6%; right: 40%; bottom: 20%; height: 4px; border-radius: 99px; background: oklch(1 0 0 / 0.25); }
+  .mbb .prog i { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: white; border-radius: 99px; }
+  .mbcap { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 8px; }
+  @media (max-width: 760px){ .ba { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="lx dp">
+
+  <header class="dp-hero">
+    <span class="ring"></span><span class="ring two"></span>
+    <span class="kick"><span class="dot"></span>Fejlesztési terv · a hero-kutatás alapján</span>
+    <h1>A kezdőlap hero újratervezése — a Foundation program a főszerepben</h1>
+    <p class="lede">A Netflix &amp; Apple TV hero-kutatás 7 átvihető elvét konkrét, fájl-szintű feladatokká bontjuk. A cél: a jelenlegi napi-edzés billboardot úgy strukturáljuk át, hogy a <strong>Foundation programot</strong> mint utat állítsa középpontba — egyedi, de a programkártyákkal rokon kulcs-arttal —, miközben megtartjuk a már meglévő, erős billboard-vázat és a márka vizuális nyelvét.</p>
+    <div class="meta">
+      <span class="m">8 FELADAT</span>
+      <span class="m">3 SPRINT</span>
+      <span class="m">ELV 1–7 LEFEDVE</span>
+      <span class="m">A VÁZ MARAD</span>
+    </div>
+  </header>
+
+  <!-- 00 — áttekintés -->
+  <section style="margin-top:8px">
+    <div class="sec-hd"><span class="no">00</span><h2>A terv egy pillantásra</h2></div>
+    <p class="sub">A kutatás nem új szerkezetet, hanem <strong>fókusz-váltást</strong> kér. A meglévő <code>app/home-billboard.jsx</code> már full-bleed, scrimes, állapot-tudatos billboard — ezt nem dobjuk el. Egy új, Foundation-fókuszú hero-történetet és egy billboard-léptékű kulcs-artot építünk rá, majd megerősítjük a mozgás-kontrollt és az újra-belépést.</p>
+    <div class="road">
+      <div class="ph s1"><span class="bar"></span><div class="when">Sprint 1 · alap</div><h3>Foundation-hero</h3><p>Új hero-történet a programról + billboard kulcs-art a kártya-nyelvből.</p><div class="c">Elv 1 · 7</div></div>
+      <div class="ph s2"><span class="bar"></span><div class="when">Sprint 2 · logika</div><h3>CTA &amp; állapot</h3><p>Egy domináns + másodlagos CTA; állapot-tudat és folytatás összekötése.</p><div class="c">Elv 3 · 5 · 6</div></div>
+      <div class="ph s3"><span class="bar"></span><div class="when">Sprint 3 · mozgás</div><h3>Mozgás &amp; A11Y</h3><p>Néma előnézet, szünet, reduced-motion, kontraszt-ellenőrzés.</p><div class="c">Elv 2 · 4</div></div>
+      <div class="ph s0"><span class="bar"></span><div class="when">Folyamatos</div><h3>QA</h3><p>Squint-teszt, billentyűzet, AA-kontraszt, mobil.</p><div class="c">DoD</div></div>
+    </div>
+  </section>
+
+  <!-- előtte/utána -->
+  <section>
+    <div class="sec-hd"><span class="no">01</span><h2>Előtte → utána</h2></div>
+    <p class="sub">A hero elsődleges története változik: a „mai edzés" kártyából a „Foundation — az utad" billboard lesz. A napi edzés nem tűnik el — a hero alatti „Folytasd a programot" sorba kerül (Elv 6), pontosan úgy, ahogy a Netflix a „Folytatás" sort a billboard alá teszi.</p>
+    <div class="ba">
+      <div class="col now">
+        <h4><span class="t">MOST</span> napi-edzés hero</h4>
+        <div class="mbb a-now">
+          <span class="art"></span><span class="ring"></span><span class="scr"></span>
+          <span class="word">CARDIO</span>
+          <div class="ct">
+            <div class="ey">MAI EDZÉS · CSÜTÖRTÖK · F023</div>
+            <div class="h">Második fázis</div>
+            <div class="row"><span class="p1">▶ Edzés indítása</span></div>
+          </div>
+        </div>
+        <div class="mbcap">Egy nap egy edzése — a program mint út háttérben marad.</div>
+      </div>
+      <div class="col new">
+        <h4><span class="t">ÚJ</span> Foundation-program hero</h4>
+        <div class="mbb a-new">
+          <span class="art"></span><span class="ring"></span><span class="scr"></span>
+          <span class="word">FOUNDATION</span>
+          <div class="ct">
+            <div class="ey">A PROGRAMOD · 4. HÉT · 🔨 ÉPÍTÉS · 23/48</div>
+            <div class="h">Foundation</div>
+            <div class="row"><span class="p1">▶ Mai edzés indítása</span></div>
+            <span class="lk"><span class="mk"></span>FOUNDATION</span>
+          </div>
+          <div class="prog"><i></i></div>
+        </div>
+        <div class="mbcap">A program az elsődleges történet; a mai edzés a domináns CTA-ban él.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sprint 1 -->
+  <div class="sprint-band"><span class="tag s1">Sprint 1 · alap</span><h2>Foundation-fókuszú hero</h2><span class="goal">Egy magabiztos ajánlat + rokon kulcs-art (Elv 1, 7)</span></div>
+
+  <div class="task">
+    <div class="th"><span class="tid">T-01</span><span class="tt">Billboard-léptékű Foundation kulcs-art</span><span class="audref">Elv 7</span><span class="eff M">M</span></div>
+    <div class="tb">
+      <div class="blk"><span class="k">Fájlok</span><span class="v files"><code>app/home-billboard.jsx</code> <code>app/lexfit-app.css</code> <code>explore/prog-thumbs.jsx</code></span></div>
+      <div class="blk"><span class="k">Változás</span><span class="v">A <code>.nhb-art</code> hátterét a program-thumbnail nyelvre hangoljuk: kategória-gradiens + <code>.nhb-word</code> nagy szó megmarad, de bekerül a <b>Foundation lockup</b> (a <code>PtTV</code>-ből ismert <b>● geometriai ikon + „FOUNDATION" név</b>). Így a hero egyértelműen a program nagy testvére, nem egy random edzésborító. A ring/vig réteg marad.</span></div>
+      <div class="blk"><span class="k">Kész, ha</span><span class="v"><ul class="ac"><li><span class="ck"></span>A hero egy pillantásra „Foundation"-ként olvasható (ikon + név), a kártyákkal egy családban.</li><li><span class="ck"></span>Nincs új program-szín bevezetve; a rendszer konzisztens marad a <code>prog-thumbs</code> logikával.</li></ul></span></div>
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th"><span class="tid">T-02</span><span class="tt">Hero-történet: a program mint elsődleges narratíva</span><span class="audref">Elv 1</span><span class="eff M">M</span></div>
+    <div class="tb">
+      <div class="blk"><span class="k">Fájlok</span><span class="v files"><code>app/home-billboard.jsx</code> <code>app/lexfit-data.jsx</code></span></div>
+      <div class="blk"><span class="k">Változás</span><span class="v">A <code>cfg</code> objektum elsődleges története a Foundation program lesz: <b>eyebrow</b> = „A PROGRAMOD · {hét}. HÉT · {fázis} · {done}/{total}", <b>cím</b> = „Foundation", <b>szinopszis</b> = a program egy mondatos ígérete + a mai lépés. A napi edzés részletei a CTA-ba és az alsó sorba kerülnek. A 4 állapot (Edzésnap / Kész / Pihenő / Visszamérés) megmarad, de mind a <b>program keretén belül</b> fogalmaz.</span></div>
+      <div class="blk"><span class="k">Kész, ha</span><span class="v"><ul class="ac"><li><span class="ck"></span>A hero a programot mint utat kommunikálja, nem csak a napi feladatot.</li><li><span class="ck"></span>Mind a 4 user-állapot értelmes a program-keretben.</li></ul></span></div>
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th"><span class="tid">T-03</span><span class="tt">Program-előrehaladás jelzés a heróban</span><span class="audref">Elv 1 · 6</span><span class="eff S">S</span></div>
+    <div class="tb">
+      <div class="blk"><span class="k">Fájlok</span><span class="v files"><code>app/home-billboard.jsx</code> <code>app/lexfit-app.css</code></span></div>
+      <div class="blk"><span class="k">Változás</span><span class="v">Vékony előrehaladás-sáv a heróban (a <code>ProgramCard</code> fázis-logikájából: <code>lxData.phases</code>, <code>programDone/programTotal</code>) — a streaming „Continue Watching" progress-bar mintájára, de programszinten: hol tartasz a Foundationben. Diszkrét, a scrim fölött, jobbra a kulcs-art felé fadelve.</span></div>
+      <div class="blk"><span class="k">Kész, ha</span><span class="v"><ul class="ac"><li><span class="ck"></span>A felhasználó a heróból látja, hol tart a programban.</li><li><span class="ck"></span>A sáv nem verseng a címmel/CTA-val — halkabb regiszter.</li></ul></span></div>
+    </div>
+  </div>
+
+  <!-- Sprint 2 -->
+  <div class="sprint-band"><span class="tag s2">Sprint 2 · logika</span><h2>CTA, hierarchia &amp; újra-belépés</h2><span class="goal">Egy domináns akció + folytonosság (Elv 3, 5, 6)</span></div>
+
+  <div class="task">
+    <div class="th"><span class="tid">T-04</span><span class="tt">Egy domináns + egy másodlagos CTA</span><span class="audref">Elv 5</span><span class="eff S">S</span></div>
+    <div class="tb">
+      <div class="blk"><span class="k">Fájlok</span><span class="v files"><code>app/home-billboard.jsx</code></span></div>
+      <div class="blk"><span class="k">Változás</span><span class="v">A hero CTA-párja: elsődleges <b>„Mai edzés indítása"</b> (<code>.nhb-playw</code>, magas kontraszt, a mai edzést nyitja) + másodlagos <b>„Program áttekintése"</b> / „Részletek" (<code>.nhb-info</code> → a program-nézetre visz vagy az <code>NcardModal</code>-t nyitja). Egy domináns akció, nincs choice-paralízis — a habozónak a másodlagos út.</span></div>
+      <div class="blk"><span class="k">Kész, ha</span><span class="v"><ul class="ac"><li><span class="ck"></span>Squint-teszt: 3 mp alatt egyértelmű a fő akció.</li><li><span class="ck"></span>Mindkét gomb valós célra visz (nincs holt CTA).</li></ul></span></div>
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th"><span class="tid">T-05</span><span class="tt">„Folytasd a programot" sor közvetlen a hero alá</span><span class="audref">Elv 6</span><span class="eff S">S</span></div>
+    <div class="tb">
+      <div class="blk"><span class="k">Fájlok</span><span class="v files"><code>app/screen-home.jsx</code></span></div>
+      <div class="blk"><span class="k">Változás</span><span class="v">A szekció-sorrendben a <code>ContinueRow</code> / <code>SecContinue</code> közvetlenül a billboard után jön (ma is ott van — megerősítjük, hogy a hero „mai lépése" és a sor első kártyája konzisztens). Ez a Netflix „Folytatás a billboard alatt" mintája: a hero a fókusz, a sor a folytonosság.</span></div>
+      <div class="blk"><span class="k">Kész, ha</span><span class="v"><ul class="ac"><li><span class="ck"></span>A hero alatti első sor a program folytatása, nem vegyes tartalom.</li><li><span class="ck"></span>A hero mai edzése és a sor első eleme nem mond ellent egymásnak.</li></ul></span></div>
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th"><span class="tid">T-06</span><span class="tt">Bal-igazított F-verem finomhangolása</span><span class="audref">Elv 3</span><span class="eff S">S</span></div>
+    <div class="tb">
+      <div class="blk"><span class="k">Fájlok</span><span class="v files"><code>app/lexfit-app.css</code></span></div>
+      <div class="blk"><span class="k">Változás</span><span class="v">Az eyebrow → cím → szinopszis → CTA verem térköz- és méret-ritmusa a squint-teszthez: a cím a domináns, a szinopszis max. 2 sor, a metaadat a mono eyebrow-ban. A jobb oldali <code>.nhb-right</code> (agebox, mute) ne vonja el a fókuszt a bal verzióról.</span></div>
+      <div class="blk"><span class="k">Kész, ha</span><span class="v"><ul class="ac"><li><span class="ck"></span>Összehúzott szemmel a cím és az elsődleges CTA ugrik ki elsőként.</li></ul></span></div>
+    </div>
+  </div>
+
+  <!-- Sprint 3 -->
+  <div class="sprint-band"><span class="tag s3">Sprint 3 · mozgás</span><h2>Kontrollált mozgás &amp; akadálymentesség</h2><span class="goal">Felelős autoplay (Elv 2, 4 · A11Y-H1…3)</span></div>
+
+  <div class="task">
+    <div class="th"><span class="tid">T-07</span><span class="tt">Néma előnézet + látható szünet, reduced-motion fallback</span><span class="audref">A11Y-H1 · H2</span><span class="eff M">M</span></div>
+    <div class="tb">
+      <div class="blk"><span class="k">Fájlok</span><span class="v files"><code>app/home-billboard.jsx</code> <code>app/lexfit-app.css</code></span></div>
+      <div class="blk"><span class="k">Változás</span><span class="v">Ha a hero valódi mozgóképet/loopot kap (jelenleg animált art): alapból <b>néma</b>, látható <b>szünet/lejátszás</b> gombbal (a meglévő <code>.nhb-mute</code> mellé), billentyűzettel elérhetően, feliratozott ikonnal. <code>matchMedia('(prefers-reduced-motion: reduce)')</code> esetén <b>nem indul</b> — statikus kulcs-art, opcionális felhasználói lejátszással. A szünet/lejátszás döntést <code>localStorage</code>-ben őrizzük, hogy visszatéréskor ne induljon újra.</span></div>
+      <div class="blk"><span class="k">Kész, ha</span><span class="v"><ul class="ac"><li><span class="ck"></span>Reduced-motion alatt a hero nem mozog magától.</li><li><span class="ck"></span>A szünet 2 tab-lépésen belül fókuszálható; állapota megmarad reload után.</li></ul></span></div>
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th"><span class="tid">T-08</span><span class="tt">Scrim &amp; kontraszt-ellenőrzés a vizuál fölött</span><span class="audref">Elv 2 · A11Y-H3</span><span class="eff S">S</span></div>
+    <div class="tb">
+      <div class="blk"><span class="k">Fájlok</span><span class="v files"><code>app/lexfit-app.css</code></span></div>
+      <div class="blk"><span class="k">Változás</span><span class="v">A <code>.nhb-scrim</code> / <code>.nhb-vig</code> gradienst úgy hangoljuk, hogy a cím, szinopszis és CTA-k a legvilágosabb kulcs-art fölött is elérjék az AA-kontrasztot (4,5:1). A hero üzenete némán, szöveg alapján is teljes — a mozgás sosem az egyetlen információhordozó.</span></div>
+      <div class="blk"><span class="k">Kész, ha</span><span class="v"><ul class="ac"><li><span class="ck"></span>Minden hero-szöveg AA-kontraszt felett (ellenőrző eszközzel).</li><li><span class="ck"></span>A hero érthető mozgás/hang nélkül is.</li></ul></span></div>
+    </div>
+  </div>
+
+  <!-- QA -->
+  <section>
+    <div class="sec-hd"><span class="no">02</span><h2>Definition of Done — QA</h2></div>
+    <p class="sub">A hero-átalakítás akkor kész, ha mindegyik pont teljesül. A kutatás 7 elvét és az akadálymentességi minimumot tükrözi.</p>
+    <div class="qa">
+      <div class="q"><span class="ck"></span><span>A hero elsődleges története a Foundation program (Elv 1).</span></div>
+      <div class="q"><span class="ck"></span><span>A kulcs-art a program-thumbnail nyelvből épül: ● ikon + „FOUNDATION" (Elv 7).</span></div>
+      <div class="q"><span class="ck"></span><span>Squint-teszt: cím + elsődleges CTA 3 mp alatt kiugrik (Elv 3, 5).</span></div>
+      <div class="q"><span class="ck"></span><span>Egy domináns „Mai edzés indítása" + egy másodlagos CTA; egyik sem holt.</span></div>
+      <div class="q"><span class="ck"></span><span>„Folytasd a programot" sor közvetlen a hero alatt, konzisztensen (Elv 6).</span></div>
+      <div class="q"><span class="ck"></span><span>Program-előrehaladás látszik a heróban, halkabb regiszterben.</span></div>
+      <div class="q"><span class="ck"></span><span>Autoplay néma; látható, billentyűzet-elérhető szünet (A11Y-H1).</span></div>
+      <div class="q"><span class="ck"></span><span><code>prefers-reduced-motion</code> alatt statikus poszter, perzisztens döntés (A11Y-H2).</span></div>
+      <div class="q"><span class="ck"></span><span>Minden hero-szöveg AA-kontraszt felett a scrim fölött (A11Y-H3).</span></div>
+      <div class="q"><span class="ck"></span><span>Mind a 4 user-állapot értelmes a program-keretben.</span></div>
+      <div class="q"><span class="ck"></span><span>Nincs új program-szín; a rendszer konzisztens a kártyákkal.</span></div>
+      <div class="q"><span class="ck"></span><span>Mobilon a hero olvasható, a CTA-k ≥44px érintési céllal.</span></div>
+    </div>
+  </section>
+
+  <!-- effort -->
+  <section>
+    <div class="sec-hd"><span class="no">03</span><h2>Ráfordítás összegzés</h2></div>
+    <div class="eff-sum">
+      <div class="e"><div class="v">3</div><div class="l">Sprint</div><div class="d">Alap · logika · mozgás</div></div>
+      <div class="e"><div class="v">8</div><div class="l">Feladat</div><div class="d">3×M · 5×S</div></div>
+      <div class="e"><div class="v">7/7</div><div class="l">Elv lefedve</div><div class="d">a kutatásból</div></div>
+      <div class="e"><div class="v">~4–5</div><div class="l">nap becslés</div><div class="d">S = fél nap, M = 1–2 nap</div></div>
+    </div>
+    <p class="sub" style="margin-top:18px; font-size:13.5px;">A meglévő billboard-váz <strong>változatlan marad</strong> — a terv a hero <em>tartalmi fókuszát</em> tolja a Foundation programra, egy rokon kulcs-arttal, és megerősíti a mozgás-kontrollt. Nem másolás: a streaming-óriások bizonyított logikáját (egy magabiztos ajánlat, tartalom mint felület, kontrollált mozgás, újra-belépés) alkalmazzuk a LEXFIT márka nyelvén.</p>
+  </section>
+
+  <div class="foot">
+    <span class="mk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 L5 13 H11 L10 21 L18 10 H12 Z"></path></svg></span>
+    LEXFIT — Kezdőlap hero · fejlesztési terv a Netflix &amp; Apple TV kutatás alapján · belső anyag
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Foundation hero · Fázis-fókusz</title>
+<link rel="stylesheet" href="lexfit-tokens.css">
+<link rel="stylesheet" href="cards/cards.css">
+<link rel="stylesheet" href="explore/prog-thumbs.css">
+<style>
+  html,body{margin:0;background:#eceae5;min-height:100%}
+  .lx{font-family:var(--font);color:var(--ink);padding:60px}
+  .wrap{max-width:1080px;margin:0 auto}
+  .hb{position:relative;height:452px;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-card);background:var(--ink)}
+  .hb-art{position:absolute;inset:0}
+  .hb-photo{position:absolute;inset:0;z-index:0;pointer-events:none;
+    background-image:url('uploads/645406172_122099815329230342_5248551207032804718_n.jpg');
+    background-size:cover;mix-blend-mode:luminosity}
+  .hb-ring{position:absolute;border-radius:50%;border:40px solid oklch(1 0 0/.12)}
+  .hb-scrim{position:absolute;inset:0}
+  .hb-lock{display:inline-flex;align-items:center;gap:9px;padding:6px 14px 6px 7px;border-radius:999px;
+    background:oklch(.18 .03 350/.5);border:1px solid oklch(1 0 0/.18);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+  .hb-lock .mk{width:24px;height:24px;border-radius:999px;background:oklch(1 0 0/.16);color:#fff;display:flex;align-items:center;justify-content:center}
+  .hb-lock .nm{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;color:#fff}
+  svg{display:block}
+  /* borító-kártyák a heróban (Program-borítók PtTV, kicsiben) */
+  .hb-cards{position:absolute;left:0;right:0;bottom:22px;z-index:3;display:flex;gap:11px;justify-content:center;align-items:flex-end;padding:0 24px}
+  .hb-cards .pt-tv{transform-origin:bottom center;transition:transform .2s ease,opacity .2s ease}
+  .hb-cards .pt-tv.r-mid{transform:scale(.9);opacity:.78}
+  .hb-cards .pt-tv.r-out{transform:scale(.8);opacity:.52}
+  .hb-cards .pt-tv{width:156px}
+  .hb-cards .pt-tv-art .cca-lockup .wd{font-size:14.4px;max-width:120px;padding:0 6px}
+  .hb-cards .cca-lockup .ey{font-size:7.5px;letter-spacing:.06em}
+  .hb-cards .cca-lockup .un{width:16px;height:2px;margin-top:5px}
+  .hb-cards .pt-tv-tl{top:7px;left:7px;padding:3px 8px 3px 4px;gap:5px}
+  .hb-cards .pt-tv-tl .pt-name{font-size:8px;letter-spacing:.1em}
+  .hb-cards .pt-tv-tl .pt-mark{width:15px;height:15px}
+  .hb-cards .cca-chip{font-size:8px;padding:2px 6px;top:7px;right:7px}
+  .hb-cards .pt-tv-foot{padding:12px 9px 8px}
+  .hb-cards .pt-tv-name{font-size:10.5px;margin-bottom:0}
+</style>
+</head>
+<body class="lx">
+<div class="wrap">
+  <div class="hb">
+    <div class="hb-art" style="background:linear-gradient(125deg,oklch(.24 .03 350) 0%,oklch(.34 .07 320) 62%,oklch(.5 .12 330) 100%)"></div>
+    <div class="hb-photo" style="background-position:58% 22%;opacity:.4;-webkit-mask-image:radial-gradient(130% 120% at 70% 38%,#000 42%,transparent 82%);mask-image:radial-gradient(130% 120% at 70% 38%,#000 42%,transparent 82%)"></div>
+    <span class="hb-ring" style="left:-10%;top:-46%;width:52%;aspect-ratio:1;border-width:30px"></span>
+    <span class="hb-scrim" style="background:linear-gradient(to top,oklch(.18 .03 350/.94) 8%,oklch(.18 .03 350/.4) 48%,transparent 82%)"></span>
+
+    <!-- centered editorial lockup -->
+    <div style="position:absolute;left:0;right:0;top:44%;transform:translateY(-50%);z-index:3;text-align:center">
+      <span class="hb-lock" style="margin:0 auto 16px"><span class="mk"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg></span><span class="nm">FOUNDATION</span></span>
+      <div style="font-weight:900;font-size:66px;line-height:.9;letter-spacing:-.035em;color:#fff;text-transform:uppercase">kihívás</div>
+      <div style="margin-top:12px;font-size:15px;color:oklch(1 0 0/.85);font-weight:600">8 hét · 48 edzés · kezdőtől a visszamérésig</div>
+    </div>
+    <div class="hb-cards">
+      <div class="pt-tv r-out"><div class="pt-tv-art" style="background:linear-gradient(135deg,oklch(from var(--cat-also) calc(l + .07) c h) 0%,var(--cat-also) 100%)"><div class="pt-tv-photo"></div><span class="cc-ring"></span><div class="cca-lockup"><div class="ey">LEXFIT · F001</div><div class="wd">ALSÓTEST</div><div class="un"></div></div></div></div>
+      <div class="pt-tv r-mid"><div class="pt-tv-art" style="background:linear-gradient(135deg,oklch(from var(--cat-felso) calc(l + .07) c h) 0%,var(--cat-felso) 100%)"><div class="pt-tv-photo"></div><span class="cc-ring"></span><div class="cca-lockup"><div class="ey">LEXFIT · F002</div><div class="wd">FELSŐTEST</div><div class="un"></div></div></div></div>
+      <div class="pt-tv"><div class="pt-tv-art" style="background:linear-gradient(135deg,oklch(from var(--cat-cardio) calc(l + .07) c h) 0%,var(--cat-cardio) 100%)"><div class="pt-tv-photo"></div><span class="cc-ring"></span><div class="cca-lockup"><div class="ey">LEXFIT · F003</div><div class="wd">CARDIO + HAS</div><div class="un"></div></div></div></div>
+      <div class="pt-tv r-mid"><div class="pt-tv-art" style="background:linear-gradient(135deg,oklch(from var(--cat-teljes) calc(l + .07) c h) 0%,var(--cat-teljes) 100%)"><div class="pt-tv-photo"></div><span class="cc-ring"></span><div class="cca-lockup"><div class="ey">LEXFIT · F004</div><div class="wd">TELJES TEST</div><div class="un"></div></div></div></div>
+      <div class="pt-tv r-out"><div class="pt-tv-art" style="background:linear-gradient(135deg,oklch(from var(--cat-mobility) calc(l + .07) c h) 0%,var(--cat-mobility) 100%)"><div class="pt-tv-photo"></div><span class="cc-ring"></span><div class="cca-lockup"><div class="ey">LEXFIT · F005</div><div class="wd">MOBILITY</div><div class="un"></div></div></div></div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

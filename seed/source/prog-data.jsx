@@ -1,19 +1,19 @@
-// LEXFIT — Foundation program dataset (8 hét · 40 edzés · 4 fázis)
+// LEXFIT — Foundation program dataset (4 hét · 20 edzés · 4 fázis)
 // Forrás: Áttekintés doc. Heti split: H Alsó / K Felső / Sze 🛌 / Cs Cardio+has / P Teljes / Szo Mobility / V 🛌
-// Minden edzés fix 30 perc, eszköz nélkül. F001–F040 sorrendben, 5/hét.
+// Minden edzés fix 30 perc, eszköz nélkül. F001–F020 sorrendben, 5/hét. (F021–F040 tartalék.)
 
 const PROG_PHASES = [
-  { idx: 0, icon: "🌱", name: "Alap", weeks: "Hét 1–2", short: "Forma + szokás",
+  { idx: 0, icon: "🌱", name: "Alap", weeks: "Hét 1", short: "Forma + szokás",
     desc: "Forma és szokás kialakítása. Lassú tempó, alapgyakorlatok, bőséges modifikációkkal.",
     c: "var(--cat-mobility)" },
-  { idx: 1, icon: "🔨", name: "Építés", weeks: "Hét 3–4", short: "Variációk + cardio",
+  { idx: 1, icon: "🔨", name: "Építés", weeks: "Hét 2", short: "Variációk + cardio",
     desc: "Új variációk és cardio-alapozás. Tempo-játékok, új formátumok lépnek be.",
     c: "var(--cat-tartas)" },
-  { idx: 2, icon: "🔥", name: "Elmélyítés", weeks: "Hét 5–6", short: "Komplexitás + intenzitás",
-    desc: "Komplexitás és intenzitás. Egylábú gyakorlatok, EMOM, AMRAP. Hét 5 = Hét 1 visszamérés, erősebben.",
+  { idx: 2, icon: "🔥", name: "Elmélyítés", weeks: "Hét 3", short: "Komplexitás + intenzitás",
+    desc: "Komplexitás és intenzitás. Egylábú gyakorlatok, EMOM, AMRAP.",
     c: "var(--cat-cardio)" },
-  { idx: 3, icon: "🏆", name: "Kifejezés", weeks: "Hét 7–8", short: "Flow-k + záró mérés",
-    desc: "Komplex flow-k és záró visszamérés. Hét 8 = Hét 1 pontos visszamérése — mit fejlődtél.",
+  { idx: 3, icon: "🏆", name: "Kifejezés", weeks: "Hét 4", short: "Flow-k + záró mérés",
+    desc: "Komplex flow-k és záró visszamérés. Hét 4 = Hét 1 pontos visszamérése — mit fejlődtél.",
     c: "var(--cat-teljes)" },
 ];
 
@@ -80,10 +80,10 @@ const _W = [
   ["F040","Záró flow — ünnep","Mobility / nyújtás",2,"Folyamatos flow",["🧘 Lazító"]],
 ];
 
-// build 8 weeks, each with its phase + 5 workouts (+ the rest-day rhythm)
-const PROG_WEEKS = Array.from({ length: 8 }, (_, w) => {
-  const phase = Math.floor(w / 2);
-  const retest = w === 4 ? "soft" : w === 7 ? "final" : null; // hét 5 / hét 8
+// build 4 weeks, each its own phase + 5 workouts (+ the rest-day rhythm)
+const PROG_WEEKS = Array.from({ length: 4 }, (_, w) => {
+  const phase = w; // 4 hét · 4 fázis (heti egy)
+  const retest = w === 3 ? "final" : null; // hét 4 = záró visszamérés
   const slots = PROG_SPLIT.filter((s) => !s.rest); // 5 workout slots
   const workouts = slots.map((slot, i) => {
     const [code, title, theme, level, format, types] = _W[w * 5 + i];
@@ -101,10 +101,10 @@ const PROG_BY_CODE = {};
 PROG_WEEKS.forEach((wk) => wk.workouts.forEach((v) => { PROG_BY_CODE[v.code] = v; }));
 
 // ── progress model ──────────────────────────────────────────────
-// in-progress: Réka, 4. hét csütörtök. 3 teljes hét (15) + H,K (2) = 17 kész, F018 = ma.
-const PROG_CURRENT_INDEX = 17;        // F018 — a mai edzés
-const PROG_DONE_COUNT = 17;           // ennyi kész előtte
-const PROG_STREAK = 16;
+// in-progress: Réka, 3. hét csütörtök. 2 teljes hét (10) + H,K (2) = 12 kész, F013 = ma.
+const PROG_CURRENT_INDEX = 12;        // F013 — a mai edzés
+const PROG_DONE_COUNT = 12;           // ennyi kész előtte
+const PROG_STREAK = 11;
 
 // state egy edzéshez az adott user-szcenárióban
 function progDayState(v, joined) {
@@ -116,7 +116,7 @@ function progDayState(v, joined) {
 // state egy egész fázishoz
 function progPhaseState(phaseIdx, joined) {
   if (!joined) return phaseIdx === 0 ? "open" : "locked-preview";
-  const start = phaseIdx * 10, end = start + 10;
+  const start = phaseIdx * 5, end = start + 5;
   if (PROG_DONE_COUNT >= end) return "done";
   if (PROG_CURRENT_INDEX >= start && PROG_CURRENT_INDEX < end) return "now";
   if (PROG_DONE_COUNT >= start) return "now";
@@ -127,12 +127,12 @@ function progPhaseState(phaseIdx, joined) {
 const PROG_META = {
   title: "Foundation",
   hu: "Alapozó program",
-  weeks: 8, total: 40, perWeek: 5, mins: 30,
+  weeks: 4, total: 20, perWeek: 5, mins: 30,
   level: "Kezdő – újrakezdő",
-  eyebrow: "8 HETES PROGRAM · KEZDŐ",
+  eyebrow: "4 HETES PROGRAM · KEZDŐ",
   synopsis: "Stabil alap mindenhez: heti 5 edzés, napi fix 30 perc, eszköz nélkül. Négy fázis vezet a formától a záró mérésig.",
   facts: [
-    ["Időtartam", "8 hét"],
+    ["Időtartam", "4 hét"],
     ["Heti edzés", "5 nap + 2 pihenő"],
     ["Edzés hossza", "fix 30 perc"],
     ["Eszköz", "nincs (matrac)"],

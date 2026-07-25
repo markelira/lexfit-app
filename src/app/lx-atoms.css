@@ -124,3 +124,21 @@
   border-radius: 24px;
   box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.85), 0 10px 36px -16px oklch(0.45 0.08 0 / 0.18);
 }
+
+/* ── horizontal content rail (Netflix row) — shared by Videótár + Foundation ── */
+.lx .nxrail-sec { position: relative; }
+.lx .nxrail-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.lx .nxrail-head h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+.lx .nxrail-head .sub { font-size: 12.5px; color: var(--ink-3); }
+.lx .nxrail-head .all { margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--accent-ink); background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.15s ease; white-space: nowrap; }
+.lx .nxrail-sec:hover .all { opacity: 1; }
+.lx .nxrail-wrap { position: relative; margin: 0 -30px 0 0; }
+.lx .nxrail { display: flex; gap: 15px; overflow-x: auto; scroll-snap-type: x proximity; padding: 6px 30px 14px 0; scrollbar-width: none; }
+.lx .nxrail::-webkit-scrollbar { display: none; }
+.lx .nxrail > * { flex: 0 0 240px; scroll-snap-align: start; }
+.lx .nxrail-btn { position: absolute; top: 0; bottom: 14px; width: 50px; z-index: 6; border: none; cursor: pointer; display: flex; align-items: center; color: var(--ink); opacity: 0; transition: opacity 0.18s ease; background: transparent; }
+.lx .nxrail-sec:hover .nxrail-btn { opacity: 1; }
+.lx .nxrail-btn:disabled { opacity: 0 !important; pointer-events: none; }
+.lx .nxrail-btn.l { left: 0; justify-content: flex-start; }
+.lx .nxrail-btn.r { right: 0; justify-content: flex-end; }
+.lx .nxrail-btn span { width: 36px; height: 36px; border-radius: 50%; background: oklch(1 0 0 / 0.94); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px -6px oklch(0 0 0 / 0.3); }

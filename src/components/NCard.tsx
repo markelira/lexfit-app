@@ -5,9 +5,15 @@ import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { cardGrad, catWord, levelWord } from "@/lib/categories";
 import { NcardModal, type CardVideo } from "@/components/NcardModal";
+import { ProgramLockup } from "@/components/ProgramLockup";
+
+// Default trainer underlayer (blended into the category color). Production can bind
+// this to a per-program/per-trainer hero image field; absent → gradient + word only.
+const TRAINER = "/trainer-underlayer.jpg";
 
 export function NCard({
   v, resume, isNew = false, saved, onToggleSave, onPlay, pool = [], browse = false,
+  program = "foundation", trainer = TRAINER,
 }: {
   v: CardVideo;
   resume?: number; // 0–1 fraction, if in progress
@@ -17,6 +23,8 @@ export function NCard({
   onPlay: (code: string) => void;
   pool?: CardVideo[];
   browse?: boolean;
+  program?: string;
+  trainer?: string | null;
 }) {
   const [detail, setDetail] = useState(false);
   const isResume = resume != null;
@@ -29,13 +37,21 @@ export function NCard({
     <>
       <button className={`ncard is-${mode}`} onClick={() => setDetail(true)}>
         <div className="ncard-art" style={{ background: cardGrad(v.theme) }}>
+          {trainer && (
+            <div
+              className="ncard-photo"
+              style={{ backgroundImage: `url(${trainer})` }}
+              aria-hidden="true"
+            />
+          )}
           <span className="ncard-ring" />
+          <ProgramLockup program={program} variant="corner-tab" />
           <div className="ncard-lockup">
+            <div className="ey">LEXFIT · {v.code}</div>
             <div className="wd">{catWord(v.theme)}</div>
             <div className="un" />
           </div>
           <span className="ncard-vig" />
-          {mode === "new" && <span className="ncard-badge">ÚJ EDZÉS</span>}
           <span className="ncard-chip">{v.mins} PERC</span>
           <div className="ncard-title">{v.title}</div>
           {isResume && <div className="ncard-prog"><i style={{ width: `${Math.round((resume ?? 0) * 100)}%` }} /></div>}
@@ -82,6 +98,8 @@ export function NCard({
           onToggleSave={onToggleSave}
           onClose={() => setDetail(false)}
           onPlay={onPlay}
+          program={program}
+          trainer={trainer}
         />
       )}
     </>

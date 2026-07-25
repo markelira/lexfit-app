@@ -1,43 +1,13 @@
-"use client";
+import type { Metadata } from "next";
+import "./landing.css";
+import LandingPage from "@/components/landing/LandingPage";
 
-import Link from "next/link";
-import { useAuth } from "@/lib/auth-context";
-import styles from "./page.module.css";
+export const metadata: Metadata = {
+  title: "LEXFIT — A változás otthon kezdődik",
+  description:
+    "A teljes otthoni edzésprogram nőknek. Napi 30 perc, eszköz nélkül — egy vezetett program, 200+ edzés, fejlődéskövetés és közösség.",
+};
 
 export default function Home() {
-  const { user, loading } = useAuth();
-
-  return (
-    <div className={styles.page}>
-      <main className={styles.card}>
-        <p className={styles.kicker}>LEXFIT · OTTHONI EDZÉS</p>
-
-        <h1 className={styles.wordmark}>
-          LEXFIT<span className={styles.dot}>.</span>
-        </h1>
-        <p className={styles.tagline}>
-          Vezetett, nőközpontú edzésprogram. 30 perc, csak egy matrac, és egy
-          közösség mögötted.
-        </p>
-
-        <div className={styles.cta}>
-          {loading ? (
-            <span className={styles.ctaGhost}>…</span>
-          ) : user ? (
-            <Link href="/app" className={styles.ctaBtn}>
-              Belépek az appba →
-            </Link>
-          ) : (
-            <Link href="/login" className={styles.ctaBtn}>
-              Belépés →
-            </Link>
-          )}
-        </div>
-
-        <p className={styles.footer}>
-          Prototype → Next.js · Firebase · Mux · Stripe · Vercel
-        </p>
-      </main>
-    </div>
-  );
+  return <LandingPage />;
 }

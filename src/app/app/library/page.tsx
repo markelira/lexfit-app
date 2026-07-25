@@ -1,13 +1,14 @@
 "use client";
 
 import "./library.css";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { NCard } from "@/components/NCard";
-import { cardGrad, catWord } from "@/lib/categories";
+import { Rail } from "@/components/Rail";
+import { cardGrad } from "@/lib/categories";
 import { getMyList, setSaved } from "@/lib/mylist";
 import { getProgress } from "@/lib/progress";
 import {
@@ -117,7 +118,7 @@ export default function LibraryPage() {
       resume={resumeOf(v)}
       saved={myList.has(v.code)}
       onToggleSave={() => toggleSave(v.code)}
-      onPlay={(c) => router.push(`/player/${c}`)}
+      onPlay={(c) => router.push(`/player/${c}?autostart=1`)}
       pool={data?.videos ?? []}
       browse={browse}
     />
@@ -129,7 +130,9 @@ export default function LibraryPage() {
   const byTheme = (t: string) => data.videos.filter((v) => v.theme === t);
   const byType = (t: string) => data.videos.filter((v) => v.types.includes(t));
   const byPhase = (p: number | null) => data.videos.filter((v) => v.phase === p);
+  const resumed = data.videos.filter((v) => (resumeMap[v.code] ?? 0) > 0);
   const rails: { title: string; sub?: string; v: LibVideo[] }[] = [
+    ...(resumed.length ? [{ title: "Folytatás", sub: "ott veszed fel, ahol abbahagytad", v: resumed }] : []),
     { title: "A te fázisod · 🔨 Építés", sub: "a mostani heteid", v: byPhase(1) },
     { title: "Csendben is megy", sub: "🔇 szomszéd-barát", v: byType("🔇 Csendes") },
     { title: "15 perc, ami belefér", sub: "gyors rutinok", v: data.videos.filter((x) => x.mins <= 15) },
@@ -216,16 +219,16 @@ export default function LibraryPage() {
             spot={spot}
             setSpot={setSpot}
             count={(t) => byTheme(t).length}
-            onPlay={(c) => router.push(`/player/${c}`)}
+            onPlay={(c) => router.push(`/player/${c}?autostart=1`)}
             onBrowse={browseFrom}
           />
           {rails.filter((r) => r.v.length > 0).map((r) => (
-            <NxRail
+            <Rail
               key={r.title}
               title={r.title}
               sub={r.sub}
-              videos={r.v}
-              renderCard={(v) => card(v, true)}
+              items={r.v}
+              renderItem={(v) => card(v, true)}
               onAll={RAIL_FILTER[r.title] ? () => browseFrom(RAIL_FILTER[r.title]) : undefined}
             />
           ))}
@@ -253,6 +256,7 @@ function LibSpotlight({
         <span className="word">{s.word}</span>
       </div>
       <span className="scrim" />
+      <span className="vig" />
       <div className="content">
         <div className="ey">{s.ey}</div>
         <h2>{s.title}</h2>
@@ -274,42 +278,3 @@ function LibSpotlight({
   );
 }
 
-function NxRail({
-  title, sub, videos, renderCard, onAll,
-}: {
-  title: string; sub?: string; videos: LibVideo[];
-  renderCard: (v: LibVideo) => React.ReactNode; onAll?: () => void;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
-  const upd = () => {
-    const el = ref.current;
-    if (!el) return;
-    setAtStart(el.scrollLeft < 8);
-    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 8);
-  };
-  useEffect(() => { upd(); }, [videos]);
-  const scroll = (dir: number) => ref.current?.scrollBy({ left: dir * ref.current.clientWidth * 0.8, behavior: "smooth" });
-  if (!videos.length) return null;
-  return (
-    <section className="nxrail-sec">
-      <div className="nxrail-head">
-        <h3>{title}</h3>
-        {sub && <span className="sub">{sub}</span>}
-        {onAll && <button className="all" onClick={onAll}>Mind ({videos.length}) <LxIcon d={lxPaths.arrowR} size={14} /></button>}
-      </div>
-      <div className="nxrail-wrap">
-        <button className="nxrail-btn l" disabled={atStart} onClick={() => scroll(-1)} aria-label="Vissza">
-          <span><LxIcon d={lxPaths.arrowR} size={17} style={{ transform: "rotate(180deg)" }} /></span>
-        </button>
-        <div className="nxrail" ref={ref} onScroll={upd}>
-          {videos.map((v) => renderCard(v))}
-        </div>
-        <button className="nxrail-btn r" disabled={atEnd} onClick={() => scroll(1)} aria-label="Tovább">
-          <span><LxIcon d={lxPaths.arrowR} size={17} /></span>
-        </button>
-      </div>
-    </section>
-  );
-}

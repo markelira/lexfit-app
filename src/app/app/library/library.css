@@ -41,6 +41,7 @@
 .lx .lib-spot .ring { position: absolute; right: -4%; top: -36%; width: 42%; aspect-ratio: 1; border-radius: 50%; border: 40px solid oklch(1 0 0 / 0.12); }
 .lx .lib-spot .word { position: absolute; right: -30px; bottom: 24px; font-weight: 900; font-size: 168px; letter-spacing: -0.04em; line-height: 0.8; color: oklch(1 0 0 / 0.1); user-select: none; }
 .lx .lib-spot .scrim { position: absolute; inset: 0; background: linear-gradient(to right, oklch(0.22 0.03 350 / 0.95) 24%, oklch(0.22 0.03 350 / 0.5) 56%, transparent 80%); }
+.lx .lib-spot .vig { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(to top, oklch(0.22 0.03 350 / 0.4), transparent); }
 .lx .lib-spot .content { position: absolute; left: 36px; top: 50%; transform: translateY(-50%); max-width: 460px; z-index: 2; }
 .lx .lib-spot .ey { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.11em; color: var(--d-accent); }
 .lx .lib-spot h2 { margin-top: 11px; font-weight: 900; font-size: 40px; line-height: 0.98; letter-spacing: -0.025em; color: white; text-transform: uppercase; text-wrap: balance; }
@@ -56,22 +57,6 @@
 .lx .lib-spot-dots button.on { width: 22px; background: white; }
 
 /* horizontal rail */
-.lx .nxrail-sec { position: relative; }
-.lx .nxrail-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
-.lx .nxrail-head h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
-.lx .nxrail-head .sub { font-size: 12.5px; color: var(--ink-3); }
-.lx .nxrail-head .all { margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--accent-ink); background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.15s ease; white-space: nowrap; }
-.lx .nxrail-sec:hover .all { opacity: 1; }
-.lx .nxrail-wrap { position: relative; margin: 0 -30px 0 0; }
-.lx .nxrail { display: flex; gap: 15px; overflow-x: auto; scroll-snap-type: x proximity; padding: 6px 30px 14px 0; scrollbar-width: none; }
-.lx .nxrail::-webkit-scrollbar { display: none; }
-.lx .nxrail > * { flex: 0 0 240px; scroll-snap-align: start; }
-.lx .nxrail-btn { position: absolute; top: 0; bottom: 14px; width: 50px; z-index: 6; border: none; cursor: pointer; display: flex; align-items: center; color: var(--ink); opacity: 0; transition: opacity 0.18s ease; background: transparent; }
-.lx .nxrail-sec:hover .nxrail-btn { opacity: 1; }
-.lx .nxrail-btn:disabled { opacity: 0 !important; pointer-events: none; }
-.lx .nxrail-btn.l { left: 0; justify-content: flex-start; }
-.lx .nxrail-btn.r { right: 0; justify-content: flex-end; }
-.lx .nxrail-btn span { width: 36px; height: 36px; border-radius: 50%; background: oklch(1 0 0 / 0.94); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px -6px oklch(0 0 0 / 0.3); }
 
 /* results */
 .lx .lib-resmeta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }

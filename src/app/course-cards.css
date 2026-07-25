@@ -1,0 +1,83 @@
+/* LEXFIT — course card + program thumbnail system.
+   CATEGORY owns color + the big centered word; PROGRAM owns a colorless icon+name
+   lockup. Ported from the design handoff (cards.css + prog-thumbs.css). All selectors
+   are scoped under `.lx` like the rest of the app. */
+
+/* ── shared cover atoms ── */
+.lx .lx-cover { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+/* trainer underlayer — her tones pick up the category color, the room dissolves at the edges.
+   background-image + position come from inline style (the image is a prop). */
+.lx .lx-cover-photo { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-size: cover; mix-blend-mode: luminosity; opacity: 0.42;
+  -webkit-mask-image: radial-gradient(125% 105% at 66% 34%, #000 40%, transparent 82%);
+  mask-image: radial-gradient(125% 105% at 66% 34%, #000 40%, transparent 82%); }
+.lx .cc-ring { position: absolute; border-radius: 50%; border: 26px solid oklch(1 0 0 / 0.13); pointer-events: none; }
+
+/* centered category lockup — the "key art" */
+.lx .cca-lockup { position: relative; z-index: 1; text-align: center; }
+.lx .cca-lockup .ey { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.08em; color: oklch(1 0 0 / 0.8); }
+.lx .cca-lockup .wd { font-weight: 900; font-size: 31px; letter-spacing: -0.03em; line-height: 1;
+  color: oklch(1 0 0 / 0.96); margin-top: 5px; }
+.lx .cca-lockup .un { width: 26px; height: 3px; border-radius: 2px; background: oklch(1 0 0 / 0.55); margin: 8px auto 0; }
+
+/* liquid-glass duration chip on the art (top-right) */
+.lx .cca-chip { position: absolute; top: 10px; right: 10px; z-index: 3; font-family: var(--mono); font-size: 10.5px;
+  color: white; background: oklch(1 0 0 / 0.18); border: 1px solid oklch(1 0 0 / 0.3);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 3px 9px; border-radius: 999px; }
+
+/* play veil — dark wash + white glass circle, fades in on hover */
+.lx .cc-play { position: absolute; inset: 0; z-index: 4; display: flex; align-items: center; justify-content: center;
+  background: oklch(0.2 0.03 350 / 0.34); opacity: 0; transition: opacity 0.16s ease; }
+.lx .pt-tv:hover .cc-play { opacity: 1; }
+.lx .cc-play > span { width: 46px; height: 46px; border-radius: 50%; background: oklch(1 0 0 / 0.9);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--ink);
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px -6px oklch(0 0 0 / 0.35); }
+
+/* ── program lockup — consistent, colorless (icon + name) ── */
+/* top-left glass pill (TV key art, grid) */
+.lx .pt-tv-tl { position: absolute; top: 11px; left: 11px; z-index: 3; display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 12px 5px 6px; border-radius: 999px; background: oklch(0.18 0.03 350 / 0.5);
+  backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); border: 1px solid oklch(1 0 0 / 0.16); }
+.lx .pt-tv-tl .pt-mark { width: 22px; height: 22px; border-radius: 999px; background: oklch(1 0 0 / 0.16); color: #fff;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.lx .pt-tv-tl .pt-name { font-family: var(--mono); font-size: 11.5px; font-weight: 500; letter-spacing: 0.14em; color: #fff; }
+
+/* corner-tab (dense shelf) */
+.lx .pt-tab { position: absolute; top: 8px; left: 8px; z-index: 3; display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px 3px 5px; border-radius: 999px; background: oklch(0.18 0.03 350 / 0.66);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid oklch(1 0 0 / 0.18); }
+.lx .pt-tab-mark { display: flex; color: #fff; }
+.lx .pt-tab-name { font-family: var(--mono); font-size: 9px; font-weight: 500; letter-spacing: 0.12em; color: #fff; }
+
+/* ── TV key art card ── */
+.lx .pt-tv { display: block; width: 100%; padding: 0; border: none; background: none; text-align: left; cursor: pointer; }
+.lx .pt-tv-art { aspect-ratio: 16 / 9; border-radius: 14px;
+  box-shadow: 0 10px 26px -12px oklch(0 0 0 / 0.55); transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.lx .pt-tv:hover .pt-tv-art { transform: scale(1.025); box-shadow: 0 18px 40px -12px oklch(0 0 0 / 0.65); }
+.lx .pt-tv-art .cc-ring { left: -14%; top: -48%; width: 64%; aspect-ratio: 1; border-width: 22px; }
+/* nudge the centered category lockup up so it clears the title band */
+.lx .pt-tv-art .cca-lockup { transform: translateY(-6px); }
+.lx .pt-tv-art .cca-lockup .wd { font-size: 26px; line-height: 1.02; white-space: normal; text-wrap: balance;
+  max-width: 230px; margin-left: auto; margin-right: auto; padding: 0 12px; }
+/* bottom gradient foot band carrying the workout title */
+.lx .pt-tv-foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 16px 14px 12px;
+  background: linear-gradient(to top, oklch(0.15 0.03 350 / 0.94), oklch(0.15 0.03 350 / 0.55) 62%, transparent); }
+.lx .pt-tv-name { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.16; color: #fff; text-wrap: balance; }
+
+/* ── dense shelf card ── */
+.lx .ccn { position: relative; display: block; width: 100%; text-align: left; padding: 0; border: none; background: none;
+  cursor: pointer; border-radius: 6px; overflow: hidden; box-shadow: 0 10px 28px -14px oklch(0 0 0 / 0.6);
+  transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.lx .ccn:hover { transform: scale(1.035); z-index: 2; box-shadow: 0 18px 44px -14px oklch(0 0 0 / 0.7); }
+.lx .ccn-art { aspect-ratio: 16 / 9; border-radius: 6px; }
+.lx .ccn-art .cc-ring { left: -14%; top: -48%; width: 64%; aspect-ratio: 1; border-width: 22px; }
+.lx .ccn-art .cca-lockup { transform: translateY(-9px); }
+.lx .ccn-art .cca-lockup .wd { font-size: 25px; line-height: 1.02; white-space: normal; text-wrap: balance; max-width: 200px; margin: 0 auto; padding: 0 10px; }
+.lx .ccn-art .cca-lockup .ey { font-size: 9px; letter-spacing: 0.07em; }
+.lx .ccn-art .cca-lockup .un { width: 22px; height: 2.5px; margin-top: 7px; }
+.lx .ccn-vig { position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to top, oklch(0.18 0.03 350 / 0.72) 0%, oklch(0.18 0.03 350 / 0.14) 36%, transparent 55%); }
+.lx .ccn-lockup { position: absolute; left: 12px; bottom: 9px; right: 84px; z-index: 2; font-weight: 900; font-size: 13.5px;
+  line-height: 1.08; letter-spacing: -0.005em; text-transform: uppercase; color: white; text-wrap: balance; text-shadow: 0 1px 8px oklch(0 0 0 / 0.35); }
+.lx .ccn-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; z-index: 3; background: oklch(1 0 0 / 0.28); }
+.lx .ccn-progress > i { display: block; height: 100%; background: var(--accent); }

@@ -1,6 +1,7 @@
 "use client";
 
 import "./shell.css";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Protected } from "@/components/Protected";
@@ -12,6 +13,7 @@ const NAV: [string, keyof typeof lxPaths, string][] = [
   ["/app", "flame", "Foundation"],
   ["/app/library", "grid", "Videótár"],
   ["/app/progress", "chart", "Haladásom"],
+  ["/app/szm", "ballot", "Szavazz Magadra"],
 ];
 
 function Shell({ children }: { children: React.ReactNode }) {
@@ -22,10 +24,11 @@ function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="lx lx-shell" style={{ minHeight: "100dvh", display: "flex", fontSize: 15 }}>
+      <div className="lx-ambient" aria-hidden="true" />
       <aside className="lx-sidebar">
         <div className="lx-brand">
           <span className="mark">
-            <LxIcon d={lxPaths.flame} size={17} sw={2.2} />
+            <Image src="/lexfit-icon.png" alt="LEXFIT" width={32} height={32} priority />
           </span>
           <span className="wm">
             LEX<span>FIT</span>
@@ -37,6 +40,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           {NAV.map(([href, ic, label]) => (
             <Link key={href} href={href} className={`nav2${pathname === href ? " on" : ""}`}>
               <LxIcon d={lxPaths[ic]} size={19} /> {label}
+              {href === "/app/szm" && <span className="szm-newdot">MAI</span>}
             </Link>
           ))}
         </nav>

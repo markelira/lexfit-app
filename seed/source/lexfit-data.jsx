@@ -68,11 +68,34 @@ function lxFilterVideos(videos, active) {
 const LX_TODAY_PLAN = {
   code: "F023", title: "Második fázis — cardio", theme: "Cardio + has",
   mins: 30, level: 2, format: "EMOM", type: "🔇 Csendes",
+  // NOTE: block + exercise `start`s (seconds) are demo values scaled to the 24s
+  // emulator test asset (see scripts/attach-emulator-video.mjs) so the player's
+  // stamped nav + per-exercise seek/highlight can be exercised in dev.
   blocks: [
-    { name: "Bemelegítés", mins: 4, items: ["Helyben járás + karkörzés", "Csípőkörzés", "Dinamikus nyújtás"] },
-    { name: "1. blokk — EMOM 10", mins: 10, items: ["Térdelés-felállás", "Hegymászó (csendes)", "Oldalsó lépés + érintés", "Plank váll-érintés", "Guggolás + sarokemelés"] },
-    { name: "2. blokk — EMOM 10", mins: 10, items: ["Kitörés hátra, váltott", "Lassú burpee (ugrás nélkül)", "Orosz csavarás", "Lábemelés fekvésben", "Híd + tartás"] },
-    { name: "Levezetés", mins: 6, items: ["Kobra nyújtás", "Gyermekpóz", "Mély légzés a falnál"] },
+    { name: "Bemelegítés", mins: 4, start: 0, items: [
+      { name: "Helyben járás + karkörzés", start: 0 },
+      { name: "Csípőkörzés", start: 2 },
+      { name: "Dinamikus nyújtás", start: 4 },
+    ] },
+    { name: "1. blokk — EMOM 10", mins: 10, start: 6, items: [
+      { name: "Térdelés-felállás", start: 6 },
+      { name: "Hegymászó (csendes)", start: 7 },
+      { name: "Oldalsó lépés + érintés", start: 8 },
+      { name: "Plank váll-érintés", start: 9 },
+      { name: "Guggolás + sarokemelés", start: 10 },
+    ] },
+    { name: "2. blokk — EMOM 10", mins: 10, start: 12, items: [
+      { name: "Kitörés hátra, váltott", start: 12 },
+      { name: "Lassú burpee (ugrás nélkül)", start: 13 },
+      { name: "Orosz csavarás", start: 14 },
+      { name: "Lábemelés fekvésben", start: 15 },
+      { name: "Híd + tartás", start: 16 },
+    ] },
+    { name: "Levezetés", mins: 6, start: 18, items: [
+      { name: "Kobra nyújtás", start: 18 },
+      { name: "Gyermekpóz", start: 20 },
+      { name: "Mély légzés a falnál", start: 22 },
+    ] },
   ],
 };
 

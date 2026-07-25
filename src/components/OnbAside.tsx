@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { WELCOME } from "@/lib/onboarding-data";
 
 const AVATARS: [string, string][] = [
@@ -26,7 +27,7 @@ export function OnbAside({
       <span className="ring" aria-hidden="true" />
       <span className="ring two" aria-hidden="true" />
       <div className="a-wm">
-        <span className="hash">#</span> LEXFIT
+        <span className="hash"><Image src="/lexfit-icon.png" alt="LEXFIT" width={20} height={20} /></span> LEXFIT
       </div>
 
       <div className="aside-body">

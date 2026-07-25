@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Foundation hero · Az utad</title>
+<link rel="stylesheet" href="lexfit-tokens.css">
+<style>
+  html,body{margin:0;background:#eceae5;min-height:100%}
+  .lx{font-family:var(--font);color:var(--ink);padding:60px}
+  .wrap{max-width:1080px;margin:0 auto}
+  .hb{position:relative;height:452px;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-card);background:var(--ink)}
+  .hb-art{position:absolute;inset:0}
+  .hb-photo{position:absolute;inset:0;z-index:0;pointer-events:none;
+    background-image:url('uploads/645406172_122099815329230342_5248551207032804718_n.jpg');
+    background-size:cover;mix-blend-mode:luminosity;opacity:.34}
+  .hb-ring{position:absolute;border-radius:50%;border:40px solid oklch(1 0 0/.12)}
+  .hb-word{position:absolute;font-weight:900;letter-spacing:-0.04em;line-height:.8;color:oklch(1 0 0/.1);user-select:none;white-space:nowrap}
+  .hb-scrim{position:absolute;inset:0}
+  .hb-vig{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(to top,oklch(.2 .03 350/.5),transparent)}
+  .hb-top{position:absolute;top:20px;left:26px;right:26px;z-index:3;display:flex;align-items:center;gap:10px}
+  .hb-hello{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.01em;margin-right:auto;text-shadow:0 1px 10px oklch(0 0 0/.3)}
+  .hb-content{position:absolute;left:30px;bottom:44px;max-width:560px;z-index:3}
+  .hb-lock{display:inline-flex;align-items:center;gap:9px;padding:6px 14px 6px 7px;border-radius:999px;margin-bottom:14px;
+    background:oklch(.18 .03 350/.5);border:1px solid oklch(1 0 0/.18);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+  .hb-lock .mk{width:24px;height:24px;border-radius:999px;background:oklch(1 0 0/.16);color:#fff;display:flex;align-items:center;justify-content:center}
+  .hb-lock .nm{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;color:#fff}
+  .hb-eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.11em;color:var(--d-accent)}
+  .hb-title{margin-top:10px;font-weight:900;font-size:52px;line-height:.95;letter-spacing:-.03em;color:#fff;text-transform:uppercase;text-wrap:balance}
+  .hb-title small{display:block;font-size:21px;font-weight:700;letter-spacing:-.01em;color:oklch(1 0 0/.85);margin-top:8px;text-transform:none}
+  .hb-syn{margin-top:12px;font-size:14.5px;line-height:1.5;color:oklch(1 0 0/.88);text-wrap:pretty;max-width:46ch}
+  .hb-ctas{display:flex;align-items:center;gap:11px;margin-top:19px}
+  .hb-play{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;border-radius:999px;border:none;cursor:pointer;
+    font-size:14.5px;font-weight:800;color:oklch(.22 .03 350);background:oklch(1 0 0/.96);box-shadow:0 8px 24px -10px oklch(0 0 0/.5);white-space:nowrap;font-family:inherit}
+  .hb-info{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:700;color:#fff;
+    background:oklch(1 0 0/.16);border:1px solid oklch(1 0 0/.26);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);white-space:nowrap;font-family:inherit}
+  .hb-phase{display:flex;align-items:center;gap:6px;margin-top:18px}
+  .hb-seg{height:6px;border-radius:99px;flex:1;background:oklch(1 0 0/.22)}
+  .hb-seg.done{background:oklch(1 0 0/.85)}
+  .hb-seg.now{background:var(--d-accent)}
+  .hb-phaselbl{display:flex;justify-content:space-between;margin-top:7px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:oklch(1 0 0/.6)}
+  svg{display:block}
+</style>
+</head>
+<body class="lx">
+<div class="wrap">
+  <div class="hb">
+    <div class="hb-art" style="background:linear-gradient(120deg,oklch(.28 .06 358) 0%,oklch(.5 .16 358) 58%,oklch(.66 .155 5) 100%)"></div>
+    <div class="hb-photo" style="background-position:64% 20%;-webkit-mask-image:radial-gradient(120% 120% at 78% 40%,#000 34%,transparent 78%);mask-image:radial-gradient(120% 120% at 78% 40%,#000 34%,transparent 78%)"></div>
+    <span class="hb-ring" style="right:-6%;top:-34%;width:44%;aspect-ratio:1"></span>
+    <span class="hb-word" style="right:-30px;bottom:26px;font-size:180px">FOUNDATION</span>
+    <span class="hb-scrim" style="background:linear-gradient(to right,oklch(.22 .03 350/.96) 20%,oklch(.22 .03 350/.5) 52%,transparent 80%)"></span>
+    <span class="hb-vig"></span>
+    <div class="hb-top">
+      <span class="hb-hello">Szia, Réka!</span>
+    </div>
+    <div class="hb-content">
+      <span class="hb-lock"><span class="mk"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg></span><span class="nm">FOUNDATION</span></span>
+      <div class="hb-eyebrow">A PROGRAMOD · 4. HÉT · 🔨 ÉPÍTÉS FÁZIS</div>
+      <h1 class="hb-title">Foundation<small>Az alapprogramod — 8 hét, egy erősebb te.</small></h1>
+      <p class="hb-syn">Nem külön edzések, hanem egy felépített út. Ma a Második fázis cardio vár — Alexa végig veled csinálja, eszköz nélkül.</p>
+      <div class="hb-phase">
+        <span class="hb-seg done"></span><span class="hb-seg done"></span><span class="hb-seg done"></span><span class="hb-seg now"></span><span class="hb-seg"></span>
+      </div>
+      <div class="hb-phaselbl"><span>23 / 48 EDZÉS KÉSZ</span><span>VISSZAMÉRÉS: 8. HÉT</span></div>
+      <div class="hb-ctas">
+        <button class="hb-play"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg> Mai edzés indítása</button>
+        <button class="hb-info"><span style="font-size:16px">ⓘ</span> Program áttekintése</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
