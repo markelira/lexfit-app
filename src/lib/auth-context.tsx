@@ -2,6 +2,7 @@
 
 import {
   GoogleAuthProvider,
+  OAuthProvider,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -16,6 +17,7 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signOutUser: () => Promise<void>;
@@ -24,6 +26,12 @@ interface AuthState {
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 const googleProvider = new GoogleAuthProvider();
+// Apple returns name/email only on the FIRST authorization — request both scopes
+// so we capture them while we can. Apple's default response locale follows the
+// user's device; the popup UI is Apple-hosted.
+const appleProvider = new OAuthProvider("apple.com");
+appleProvider.addScope("email");
+appleProvider.addScope("name");
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -40,6 +48,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signInWithPopup(auth, googleProvider);
   }
 
+  async function signInWithApple() {
+    await signInWithPopup(auth, appleProvider);
+  }
+
   async function signInWithEmail(email: string, password: string) {
     await signInWithEmailAndPassword(auth, email, password);
   }
@@ -54,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOutUser }}
+      value={{ user, loading, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail, signOutUser }}
     >
       {children}
     </AuthContext.Provider>

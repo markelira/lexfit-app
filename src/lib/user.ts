@@ -32,17 +32,26 @@ export const BLANK_ONBOARDING: OnboardingAnswers = {
   focus: [], motiv: "", obstacle: null, days: 5, time: null, env: [],
 };
 
+/** Extras captured at email registration (the OAuth path has none). */
+export interface SignupExtra {
+  /** First name from the register form; falls back to the Auth displayName. */
+  firstName?: string;
+  /** Marketing opt-in — GDPR opt-in, defaults to false when not provided. */
+  marketing?: boolean;
+}
+
 /** Create users/{uid} on first sign-in (idempotent). Returns true if created. */
-export async function ensureUserDoc(user: User): Promise<boolean> {
+export async function ensureUserDoc(user: User, extra?: SignupExtra): Promise<boolean> {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   if (snap.exists()) return false;
   await setDoc(ref, {
-    displayName: user.displayName ?? null,
+    displayName: extra?.firstName?.trim() || user.displayName || null,
     email: user.email ?? null,
     photoURL: user.photoURL ?? null,
     provider: user.providerData[0]?.providerId ?? null,
     locale: "hu",
+    marketingOptIn: extra?.marketing ?? false,
     createdAt: serverTimestamp(),
   });
   return true;
