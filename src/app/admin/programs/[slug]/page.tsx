@@ -79,7 +79,7 @@ export default function EditProgramPage() {
           <ProgramForm initial={data.program} create={false} />
           <SessionsBuilder slug={slug} initialSessions={data.sessions} videos={data.videos} />
           <div>
-            <button className="adm-btn danger" style={{ color: "var(--accent-2)", borderColor: "oklch(0.85 0.08 0)" }} onClick={del}>
+            <button className="adm-btn danger" style={{ color: "var(--accent-2)", borderColor: "oklch(0.85 0.03 168)" }} onClick={del}>
               Program törlése
             </button>
           </div>

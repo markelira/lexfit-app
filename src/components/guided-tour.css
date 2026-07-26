@@ -1,26 +1,26 @@
 /* LEXFIT — Foundation vezetett réteg: welcome carousel + spotlight tour + replay. Ported from prog-guide.css. */
 
 /* ── replay "?" pill ── */
-.lx .greplay { position: fixed; left: 270px; bottom: 18px; z-index: 60; display: inline-flex; align-items: center; gap: 4px; padding: 5px 6px; border-radius: 999px; border: none; color: white; background: var(--accent-2); box-shadow: 0 10px 28px -8px oklch(0.58 0.165 358 / 0.55), inset 0 1px 0 oklch(1 0 0 / 0.25); }
+.lx .greplay { position: fixed; left: 270px; bottom: 18px; z-index: 60; display: inline-flex; align-items: center; gap: 4px; padding: 5px 6px; border-radius: 999px; border: none; color: white; background: var(--accent-2); box-shadow: 0 10px 28px -8px oklch(0.500 0.046 168 / 0.55), inset 0 1px 0 oklch(1 0 168 / 0.25); }
 .lx .greplay:hover { background: oklch(from var(--accent-2) calc(l - 0.04) c h); }
 .lx .grep-main { display: inline-flex; align-items: center; gap: 9px; padding: 6px 8px; border: none; background: none; cursor: pointer; font-size: 13.5px; font-weight: 700; color: white; }
-.lx .greplay .q { width: 24px; height: 24px; border-radius: 50%; background: oklch(1 0 0 / 0.22); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; }
-.lx .grep-x { width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer; flex-shrink: 0; background: oklch(1 0 0 / 0.16); color: white; font-size: 12px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-.lx .grep-x:hover { background: oklch(1 0 0 / 0.34); }
+.lx .greplay .q { width: 24px; height: 24px; border-radius: 50%; background: oklch(1 0 168 / 0.22); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; }
+.lx .grep-x { width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer; flex-shrink: 0; background: oklch(1 0 168 / 0.16); color: white; font-size: 12px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.lx .grep-x:hover { background: oklch(1 0 168 / 0.34); }
 
 /* ── welcome carousel ── */
-.lx.gw-back { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 24px; background: radial-gradient(120% 120% at 30% 10%, oklch(0.34 0.06 355) 0%, oklch(0.22 0.03 350) 70%); animation: nmodFade 0.25s ease both; }
+.lx.gw-back { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 24px; background: radial-gradient(120% 120% at 30% 10%, oklch(0.34 0.05 168) 0%, oklch(0.22 0.03 168) 70%); animation: nmodFade 0.25s ease both; }
 .lx .gw-back::before, .lx .gw-back::after { content: ""; position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
 .lx .gw-back::before { width: 40vw; height: 40vw; left: -8%; top: -10%; background: var(--accent); opacity: 0.28; }
 .lx .gw-back::after { width: 34vw; height: 34vw; right: -8%; bottom: -10%; background: var(--cat-cardio); opacity: 0.22; }
-.lx .gw-card { position: relative; width: min(540px, 100%); border-radius: 26px; overflow: hidden; background: oklch(0.985 0.006 0); box-shadow: 0 50px 120px -24px oklch(0.05 0.03 350 / 0.7); animation: nmodIn 0.3s cubic-bezier(0.22,1,0.36,1) both; }
-.lx .gw-skip { position: absolute; top: 16px; right: 16px; z-index: 4; background: oklch(1 0 0 / 0.18); border: 1px solid oklch(1 0 0 / 0.3); color: white; font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.lx .gw-skip:hover { background: oklch(1 0 0 / 0.3); }
+.lx .gw-card { position: relative; width: min(540px, 100%); border-radius: 26px; overflow: hidden; background: oklch(0.985 0.004 168); box-shadow: 0 50px 120px -24px oklch(0.05 0.02 168 / 0.7); animation: nmodIn 0.3s cubic-bezier(0.22,1,0.36,1) both; }
+.lx .gw-skip { position: absolute; top: 16px; right: 16px; z-index: 4; background: oklch(1 0 168 / 0.18); border: 1px solid oklch(1 0 168 / 0.3); color: white; font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.lx .gw-skip:hover { background: oklch(1 0 168 / 0.3); }
 .lx .gw-art { position: relative; height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.lx .gw-art .ring { position: absolute; right: -8%; top: -46%; width: 52%; aspect-ratio: 1; border-radius: 50%; border: 30px solid oklch(1 0 0 / 0.13); }
-.lx .gw-art .word { position: absolute; left: 22px; bottom: -0.24em; font-weight: 900; font-size: 96px; letter-spacing: -0.04em; line-height: 0.8; color: oklch(1 0 0 / 0.16); white-space: nowrap; user-select: none; }
-.lx .gw-art .big { font-size: 76px; filter: drop-shadow(0 6px 18px oklch(0 0 0 / 0.3)); position: relative; z-index: 1; }
-.lx .gw-art .vig { position: absolute; inset: 0; background: linear-gradient(to top, oklch(0.18 0.03 350 / 0.55), transparent 60%); }
+.lx .gw-art .ring { position: absolute; right: -8%; top: -46%; width: 52%; aspect-ratio: 1; border-radius: 50%; border: 30px solid oklch(1 0 168 / 0.13); }
+.lx .gw-art .word { position: absolute; left: 22px; bottom: -0.24em; font-weight: 900; font-size: 96px; letter-spacing: -0.04em; line-height: 0.8; color: oklch(1 0 168 / 0.16); white-space: nowrap; user-select: none; }
+.lx .gw-art .big { font-size: 76px; filter: drop-shadow(0 6px 18px oklch(0 0 168 / 0.3)); position: relative; z-index: 1; }
+.lx .gw-art .vig { position: absolute; inset: 0; background: linear-gradient(to top, oklch(0.18 0.03 168 / 0.55), transparent 60%); }
 .lx .gw-body { padding: 24px 28px 0; }
 .lx .gw-ey { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.12em; color: var(--accent-ink); }
 .lx .gw-h { font-size: 25px; font-weight: 900; letter-spacing: -0.02em; margin-top: 8px; text-wrap: balance; line-height: 1.1; }
@@ -32,20 +32,20 @@
 .lx .gw-dots { display: flex; gap: 7px; }
 .lx .gw-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: all 0.2s ease; }
 .lx .gw-dots i.on { width: 22px; border-radius: 99px; background: var(--accent); }
-.lx .gw-next { margin-left: auto; display: inline-flex; align-items: center; gap: 9px; padding: 13px 26px; border-radius: 999px; border: none; cursor: pointer; font-size: 14.5px; font-weight: 800; color: white; background: var(--accent-2); box-shadow: 0 8px 22px -8px oklch(0.58 0.165 358 / 0.5); white-space: nowrap; }
+.lx .gw-next { margin-left: auto; display: inline-flex; align-items: center; gap: 9px; padding: 13px 26px; border-radius: 999px; border: none; cursor: pointer; font-size: 14.5px; font-weight: 800; color: white; background: var(--accent-2); box-shadow: 0 8px 22px -8px oklch(0.500 0.046 168 / 0.5); white-space: nowrap; }
 .lx .gw-next:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); transform: translateY(-1px); }
 .lx .gw-prev { background: none; border: none; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-3); padding: 8px; }
 .lx .gw-prev:hover { color: var(--ink); }
 
 /* ── spotlight tour ── */
 .lx .gt-mask { position: fixed; inset: 0; z-index: 90; }
-.lx .gt-mask .pane { position: fixed; background: oklch(0.18 0.03 350 / 0.74); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
-.lx .gt-ringbox { position: fixed; z-index: 91; border-radius: 16px; pointer-events: none; outline: 2.5px solid var(--accent); outline-offset: 3px; box-shadow: 0 0 0 6px oklch(0.66 0.155 0 / 0.25), 0 16px 40px -12px oklch(0 0 0 / 0.5); }
+.lx .gt-mask .pane { position: fixed; background: oklch(0.18 0.03 168 / 0.74); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.lx .gt-ringbox { position: fixed; z-index: 91; border-radius: 16px; pointer-events: none; outline: 2.5px solid var(--accent); outline-offset: 3px; box-shadow: 0 0 0 6px oklch(0.660 0.042 168 / 0.25), 0 16px 40px -12px oklch(0 0 168 / 0.5); }
 .lx .gt-ringbox.pulse { animation: gtPulse 1.4s ease-in-out infinite; }
-@keyframes gtPulse { 0%,100% { box-shadow: 0 0 0 6px oklch(0.66 0.155 0 / 0.25), 0 16px 40px -12px oklch(0 0 0 / 0.5); } 50% { box-shadow: 0 0 0 11px oklch(0.66 0.155 0 / 0.12), 0 16px 40px -12px oklch(0 0 0 / 0.5); } }
+@keyframes gtPulse { 0%,100% { box-shadow: 0 0 0 6px oklch(0.660 0.042 168 / 0.25), 0 16px 40px -12px oklch(0 0 168 / 0.5); } 50% { box-shadow: 0 0 0 11px oklch(0.660 0.042 168 / 0.12), 0 16px 40px -12px oklch(0 0 168 / 0.5); } }
 @media (prefers-reduced-motion: reduce) { .lx .gt-ringbox.pulse { animation: none; } }
 .lx .gt-hole-catch { position: fixed; z-index: 92; cursor: pointer; background: transparent; }
-.lx .gt-tip { position: fixed; z-index: 95; width: min(340px, calc(100vw - 32px)); border-radius: 18px; padding: 17px 18px 16px; background: oklch(0.99 0.005 0); box-shadow: 0 28px 70px -18px oklch(0.05 0.03 350 / 0.6), inset 0 1px 0 white; animation: gtTipIn 0.22s cubic-bezier(0.22,1,0.36,1) both; }
+.lx .gt-tip { position: fixed; z-index: 95; width: min(340px, calc(100vw - 32px)); border-radius: 18px; padding: 17px 18px 16px; background: oklch(0.99 0.005 168); box-shadow: 0 28px 70px -18px oklch(0.05 0.02 168 / 0.6), inset 0 1px 0 white; animation: gtTipIn 0.22s cubic-bezier(0.22,1,0.36,1) both; }
 @keyframes gtTipIn { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: none; } }
 .lx .gt-tip .gt-alexa { display: flex; align-items: center; gap: 9px; }
 .lx .gt-tip .gt-alexa .av { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; background: var(--accent-2); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; }
@@ -59,7 +59,7 @@
 .lx .gt-tip .gt-skip { background: none; border: none; cursor: pointer; font-size: 12.5px; color: var(--ink-3); font-weight: 600; padding: 0; }
 .lx .gt-tip .gt-skip:hover { color: var(--ink); }
 .lx .gt-tip .gt-back { margin-left: auto; background: none; border: none; cursor: pointer; font-size: 13px; color: var(--ink-2); font-weight: 600; }
-.lx .gt-tip .gt-next { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 999px; border: none; cursor: pointer; font-size: 13.5px; font-weight: 800; color: white; background: var(--accent-2); box-shadow: 0 6px 16px -6px oklch(0.58 0.165 358 / 0.5); }
+.lx .gt-tip .gt-next { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 999px; border: none; cursor: pointer; font-size: 13.5px; font-weight: 800; color: white; background: var(--accent-2); box-shadow: 0 6px 16px -6px oklch(0.500 0.046 168 / 0.5); }
 .lx .gt-tip .gt-next:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
 
 @media (max-width: 560px) { .lx .greplay { left: 16px; } }

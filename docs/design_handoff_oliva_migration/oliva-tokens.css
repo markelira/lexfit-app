@@ -1,0 +1,46 @@
+/* LEXFIT — Olíva palette tokens
+   Drop-in replacement for the :root block in lexfit-landing.css
+   See design_handoff_oliva_migration/README.md §6 — hardcoded literals
+   must ALSO be migrated; this file alone is not sufficient. */
+
+:root{
+  /* ---- brand · Olíva ---- */
+  --accent:oklch(0.60 0.045 118);        /* #8b8f6b */
+  --accent-2:oklch(0.50 0.048 118);      /* #6f7454 */
+  --accent-soft:#eef0e3;
+
+  /* ---- ink ramp ---- */
+  --ink:oklch(0.24 0.014 120);           /* #25271f */
+  --ink-2:oklch(0.43 0.024 117);         /* #565948 */
+  --ink-3:oklch(0.55 0.026 116);         /* darkened for AA */
+
+  /* ---- surfaces ---- */
+  --bg:#f8f8f3;
+  --cream:#f8f8f3;                       /* legacy alias */
+  --surface:#eff0e8;
+  --surface-2:#e7e9dd;
+  --line:#dfe1d4;
+  --line-2:#cdd0bf;
+  --navy:#1f2119;                        /* green-black, was #181821 */
+  --sage:#8b8f6b;                        /* legacy name — now truthful */
+  --sage-2:#8b8f6b;
+  --panel:#eef0e3;
+
+  /* ---- workout categories ---- */
+  --cat-also:oklch(0.60 0.045 118);      /* #8b8f6b  ALSÓ     */
+  --cat-felso:oklch(0.48 0.024 120);     /* #6c6f5e  FELSŐ    */
+  --cat-cardio:oklch(0.65 0.075 75);     /* #b08a55  CARDIO   */
+  --cat-teljes:oklch(0.50 0.045 80);     /* #7d6a4e  TELJES   */
+  --cat-mobility:oklch(0.61 0.033 145);  /* #7f9280  MOBILITY */
+
+  /* ---- inversion helpers ----
+     Olíva is LIGHT. Text on --accent must be dark ink, never white.
+     white on --accent = 3.37:1 (FAILS AA) · ink on --accent = 9.7:1 */
+  --on-accent:var(--ink);
+  --on-accent-soft:oklch(0.24 0.014 120/.78);
+
+  /* ---- unchanged ---- */
+  --font:"Poppins","Helvetica Neue",sans-serif;
+  --mono:"IBM Plex Mono",monospace;
+  --col:1200px;
+}

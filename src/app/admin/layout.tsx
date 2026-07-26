@@ -75,7 +75,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       <aside className={`adm-side${navOpen ? "" : " collapsed"}`}>
         <div className="adm-brand">
           <span className="mark">
-            <Image src="/lexfit-icon.png" alt="LEXFIT" width={30} height={30} priority />
+            <Image src="/lexfit-icon.png" alt="LEXFIT" width={33} height={30} priority />
           </span>
           <span className="wm">
             LEX<span>FIT</span>

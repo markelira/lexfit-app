@@ -16,6 +16,7 @@ import { GuideController, GUIDE_START_EVENT } from "@/components/GuidedTour";
 import { JoinCinematic } from "@/components/JoinCinematic";
 import { loadFoundation, type FoundationData, type WorkoutItem } from "@/lib/program";
 import { CheckinWeek } from "@/components/CheckinWeek";
+import { confirmCheckout } from "@/lib/billing";
 
 export default function FoundationPage() {
   const { user } = useAuth();
@@ -39,6 +40,19 @@ export default function FoundationPage() {
       setLoading(false);
     }
   }, [user]);
+
+  // Success-page fulfillment: if we arrived from Checkout, confirm the session
+  // so access is instant (don't wait on the webhook), then clean the URL.
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const sid = p.get("session_id");
+    if (p.get("sub") === "success" && sid) {
+      confirmCheckout(sid).finally(() => {
+        window.history.replaceState({}, "", "/app");
+        reload();
+      });
+    }
+  }, [reload]);
 
   useEffect(() => {
     reload();
@@ -236,7 +250,7 @@ function Billboard({
     <section className="hb">
       <div
         className="hb-art"
-        style={{ background: "linear-gradient(120deg, oklch(0.28 0.06 358) 0%, oklch(0.5 0.16 358) 58%, oklch(0.66 0.155 5) 100%)" }}
+        style={{ background: "linear-gradient(120deg, oklch(0.28 0.05 168) 0%, oklch(0.5 0.05 168) 58%, oklch(0.66 0.05 168) 100%)" }}
       />
       <div className="hb-photo" style={{ backgroundImage: `url(${HERO_TRAINER})` }} aria-hidden="true" />
       <span className="hb-ring" aria-hidden="true" />

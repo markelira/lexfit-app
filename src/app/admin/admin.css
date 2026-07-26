@@ -1,6 +1,6 @@
 /* LEXFIT admin — internal CMS shell. Hand-built on the .lx design tokens (no Tailwind). */
 
-.lx.adm-shell { min-height: 100dvh; display: flex; background: var(--bg, oklch(0.985 0.006 320)); font-size: 15px; }
+.lx.adm-shell { min-height: 100dvh; display: flex; background: var(--bg, oklch(0.985 0.006 168)); font-size: 15px; }
 
 /* ── sidebar (sticky; collapses to full-width content) ── */
 .lx .adm-side { width: 236px; flex-shrink: 0; position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column;
@@ -12,7 +12,7 @@
 .lx .adm-navtoggle:hover { background: var(--surface-2); color: var(--ink); }
 .lx .adm-navopen { position: fixed; left: 14px; top: 14px; z-index: 40; width: 40px; height: 40px; border-radius: 11px;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; display: flex;
-  align-items: center; justify-content: center; box-shadow: 0 6px 18px -8px oklch(0.45 0.08 0 / 0.28); }
+  align-items: center; justify-content: center; box-shadow: 0 6px 18px -8px oklch(0.42 0.03 168 / 0.28); }
 .lx .adm-navopen:hover { background: var(--surface-2); }
 .lx .adm-brand { display: flex; align-items: center; gap: 10px; padding: 2px 8px 4px; }
 .lx .adm-brand .mark { width: 30px; height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
@@ -50,12 +50,12 @@
 
 /* ── generic surfaces ── */
 .lx .adm-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px;
-  box-shadow: var(--shadow-card, 0 10px 30px -18px oklch(0.45 0.08 0 / 0.25)); }
+  box-shadow: var(--shadow-card, 0 10px 30px -18px oklch(0.42 0.03 168 / 0.25)); }
 .lx .adm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
 .lx .adm-tile { display: flex; flex-direction: column; gap: 8px; padding: 20px; border-radius: 16px; border: 1px solid var(--line);
   background: var(--surface); text-decoration: none; transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease; }
 .lx .adm-tile:hover { transform: translateY(-2px); border-color: oklch(from var(--accent) l c h / 0.4);
-  box-shadow: 0 14px 34px -18px oklch(0.45 0.08 0 / 0.35); }
+  box-shadow: 0 14px 34px -18px oklch(0.42 0.03 168 / 0.35); }
 .lx .adm-tile .ic { width: 40px; height: 40px; border-radius: 11px; background: var(--accent-soft); color: var(--accent-2);
   display: flex; align-items: center; justify-content: center; }
 .lx .adm-tile .tt { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
@@ -66,12 +66,12 @@
   background: var(--surface); color: var(--ink); font-size: 13.5px; font-weight: 700; cursor: pointer; text-decoration: none; }
 .lx .adm-btn:hover { background: var(--surface-2); }
 .lx .adm-btn.primary { background: var(--accent-2); border-color: var(--accent-2); color: #fff;
-  box-shadow: 0 8px 22px -8px oklch(0.58 0.165 358 / 0.5); }
+  box-shadow: 0 8px 22px -8px oklch(0.500 0.046 168 / 0.5); }
 .lx .adm-btn.primary:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
 
 /* ── dashboard KPIs ── */
 .lx .adm-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 26px; }
-.lx .adm-kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow-card, 0 10px 30px -18px oklch(0.45 0.08 0 / 0.22)); }
+.lx .adm-kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow-card, 0 10px 30px -18px oklch(0.42 0.03 168 / 0.22)); }
 .lx .adm-kpi .v { font-size: 30px; font-weight: 900; letter-spacing: -0.02em; }
 .lx .adm-kpi .k { font-size: 12.5px; color: var(--ink-2); margin-top: 4px; }
 .lx .adm-secttl { font-size: 15px; font-weight: 800; margin: 6px 0 12px; letter-spacing: -0.01em; }
@@ -112,7 +112,7 @@
   background: var(--surface); color: var(--ink-3); cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
 .lx .adm-iconbtn:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
 .lx .adm-iconbtn:disabled { opacity: 0.35; cursor: default; }
-.lx .adm-iconbtn.danger:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent-2); border-color: oklch(0.85 0.08 0); }
+.lx .adm-iconbtn.danger:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent-2); border-color: oklch(0.85 0.03 168); }
 .lx .adm-addrow { display: flex; gap: 7px; margin-top: 11px; }
 .lx .adm-addrow input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; border: 1px dashed var(--line);
   background: var(--surface); font-size: 14px; }

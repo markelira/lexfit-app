@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     mode: recurring ? "subscription" : "payment",
     customer,
     line_items: [{ price, quantity: 1 }],
-    success_url: `${origin}/app?sub=success`,
+    success_url: `${origin}/app?sub=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/subscribe?canceled=1`,
     client_reference_id: token.uid,
     locale: "hu",

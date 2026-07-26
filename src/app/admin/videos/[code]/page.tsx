@@ -58,7 +58,7 @@ export default function EditVideoPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <VideoForm initial={video} filters={filters!} create={false} />
           <div>
-            <button className="adm-btn danger" style={{ color: "var(--accent-2)", borderColor: "oklch(0.85 0.08 0)" }} onClick={del}>
+            <button className="adm-btn danger" style={{ color: "var(--accent-2)", borderColor: "oklch(0.85 0.03 168)" }} onClick={del}>
               Videó törlése
             </button>
           </div>

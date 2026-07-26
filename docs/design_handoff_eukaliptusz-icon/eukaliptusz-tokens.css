@@ -1,0 +1,63 @@
+/* LEXFIT — Eukaliptusz design tokens · v1
+   GLOBAL palette. Replaces the rose-pink system in BOTH token files:
+     · lexfit-tokens.css   (app — canonical, incl. dark theme + 6 categories)
+     · lexfit-landing.css  (landing — duplicate :root block)
+   See README.md §5 for the 321 hardcoded literals that this file does NOT fix. */
+
+:root {
+  /* ---- brand · Eukaliptusz (hue 168 — blue-green, out of the khaki band) ---- */
+  --accent:        oklch(0.660 0.042 168);  /* #7a9b8d */
+  --accent-2:      oklch(0.500 0.046 168);  /* #496c5e */
+  --accent-soft:   oklch(0.945 0.020 168);  /* #e1f1ea */
+  --accent-ink:    oklch(0.440 0.050 168);  /* #355c4d — accent-coloured TEXT on white */
+
+  /* ---- ink ramp ---- */
+  --ink:           oklch(0.235 0.014 168);  /* #18201d */
+  --ink-2:         oklch(0.430 0.022 168);  /* #44544d */
+  --ink-3:         oklch(0.520 0.024 168);  /* #5c6e66 — AA-safe at small sizes */
+
+  /* ---- surfaces ---- */
+  --bg:            oklch(0.968 0.006 168);  /* #f1f6f4 */
+  --surface:       #ffffff;
+  --surface-2:     oklch(0.945 0.008 168);  /* #e8efec */
+  --line:          oklch(0.900 0.010 168);  /* #d8e0dd */
+  --line-2:        oklch(0.845 0.013 168);  /* #c5cfca */
+
+  /* ---- semantic ---- */
+  --ok:            oklch(0.520 0.145 150);  /* #007f37 — 1.69 vs accent, stays distinct */
+  --ok-soft:       oklch(0.945 0.035 150);  /* #ddf4e1 */
+  --warn:          oklch(0.520 0.115 70);   /* #925b00 */
+  --danger:        oklch(0.520 0.155 25);   /* #b13a38 */
+
+  /* ---- workout categories · 6, separated on hue AND lightness ---- */
+  --cat-also:      oklch(0.660 0.042 168);  /* #7a9b8d  ALSÓ     — brand */
+  --cat-felso:     oklch(0.450 0.030 150);  /* #4a5a4d  FELSŐ    */
+  --cat-cardio:    oklch(0.560 0.085 72);   /* #936c38  CARDIO   */
+  --cat-teljes:    oklch(0.520 0.058 42);   /* #865e4f  TELJES   */
+  --cat-mobility:  oklch(0.755 0.032 225);  /* #9bb4bf  MOBILITY */
+  --cat-tartas:    oklch(0.580 0.042 300);  /* #7e7590  TARTÁS   */
+
+  /* ---- dark theme (player, cast, showcase, founder finale) ---- */
+  --d-bg:          oklch(0.235 0.014 168);  /* #18201d */
+  --d-surface:     oklch(0.285 0.016 168);  /* #232d29 */
+  --d-surface-2:   oklch(0.330 0.018 168);  /* #2d3834 */
+  --d-line:        oklch(0.390 0.020 168);  /* #3b4943 */
+  --d-ink:         oklch(0.965 0.005 168);  /* #f0f4f3 */
+  --d-ink-2:       oklch(0.730 0.022 168);  /* #9baca5 */
+  --d-accent:      oklch(0.720 0.060 168);  /* #80b19d — lifted for dark grounds */
+
+  /* ---- inversion helpers ----
+     Eukaliptusz is LIGHT. Text on --accent is dark ink, never white.
+     white on --accent = 3.04:1 (FAILS AA) · ink on --accent = 5.46:1 (passes) */
+  --on-accent:      var(--ink);
+  --on-accent-soft: oklch(0.235 0.014 168 / .82);
+
+  --grad-hero: linear-gradient(135deg, oklch(0.700 0.040 168) 0%, oklch(0.620 0.048 168) 100%);
+  --shadow-card: 0 1px 2px oklch(0.30 0.02 168 / .05), 0 6px 24px -8px oklch(0.40 0.04 168 / .13);
+
+  /* ---- unchanged ---- */
+  --font: "Poppins", "Helvetica Neue", sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+  --r-sm: 8px; --r-md: 14px; --r-lg: 20px;
+  --col: 1200px;
+}

@@ -48,14 +48,14 @@
   padding: 1.1rem 1.25rem;
   background: var(--grad-hero);
   color: white;
-  box-shadow: 0 14px 34px -16px oklch(0.66 0.155 0 / 0.55);
+  box-shadow: 0 14px 34px -16px oklch(0.660 0.042 168 / 0.55);
 }
 
 .planName { font-size: 1rem; font-weight: 800; }
-.planPer { font-size: 0.78rem; color: oklch(1 0 0 / 0.85); margin-top: 0.2rem; }
+.planPer { font-size: 0.78rem; color: oklch(1 0 168 / 0.85); margin-top: 0.2rem; }
 .planPrice { text-align: right; white-space: nowrap; }
 .amt { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.01em; }
-.per { font-size: 0.85rem; color: oklch(1 0 0 / 0.85); margin-left: 0.2rem; }
+.per { font-size: 0.85rem; color: oklch(1 0 168 / 0.85); margin-left: 0.2rem; }
 
 .feat {
   list-style: none;
@@ -99,7 +99,7 @@
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 26px -10px oklch(0.58 0.165 358 / 0.55);
+  box-shadow: 0 10px 26px -10px oklch(0.500 0.046 168 / 0.55);
 }
 
 .cta:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
@@ -161,7 +161,7 @@
   background:
     linear-gradient(var(--surface), var(--surface)) padding-box,
     var(--grad-hero) border-box;
-  box-shadow: 0 20px 48px -22px oklch(0.66 0.155 0 / 0.5);
+  box-shadow: 0 20px 48px -22px oklch(0.660 0.042 168 / 0.5);
   transform: translateY(-8px);
   position: relative;
 }
@@ -220,7 +220,7 @@
   border: none;
   color: white;
   background: var(--accent-2);
-  box-shadow: 0 10px 26px -10px oklch(0.58 0.165 358 / 0.55);
+  box-shadow: 0 10px 26px -10px oklch(0.500 0.046 168 / 0.55);
 }
 .pickHero:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
 

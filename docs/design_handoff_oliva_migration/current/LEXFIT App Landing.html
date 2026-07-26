@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEXFIT — A változás otthon kezdődik</title>
+<link rel="stylesheet" href="lexfit-landing.css">
+<script src="image-slot.js"></script>
+</head>
+<body>
+
+<!-- sticky nav · floating glass pill -->
+<div class="stickynav" id="sticky">
+  <div class="row1">
+    <span class="wordmark" style="font-size:19px">LEXFIT</span>
+    <nav class="links"><a class="active" href="#valos">Valós idejű</a><a href="#programok">Foundation</a><a href="#youtube">Bemutató</a><a href="#profil">Haladásom</a><a href="#receptek">Receptek</a></nav>
+    <a class="mini" href="#elofizetes">Kezdd el a programot <span>→</span></a>
+  </div>
+</div>
+
+<!-- HERO · premium light -->
+<header class="hero">
+  <div class="hero-aura"></div>
+  <div class="wrap">
+    <div class="hero-nav">
+      <span class="wordmark">LEXFIT</span>
+      <nav class="links"><a href="#funkciok">Funkciók</a><a href="#alexa">Alexa</a><a href="#elofizetes">Előfizetés</a></nav>
+    </div>
+    <div class="hero-body">
+      <div class="hero-copy">
+        <div class="hero-eyebrow">A teljes otthoni edzésprogram · nőknek</div>
+        <h1>A változás<br><b>otthon kezdődik</b></h1>
+        <p class="body">Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz — és egy edző, aki végig veled marad.</p>
+        <div class="hero-row">
+          <button class="pill pill-dark">Kezdd el a programot</button>
+          <button class="hero-cta2">Bemutató →</button>
+        </div>
+        <div class="hero-trust">10 év versenysport mögötte · 14 napos garancia</div>
+      </div>
+      <div class="hero-device"><image-slot id="hero-screen" shape="rect" placeholder="Kép helye — később töltöm fel"></image-slot></div>
+    </div>
+  </div>
+  </header>
+<!-- FUNKCIÓK intro (MadFit-style: left intro + feature sub-nav) -->
+<div class="band-cream sec" id="funkciok"><div class="wrap">
+  <div class="rise app-intro">
+    <div class="eyebrow">Az app</div>
+    <h2 class="h-bold" style="font-size:clamp(28px,3vw,38px);margin-top:10px">Minden, ami az edzéshez kell — egy appban.</h2>
+    <p class="body" style="margin-top:14px">Edzésprogram, videótár és fejlődéskövetés egy helyen. Nincs több app, nincs több kifogás — csak te és a következő edzésed.</p>
+  </div>
+</div></div>
+
+<!-- follow-along panel -->
+<div class="band-cream sec-sm" id="valos"><div class="wrap"><div class="panel panel-pad rise">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+    <div style="display:flex;justify-content:center"><div style="width:280px;aspect-ratio:9/19.5;border-radius:34px;overflow:hidden"><image-slot id="fa-screen" shape="rect" placeholder="Telefon mockup helye — később töltöm fel"></image-slot></div></div>
+    <div class="ticon center">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/></svg>
+      <h3 class="h-thin">edzés, amikor<br>neked jó</h3>
+      <p class="body">Minden héten új órák a legjobb edzőinktől. Erő, HIIT, jóga, pilates. Válaszd ki a hangulatod, nyomd meg a lejátszást, és mozogj velem, mintha ott lennének a szobában.</p>
+      <button class="pill pill-outline">Válaszd ki a csomagod</button>
+    </div>
+  </div>
+</div></div></div>
+
+<!-- 500+ caption + category carousel -->
+<div class="band-cream sec-sm"><div class="wrap rise">
+  <h3 class="cap-title">Minden nap új edzés. Egy sem unalmas.</h3>
+  <p class="cap-body">Kövesd valós időben. Naplózz, kövesd a fejlődésed, mentsd a kedvenceid. Új listák hétről hétre — sosem fogysz ki a következő kihívásból.</p>
+</div>
+<div class="coverflow" id="coverflow"></div>
+</div>
+
+<!-- CAST navy (MadFit layout: phone → beam → TV → device chain) -->
+<div class="band-navy sec"><div class="wrap"><div class="cast rise">
+  <div class="cast-top">
+    <div class="cast-copy">
+      <div class="cast-icons">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 16a6 6 0 016 6M2 12a10 10 0 0110 10M2 20h.01M4 4h16v7"/><rect x="14" y="15" width="8" height="6" rx="1"/></svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 5h16v11h-8M4 20l8-9"/></svg>
+      </div>
+      <h3 class="h-thin" style="color:#fff">vidd a<br>nagy képernyőre</h3>
+      <p class="body" style="color:oklch(1 0 0/.8);max-width:340px">Egy koppintás, és a követhető edzésed a TV-n vagy a laptopon fut — Chromecasttal és AirPlay-jel, zökkenőmentesen.</p>
+    </div>
+    <div class="cast-phone">
+      <div class="cast-beam"></div>
+      <div class="cast-shot ph"><image-slot id="cast-phone" shape="rect" placeholder="Telefon — futó edzés"></image-slot></div>
+    </div>
+  </div>
+  <div class="cast-tvwrap">
+    <div class="cast-shot tv"><image-slot id="cast-tv" shape="rect" placeholder="Nappali — TV-n futó edzés"></image-slot></div>
+  </div>
+  <div class="castrow">
+    <div class="dev"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="2" width="12" height="20" rx="2"/></svg><span class="lab">TELEFON</span></div>
+    <div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span class="wave"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="transform:rotate(90deg) scaleX(-1)"><path d="M5 12.5a9 9 0 0114 0M8 16a5 5 0 018 0"/><circle cx="12" cy="19.5" r="1.1" fill="currentColor" stroke="none"/></svg></span></div>
+    <div class="dev"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20h8"/></svg><span class="lab">ASZTALI GÉP</span></div>
+    <div class="dev"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="5" width="16" height="10" rx="1"/><path d="M2 19h20"/></svg><span class="lab">LAPTOP</span></div>
+    <div class="dev"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="13" rx="1"/><path d="M8 21h8"/></svg><span class="lab">OKOS TV</span></div>
+  </div>
+</div></div></div>
+
+<!-- goal-focused panel -->
+<div class="band-cream sec" id="programok"><div class="wrap"><div class="panel panel-pad rise">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+    <div class="ticon center">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 17l4-2 5 1 8-4 3 2v3H2z"/><path d="M6 15l1-4 4 1"/></svg>
+      <h3 class="h-thin">programok,<br>amik célba<br>érnek</h3>
+      <p class="body">Nem kell kitalálnod, mit csinálj. Válassz egy programot, és mi végigvezetünk rajta — az első naptól az eredményig.</p>
+      <button class="pill pill-outline">Válaszd ki a csomagod</button>
+    </div>
+    <div style="display:flex;justify-content:center"><div style="width:100%;max-width:340px;aspect-ratio:4/5;border-radius:20px;overflow:hidden"><image-slot id="gf-screen" shape="rect" placeholder="Kép helye — később töltöm fel"></image-slot></div></div></div>
+  </div>
+</div></div></div>
+
+<!-- FOUNDATION STARTER — first 4 weeks -->
+<div class="band-cream sec-sm"><div class="wrap rise">
+  <div class="starter-head rise">
+    <span class="starter-badge">A kezdő program</span>
+    <h2 class="starter-title">4 hét, ami elindít.</h2>
+    <p class="cap-body">A teljes Foundation első fele: 4 hét, 20 vezetett edzés, heti 5 nap, napi fix 30 perc — eszköz nélkül. Két fázis vezet a forma és a szokás kialakításától az első igazi építésig.</p>
+  </div>
+  <div class="starter-facts">
+    <span>20 edzés</span><span>5 nap / hét</span><span>fix 30 perc</span><span>eszköz nélkül</span><span>2 fázis</span>
+  </div>
+  <div class="journey" id="journey">
+    <div class="jbg ph-alap" id="jbg"></div>
+    <div class="jglow"></div>
+    <div class="journey-inner">
+      <div class="j-left j-anim" id="jLeft"></div>
+      <div class="j-days" id="jDays"></div>
+    </div>
+    <div class="j-chapters" id="jChapters">
+      <button class="j-chap on" data-i="0"><span class="fill"></span></button>
+      <button class="j-chap" data-i="1"><span class="fill"></span></button>
+      <button class="j-chap" data-i="2"><span class="fill"></span></button>
+      <button class="j-chap" data-i="3"><span class="fill"></span></button>
+    </div>
+  </div>
+</div></div>
+
+<!-- unlimited creation circles -->
+<div class="band-cream sec-sm"><div class="wrap rise">
+  <h3 class="cap-title">korlátlan lehetőség</h3>
+  <p class="cap-body">Alakítsd a kedvenc edzéseid személyre szabott tervvé. Hívd meg a barátaid, tartsátok formában egymást, és érjétek el együtt, amit egyedül nehezebb.</p>
+</div>
+<div class="carousel" style="margin-top:34px" id="unlim-carousel"></div>
+</div>
+
+<!-- CINEMATIC SHOWCASE -->
+<div class="band-navy showcase-band" id="youtube"><div class="wrap">
+  <div class="showcase rise">
+    <div class="sc-head">
+      <span class="sc-play" id="scPlay" aria-label="Lejátszás/szünet"><svg class="i-play" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></span>
+      <span class="sc-eyebrow">Nézd meg egy perc alatt</span>
+    </div>
+    <div class="sc-stage">
+      <div class="sc-glow"></div>
+      <div class="device sc-device">
+        <div class="notch"></div>
+        <div class="screen sc-screen">
+          <div class="sc-scene on"><image-slot id="sc0" shape="rect" placeholder="Kezdőképernyő — a mai edzésed"></image-slot></div>
+          <div class="sc-scene"><image-slot id="sc1" shape="rect" placeholder="Valós idejű edzés — együtt az edzővel"></image-slot></div>
+          <div class="sc-scene"><image-slot id="sc2" shape="rect" placeholder="Programok — a heted egy helyen"></image-slot></div>
+          <div class="sc-scene"><image-slot id="sc3" shape="rect" placeholder="Receptek — töltődj fel"></image-slot></div>
+          <div class="sc-scene"><image-slot id="sc4" shape="rect" placeholder="Profil — lásd a fejlődésed"></image-slot></div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-caption" id="scCaption">A mai edzésed egy koppintásra</div>
+    <div class="sc-chapters" id="scChapters">
+      <button class="sc-chap on" data-i="0"><span class="fill"></span></button>
+      <button class="sc-chap" data-i="1"><span class="fill"></span></button>
+      <button class="sc-chap" data-i="2"><span class="fill"></span></button>
+      <button class="sc-chap" data-i="3"><span class="fill"></span></button>
+      <button class="sc-chap" data-i="4"><span class="fill"></span></button>
+    </div>
+  </div>
+</div></div>
+
+<!-- track activity panel -->
+<div class="band-cream sec" id="profil"><div class="wrap"><div class="panel panel-pad rise">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+    <div class="ticon center">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+      <h3 class="h-thin">lásd, milyen<br>messzire jutottál</h3>
+      <p class="body">Az app szinkronban van a Health és a Naptár appjaiddal. Egy pillantás, és látod a fejlődésed — ami látszik, az motivál.</p>
+      <button class="pill pill-outline">Válaszd ki a csomagod</button>
+    </div>
+    <div style="display:flex;justify-content:center;gap:16px">
+      <div style="flex:1;max-width:200px;aspect-ratio:4/5;border-radius:18px;overflow:hidden"><image-slot id="tr1" shape="rect" placeholder="Kép helye"></image-slot></div>
+      <div style="flex:1;max-width:200px;aspect-ratio:4/5;border-radius:18px;overflow:hidden"><image-slot id="tr2" shape="rect" placeholder="Kép helye"></image-slot></div>
+    </div>
+  </div>
+</div></div></div>
+
+<!-- unlock achievements -->
+<div class="band-cream sec-sm"><div class="wrap rise">
+  <h3 class="cap-title">gyűjtsd a jelvényeket</h3>
+  <p class="cap-body">Jelvények a vízért, az alvásért, minden edzésért. Hálanaplóval a fejben is rendet raksz, a virtuális naplóddal pedig végigköveted az egész utad.</p>
+  <div class="badges" style="margin-top:38px" id="badges"></div>
+</div></div>
+
+<!-- new recipes panel -->
+<div class="band-cream sec" id="receptek"><div class="wrap"><div class="panel panel-pad rise">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+    <div class="ticon center">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11h18a9 9 0 01-18 0zM12 3v4"/></svg>
+      <h3 class="h-thin">minden héten<br>friss recept</h3>
+      <p class="body">Táplálkozási szakértőnk állítja össze mind. Egyszerű, finom, és pontosan annyi energiát ad, amennyi a következő edzésedhez kell.</p>
+      <button class="pill pill-outline">Válaszd ki a csomagod</button>
+    </div>
+    <div style="display:flex;justify-content:center"><div style="width:100%;max-width:340px;aspect-ratio:4/5;border-radius:20px;overflow:hidden;position:relative"><image-slot id="rec-screen" shape="rect" placeholder="Kép helye — később töltöm fel"></image-slot></div></div>
+  </div>
+</div></div></div>
+
+<!-- 200+ recipes carousel -->
+<div class="band-cream sec-sm"><div class="wrap rise">
+  <h3 class="cap-title">200+ recept minden ízléshez</h3>
+  <p class="cap-body">Szűrj étrend vagy preferencia szerint. Reggeli, ebéd, snack, vacsora, ital — a konyhád is része az utadnak.</p>
+</div>
+<div class="carousel" style="margin-top:34px" id="food-carousel"></div>
+</div>
+
+<!-- ALEXA · founder / personal brand (MadFit card-row style) -->
+<div class="band-cream sec-sm" id="alexa"><div class="wrap rise" style="padding-bottom:30px">
+  <div class="eyebrow">Az alapító</div>
+  <h2 class="h-bold">Ismerd meg Alexát.</h2>
+  <p class="body" style="margin-top:12px;max-width:560px">Tíz év versenysport, egy összeomlás, és egy felismerés, ami közösséggé vált. Ez az ő története — és innentől a tiéd is.</p>
+</div>
+<div class="carousel" id="alexa-carousel"></div>
+</div>
+<div class="band-navy sec alexa-band"><div class="wrap rise">
+  <div class="alexa-pull-big">„Egyedül nem megy.”</div>
+  <div class="aq-promise">
+    <span>Nem mondom meg, mit csinálj.</span>
+    <span>Nem ítéllek el, ha kimaradsz.</span>
+    <span>Nem játszom, hogy tökéletes vagyok.</span>
+  </div>
+  <div class="aq-close">Egyedül nehéz.<br>Együtt muszáj.</div>
+  <div class="aq-sign">— Alexa</div>
+  <button class="pill pill-sage aq-cta">Csatlakozz a csapathoz</button>
+</div></div>
+
+<!-- PRICING sage -->
+<div class="band-sage" style="background:var(--sage-2);padding:120px 0 90px" id="elofizetes"><div class="wrap">
+  <div style="text-align:center;margin-bottom:44px" class="rise">
+    <span class="wordmark" style="color:var(--ink);justify-content:center;font-size:26px">LEXFIT</span>
+    <div class="eyebrow" style="margin-top:14px">Előfizetés</div>
+    <p class="cap-body" style="margin-top:10px">Egy előfizetés. Minden funkció. Bármikor lemondhatod.</p>
+  </div>
+  <div class="price-grid rise">
+    <div class="price-card"><div class="plan">Havi</div><div class="rule"></div><div class="old">&nbsp;</div><div class="amt">$29.99</div><div class="cur">USD</div><div class="save">&nbsp;</div><div class="fine">$29.99 usd / hó<br>havi számlázás</div></div>
+    <div class="price-card"><div class="plan">Féléves</div><div class="rule"></div><div class="old">$179.94 usd</div><div class="amt">$99.99</div><div class="cur">USD</div><div class="save cyan">Spórolj 80$</div><div class="fine">$16.67 usd / hó<br>féléves számlázás</div></div>
+    <div class="price-card"><div class="plan">Éves</div><div class="rule"></div><div class="old">$359.88 usd</div><div class="amt">$149.99</div><div class="cur">USD</div><div class="save cyan">Spórolj 210$</div><div class="fine">$12.50 usd / hó<br>éves számlázás</div></div>
+    <div class="price-card"><div class="plan">Örökös</div><div class="rule"></div><div class="old">&nbsp;</div><div class="amt">$299.99</div><div class="cur">USD</div><div class="save coral">Egyszer fizetsz, örökre a tiéd</div><div class="fine">$299.99 usd<br>egyszeri számlázás</div></div>
+  </div>
+  <div class="price-foot"><button class="pill pill-dark">Kezdd el még ma</button></div>
+</div>
+<div class="foot">
+  <div class="help"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>Kérdésed van? Írj nekünk, és segítünk — <a href="mailto:team@lexfit.hu">team@lexfit.hu</a></span></div>
+  <div class="legal"><a href="#">Felhasználási feltételek</a> | <a href="#">Adatvédelem</a></div>
+</div>
+</div>
+
+<script>
+// ---- populate carousels & grids ----
+// ---- course-card coverflow ----
+(function(){
+  const wrap=document.getElementById('coverflow');
+  if(!wrap)return;
+  const catVar={"Alsótest":"var(--cat-also)","Felsőtest":"var(--cat-felso)","Cardio + has":"var(--cat-cardio)","Teljes test":"var(--cat-teljes)","Mobility":"var(--cat-mobility)"};
+  const catWord={"Alsótest":"ALSÓ","Felsőtest":"FELSŐ","Cardio + has":"CARDIO","Teljes test":"TELJES","Mobility":"MOBILITY"};
+  const grad=t=>{const c=catVar[t];return `linear-gradient(125deg, oklch(from ${c} calc(l - 0.16) calc(c * 0.85) h) 0%, ${c} 65%, oklch(from ${c} calc(l + 0.07) c h) 100%)`;};
+  const cards=[
+    ["Alsótest","Fenék & comb égő","24 perc"],
+    ["Cardio + has","Zsírégető cardio","22 perc"],
+    ["Felsőtest","Tónusos kar & váll","21 perc"],
+    ["Teljes test","Teljes test égő","28 perc"],
+    ["Mobility","Reggeli mobilitás","14 perc"],
+    ["Alsótest","Lépcsőző comb-sorozat","19 perc"],
+    ["Cardio + has","Tabata core","10 perc"],
+    ["Felsőtest","Tartás-reset","17 perc"],
+    ["Teljes test","Multi-mozgás mindenre","26 perc"],
+  ];
+  wrap.innerHTML=cards.map((c,i)=>`<div class="cf-card" data-i="${i}"><div class="cf-cover" style="background:${grad(c[0])}"><span class="cf-ring"></span><span class="cf-word">${catWord[c[0]]}</span><div class="cf-meta"><span class="cf-cat">${c[0]}</span><b>${c[1]}</b><span class="cf-min">${c[2]} · Alexa</span></div></div><span class="cf-glass"></span></div>`).join('');
+  const els=[...wrap.children];
+  let center=Math.floor(cards.length/2),timer=null,playing=false;
+  function layout(){
+    const N=cards.length;
+    els.forEach((el,i)=>{
+      let o=i-center;
+      if(o>N/2)o-=N;else if(o<-N/2)o+=N;
+      const a=Math.abs(o);
+      el.style.transform=`translateX(${o*118}px) scale(${Math.max(.52,1-a*.14)})`;
+      el.style.opacity=a>=4?0:1;
+      el.style.zIndex=String(20-Math.round(a));
+      el.style.pointerEvents=a>=4?'none':'auto';
+      const g=el.querySelector('.cf-glass');if(g)g.style.opacity=String(a>=4?0:Math.min(.85,a*.3));
+    });
+  }
+  function next(){center=(center+1)%cards.length;layout();}
+  function play(){if(playing)return;playing=true;timer=setInterval(next,2800);}
+  function pause(){playing=false;clearInterval(timer);timer=null;}
+  els.forEach(el=>el.addEventListener('click',()=>{center=+el.dataset.i;layout();if(playing){clearInterval(timer);timer=setInterval(next,2800);}}));
+  layout();
+  const cfIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)play();else pause();}),{threshold:.3});
+  cfIO.observe(wrap);
+})();
+
+const progThemeDot={"Alsótest":"var(--cat-also)","Felsőtest":"var(--cat-felso)","Cardio + has":"var(--cat-cardio)","Teljes test":"var(--cat-teljes)","Mobility":"var(--cat-mobility)"};
+const starterWeeks=[
+  {n:1,ph:"alap",eyebrow:"🌱 Alap fázis",desc:"Forma és szokás. Lassú tempó, alapgyakorlatok, bőséges modifikációkkal.",rows:[["H","Alsótest","Láb alapokról","F001"],["K","Felsőtest","Felsőtest indító","F002"],["Sze","Cardio + has","Csendes cardio","F003"],["Cs","Teljes test","Mindent egy edzésben","F004"],["P","Mobility","Reset — alap flow","F005"]]},
+  {n:2,ph:"alap",eyebrow:"🌱 Alap fázis",desc:"Beépül a rutin. Ugyanaz a ritmus, kicsit mélyebben, magabiztosabban.",rows:[["H","Alsótest","Fenék-fókusz, első réteg","F006"],["K","Felsőtest","Egyenes hát, nyitott mell","F007"],["Sze","Cardio + has","Lépés-alapú cardio + has","F008"],["Cs","Teljes test","Egész test flow, könnyedén","F009"],["P","Mobility","Csípő + váll mobility","F010"]]},
+  {n:3,ph:"epites",eyebrow:"🔨 Építés fázis",desc:"Új variációk és cardio-alapozás. Belép a tempó és az új formátumok.",rows:[["H","Alsótest","Combé az erő — pulzusok","F011"],["K","Felsőtest","Felsőtest variációkkal","F012"],["Sze","Cardio + has","Step it up — cardio építés","F013"],["Cs","Teljes test","Teljes test fél órában","F014"],["P","Mobility","Lazító flow + mély nyújtás","F015"]]},
+  {n:4,ph:"epites",eyebrow:"🔨 Építés fázis",desc:"Erősebb terhelés. Pyramid, EMOM, AMRAP — és érzed, hogy bírod.",rows:[["H","Alsótest","Lábmunka oldalra, átlósan","F016"],["K","Felsőtest","Lapockák erősítése","F017"],["Sze","Cardio + has","Cardio combo + ferde has","F018"],["Cs","Teljes test","Multi-mozgás mindenre","F019"],["P","Mobility","Mély nyújtás — egész test","F020"]]},
+];
+(function(){
+  const bg=document.getElementById('jbg');
+  const left=document.getElementById('jLeft');
+  const days=document.getElementById('jDays');
+  const chaps=[...document.querySelectorAll('.j-chap')];
+  const themeWord={"Alsótest":"ALSÓ","Felsőtest":"FELSŐ","Cardio + has":"CARDIO","Teljes test":"TELJES","Mobility":"MOBILITY"};
+  const themeGrad=t=>{const c=progThemeDot[t];return `linear-gradient(125deg, oklch(from ${c} calc(l - 0.16) calc(c * 0.85) h) 0%, ${c} 65%, oklch(from ${c} calc(l + 0.07) c h) 100%)`;};
+  const DAY=2600;
+  let wi=0,di=0,timer=null,playing=false;
+  function renderWeek(){
+    const w=starterWeeks[wi];
+    bg.className='jbg ph-'+w.ph;
+    left.classList.remove('j-anim');void left.offsetWidth;left.classList.add('j-anim');
+    left.innerHTML=`<div class="j-eyebrow">${w.eyebrow}</div><div class="j-weeknum">0${w.n}</div><div class="j-week">${w.n}. hét · 5 edzés</div><p class="j-desc">${w.desc}</p><div class="j-meta">Napi 30 perc · eszköz nélkül</div>`;
+    days.innerHTML=w.rows.map((r,n)=>`<div class="j-drow" data-n="${n}"><div class="j-dhead"><span class="j-dot" style="background:${progThemeDot[r[1]]}"></span><span class="j-day">${r[0]}</span><span class="j-t">${r[2]}</span></div><div class="j-card"><div class="j-cover" style="background:${themeGrad(r[1])}"><span class="j-ring"></span><span class="j-word">${themeWord[r[1]]}</span><div class="j-cmeta"><b>${r[2]}</b><span>${r[3]} · Foundation · 30 perc</span></div></div></div></div>`).join('');
+    paintDay();updateChaps();
+  }
+  function paintDay(){
+    [...days.children].forEach((el,n)=>{
+      el.classList.toggle('active',n===di);
+      let op=1;
+      if(n<di)op=.34;else if(n>di)op=Math.max(.24,1-.2*(n-di));
+      el.style.opacity=op;
+    });
+  }
+  function updateChaps(){
+    chaps.forEach((c,n)=>{c.classList.remove('on','done','paused');if(n<wi)c.classList.add('done');});
+    const fill=chaps[wi].querySelector('.fill');fill.style.animation='none';void fill.offsetWidth;fill.style.animation='';
+    chaps[wi].classList.add('on');chaps[wi].style.setProperty('--dur',(DAY*starterWeeks[wi].rows.length)+'ms');
+    if(!playing)chaps[wi].classList.add('paused');
+  }
+  function tick(){
+    di++;
+    if(di>=starterWeeks[wi].rows.length){di=0;wi=(wi+1)%starterWeeks.length;renderWeek();}
+    else paintDay();
+  }
+  function play(){if(playing)return;playing=true;chaps[wi].classList.remove('paused');timer=setInterval(tick,DAY);}
+  function pause(){playing=false;chaps[wi].classList.add('paused');clearInterval(timer);timer=null;}
+  chaps.forEach(c=>c.addEventListener('click',()=>{wi=+c.dataset.i;di=0;renderWeek();if(playing){clearInterval(timer);timer=setInterval(tick,DAY);}}));
+  renderWeek();
+  const jIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)play();else pause();}),{threshold:.4});
+  jIO.observe(document.getElementById('journey'));
+})();
+
+const unlim=[["Alsótest","Fenék & comb alap","28 perc"],["Felsőtest","Tónusos kar & váll","24 perc"],["Cardio + has","Zsírégető kardió","20 perc"],["Teljes test","Teljes test égő","30 perc"],["Mobility","Reggeli mobilitás","15 perc"],["Alsótest","Comb & fenék formáló","26 perc"],["Cardio + has","Core & has fókusz","18 perc"],["Felsőtest","Hát & tartás","22 perc"],["Teljes test","Tánc kardió","25 perc"],["Mobility","Estéli nyújtás","12 perc"],["Alsótest","Láb erősítő","30 perc"],["Teljes test","HIIT kör","20 perc"]];
+const unlimWord={"Alsótest":"ALSÓ","Felsőtest":"FELSŐ","Cardio + has":"CARDIO","Teljes test":"TELJES","Mobility":"MOBILITY"};
+const unlimGrad=t=>{const c=progThemeDot[t];return `linear-gradient(125deg, oklch(from ${c} calc(l - 0.16) calc(c * 0.85) h) 0%, ${c} 65%, oklch(from ${c} calc(l + 0.07) c h) 100%)`;};
+document.getElementById('unlim-carousel').innerHTML=unlim.map(u=>`<div class="unlim-card" style="background:${unlimGrad(u[0])}"><span class="uc-ring"></span><span class="uc-word">${unlimWord[u[0]]}</span><div class="uc-meta"><b>${u[1]}</b><span>${u[2]} · Alexa</span></div></div>`).join('');
+
+document.getElementById('food-carousel').innerHTML=Array.from({length:14},(_,i)=>`<div class="food-tile"><image-slot id="food${i}" shape="rect" placeholder="étel"></image-slot></div>`).join('');
+
+const badges=[["24 HÉT","t-teal"],["500 PERC","t-sage"],["50 EDZÉS","t-teal"],["15 EDZÉS","t-green"],["6 HÉT","t-coral"],["100 PERC","t-green"],["50 VÍZNAPLÓ","t-blue"],["30 NAPLÓBEJEGYZÉS","t-coral"],["30 ALVÁSNAPLÓ","t-teal"],["90 NAPLÓBEJEGYZÉS","t-green"],["500 VÍZNAPLÓ","t-blue"],["365 ALVÁSNAPLÓ","t-teal"]];
+document.getElementById('badges').innerHTML=badges.map(b=>`<div class="badge"><div class="hex ${b[1]}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></div><span class="lab">${b[0]}</span></div>`).join('');
+
+const alexaCh=[
+  ["A VERSENYZŐ","10 év a szőnyegen","linear-gradient(160deg,var(--cat-felso),oklch(.34 .08 318))"],
+  ["A FORDULAT","2023 — abbahagytam","linear-gradient(160deg,var(--cat-teljes),oklch(.34 .1 353))"],
+  ["A FELISMERÉS","„Egyedül nem megy”","linear-gradient(160deg,var(--accent),var(--accent-2))"],
+  ["A KÖZÖSSÉG","17 000+ ember","linear-gradient(160deg,var(--cat-cardio),oklch(.56 .13 40))"],
+  ["AZ ÍGÉRET","Együtt muszáj","linear-gradient(160deg,var(--accent-2),var(--cat-felso))"],
+];
+document.getElementById('alexa-carousel').innerHTML=alexaCh.map((c,i)=>`<div class="trainer-card"><div class="grad" style="background:${c[2]}"></div><image-slot id="alexa-ch${i}" shape="rect" placeholder="Alexa — ${c[0].toLowerCase()}"></image-slot><span class="role">${c[0]}</span><span class="name">${c[1]}</span></div>`).join('');
+
+// ---- sticky pill nav: show on scroll + scroll-spy ----
+const sticky=document.getElementById('sticky');
+const featTabs=document.getElementById('featTabs');
+const specs=[["#valos"],["#programok"],["#youtube"],["#profil"],["#receptek"]];
+const spyEls=specs.map(s=>document.querySelector(s[0]));
+function setActive(href){
+  document.querySelectorAll('#featTabs a, .stickynav .links a').forEach(a=>{
+    a.classList.toggle('active',a.getAttribute('href')===href);
+  });
+}
+addEventListener('scroll',()=>{
+  sticky.classList.toggle('show',scrollY>640);
+  let cur='#valos';
+  for(const el of spyEls){if(el&&el.getBoundingClientRect().top<220)cur='#'+el.id;}
+  setActive(cur);
+},{passive:true});
+
+// ---- reveal ----
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rise').forEach(el=>io.observe(el));
+
+// ---- cinematic showcase ----
+(function(){
+  const scenes=[...document.querySelectorAll('.sc-scene')];
+  const chaps=[...document.querySelectorAll('.sc-chap')];
+  const caption=document.getElementById('scCaption');
+  const playBtn=document.getElementById('scPlay');
+  const captions=["A mai edzésed egy koppintásra","Mozogj együtt az edzőkkel, valós időben","A heted, felépítve — programok és kihívások","Friss receptek, hogy feltöltődj","Lásd, milyen messzire jutottál"];
+  const DUR=5000;
+  let i=0,timer=null,playing=false;
+  function paint(){
+    scenes.forEach((s,n)=>s.classList.toggle('on',n===i));
+    chaps.forEach((c,n)=>{c.classList.remove('on','done','paused');if(n<i)c.classList.add('done');});
+    caption.style.opacity=0;
+    setTimeout(()=>{caption.textContent=captions[i];caption.style.opacity=1;},250);
+    const fill=chaps[i].querySelector('.fill');fill.style.animation='none';void fill.offsetWidth;fill.style.animation='';
+    chaps[i].classList.add('on');
+    chaps[i].style.setProperty('--dur',DUR+'ms');
+    if(!playing)chaps[i].classList.add('paused');
+  }
+  function next(){i=(i+1)%scenes.length;paint();}
+  function play(){if(playing)return;playing=true;playBtn.classList.add('playing');chaps[i].classList.remove('paused');timer=setInterval(next,DUR);}
+  function pause(){playing=false;playBtn.classList.remove('playing');chaps[i].classList.add('paused');clearInterval(timer);timer=null;}
+  playBtn.addEventListener('click',()=>playing?pause():play());
+  chaps.forEach(c=>c.addEventListener('click',()=>{i=+c.dataset.i;paint();if(playing){clearInterval(timer);timer=setInterval(next,DUR);}}));
+  paint();
+  const scIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)play();else pause();}),{threshold:.4});
+  scIO.observe(document.querySelector('.showcase'));
+})();
+</script>
+</body>
+</html>

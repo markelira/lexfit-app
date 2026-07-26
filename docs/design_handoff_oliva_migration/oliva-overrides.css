@@ -1,0 +1,46 @@
+/* LEXFIT — Olíva migration · component overrides
+   Apply AFTER oliva-tokens.css. These are the declarations that must change
+   beyond the token swap. README §6 and §8 explain each one. */
+
+/* ============ §6 · HARDCODED LITERALS ============ */
+.panel{
+  background:
+    radial-gradient(120% 90% at 12% 8%, oklch(1 0 0/.55), transparent 55%),
+    radial-gradient(90% 80% at 88% 100%, oklch(from var(--accent) l c h / .28), transparent 60%),
+    linear-gradient(150deg, oklch(0.94 .02 116/.85), oklch(0.90 .03 116/.7));
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0/.7),
+    inset 0 -30px 60px -30px oklch(from var(--accent) l c h / .35),
+    0 30px 60px -34px oklch(0.35 .03 118/.5);
+}
+.t-sage {background:linear-gradient(160deg,oklch(0.66 .04 118),oklch(0.56 .045 118))}
+.t-coral{background:linear-gradient(160deg,var(--cat-cardio),oklch(0.56 .07 75))}
+.t-teal {background:linear-gradient(160deg,var(--cat-felso),oklch(0.40 .02 120))}
+.t-pink {background:linear-gradient(160deg,var(--accent),var(--accent-2))}
+.t-plum {background:linear-gradient(160deg,var(--cat-felso),oklch(0.40 .02 120))}
+.t-rose {background:linear-gradient(160deg,var(--cat-teljes),oklch(0.44 .04 80))}
+.t-blue {background:linear-gradient(160deg,oklch(0.58 .03 145),oklch(0.48 .035 145))}
+.t-green{background:linear-gradient(160deg,oklch(0.64 .045 118),oklch(0.54 .05 118))}
+.sc-glow  {background:radial-gradient(circle,oklch(from var(--accent) l c h / .6),transparent 62%)}
+.cast-beam{background:linear-gradient(180deg,oklch(from var(--accent) l c h / .5),transparent 88%)}
+
+/* ============ §4 + §8.1 · HERO INVERSION ============
+   Olíva is lighter than the old pink — all hero text flips to dark ink. */
+.hero-aura{background:radial-gradient(circle, oklch(1 0 0/.34), transparent 60%)}
+.hero-nav{color:var(--ink)}
+.hero-nav .links a{color:oklch(from var(--ink) l c h / .7)}
+.hero-nav .links a:hover{color:var(--ink)}
+.hero-eyebrow{color:oklch(from var(--ink) l c h / .85)}
+.hero-copy{color:var(--ink)}
+.hero-copy h1{color:var(--ink)}
+.hero-copy h1 b{color:var(--ink)}
+.hero-copy .body{color:oklch(from var(--ink) l c h / .82)}
+.hero-cta2{color:oklch(from var(--ink) l c h / .78)}
+.hero-cta2:hover{color:var(--ink)}
+.hero-trust{color:oklch(from var(--ink) l c h / .6)}
+/* .pill-dark unchanged — dark ink CTA is still correct on olive */
+
+/* ============ §8.5 · JOURNEY ============
+   ph-epites darkened: white text on raw --accent would be 3.37:1. */
+.journey .jbg.ph-alap  {background:linear-gradient(135deg,oklch(0.46 .028 122),oklch(0.30 .022 122))}
+.journey .jbg.ph-epites{background:linear-gradient(135deg,var(--accent-2),oklch(0.40 .04 118))}

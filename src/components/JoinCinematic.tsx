@@ -20,21 +20,21 @@ type Scene = {
 
 const CINE: Scene[] = [
   { dur: 3200, kind: "title", kicker: "LEXFIT · BEMUTATJA",
-    bg: "radial-gradient(125% 125% at 30% 18%, oklch(0.52 0.18 8) 0%, oklch(0.16 0.04 350) 70%)" },
+    bg: "radial-gradient(125% 125% at 30% 18%, oklch(0.52 0.05 168) 0%, oklch(0.16 0.04 168) 70%)" },
   { dur: 4400, kind: "big", big: "EGY STABIL ALAP", sub: "8 hét alatt szokást építünk, formába hozunk, és felkészítünk minden következő edzésre.",
     bg: "radial-gradient(125% 125% at 72% 26%, oklch(0.56 0.17 32) 0%, oklch(0.15 0.03 330) 72%)" },
   { dur: 5000, kind: "rhythm", title: "A HETED", sub: "5 edzésnap, 2 pihenő. Napi fix 30 perc, eszköz nélkül — csak egy matrac.",
-    bg: "linear-gradient(135deg, oklch(0.5 0.15 300) 0%, oklch(0.14 0.03 350) 78%)" },
+    bg: "linear-gradient(135deg, oklch(0.5 0.15 300) 0%, oklch(0.14 0.03 168) 78%)" },
   { dur: 5000, kind: "types", title: "AMIT CSINÁLNI FOGSZ", sub: "Circuit, EMOM, Tabata, AMRAP, flow — minden nap más, sosem unalmas.",
     bg: "radial-gradient(120% 120% at 60% 80%, oklch(0.52 0.16 45) 0%, oklch(0.14 0.03 340) 74%)" },
   { dur: 4600, kind: "phases", title: "4 FÁZIS", sub: "A formától az erőig — lépésről lépésre építünk fel.",
     bg: "radial-gradient(110% 130% at 50% 0%, oklch(0.5 0.16 150) 0%, oklch(0.15 0.03 340) 74%)" },
   { dur: 4800, kind: "big", big: "MÉRD MAGAD", sub: "A 8. héten ugyanazt csinálod, mint az 1.-en. A különbség te leszel.",
-    bg: "radial-gradient(125% 125% at 38% 82%, oklch(0.55 0.18 18) 0%, oklch(0.13 0.03 350) 72%)" },
+    bg: "radial-gradient(125% 125% at 38% 82%, oklch(0.55 0.18 18) 0%, oklch(0.13 0.03 168) 72%)" },
   { dur: 5200, kind: "goals", title: "MIT NYERSZ?", sub: "Nem csak edzéseket. Egy erősebb, magabiztosabb verziódat.",
     bg: "radial-gradient(120% 120% at 40% 30%, oklch(0.5 0.15 280) 0%, oklch(0.14 0.03 345) 74%)" },
   { finale: true, title: "KÉSZEN ÁLLSZ?", sub: "Az első edzésed innen egy kattintás.",
-    bg: "radial-gradient(125% 125% at 50% 30%, oklch(0.6 0.17 5) 0%, oklch(0.16 0.03 345) 76%)" },
+    bg: "radial-gradient(125% 125% at 50% 30%, oklch(0.6 0.05 168) 0%, oklch(0.16 0.03 345) 76%)" },
 ];
 
 const CINE_PHASES = [
@@ -52,7 +52,7 @@ const CINE_THEMES = ["Alsótest", "Felsőtest", "Cardio + has", "Teljes test", "
 const CINE_GOALS: [string, string][] = [
   ["💪", "Erősebb láb és törzs"], ["🧍", "Jobb testtartás"], ["🔁", "Napi mozgás-szokás"], ["📈", "Mérhető fejlődés"],
 ];
-const CONFETTI_COLORS = ["#e5719b", "#d56487", "#ffb86b", "#7ee0a8", "#ffffff", "#b692d8"];
+const CONFETTI_COLORS = ["#7a9b8d", "#496c5e", "#ffb86b", "#7ee0a8", "#ffffff", "#b692d8"];
 
 // Deterministic 0..1 hash (pure — avoids Math.random impurity + hydration mismatch).
 const rand = (n: number) => {

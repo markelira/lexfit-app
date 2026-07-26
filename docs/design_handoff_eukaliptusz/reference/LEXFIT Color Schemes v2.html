@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEXFIT — Új színirányok</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box}
+body{margin:0;font-family:"Poppins",sans-serif;background:#f7f6f4;color:#222;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1140px;margin:0 auto;padding:0 40px}
+.mono{font-family:"IBM Plex Mono",monospace}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.78}
+h1{font-weight:300;font-size:clamp(38px,5.2vw,70px);line-height:.98;letter-spacing:-.035em;margin:18px 0 0}
+h1 b{font-weight:700}
+h2{font-weight:600;font-size:clamp(24px,2.6vw,33px);letter-spacing:-.03em;margin:6px 0 0}
+p{line-height:1.62;margin:10px 0 0;text-wrap:pretty}
+.lead{font-size:18px;opacity:.75;max-width:680px;margin-top:22px}
+header{padding:92px 0 52px}
+.opt{padding:56px 0;border-top:1px solid rgba(0,0,0,.12)}
+.hd{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:flex-start}
+.hd .n{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;opacity:.78}
+.why{font-size:14.5px;opacity:.75;max-width:530px;line-height:1.6;margin:0}
+.note{background:#efece6;border-radius:16px;padding:20px 24px;margin-top:26px;font-size:14.5px;line-height:1.62;max-width:880px}
+.ramp{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;margin-top:26px}
+.sw{border-radius:12px;overflow:hidden;border:1px solid rgba(0,0,0,.1);background:#fff;min-width:0}
+.sw .ch{height:62px}.sw .in{padding:8px 10px 10px}
+.sw .nm{font-size:11.5px;font-weight:600}.sw .hx{font-family:"IBM Plex Mono",monospace;font-size:9.5px;opacity:.78;margin-top:2px}
+.board{display:grid;grid-template-columns:1.12fr .88fr;gap:20px;margin-top:22px}
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.hero{position:relative;border-radius:24px;padding:34px;min-height:290px;display:flex;align-items:center;overflow:hidden;background:var(--ac);color:var(--ink)}
+.hero .aura{position:absolute;width:440px;height:440px;left:62%;top:54%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.42),transparent 62%);filter:blur(26px)}
+.hc{position:relative}
+.hero .eb{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+.hero h3{font-weight:300;font-size:38px;line-height:1;letter-spacing:-.025em;text-transform:uppercase;margin:14px 0 0}
+.hero h3 b{font-weight:700}
+.hero p{font-size:13.5px;max-width:300px;color:var(--ink)}
+.btns{display:flex;gap:14px;align-items:center;margin-top:20px;flex-wrap:wrap}
+.tr{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);margin-top:20px}
+.b{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:13px 24px;border:none;cursor:pointer;font-family:inherit}
+.b.pr{background:var(--ink);color:#fff}
+.b.ac{background:var(--ac);color:var(--ink)}
+.b.ol{background:transparent;border:1.5px solid var(--ink);color:var(--ink)}
+.b.qt{background:var(--soft);color:var(--ink)}
+.b2{background:none;border:none;cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);font-weight:500}
+.iconrow{display:flex;gap:16px;align-items:center;background:var(--surf);border:1px solid var(--line);border-radius:20px;padding:20px 22px}
+.ai{width:92px;height:92px;border-radius:23%;overflow:hidden;flex:none;box-shadow:0 12px 26px -12px rgba(0,0,0,.45)}
+.ai svg{width:100%;height:100%;display:block}
+.lbl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;opacity:.78;line-height:1.65;color:var(--ink)}
+.pnl{display:flex;gap:14px;align-items:center;background:var(--surf);border:1px solid var(--line);border-radius:20px;padding:20px 22px}
+.pi{width:44px;height:44px;border-radius:13px;background:var(--soft);color:var(--ac2);display:flex;align-items:center;justify-content:center;flex:none}
+.pt .t{font-weight:300;font-size:20px;letter-spacing:-.02em;color:var(--ink)}
+.pt .m{font-family:"IBM Plex Mono",monospace;font-size:10.5px;opacity:.78;margin-top:5px;color:var(--ink)}
+.dk{background:var(--dark);border-radius:20px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center}
+.dl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.62)}
+.dv{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:rgba(255,255,255,.9)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-top:18px}
+.cc{border-radius:16px;overflow:hidden;background:#fff;border:1px solid var(--line);min-width:0}
+.cc .cv{aspect-ratio:4/3.1;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:12px}
+.cc .cv .r{position:absolute;top:-30px;right:-20px;width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,255,255,.3)}
+.cc .cv::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 10%,rgba(255,255,255,.18),transparent 55%)}
+.cc .cv .w{position:absolute;top:9px;right:12px;font-weight:900;font-size:18px;color:rgba(255,255,255,.36);z-index:1;line-height:1}
+.cc .bd{padding:11px 13px 14px}
+.cc .bd .t{font-weight:600;font-size:12.5px;color:var(--ink)}
+.cc .bd .m{font-family:"IBM Plex Mono",monospace;font-size:9.5px;opacity:.78;margin-top:4px;color:var(--ink)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.chip{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--soft);color:var(--ac2);border-radius:999px;padding:8px 14px}
+.vd{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.vd .col{background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:16px 20px;color:var(--ink)}
+.vd .col b{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.78}
+.vd .col p{font-size:13.5px;margin-top:7px;line-height:1.55}
+table{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.12);vertical-align:top}
+th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.78;font-weight:500}
+code{font-family:"IBM Plex Mono",monospace;font-size:12.5px;background:rgba(0,0,0,.06);border-radius:5px;padding:2px 6px}
+.mil{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+.mil .m{border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.1);background:#fff}
+.mil .m .c{height:64px}
+.mil .m .l{padding:9px 12px 11px;font-family:"IBM Plex Mono",monospace;font-size:9.5px;line-height:1.55;opacity:.78}
+@media(max-width:900px){.board{grid-template-columns:1fr}.vd{grid-template-columns:1fr}}
+.p1{--ac:#7a9b8d;--ac2:#4a6c5e;--soft:#e1f1ea;--ink:#19211e;--bg:#f1f6f4;--surf:#e8eeec;--line:#d8e0dd;--dark:#18201d;--c1:#7a9b8d;--c2:#4f6157;--c3:#b8895e;--c4:#7d6a55;--c5:#93b2bb;--c6:#8a8098}
+.p2{--ac:#af8975;--ac2:#7f5946;--soft:#fce8df;--ink:#251d1a;--bg:#f9f3f0;--surf:#f3ebe7;--line:#e5dcd7;--dark:#251c17;--c1:#af8975;--c2:#6f5a4e;--c3:#bb8b57;--c4:#9a6350;--c5:#8fa3a0;--c6:#8f8193}
+.p3{--ac:#7b97a6;--ac2:#4c6877;--soft:#e2eff6;--ink:#192125;--bg:#f1f5f7;--surf:#e8eef1;--line:#d9dfe3;--dark:#191f23;--c1:#7b97a6;--c2:#59636b;--c3:#b98d61;--c4:#7f6a63;--c5:#8fb0ae;--c6:#8b8298}
+.p4{--ac:#ab9c83;--ac2:#6f6148;--soft:#f3ece0;--ink:#231f18;--bg:#f6f4f1;--surf:#efece7;--line:#e1ddd8;--dark:#211e18;--c1:#ab9c83;--c2:#6b6250;--c3:#b98d5c;--c4:#8e6f5a;--c5:#8fa8a6;--c6:#8d8395}
+.p5{--ac:#a38b94;--ac2:#735c65;--soft:#f5e9ee;--ink:#251d20;--bg:#f7f3f5;--surf:#f0ebed;--line:#e2dcde;--dark:#221c1e;--c1:#a38b94;--c2:#665059;--c3:#b98c5f;--c4:#94655f;--c5:#8fa5a9;--c6:#877e9a}
+.p6{--ac:#6f9898;--ac2:#416c6c;--soft:#def1f1;--ink:#182121;--bg:#f0f6f6;--surf:#e7efee;--line:#d7e0e0;--dark:#172020;--c1:#6f9898;--c2:#4e615f;--c3:#b98a5d;--c4:#7c6a5f;--c5:#8fb0bb;--c6:#877e9a}
+</style></head><body><div class="wrap">
+<header>
+ <div class="eyebrow">LEXFIT · Színirányok · 2. kör</div>
+ <h1>Az olíva után<br><b>hat új irány</b></h1>
+ <p class="lead">Az olíva katonás olvasata valós, és van rá magyarázat: a khaki pontosan az a sáv, ahol a sárgás-zöld (hue 100–125) találkozik a közepes világossággal és az alacsony krómával. A megoldás nem a tompítottság feladása — hanem a hue elmozdítása.</p>
+ <div class="note"><strong>Amit a kutatásból megtartunk, változatlanul.</strong> A szín–érzelem irodalom legfontosabb megállapítása, hogy az érzelmi hatást <strong>a világosság és a króma vezérli, nem a színárnyalat</strong>. Ezért mind a hat javaslat alacsony krómájú (<code>.032–.055</code>, szemben a régi rózsaszín <code>.155</code> értékével) és világos (<code>L .65–.70</code>) — így megmarad a nyugodt, nyomásmentes karakter. <strong>A hue szabadon mozgatható anélkül, hogy bármit feladnánk.</strong> Kontraszt sötét „ink” szöveggel az accent felületen, szerepenként: <strong>cím 5,2–6,1:1</strong> · <strong>törzs, eyebrow, gomb és bizalom-sor egyaránt 5,2–6,1:1</strong> — mert ezeken a kis méretű elemeken nincs opacity-halványítás, teli ink fut. Mind a hat, minden szerepben átmegy az AA 4,5:1 küszöbön. <em>Fehér szöveg egyiken sem használható</em> (2,7–3,2:1).</div>
+ <h2 style="margin-top:40px;font-size:20px">Miért volt katonás az olíva</h2>
+ <div class="mil">
+  <div class="m"><div class="c" style="background:#868d6f"></div><div class="l">OLÍVA · hue 118<br>a khaki-sáv közepe</div></div>
+  <div class="m"><div class="c" style="background:#7a9b8d"></div><div class="l">EUKALIPTUSZ · hue 168<br>+50° a kék felé</div></div>
+  <div class="m"><div class="c" style="background:#6f9898"></div><div class="l">LAGÚNA · hue 196<br>+78° — víz, nem növény</div></div>
+  <div class="m"><div class="c" style="background:#af8975"></div><div class="l">AGYAG · hue 48<br>−70° — föld, nem terep</div></div>
+  <div class="m"><div class="c" style="background:#7b97a6"></div><div class="l">FÜSTKÉK · hue 232<br>a kék semleges zóna</div></div>
+ </div>
+</header>
+
+<section class="opt pal p1">
+ <div class="hd"><div><div class="n">01 · kékes-zöld · hue 168 · króma .042</div><h2>Eukaliptusz</h2></div><p class="why">Ugyanaz a természet-asszociáció, mint az olívánál, de a hue a sárgás-zöldből a kékes-zöldbe csúszik — pont abból a sávból ki, ahol a khaki lakik. Eukaliptusz, nem terepszín.</p></div>
+ <div class="ramp"><div class="sw"><div class="ch" style="background:#7a9b8d"></div><div class="in"><div class="nm">Accent</div><div class="hx">#7a9b8d</div></div></div><div class="sw"><div class="ch" style="background:#4a6c5e"></div><div class="in"><div class="nm">Mély</div><div class="hx">#4a6c5e</div></div></div><div class="sw"><div class="ch" style="background:#e1f1ea"></div><div class="in"><div class="nm">Soft</div><div class="hx">#e1f1ea</div></div></div><div class="sw"><div class="ch" style="background:#e8eeec"></div><div class="in"><div class="nm">Felület</div><div class="hx">#e8eeec</div></div></div><div class="sw"><div class="ch" style="background:#f1f6f4"></div><div class="in"><div class="nm">Alap</div><div class="hx">#f1f6f4</div></div></div><div class="sw"><div class="ch" style="background:#19211e"></div><div class="in"><div class="nm">Ink</div><div class="hx">#19211e</div></div></div></div>
+ <div class="board">
+  <div class="hero"><div class="aura"></div><div class="hc">
+   <div class="eb">A teljes otthoni edzésprogram</div>
+   <h3>A változás<br><b>otthon kezdődik</b></h3>
+   <p>Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz.</p>
+   <div class="btns"><button class="b pr">Kezdd el a programot</button><button class="b2">Bemutató →</button></div>
+   <div class="tr">10 év versenysport mögötte · 14 napos garancia</div>
+  </div></div>
+  <div class="side">
+   <div class="iconrow"><div class="ai"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="var(--ac)"/><g transform="translate(-20,52)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg></div><div class="lbl">App ikon<br>Eukaliptusz alapon fehér jel</div></div>
+   <div class="pnl"><div class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A10 10 0 0 1 14 8"/><circle cx="19" cy="6" r="2" fill="currentColor" stroke="none"/></svg></div><div class="pt"><div class="t">négy hét, ami elindít</div><div class="m">20 edzés · heti 5 · 30 perc</div></div></div>
+   <div class="dk"><span class="dl">Sötét sáv</span><span class="dv">#18201d</span></div>
+  </div>
+ </div>
+ <div class="cards"><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c1) 76%,#000) 0%,var(--c1) 65%,color-mix(in oklab,var(--c1) 84%,#fff) 100%)"><span class="r"></span><span class="w">ALSÓ</span></div><div class="bd"><div class="t">Fenék & comb</div><div class="m">24 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c2) 76%,#000) 0%,var(--c2) 65%,color-mix(in oklab,var(--c2) 84%,#fff) 100%)"><span class="r"></span><span class="w">FELSŐ</span></div><div class="bd"><div class="t">Kar & váll</div><div class="m">21 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c3) 76%,#000) 0%,var(--c3) 65%,color-mix(in oklab,var(--c3) 84%,#fff) 100%)"><span class="r"></span><span class="w">CARDIO</span></div><div class="bd"><div class="t">Zsírégető</div><div class="m">22 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c4) 76%,#000) 0%,var(--c4) 65%,color-mix(in oklab,var(--c4) 84%,#fff) 100%)"><span class="r"></span><span class="w">TELJES</span></div><div class="bd"><div class="t">Teljes test</div><div class="m">28 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c5) 76%,#000) 0%,var(--c5) 65%,color-mix(in oklab,var(--c5) 84%,#fff) 100%)"><span class="r"></span><span class="w">MOBILITY</span></div><div class="bd"><div class="t">Reggeli flow</div><div class="m">14 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c6) 76%,#000) 0%,var(--c6) 65%,color-mix(in oklab,var(--c6) 84%,#fff) 100%)"><span class="r"></span><span class="w">TARTÁS</span></div><div class="bd"><div class="t">Gerinc-reset</div><div class="m">16 perc · Alexa</div></div></div></div>
+ <div class="btnrow"><button class="b pr">Kezdd el</button><button class="b ac">Csatlakozz</button><button class="b ol">Csomagok</button><button class="b qt">Később</button><span class="chip">heti 5</span><span class="chip">30 perc</span><span class="chip">eszköz nélkül</span></div>
+ <div class="vd"><div class="col"><b>Mellette</b><p>A leginkább „nyugtató" olvasat a hatból, és megtartja a zöld egészség-glóriáját. Spa és skandináv wellness felé mutat, nem katonaság felé.</p></div><div class="col"><b>Ellene</b><p>Zöld marad — a bio-bolt félreolvasás kockázata nem tűnik el, csak csökken. A fotóválasztás továbbra is kritikus.</p></div></div>
+</section>
+<section class="opt pal p2">
+ <div class="hd"><div><div class="n">02 · meleg terrakotta · hue 48 · króma .055</div><h2>Agyag</h2></div><p class="why">Teljesen elhagyja a zöldet. Meleg, földes, emberi — az agyag és a bőr világa. A hue a narancs felé esik, de a króma olyan alacsony, hogy nem lesz belőle energiaital-narancs.</p></div>
+ <div class="ramp"><div class="sw"><div class="ch" style="background:#af8975"></div><div class="in"><div class="nm">Accent</div><div class="hx">#af8975</div></div></div><div class="sw"><div class="ch" style="background:#7f5946"></div><div class="in"><div class="nm">Mély</div><div class="hx">#7f5946</div></div></div><div class="sw"><div class="ch" style="background:#fce8df"></div><div class="in"><div class="nm">Soft</div><div class="hx">#fce8df</div></div></div><div class="sw"><div class="ch" style="background:#f3ebe7"></div><div class="in"><div class="nm">Felület</div><div class="hx">#f3ebe7</div></div></div><div class="sw"><div class="ch" style="background:#f9f3f0"></div><div class="in"><div class="nm">Alap</div><div class="hx">#f9f3f0</div></div></div><div class="sw"><div class="ch" style="background:#251d1a"></div><div class="in"><div class="nm">Ink</div><div class="hx">#251d1a</div></div></div></div>
+ <div class="board">
+  <div class="hero"><div class="aura"></div><div class="hc">
+   <div class="eb">A teljes otthoni edzésprogram</div>
+   <h3>A változás<br><b>otthon kezdődik</b></h3>
+   <p>Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz.</p>
+   <div class="btns"><button class="b pr">Kezdd el a programot</button><button class="b2">Bemutató →</button></div>
+   <div class="tr">10 év versenysport mögötte · 14 napos garancia</div>
+  </div></div>
+  <div class="side">
+   <div class="iconrow"><div class="ai"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="var(--ac)"/><g transform="translate(-20,52)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg></div><div class="lbl">App ikon<br>Agyag alapon fehér jel</div></div>
+   <div class="pnl"><div class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A10 10 0 0 1 14 8"/><circle cx="19" cy="6" r="2" fill="currentColor" stroke="none"/></svg></div><div class="pt"><div class="t">négy hét, ami elindít</div><div class="m">20 edzés · heti 5 · 30 perc</div></div></div>
+   <div class="dk"><span class="dl">Sötét sáv</span><span class="dv">#251c17</span></div>
+  </div>
+ </div>
+ <div class="cards"><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c1) 76%,#000) 0%,var(--c1) 65%,color-mix(in oklab,var(--c1) 84%,#fff) 100%)"><span class="r"></span><span class="w">ALSÓ</span></div><div class="bd"><div class="t">Fenék & comb</div><div class="m">24 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c2) 76%,#000) 0%,var(--c2) 65%,color-mix(in oklab,var(--c2) 84%,#fff) 100%)"><span class="r"></span><span class="w">FELSŐ</span></div><div class="bd"><div class="t">Kar & váll</div><div class="m">21 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c3) 76%,#000) 0%,var(--c3) 65%,color-mix(in oklab,var(--c3) 84%,#fff) 100%)"><span class="r"></span><span class="w">CARDIO</span></div><div class="bd"><div class="t">Zsírégető</div><div class="m">22 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c4) 76%,#000) 0%,var(--c4) 65%,color-mix(in oklab,var(--c4) 84%,#fff) 100%)"><span class="r"></span><span class="w">TELJES</span></div><div class="bd"><div class="t">Teljes test</div><div class="m">28 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c5) 76%,#000) 0%,var(--c5) 65%,color-mix(in oklab,var(--c5) 84%,#fff) 100%)"><span class="r"></span><span class="w">MOBILITY</span></div><div class="bd"><div class="t">Reggeli flow</div><div class="m">14 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c6) 76%,#000) 0%,var(--c6) 65%,color-mix(in oklab,var(--c6) 84%,#fff) 100%)"><span class="r"></span><span class="w">TARTÁS</span></div><div class="bd"><div class="t">Gerinc-reset</div><div class="m">16 perc · Alexa</div></div></div></div>
+ <div class="btnrow"><button class="b pr">Kezdd el</button><button class="b ac">Csatlakozz</button><button class="b ol">Csomagok</button><button class="b qt">Később</button><span class="chip">heti 5</span><span class="chip">30 perc</span><span class="chip">eszköz nélkül</span></div>
+ <div class="vd"><div class="col"><b>Mellette</b><p>A legmelegebb és leginkább „otthonos" opció, pontosan illik az Airbnb-irányhoz. Nulla katonai és nulla bio-bolt asszociáció.</p></div><div class="col"><b>Ellene</b><p>A hat közül ez van legközelebb a bőrtónushoz — a fotókon a modell bőre és a felület összeolvadhat. Kontrasztos képválasztást igényel.</p></div></div>
+</section>
+<section class="opt pal p3">
+ <div class="hd"><div><div class="n">03 · hűvös szürkéskék · hue 232 · króma .038</div><h2>Füstkék</h2></div><p class="why">A kék az egyetlen szín, amit a kutatás szerint mindkét nem egyformán kedvel — a semlegesítés legbiztosabb útja. Alacsony krómával nem lesz belőle „tech-kék".</p></div>
+ <div class="ramp"><div class="sw"><div class="ch" style="background:#7b97a6"></div><div class="in"><div class="nm">Accent</div><div class="hx">#7b97a6</div></div></div><div class="sw"><div class="ch" style="background:#4c6877"></div><div class="in"><div class="nm">Mély</div><div class="hx">#4c6877</div></div></div><div class="sw"><div class="ch" style="background:#e2eff6"></div><div class="in"><div class="nm">Soft</div><div class="hx">#e2eff6</div></div></div><div class="sw"><div class="ch" style="background:#e8eef1"></div><div class="in"><div class="nm">Felület</div><div class="hx">#e8eef1</div></div></div><div class="sw"><div class="ch" style="background:#f1f5f7"></div><div class="in"><div class="nm">Alap</div><div class="hx">#f1f5f7</div></div></div><div class="sw"><div class="ch" style="background:#192125"></div><div class="in"><div class="nm">Ink</div><div class="hx">#192125</div></div></div></div>
+ <div class="board">
+  <div class="hero"><div class="aura"></div><div class="hc">
+   <div class="eb">A teljes otthoni edzésprogram</div>
+   <h3>A változás<br><b>otthon kezdődik</b></h3>
+   <p>Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz.</p>
+   <div class="btns"><button class="b pr">Kezdd el a programot</button><button class="b2">Bemutató →</button></div>
+   <div class="tr">10 év versenysport mögötte · 14 napos garancia</div>
+  </div></div>
+  <div class="side">
+   <div class="iconrow"><div class="ai"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="var(--ac)"/><g transform="translate(-20,52)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg></div><div class="lbl">App ikon<br>Füstkék alapon fehér jel</div></div>
+   <div class="pnl"><div class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A10 10 0 0 1 14 8"/><circle cx="19" cy="6" r="2" fill="currentColor" stroke="none"/></svg></div><div class="pt"><div class="t">négy hét, ami elindít</div><div class="m">20 edzés · heti 5 · 30 perc</div></div></div>
+   <div class="dk"><span class="dl">Sötét sáv</span><span class="dv">#191f23</span></div>
+  </div>
+ </div>
+ <div class="cards"><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c1) 76%,#000) 0%,var(--c1) 65%,color-mix(in oklab,var(--c1) 84%,#fff) 100%)"><span class="r"></span><span class="w">ALSÓ</span></div><div class="bd"><div class="t">Fenék & comb</div><div class="m">24 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c2) 76%,#000) 0%,var(--c2) 65%,color-mix(in oklab,var(--c2) 84%,#fff) 100%)"><span class="r"></span><span class="w">FELSŐ</span></div><div class="bd"><div class="t">Kar & váll</div><div class="m">21 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c3) 76%,#000) 0%,var(--c3) 65%,color-mix(in oklab,var(--c3) 84%,#fff) 100%)"><span class="r"></span><span class="w">CARDIO</span></div><div class="bd"><div class="t">Zsírégető</div><div class="m">22 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c4) 76%,#000) 0%,var(--c4) 65%,color-mix(in oklab,var(--c4) 84%,#fff) 100%)"><span class="r"></span><span class="w">TELJES</span></div><div class="bd"><div class="t">Teljes test</div><div class="m">28 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c5) 76%,#000) 0%,var(--c5) 65%,color-mix(in oklab,var(--c5) 84%,#fff) 100%)"><span class="r"></span><span class="w">MOBILITY</span></div><div class="bd"><div class="t">Reggeli flow</div><div class="m">14 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c6) 76%,#000) 0%,var(--c6) 65%,color-mix(in oklab,var(--c6) 84%,#fff) 100%)"><span class="r"></span><span class="w">TARTÁS</span></div><div class="bd"><div class="t">Gerinc-reset</div><div class="m">16 perc · Alexa</div></div></div></div>
+ <div class="btnrow"><button class="b pr">Kezdd el</button><button class="b ac">Csatlakozz</button><button class="b ol">Csomagok</button><button class="b qt">Később</button><span class="chip">heti 5</span><span class="chip">30 perc</span><span class="chip">eszköz nélkül</span></div>
+ <div class="vd"><div class="col"><b>Mellette</b><p>A legbiztosabb gender-semleges választás, kutatással alátámasztva. Nyugodt, megbízható, klinikailag tiszta.</p></div><div class="col"><b>Ellene</b><p>Hűvös — elveszíti azt a melegséget, amit a márkahang („együtt muszáj") hordoz. A fitneszben a kék erősen foglalt, és a legkevésbé emlékezetes a hatból.</p></div></div>
+</section>
+<section class="opt pal p4">
+ <div class="hd"><div><div class="n">04 · meleg homok · hue 82 · króma .040</div><h2>Zab</h2></div><p class="why">A khaki-zóna szélén marad, de világosabbra emelve (L .70) és melegebbre húzva. Ezen a világosságon már nem terepszín, hanem zabpehely és vászon.</p></div>
+ <div class="ramp"><div class="sw"><div class="ch" style="background:#ab9c83"></div><div class="in"><div class="nm">Accent</div><div class="hx">#ab9c83</div></div></div><div class="sw"><div class="ch" style="background:#6f6148"></div><div class="in"><div class="nm">Mély</div><div class="hx">#6f6148</div></div></div><div class="sw"><div class="ch" style="background:#f3ece0"></div><div class="in"><div class="nm">Soft</div><div class="hx">#f3ece0</div></div></div><div class="sw"><div class="ch" style="background:#efece7"></div><div class="in"><div class="nm">Felület</div><div class="hx">#efece7</div></div></div><div class="sw"><div class="ch" style="background:#f6f4f1"></div><div class="in"><div class="nm">Alap</div><div class="hx">#f6f4f1</div></div></div><div class="sw"><div class="ch" style="background:#231f18"></div><div class="in"><div class="nm">Ink</div><div class="hx">#231f18</div></div></div></div>
+ <div class="board">
+  <div class="hero"><div class="aura"></div><div class="hc">
+   <div class="eb">A teljes otthoni edzésprogram</div>
+   <h3>A változás<br><b>otthon kezdődik</b></h3>
+   <p>Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz.</p>
+   <div class="btns"><button class="b pr">Kezdd el a programot</button><button class="b2">Bemutató →</button></div>
+   <div class="tr">10 év versenysport mögötte · 14 napos garancia</div>
+  </div></div>
+  <div class="side">
+   <div class="iconrow"><div class="ai"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="var(--ac)"/><g transform="translate(-20,52)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg></div><div class="lbl">App ikon<br>Zab alapon fehér jel</div></div>
+   <div class="pnl"><div class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A10 10 0 0 1 14 8"/><circle cx="19" cy="6" r="2" fill="currentColor" stroke="none"/></svg></div><div class="pt"><div class="t">négy hét, ami elindít</div><div class="m">20 edzés · heti 5 · 30 perc</div></div></div>
+   <div class="dk"><span class="dl">Sötét sáv</span><span class="dv">#211e18</span></div>
+  </div>
+ </div>
+ <div class="cards"><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c1) 76%,#000) 0%,var(--c1) 65%,color-mix(in oklab,var(--c1) 84%,#fff) 100%)"><span class="r"></span><span class="w">ALSÓ</span></div><div class="bd"><div class="t">Fenék & comb</div><div class="m">24 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c2) 76%,#000) 0%,var(--c2) 65%,color-mix(in oklab,var(--c2) 84%,#fff) 100%)"><span class="r"></span><span class="w">FELSŐ</span></div><div class="bd"><div class="t">Kar & váll</div><div class="m">21 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c3) 76%,#000) 0%,var(--c3) 65%,color-mix(in oklab,var(--c3) 84%,#fff) 100%)"><span class="r"></span><span class="w">CARDIO</span></div><div class="bd"><div class="t">Zsírégető</div><div class="m">22 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c4) 76%,#000) 0%,var(--c4) 65%,color-mix(in oklab,var(--c4) 84%,#fff) 100%)"><span class="r"></span><span class="w">TELJES</span></div><div class="bd"><div class="t">Teljes test</div><div class="m">28 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c5) 76%,#000) 0%,var(--c5) 65%,color-mix(in oklab,var(--c5) 84%,#fff) 100%)"><span class="r"></span><span class="w">MOBILITY</span></div><div class="bd"><div class="t">Reggeli flow</div><div class="m">14 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c6) 76%,#000) 0%,var(--c6) 65%,color-mix(in oklab,var(--c6) 84%,#fff) 100%)"><span class="r"></span><span class="w">TARTÁS</span></div><div class="bd"><div class="t">Gerinc-reset</div><div class="m">16 perc · Alexa</div></div></div></div>
+ <div class="btnrow"><button class="b pr">Kezdd el</button><button class="b ac">Csatlakozz</button><button class="b ol">Csomagok</button><button class="b qt">Később</button><span class="chip">heti 5</span><span class="chip">30 perc</span><span class="chip">eszköz nélkül</span></div>
+ <div class="vd"><div class="col"><b>Mellette</b><p>Semleges, időtálló, minden fotó jól mutat rajta. A legkevésbé „állásfoglaló" opció.</p></div><div class="col"><b>Ellene</b><p>A legközelebb áll ahhoz, amit el akarsz kerülni — világosabb, de ugyanaz a hue-család. Ha az olíva katonás volt, ez kockázatos. Ráadásul önmagában nem emlékezetes.</p></div></div>
+</section>
+<section class="opt pal p5">
+ <div class="hd"><div><div class="n">05 · nagyon halk mályva · hue 352 · króma .032</div><h2>Hamvas</h2></div><p class="why">Ugyanaz a hue-család, mint a régi rózsaszín — de a króma .155-ről .032-re esik. Ez a kutatás szerinti kulcsváltozó: ugyanaz az árnyalat, ötödannyi telítettséggel már nem olvas „rózsaszínnek".</p></div>
+ <div class="ramp"><div class="sw"><div class="ch" style="background:#a38b94"></div><div class="in"><div class="nm">Accent</div><div class="hx">#a38b94</div></div></div><div class="sw"><div class="ch" style="background:#735c65"></div><div class="in"><div class="nm">Mély</div><div class="hx">#735c65</div></div></div><div class="sw"><div class="ch" style="background:#f5e9ee"></div><div class="in"><div class="nm">Soft</div><div class="hx">#f5e9ee</div></div></div><div class="sw"><div class="ch" style="background:#f0ebed"></div><div class="in"><div class="nm">Felület</div><div class="hx">#f0ebed</div></div></div><div class="sw"><div class="ch" style="background:#f7f3f5"></div><div class="in"><div class="nm">Alap</div><div class="hx">#f7f3f5</div></div></div><div class="sw"><div class="ch" style="background:#251d20"></div><div class="in"><div class="nm">Ink</div><div class="hx">#251d20</div></div></div></div>
+ <div class="board">
+  <div class="hero"><div class="aura"></div><div class="hc">
+   <div class="eb">A teljes otthoni edzésprogram</div>
+   <h3>A változás<br><b>otthon kezdődik</b></h3>
+   <p>Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz.</p>
+   <div class="btns"><button class="b pr">Kezdd el a programot</button><button class="b2">Bemutató →</button></div>
+   <div class="tr">10 év versenysport mögötte · 14 napos garancia</div>
+  </div></div>
+  <div class="side">
+   <div class="iconrow"><div class="ai"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="var(--ac)"/><g transform="translate(-20,52)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg></div><div class="lbl">App ikon<br>Hamvas alapon fehér jel</div></div>
+   <div class="pnl"><div class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A10 10 0 0 1 14 8"/><circle cx="19" cy="6" r="2" fill="currentColor" stroke="none"/></svg></div><div class="pt"><div class="t">négy hét, ami elindít</div><div class="m">20 edzés · heti 5 · 30 perc</div></div></div>
+   <div class="dk"><span class="dl">Sötét sáv</span><span class="dv">#221c1e</span></div>
+  </div>
+ </div>
+ <div class="cards"><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c1) 76%,#000) 0%,var(--c1) 65%,color-mix(in oklab,var(--c1) 84%,#fff) 100%)"><span class="r"></span><span class="w">ALSÓ</span></div><div class="bd"><div class="t">Fenék & comb</div><div class="m">24 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c2) 76%,#000) 0%,var(--c2) 65%,color-mix(in oklab,var(--c2) 84%,#fff) 100%)"><span class="r"></span><span class="w">FELSŐ</span></div><div class="bd"><div class="t">Kar & váll</div><div class="m">21 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c3) 76%,#000) 0%,var(--c3) 65%,color-mix(in oklab,var(--c3) 84%,#fff) 100%)"><span class="r"></span><span class="w">CARDIO</span></div><div class="bd"><div class="t">Zsírégető</div><div class="m">22 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c4) 76%,#000) 0%,var(--c4) 65%,color-mix(in oklab,var(--c4) 84%,#fff) 100%)"><span class="r"></span><span class="w">TELJES</span></div><div class="bd"><div class="t">Teljes test</div><div class="m">28 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c5) 76%,#000) 0%,var(--c5) 65%,color-mix(in oklab,var(--c5) 84%,#fff) 100%)"><span class="r"></span><span class="w">MOBILITY</span></div><div class="bd"><div class="t">Reggeli flow</div><div class="m">14 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c6) 76%,#000) 0%,var(--c6) 65%,color-mix(in oklab,var(--c6) 84%,#fff) 100%)"><span class="r"></span><span class="w">TARTÁS</span></div><div class="bd"><div class="t">Gerinc-reset</div><div class="m">16 perc · Alexa</div></div></div></div>
+ <div class="btnrow"><button class="b pr">Kezdd el</button><button class="b ac">Csatlakozz</button><button class="b ol">Csomagok</button><button class="b qt">Később</button><span class="chip">heti 5</span><span class="chip">30 perc</span><span class="chip">eszköz nélkül</span></div>
+ <div class="vd"><div class="col"><b>Mellette</b><p>Megőrzi a márka eddigi vizuális emlékezetét — nem szakítás, hanem lehalkítás. Meleg, felnőtt, és a legkevésbé idegen a meglévő felhasználóknak.</p></div><div class="col"><b>Ellene</b><p>A hue változatlan, tehát a gendered olvasat kockázata a legmagasabb a hatból. Ha a cél a férfi közönség megnyitása, ez a leggyengébb opció.</p></div></div>
+</section>
+<section class="opt pal p6">
+ <div class="hd"><div><div class="n">06 · szürkés türkiz · hue 196 · króma .045</div><h2>Lagúna</h2></div><p class="why">A zöld és a kék határán — víz, nem növény. Így megkapja a természet-nyugalmat a bio-élelmiszer asszociáció nélkül, és a khaki-zónától a lehető legtávolabb van.</p></div>
+ <div class="ramp"><div class="sw"><div class="ch" style="background:#6f9898"></div><div class="in"><div class="nm">Accent</div><div class="hx">#6f9898</div></div></div><div class="sw"><div class="ch" style="background:#416c6c"></div><div class="in"><div class="nm">Mély</div><div class="hx">#416c6c</div></div></div><div class="sw"><div class="ch" style="background:#def1f1"></div><div class="in"><div class="nm">Soft</div><div class="hx">#def1f1</div></div></div><div class="sw"><div class="ch" style="background:#e7efee"></div><div class="in"><div class="nm">Felület</div><div class="hx">#e7efee</div></div></div><div class="sw"><div class="ch" style="background:#f0f6f6"></div><div class="in"><div class="nm">Alap</div><div class="hx">#f0f6f6</div></div></div><div class="sw"><div class="ch" style="background:#182121"></div><div class="in"><div class="nm">Ink</div><div class="hx">#182121</div></div></div></div>
+ <div class="board">
+  <div class="hero"><div class="aura"></div><div class="hc">
+   <div class="eb">A teljes otthoni edzésprogram</div>
+   <h3>A változás<br><b>otthon kezdődik</b></h3>
+   <p>Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz.</p>
+   <div class="btns"><button class="b pr">Kezdd el a programot</button><button class="b2">Bemutató →</button></div>
+   <div class="tr">10 év versenysport mögötte · 14 napos garancia</div>
+  </div></div>
+  <div class="side">
+   <div class="iconrow"><div class="ai"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="var(--ac)"/><g transform="translate(-20,52)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg></div><div class="lbl">App ikon<br>Lagúna alapon fehér jel</div></div>
+   <div class="pnl"><div class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A10 10 0 0 1 14 8"/><circle cx="19" cy="6" r="2" fill="currentColor" stroke="none"/></svg></div><div class="pt"><div class="t">négy hét, ami elindít</div><div class="m">20 edzés · heti 5 · 30 perc</div></div></div>
+   <div class="dk"><span class="dl">Sötét sáv</span><span class="dv">#172020</span></div>
+  </div>
+ </div>
+ <div class="cards"><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c1) 76%,#000) 0%,var(--c1) 65%,color-mix(in oklab,var(--c1) 84%,#fff) 100%)"><span class="r"></span><span class="w">ALSÓ</span></div><div class="bd"><div class="t">Fenék & comb</div><div class="m">24 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c2) 76%,#000) 0%,var(--c2) 65%,color-mix(in oklab,var(--c2) 84%,#fff) 100%)"><span class="r"></span><span class="w">FELSŐ</span></div><div class="bd"><div class="t">Kar & váll</div><div class="m">21 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c3) 76%,#000) 0%,var(--c3) 65%,color-mix(in oklab,var(--c3) 84%,#fff) 100%)"><span class="r"></span><span class="w">CARDIO</span></div><div class="bd"><div class="t">Zsírégető</div><div class="m">22 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c4) 76%,#000) 0%,var(--c4) 65%,color-mix(in oklab,var(--c4) 84%,#fff) 100%)"><span class="r"></span><span class="w">TELJES</span></div><div class="bd"><div class="t">Teljes test</div><div class="m">28 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c5) 76%,#000) 0%,var(--c5) 65%,color-mix(in oklab,var(--c5) 84%,#fff) 100%)"><span class="r"></span><span class="w">MOBILITY</span></div><div class="bd"><div class="t">Reggeli flow</div><div class="m">14 perc · Alexa</div></div></div><div class="cc"><div class="cv" style="background:linear-gradient(125deg,color-mix(in oklab,var(--c6) 76%,#000) 0%,var(--c6) 65%,color-mix(in oklab,var(--c6) 84%,#fff) 100%)"><span class="r"></span><span class="w">TARTÁS</span></div><div class="bd"><div class="t">Gerinc-reset</div><div class="m">16 perc · Alexa</div></div></div></div>
+ <div class="btnrow"><button class="b pr">Kezdd el</button><button class="b ac">Csatlakozz</button><button class="b ol">Csomagok</button><button class="b qt">Később</button><span class="chip">heti 5</span><span class="chip">30 perc</span><span class="chip">eszköz nélkül</span></div>
+ <div class="vd"><div class="col"><b>Mellette</b><p>Friss és tiszta, mégis tompított. A „víz" olvasat jól illik a mozgáshoz és a regenerációhoz, és a fitneszben szokatlan.</p></div><div class="col"><b>Ellene</b><p>A türkiz könnyen csúszik „egészségügyi/klinikai" irányba. Nagy felületen (hero) hidegebb lehet, mint amit a márkahang elbír.</p></div></div>
+</section>
+<section class="opt">
+ <div class="eyebrow">Összevetés</div>
+ <h2>Melyiket érdemes</h2>
+ <table>
+  <tr><th>Irány</th><th>Karakter</th><th>Katonás?</th><th>Gender-semleges</th><th>Emlékezetes</th><th>Szöveg az accenten</th><th>Fő kockázat</th></tr>
+  <tr><td><b>01 Eukaliptusz</b></td><td>Nyugtató, spa</td><td>Nem</td><td>Igen</td><td>Közepes</td><td>ink 5,40:1 ✓<br><span style="opacity:.78">fehér ✗</span></td><td>Bio-bolt olvasat marad</td></tr>
+  <tr><td><b>02 Agyag</b></td><td>Meleg, otthonos</td><td>Nem</td><td>Igen</td><td>Magas</td><td>ink 5,25:1 ✓<br><span style="opacity:.78">fehér ✗</span></td><td>Bőrtónussal olvad</td></tr>
+  <tr><td><b>03 Füstkék</b></td><td>Tiszta, megbízható</td><td>Nem</td><td>Legjobb</td><td>Alacsony</td><td>ink 5,30:1 ✓<br><span style="opacity:.78">fehér ✗</span></td><td>Hideg, foglalt kategória</td></tr>
+  <tr><td><b>04 Zab</b></td><td>Semleges, időtálló</td><td>Részben</td><td>Igen</td><td>Alacsony</td><td>ink 6,10:1 ✓<br><span style="opacity:.78">fehér ✗</span></td><td>Ugyanaz a hue-család</td></tr>
+  <tr><td><b>05 Hamvas</b></td><td>Halk, felnőtt</td><td>Nem</td><td>Gyenge</td><td>Közepes</td><td>ink 5,24:1 ✓<br><span style="opacity:.78">fehér ✗</span></td><td>Marad a gendered olvasat</td></tr>
+  <tr><td><b>06 Lagúna</b></td><td>Friss, vizes</td><td>Nem</td><td>Igen</td><td>Magas</td><td>ink 5,18:1 ✓<br><span style="opacity:.78">fehér ✗</span></td><td>Klinikai felé csúszhat</td></tr>
+ </table>
+ <div class="note" style="max-width:none">
+  <strong>A javaslatom: 02 Agyag, utána 01 Eukaliptusz.</strong><br><br>
+  Az <strong>Agyag</strong> oldja meg legtisztábban azt, ami elromlott. Elhagyja a zöldet teljesen, tehát se katonás, se bio-bolt — és közben ez a legmelegebb opció, ami egyedüliként illik ahhoz az „Airbnb a fitneszben" iránynak, amit korábban meghatároztunk. A kutatás szerinti melegség-igényt (a tompított paletták laposnak hathatnak) a hue-ja természetesen fedezi, nem trükkel.<br><br>
+  Az <strong>Eukaliptusz</strong> a biztonságosabb lépés, ha nem akarsz a zöldtől teljesen elszakadni: megtartja az eddigi munkát és a természet-asszociációt, csak kilép a khaki-sávból.<br><br>
+  A <strong>Zab</strong>ot óvatosan kezelném — világosabb és melegebb, de ugyanabból a hue-családból jön, amit most elutasítottál. Ha az olíva katonás volt, ez is az lehet.
+ </div>
+</section>
+<div style="height:70px"></div>
+</div></body></html>

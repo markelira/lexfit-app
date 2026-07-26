@@ -23,7 +23,7 @@ const GW_SLIDES: Slide[] = [
     h: "Heti 5 nap + 2 pihenő",
     p: "Hétfő alsó, kedd felső, csütörtök cardio, péntek teljes test, szombat mobility. Szerda és vasárnap pihenő — az is a terv része.",
     a: "Nem kell kitalálnod, mit csinálj. Minden napra megvan a dolgod — te csak megnyomod a Kezdést." },
-  { grad: "linear-gradient(135deg, oklch(0.6 0.12 300), oklch(0.5 0.15 355))", word: "FÁZIS", emoji: "🌱", ey: "PROGRESSZIÓ",
+  { grad: "linear-gradient(135deg, oklch(0.6 0.12 300), oklch(0.5 0.05 168))", word: "FÁZIS", emoji: "🌱", ey: "PROGRESSZIÓ",
     h: "4 fázis, egyre feljebb",
     p: "🌱 Alap → 🔨 Építés → 🔥 Elmélyítés → 🏆 Kifejezés. Kéthetente lépsz tovább; a gyakorlatok fokról fokra nehezednek.",
     a: "Az első fázis a legkönnyebb, az utolsó a legerősebb. Nem ugrunk — felépítünk." },

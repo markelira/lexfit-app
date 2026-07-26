@@ -44,14 +44,31 @@ interface Chosen {
   terms: string;
 }
 
+// Landing pricing cards deep-link here with ?plan=<role> — jump straight to that
+// plan's consent step.
+const CHOSEN_BY_ROLE: Record<string, Chosen> = {
+  week_intro: { role: "week_intro", title: "Heti tagság", recurring: true, terms: `Ma ${formatHuf(WEEK_INTRO)} az első 7 napért, utána ${formatHuf(WEEK_STD)}/hét, automatikusan megújul.` },
+  month_std: { role: "month_std", title: "Havi tagság", recurring: true, terms: `Ma ${formatHuf(MONTH_STD)}, havonta automatikusan megújul.` },
+  annual_std: { role: "annual_std", title: "Éves tagság", recurring: true, terms: `Ma ${formatHuf(ANNUAL)} egy teljes évre (${formatHuf(ANNUAL_PER_WEEK)}/hét), évente automatikusan megújul.` },
+};
+
 function SubscribeScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const [sub, setSub] = useState<Subscription | null | undefined>(undefined);
-  const [chosen, setChosen] = useState<Chosen | null>(null);
+  // Landing cards deep-link with ?plan=<role> — preselect it at init (no effect,
+  // and no hydration mismatch: the page shows a Loader until `sub` loads).
+  const [chosen, setChosen] = useState<Chosen | null>(() => {
+    if (typeof window === "undefined") return null;
+    const plan = new URLSearchParams(window.location.search).get("plan");
+    return (plan && CHOSEN_BY_ROLE[plan]) || null;
+  });
 
   useEffect(() => {
-    if (user) getSubscription(user.uid).then(setSub);
+    // If the read fails (e.g. rules deny it, offline), treat it as "no
+    // subscription" and show the pricing options rather than hanging on the
+    // loader forever — the server re-validates entitlement at checkout anyway.
+    if (user) getSubscription(user.uid).then(setSub, () => setSub(null));
   }, [user]);
 
   const subscribed = useMemo(() => isSubscribed(sub ?? null), [sub]);

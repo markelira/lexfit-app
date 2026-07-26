@@ -110,6 +110,17 @@ export async function getGrandSlam(): Promise<GrandSlamState> {
   return body as unknown as GrandSlamState;
 }
 
+/** Success-page fulfillment: confirm the Checkout session so access is instant
+ *  even if the webhook lags. Idempotent server-side. Returns whether access is on. */
+export async function confirmCheckout(sessionId: string): Promise<boolean> {
+  try {
+    const body = await postJson("/api/stripe/confirm", { sessionId });
+    return !!body.access;
+  } catch {
+    return false; // webhook will still fulfill; don't block the user
+  }
+}
+
 /** Redeem the Grand Slam offer (transactional gate server-side; redirects). */
 export async function redeemGrandSlam(): Promise<void> {
   const body = await postJson("/api/grandslam/redeem");

@@ -7,45 +7,45 @@
 
 /* photo layer (replaces the prototype image-slot) */
 .lx .hal-photo { position: relative; width: 100%; height: 100%; background-size: cover; background-position: center;
-  background-color: oklch(0.3 0.05 355); display: flex; align-items: center; justify-content: center; }
-.lx .hal-photo.empty { background-image: repeating-linear-gradient(135deg, oklch(0.3 0.05 355) 0 12px, oklch(0.34 0.06 358) 12px 24px); }
-.lx .hal-photo .ph-hint { font-family: var(--mono); font-size: 11px; color: oklch(1 0 0 / 0.7); text-align: center; padding: 12px; max-width: 80%; }
+  background-color: oklch(0.3 0.03 168); display: flex; align-items: center; justify-content: center; }
+.lx .hal-photo.empty { background-image: repeating-linear-gradient(135deg, oklch(0.3 0.03 168) 0 12px, oklch(0.34 0.05 168) 12px 24px); }
+.lx .hal-photo .ph-hint { font-family: var(--mono); font-size: 11px; color: oklch(1 0 168 / 0.7); text-align: center; padding: 12px; max-width: 80%; }
 
 /* compare wrapper + toggle */
 .lx .cmp { display: flex; flex-direction: column; gap: 16px; }
 .lx .cmp-toggle { align-self: center; display: inline-flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--line); padding: 4px; border-radius: 999px; }
 .lx .cmp-toggle button { border: none; background: none; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-2); padding: 9px 18px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; }
-.lx .cmp-toggle button.on { background: var(--surface); color: var(--ink); box-shadow: 0 2px 8px -3px oklch(0.45 0.08 0 / 0.3); }
+.lx .cmp-toggle button.on { background: var(--surface); color: var(--ink); box-shadow: 0 2px 8px -3px oklch(0.42 0.03 168 / 0.3); }
 .lx .cmp-stage { position: relative; display: flex; justify-content: center; padding: 8px 0 2px; }
 
 /* slider */
 .lx .halc-slider { position: relative; height: min(70vh, 680px); aspect-ratio: 9 / 16; width: auto; max-width: 100%; margin: 0 auto;
-  border-radius: 24px; overflow: hidden; background: #000; box-shadow: 0 26px 64px -26px oklch(0.2 0.05 350 / 0.6); user-select: none; touch-action: none; }
+  border-radius: 24px; overflow: hidden; background: #000; box-shadow: 0 26px 64px -26px oklch(0.2 0.05 168 / 0.6); user-select: none; touch-action: none; }
 .lx .halc-slider .ba-layer { position: absolute; inset: 0; }
 .lx .ba-divider { position: absolute; top: 0; bottom: 0; width: 2px; z-index: 4; transform: translateX(-50%); pointer-events: none;
-  background: linear-gradient(to bottom, transparent, oklch(1 0 0 / 0.95) 11%, oklch(1 0 0 / 0.95) 89%, transparent); box-shadow: 0 0 18px oklch(1 0 0 / 0.55); }
+  background: linear-gradient(to bottom, transparent, oklch(1 0 168 / 0.95) 11%, oklch(1 0 168 / 0.95) 89%, transparent); box-shadow: 0 0 18px oklch(1 0 168 / 0.55); }
 .lx .ba-handle { position: absolute; top: 50%; transform: translate(-50%, -50%); z-index: 5; width: 56px; height: 56px; border-radius: 50%;
   background: #fff; display: flex; align-items: center; justify-content: center; color: var(--ink); cursor: ew-resize; touch-action: none;
-  box-shadow: 0 12px 30px -8px oklch(0.2 0.05 350 / 0.6); }
+  box-shadow: 0 12px 30px -8px oklch(0.2 0.05 168 / 0.6); }
 .lx .ba-change { position: absolute; bottom: 14px; z-index: 6; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px;
-  border-radius: 999px; cursor: pointer; font-size: 12.5px; font-weight: 700; color: #fff; background: oklch(0.2 0.03 350 / 0.5);
-  border: 1px solid oklch(1 0 0 / 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.lx .ba-change:hover { background: oklch(0.2 0.03 350 / 0.72); }
+  border-radius: 999px; cursor: pointer; font-size: 12.5px; font-weight: 700; color: #fff; background: oklch(0.2 0.02 168 / 0.5);
+  border: 1px solid oklch(1 0 168 / 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.lx .ba-change:hover { background: oklch(0.2 0.02 168 / 0.72); }
 .lx .ba-change.l { left: 14px; } .lx .ba-change.r { right: 14px; }
 .lx .halc-tag { position: absolute; top: 14px; z-index: 3; font-family: var(--mono); font-size: 11px; font-weight: 800; letter-spacing: 0.07em;
-  color: #fff; background: oklch(0 0 0 / 0.4); padding: 6px 13px; border-radius: 999px; backdrop-filter: blur(6px); transition: opacity 0.15s ease; }
+  color: #fff; background: oklch(0 0 168 / 0.4); padding: 6px 13px; border-radius: 999px; backdrop-filter: blur(6px); transition: opacity 0.15s ease; }
 .lx .halc-tag.l { left: 14px; } .lx .halc-tag.r { right: 14px; }
 .lx .halc-badge { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 4; display: inline-flex; align-items: center;
   gap: 8px; font-weight: 900; font-size: 15px; color: #fff; background: var(--accent-2); padding: 10px 20px; border-radius: 999px;
-  box-shadow: 0 12px 30px -8px oklch(0.58 0.165 358 / 0.6); }
+  box-shadow: 0 12px 30px -8px oklch(0.500 0.046 168 / 0.6); }
 
 /* side-by-side */
 .lx .cmp-side { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: center; justify-items: center; width: 100%; }
 .lx .cmp-fig { display: flex; flex-direction: column; gap: 11px; align-items: center; }
 .lx .cmp-frame { position: relative; height: min(58vh, 560px); aspect-ratio: 9 / 16; width: auto; max-width: 100%; border-radius: 22px;
-  overflow: hidden; background: #000; box-shadow: 0 22px 54px -26px oklch(0.2 0.05 350 / 0.6); }
+  overflow: hidden; background: #000; box-shadow: 0 22px 54px -26px oklch(0.2 0.05 168 / 0.6); }
 .lx .cmp-flabel { position: absolute; top: 12px; left: 12px; z-index: 2; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.07em;
-  color: #fff; background: oklch(0 0 0 / 0.42); padding: 4px 10px; border-radius: 999px; backdrop-filter: blur(6px); }
+  color: #fff; background: oklch(0 0 168 / 0.42); padding: 4px 10px; border-radius: 999px; backdrop-filter: blur(6px); }
 .lx .cmp-arrow { display: flex; flex-direction: column; align-items: center; gap: 9px; }
 .lx .cmp-arrow .ar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-2); color: #fff; display: flex; align-items: center; justify-content: center; }
 .lx .cmp-arrow .lab { background: var(--accent-soft); color: var(--accent-ink); padding: 4px 11px; border-radius: 999px; font-size: 11.5px; font-weight: 900; }
@@ -61,7 +61,7 @@
 .lx .halc-mile { flex: 1; min-width: 168px; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
 .lx .halc-mile.done { background: var(--ok-soft); border-color: oklch(0.85 0.07 152); }
 .lx .halc-mile.locked { background: var(--surface-2); }
-.lx .halc-mile .mi { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; background: oklch(1 0 0 / 0.7); border: 1px solid var(--line); flex-shrink: 0; }
+.lx .halc-mile .mi { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; background: oklch(1 0 168 / 0.7); border: 1px solid var(--line); flex-shrink: 0; }
 .lx .halc-mile.done .mi { background: var(--ok); color: #fff; border: none; }
 .lx .halc-mile .ml { font-size: 13px; font-weight: 700; }
 .lx .halc-mile .ms { margin-left: auto; font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); }
@@ -77,10 +77,10 @@
 
 /* why */
 .lx .halc-why { display: flex; gap: 14px; align-items: flex-start; border-radius: 18px; padding: 20px 22px; color: #fff;
-  background: linear-gradient(125deg, oklch(0.3 0.05 355), oklch(0.42 0.12 10)); box-shadow: 0 14px 36px -18px oklch(0.45 0.12 10 / 0.5); }
-.lx .halc-why .qm { font-size: 46px; line-height: 0.5; font-weight: 900; color: oklch(1 0 0 / 0.3); font-family: Georgia, serif; flex-shrink: 0; }
+  background: linear-gradient(125deg, oklch(0.3 0.03 168), oklch(0.42 0.12 10)); box-shadow: 0 14px 36px -18px oklch(0.45 0.12 10 / 0.5); }
+.lx .halc-why .qm { font-size: 46px; line-height: 0.5; font-weight: 900; color: oklch(1 0 168 / 0.3); font-family: Georgia, serif; flex-shrink: 0; }
 .lx .halc-why p { font-size: 16px; font-weight: 600; line-height: 1.5; text-wrap: pretty; }
-.lx .halc-why .src { display: block; font-family: var(--mono); font-size: 11px; color: oklch(1 0 0 / 0.7); margin-top: 10px; }
+.lx .halc-why .src { display: block; font-family: var(--mono); font-size: 11px; color: oklch(1 0 168 / 0.7); margin-top: 10px; }
 
 /* note */
 .lx .halc-note { text-align: center; font-size: 13px; color: var(--ink-2); display: flex; align-items: center; justify-content: center; gap: 8px; }

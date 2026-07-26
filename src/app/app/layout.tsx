@@ -28,7 +28,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <aside className="lx-sidebar">
         <div className="lx-brand">
           <span className="mark">
-            <Image src="/lexfit-icon.png" alt="LEXFIT" width={32} height={32} priority />
+            <Image src="/lexfit-icon.png" alt="LEXFIT" width={35} height={32} priority />
           </span>
           <span className="wm">
             LEX<span>FIT</span>

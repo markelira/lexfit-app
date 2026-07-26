@@ -15,46 +15,46 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 180px; animation: cineGrain 0.5s steps(2) infinite; }
 @keyframes cineGrain { to { background-position: 36px -28px; } }
-.lx .cine-vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 100% at 50% 38%, transparent 42%, oklch(0.06 0.02 350 / 0.9) 118%); }
+.lx .cine-vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 100% at 50% 38%, transparent 42%, oklch(0.06 0.02 168 / 0.9) 118%); }
 
 .lx .cine-content { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; color: #fff; }
 .lx .cine-kicker { font-family: var(--mono); font-size: 13px; letter-spacing: 0.42em; text-transform: uppercase; color: oklch(0.86 0.09 22); animation: cineUp 0.8s 0.1s both; }
-.lx .cine-title { font-weight: 900; font-size: clamp(52px, 11vw, 150px); line-height: 0.9; letter-spacing: -0.035em; margin-top: 14px; text-shadow: 0 10px 50px oklch(0 0 0 / 0.5); animation: cineTitle 1s 0.22s both; }
-.lx .cine-big { font-weight: 900; font-size: clamp(46px, 9.5vw, 128px); line-height: 0.94; letter-spacing: -0.035em; text-shadow: 0 10px 50px oklch(0 0 0 / 0.5); animation: cineTitle 1s 0.18s both; }
-.lx .cine-sub { font-size: clamp(17px, 2.3vw, 27px); font-weight: 500; color: oklch(1 0 0 / 0.88); margin-top: 22px; max-width: 780px; line-height: 1.42; text-wrap: balance; animation: cineUp 0.9s 0.5s both; }
+.lx .cine-title { font-weight: 900; font-size: clamp(52px, 11vw, 150px); line-height: 0.9; letter-spacing: -0.035em; margin-top: 14px; text-shadow: 0 10px 50px oklch(0 0 168 / 0.5); animation: cineTitle 1s 0.22s both; }
+.lx .cine-big { font-weight: 900; font-size: clamp(46px, 9.5vw, 128px); line-height: 0.94; letter-spacing: -0.035em; text-shadow: 0 10px 50px oklch(0 0 168 / 0.5); animation: cineTitle 1s 0.18s both; }
+.lx .cine-sub { font-size: clamp(17px, 2.3vw, 27px); font-weight: 500; color: oklch(1 0 168 / 0.88); margin-top: 22px; max-width: 780px; line-height: 1.42; text-wrap: balance; animation: cineUp 0.9s 0.5s both; }
 @keyframes cineUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
 @keyframes cineTitle { from { opacity: 0; transform: translateY(44px) scale(1.06); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .lx .cine-kicker, .lx .cine-title, .lx .cine-big, .lx .cine-sub, .lx .cine-phase, .lx .cine-cta { animation: none !important; } }
 
 .lx .cine-phases { display: flex; gap: clamp(16px, 3.4vw, 48px); margin-top: 22px; }
 .lx .cine-phase { display: flex; flex-direction: column; align-items: center; gap: 9px; animation: cineUp 0.7s both; }
-.lx .cine-phase .e { font-size: clamp(36px, 6.4vw, 76px); filter: drop-shadow(0 6px 18px oklch(0 0 0 / 0.4)); }
-.lx .cine-phase .n { font-size: 12.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(1 0 0 / 0.82); }
+.lx .cine-phase .e { font-size: clamp(36px, 6.4vw, 76px); filter: drop-shadow(0 6px 18px oklch(0 0 168 / 0.4)); }
+.lx .cine-phase .n { font-size: 12.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(1 0 168 / 0.82); }
 
 .lx .cine-progress { position: absolute; top: calc(7vh + 16px); left: 6vw; right: 130px; z-index: 6; display: flex; gap: 6px; }
-.lx .cine-progseg { flex: 1; height: 3px; border-radius: 99px; background: oklch(1 0 0 / 0.25); overflow: hidden; }
+.lx .cine-progseg { flex: 1; height: 3px; border-radius: 99px; background: oklch(1 0 168 / 0.25); overflow: hidden; }
 .lx .cine-progseg > i { display: block; height: 100%; background: #fff; width: 0; }
 .lx .cine-progseg.done > i { width: 100%; }
 .lx .cine-progseg.active > i { animation: cineSeg 4200ms linear both; }
 @keyframes cineSeg { from { width: 0; } to { width: 100%; } }
-.lx .cine-skip { position: absolute; top: calc(7vh + 10px); right: 6vw; z-index: 7; cursor: pointer; font-size: 13px; font-weight: 600; color: #fff; background: oklch(1 0 0 / 0.14); border: 1px solid oklch(1 0 0 / 0.3); padding: 8px 16px; border-radius: 999px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.lx .cine-skip:hover { background: oklch(1 0 0 / 0.26); }
+.lx .cine-skip { position: absolute; top: calc(7vh + 10px); right: 6vw; z-index: 7; cursor: pointer; font-size: 13px; font-weight: 600; color: #fff; background: oklch(1 0 168 / 0.14); border: 1px solid oklch(1 0 168 / 0.3); padding: 8px 16px; border-radius: 999px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.lx .cine-skip:hover { background: oklch(1 0 168 / 0.26); }
 .lx .cine-nav { position: absolute; top: 7vh; bottom: 7vh; width: 34%; z-index: 2; cursor: pointer; background: transparent; border: none; }
 .lx .cine-nav.l { left: 0; } .lx .cine-nav.r { right: 0; }
 
 .lx .cine-cta { display: flex; align-items: center; gap: 14px; margin-top: 36px; animation: cineUp 0.9s 0.55s both; flex-wrap: wrap; justify-content: center; }
-.lx .cine-join { display: inline-flex; align-items: center; gap: 10px; padding: 18px 42px; border-radius: 999px; border: none; cursor: pointer; font-size: 18px; font-weight: 800; color: #fff; background: var(--accent-2); box-shadow: 0 16px 44px -10px oklch(0.58 0.165 358 / 0.7), inset 0 1px 0 oklch(1 0 0 / 0.25); }
+.lx .cine-join { display: inline-flex; align-items: center; gap: 10px; padding: 18px 42px; border-radius: 999px; border: none; cursor: pointer; font-size: 18px; font-weight: 800; color: #fff; background: var(--accent-2); box-shadow: 0 16px 44px -10px oklch(0.500 0.046 168 / 0.7), inset 0 1px 0 oklch(1 0 168 / 0.25); }
 .lx .cine-join:hover { transform: translateY(-2px); }
-.lx .cine-ghost { padding: 17px 26px; border-radius: 999px; cursor: pointer; font-size: 15px; font-weight: 700; color: #fff; background: oklch(1 0 0 / 0.12); border: 1px solid oklch(1 0 0 / 0.3); }
-.lx .cine-ghost:hover { background: oklch(1 0 0 / 0.24); }
+.lx .cine-ghost { padding: 17px 26px; border-radius: 999px; cursor: pointer; font-size: 15px; font-weight: 700; color: #fff; background: oklch(1 0 168 / 0.12); border: 1px solid oklch(1 0 168 / 0.3); }
+.lx .cine-ghost:hover { background: oklch(1 0 168 / 0.24); }
 
 .lx .cine-week { display: flex; gap: clamp(6px, 1.2vw, 14px); margin-top: 26px; flex-wrap: wrap; justify-content: center; }
-.lx .cw-day { min-width: 76px; padding: 13px 11px; border-radius: 14px; background: oklch(1 0 0 / 0.1); border: 1px solid oklch(1 0 0 / 0.18); display: flex; flex-direction: column; align-items: center; gap: 8px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: cineUp 0.6s both; }
-.lx .cw-day.rest { background: oklch(1 0 0 / 0.04); border-style: dashed; }
-.lx .cw-day .d { font-family: var(--mono); font-size: 11px; color: oklch(1 0 0 / 0.7); letter-spacing: 0.05em; }
+.lx .cw-day { min-width: 76px; padding: 13px 11px; border-radius: 14px; background: oklch(1 0 168 / 0.1); border: 1px solid oklch(1 0 168 / 0.18); display: flex; flex-direction: column; align-items: center; gap: 8px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: cineUp 0.6s both; }
+.lx .cw-day.rest { background: oklch(1 0 168 / 0.04); border-style: dashed; }
+.lx .cw-day .d { font-family: var(--mono); font-size: 11px; color: oklch(1 0 168 / 0.7); letter-spacing: 0.05em; }
 .lx .cw-day .dot { width: 12px; height: 12px; border-radius: 50%; }
 .lx .cw-day .t { font-size: 12px; font-weight: 800; color: #fff; letter-spacing: 0.02em; }
-.lx .cw-day .t.rest { color: oklch(1 0 0 / 0.6); font-weight: 600; }
+.lx .cw-day .t.rest { color: oklch(1 0 168 / 0.6); font-weight: 600; }
 
 .lx .cine-types { display: flex; gap: clamp(8px, 1.6vw, 18px); margin-top: 26px; flex-wrap: wrap; justify-content: center; }
 .lx .ct-card { width: clamp(94px, 12vw, 148px); aspect-ratio: 3 / 4; border-radius: 16px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 12px; box-shadow: 0 16px 40px -16px rgba(0,0,0,0.6); animation: cineCard 0.7s both; }
@@ -63,16 +63,16 @@
 @keyframes cineCard { from { opacity: 0; transform: translateY(30px) scale(0.94); } to { opacity: 1; transform: none; } }
 
 .lx .cine-goals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 26px; max-width: 640px; width: 100%; }
-.lx .cg { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 16px; background: oklch(1 0 0 / 0.1); border: 1px solid oklch(1 0 0 / 0.18); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: cineUp 0.6s both; text-align: left; }
+.lx .cg { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 16px; background: oklch(1 0 168 / 0.1); border: 1px solid oklch(1 0 168 / 0.18); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: cineUp 0.6s both; text-align: left; }
 .lx .cg .e { font-size: 30px; flex-shrink: 0; }
 .lx .cg span:last-child { font-size: clamp(14px, 1.7vw, 18px); font-weight: 700; color: #fff; }
 @media (max-width: 600px) { .lx .cine-goals { grid-template-columns: 1fr; } }
 
-.lx .cine-celebrate { position: absolute; inset: 0; z-index: 9; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; color: #fff; overflow: hidden; animation: cineFade 0.4s both; background: radial-gradient(120% 120% at 50% 30%, oklch(0.62 0.17 8) 0%, oklch(0.2 0.05 350) 82%); }
-.lx .cine-celebrate .ce-badge { width: clamp(92px, 14vw, 140px); height: clamp(92px, 14vw, 140px); border-radius: 50%; background: oklch(1 0 0 / 0.14); border: 2px solid oklch(1 0 0 / 0.4); display: flex; align-items: center; justify-content: center; font-size: clamp(46px, 8vw, 72px); animation: cePop 0.6s cubic-bezier(0.2,1.4,0.4,1) both; }
+.lx .cine-celebrate { position: absolute; inset: 0; z-index: 9; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; color: #fff; overflow: hidden; animation: cineFade 0.4s both; background: radial-gradient(120% 120% at 50% 30%, oklch(0.62 0.05 168) 0%, oklch(0.2 0.05 168) 82%); }
+.lx .cine-celebrate .ce-badge { width: clamp(92px, 14vw, 140px); height: clamp(92px, 14vw, 140px); border-radius: 50%; background: oklch(1 0 168 / 0.14); border: 2px solid oklch(1 0 168 / 0.4); display: flex; align-items: center; justify-content: center; font-size: clamp(46px, 8vw, 72px); animation: cePop 0.6s cubic-bezier(0.2,1.4,0.4,1) both; }
 @keyframes cePop { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: none; } }
 .lx .cine-celebrate h2 { font-weight: 900; font-size: clamp(34px, 7vw, 82px); letter-spacing: -0.03em; margin-top: 24px; animation: cineUp 0.7s 0.2s both; }
-.lx .cine-celebrate p { font-size: clamp(16px, 2.2vw, 24px); color: oklch(1 0 0 / 0.88); margin-top: 14px; max-width: 620px; animation: cineUp 0.7s 0.4s both; }
+.lx .cine-celebrate p { font-size: clamp(16px, 2.2vw, 24px); color: oklch(1 0 168 / 0.88); margin-top: 14px; max-width: 620px; animation: cineUp 0.7s 0.4s both; }
 .lx .cine-celebrate .ce-go { margin-top: 30px; padding: 16px 36px; border-radius: 999px; border: none; cursor: pointer; font-size: 17px; font-weight: 800; color: var(--accent-2); background: #fff; box-shadow: 0 14px 40px -10px rgba(0,0,0,0.5); animation: cineUp 0.7s 0.6s both; }
 .lx .cine-celebrate .ce-go:hover { transform: translateY(-2px); }
 .lx .cine-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }

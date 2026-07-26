@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEXFIT — Design Library · Az Ív</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+  --accent:#e5719b; --accent-2:#d5638a; --accent-soft:#fbeaf1;
+  --ink:#2a1f24; --ink-2:#5a4b52; --ink-3:#8a7d78;
+  --sand-50:#faf8f6; --sand-100:#f6f5f2; --sand-200:#ece7e3; --sand-300:#ddd5d0; --sand-400:#b8ada8;
+  --plum:#7a5878; --coral:#d1885a; --rose:#b0416d;
+  --cat-also:oklch(0.66 0.155 0); --cat-felso:oklch(0.45 0.085 320); --cat-cardio:oklch(0.68 0.140 45);
+  --cat-teljes:oklch(0.52 0.150 355); --cat-mobility:oklch(0.66 0.090 155);
+  --font:"Poppins",sans-serif; --mono:"IBM Plex Mono",monospace;
+  --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:32px;
+  --sh-1:0 2px 8px -2px rgba(42,31,36,.10);
+  --sh-2:0 12px 28px -12px rgba(42,31,36,.22);
+  --sh-3:0 28px 60px -28px rgba(42,31,36,.34);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);background:var(--sand-50);color:var(--ink);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 40px}
+a{color:var(--accent-2);text-decoration:none}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-weight:300;font-size:clamp(40px,5.6vw,76px);line-height:.98;letter-spacing:-.035em;margin:18px 0 0}
+h1 b{font-weight:700}
+h2{font-weight:600;font-size:clamp(25px,2.7vw,34px);letter-spacing:-.03em;margin:14px 0 0}
+h3{font-weight:600;font-size:17px;letter-spacing:-.02em;margin:0}
+p{line-height:1.62;text-wrap:pretty;margin:10px 0 0}
+.lead{font-size:18.5px;color:var(--ink-2);max-width:620px;margin-top:22px}
+.sub{font-size:14.5px;color:var(--ink-2);max-width:660px}
+section{padding:64px 0;border-top:1px solid var(--sand-200)}
+header{padding:100px 0 66px}
+.mono-note{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--ink-3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:30px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px;margin-top:30px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin-top:30px}
+.grid5{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:18px;margin-top:30px}
+.cover{position:relative;overflow:hidden}
+.cover .r{position:absolute;top:-38px;right:-26px;width:150px;height:150px;border-radius:50%;border:2px solid rgba(255,255,255,.28)}
+.cover::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 10%,rgba(255,255,255,.18),transparent 55%)}
+.card{background:#fff;border:1px solid var(--sand-200);border-radius:var(--r-lg);padding:26px;box-shadow:var(--sh-1);min-width:0}
+.card .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:16px;display:block}
+.stage{background:var(--sand-100);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;padding:34px;min-height:150px;overflow:hidden}
+.stage>*{max-width:100%;flex:0 1 auto}
+.stage.dark{background:var(--ink)}
+.stage.pink{background:var(--accent)}
+svg.mk{display:block}
+/* lockups */
+.lock{display:flex;align-items:center;gap:18px}
+.lock .wm{font-weight:800;font-size:34px;letter-spacing:.015em;line-height:1}
+.lock.v{flex-direction:column;gap:14px}
+.lock.v .wm{font-size:26px}
+.lock .tag{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--ink-3);margin-top:7px}
+/* clearspace */
+.clearbox{position:relative;background:var(--sand-100);border-radius:var(--r-md);padding:56px;display:flex;justify-content:center}
+.clearbox .ring{position:absolute;inset:20px;border:1.5px dashed var(--accent);border-radius:12px;opacity:.5}
+/* misuse */
+.mis{background:#fff;border:1px solid var(--sand-200);border-radius:var(--r-md);padding:22px;text-align:center;min-width:0}
+.mis .box{height:104px;display:flex;align-items:center;justify-content:center;background:var(--sand-100);border-radius:var(--r-sm);overflow:hidden}
+.mis .x{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--rose);margin-top:12px;display:block}
+/* color */
+.sw{border-radius:var(--r-md);overflow:hidden;border:1px solid var(--sand-200);background:#fff;min-width:0}
+.sw .chip{height:96px}
+.sw .info{padding:12px 14px}
+.sw .nm{font-weight:600;font-size:13.5px}
+.sw .hx{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px;overflow-wrap:anywhere}
+/* type */
+.tspec{display:flex;align-items:baseline;justify-content:space-between;gap:24px;padding:20px 0;border-bottom:1px solid var(--sand-200)}
+.tspec .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+/* components */
+.pill{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:15px 30px;border:none;cursor:pointer;transition:.22s;font-family:var(--font)}
+.p-primary{background:var(--ink);color:#fff;box-shadow:var(--sh-2)}
+.p-primary:hover{transform:translateY(-2px)}
+.p-accent{background:var(--accent);color:#fff;box-shadow:0 12px 28px -14px var(--accent-2)}
+.p-accent:hover{background:var(--accent-2)}
+.p-outline{background:transparent;border:1.5px solid var(--ink);color:var(--ink)}
+.p-outline:hover{background:var(--ink);color:#fff}
+.p-quiet{background:var(--sand-200);color:var(--ink)}
+.chipset{display:flex;flex-wrap:wrap;gap:8px}
+.chip-t{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;background:var(--accent-soft);color:var(--accent-2);border-radius:999px;padding:8px 15px}
+.field{width:100%;border:1.5px solid var(--sand-300);border-radius:var(--r-md);padding:15px 18px;font-family:var(--font);font-size:15px;color:var(--ink);background:#fff}
+.field::placeholder{color:var(--ink-3)}
+.listing{background:#fff;border:1px solid var(--sand-200);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-1);transition:.25s;min-width:0}
+.listing:hover{box-shadow:var(--sh-3);transform:translateY(-3px)}
+.listing .ph{aspect-ratio:4/3;background:linear-gradient(150deg,var(--accent),var(--accent-2));position:relative;display:flex;align-items:flex-end;padding:16px}
+.listing .ph .w{position:absolute;top:12px;right:16px;font-weight:900;font-size:26px;color:rgba(255,255,255,.34);line-height:1;z-index:1}
+.listing .ph .r{position:absolute;top:-38px;right:-26px;width:150px;height:150px;border-radius:50%;border:2px solid rgba(255,255,255,.28)}
+.listing .bd{padding:16px 18px 20px}
+.listing .bd .t{font-weight:600;font-size:15.5px;letter-spacing:-.01em}
+.listing .bd .m{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:6px;letter-spacing:.04em}
+.icoset{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
+.icobox{width:78px;height:78px;background:#fff;border:1px solid var(--sand-200);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+table{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--sand-200);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+code{font-family:var(--mono);font-size:12.5px;background:var(--accent-soft);border-radius:5px;padding:2px 6px;color:var(--accent-2)}
+.note{background:var(--accent-soft);border-radius:var(--r-md);padding:20px 24px;margin-top:26px;font-size:14.5px;line-height:1.6}
+.voice{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--sand-200);border-radius:var(--r-md);overflow:hidden;margin-top:26px;background:#fff}
+.voice .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:14px 20px;background:var(--sand-100);color:var(--ink-3)}
+.voice .c{padding:16px 20px;font-size:14.5px;border-top:1px solid var(--sand-200);line-height:1.55}
+.voice .yes{color:var(--ink)}
+.voice .no{color:var(--ink-3);border-left:1px solid var(--sand-200)}
+.voice .h.no{border-left:1px solid var(--sand-200)}
+@media(max-width:1100px){.card{padding:20px}.stage{padding:20px}}
+@media(max-width:900px){.grid2,.voice{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="lock" style="margin-bottom:34px">
+    <svg class="mk" width="58" height="53" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#e5719b"/></g></svg>
+    <span class="wm">LEXFIT</span>
+  </div>
+  <div class="eyebrow">Design Library · v1</div>
+  <h1>Az Ív<br><b>rendszere</b></h1>
+  <p class="lead">Egy ív, ami emelkedik, és egy pont, ami felé tart. Ez a jel visz mindent — az app ikontól a pólóig. A rendszer melegségre épül: lekerekített formák, homokszínű alapok, bőséges levegő, emberi hang. Nem edzőterem-esztétika. Otthon-esztétika.</p>
+  <p class="mono-note" style="margin-top:26px">Márkajel · Szín · Tipográfia · Ikonok · Komponensek · Hang · Alkalmazások</p>
+</header>
+
+<!-- ============ MARK ============ -->
+<section>
+  <div class="eyebrow">01 · Márkajel</div>
+  <h2>Az Ív</h2>
+  <p class="sub">Az ív az út: alulról indul, jobbra emelkedik. A pont a cél, ami már látszik. Kerek vonalvégek, egyenletes vastagság — semmi szög, semmi agresszió.</p>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="stage"><svg class="mk" width="150" height="136" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#e5719b"/></g></svg></div>
+      <span class="cap">Elsődleges · rózsaszín</span>
+    </div>
+    <div class="card">
+      <div class="stage"><svg class="mk" width="150" height="136" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#2a1f24" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#2a1f24"/></g></svg></div>
+      <span class="cap">Egyszínű · ink</span>
+    </div>
+    <div class="card">
+      <div class="stage dark"><svg class="mk" width="150" height="136" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></div>
+      <span class="cap">Negatív · fehér</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:44px">Lockupok</h3>
+  <div class="grid3">
+    <div class="card">
+      <div class="stage">
+        <div class="lock">
+          <svg class="mk" width="52" height="47" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#e5719b"/></g></svg>
+          <span class="wm">LEXFIT</span>
+        </div>
+      </div>
+      <span class="cap">Vízszintes · elsődleges</span>
+    </div>
+    <div class="card">
+      <div class="stage">
+        <div class="lock v">
+          <svg class="mk" width="60" height="54" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#e5719b"/></g></svg>
+          <div style="text-align:center"><span class="wm">LEXFIT</span><span class="tag">Otthon · Együtt</span></div>
+        </div>
+      </div>
+      <span class="cap">Függőleges · aláírással</span>
+    </div>
+    <div class="card">
+      <div class="stage"><svg class="mk" width="104" height="104" viewBox="0 0 1024 1024"><circle cx="512" cy="512" r="512" fill="#e5719b"/><g transform="translate(512,512) scale(0.62) translate(-340,-308)"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></g></svg></div>
+      <span class="cap">Körjel · avatar, hímzés</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:44px">Védőzóna és minimum méret</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="clearbox"><div class="ring"></div>
+        <svg class="mk" width="130" height="118" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#e5719b"/></g></svg>
+      </div>
+      <span class="cap">Védőzóna = a pont átmérője (× minden oldalon)</span>
+    </div>
+    <div class="card">
+      <div class="stage" style="gap:26px">
+        <svg class="mk" width="64" height="58" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#2a1f24" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#2a1f24"/></g></svg>
+        <svg class="mk" width="32" height="29" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#2a1f24" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#2a1f24"/></g></svg>
+        <svg class="mk" width="20" height="18" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#2a1f24" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#2a1f24"/></g></svg>
+      </div>
+      <span class="cap">Minimum: 20 px képernyőn · 12 mm nyomtatásban · 20 mm hímezve</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:44px">Amit ne csinálj</h3>
+  <div class="grid4">
+    <div class="mis"><div class="box"><svg width="86" height="52" viewBox="0 0 680 616" preserveAspectRatio="none"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#e5719b"/></g></svg></div><span class="x">Ne torzítsd</span></div>
+    <div class="mis"><div class="box"><svg width="74" height="67" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="34" stroke-linecap="round"/><circle cx="800" cy="224" r="26" fill="#e5719b"/></g></svg></div><span class="x">Ne vékonyítsd</span></div>
+    <div class="mis"><div class="box" style="background:#d1885a"><svg width="74" height="67" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#7a5878" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#7a5878"/></g></svg></div><span class="x">Ne színezd át</span></div>
+    <div class="mis"><div class="box"><svg width="74" height="67" viewBox="0 0 680 616" style="transform:rotate(38deg)"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#e5719b"/></g></svg></div><span class="x">Ne forgasd</span></div>
+  </div>
+</section>
+
+<!-- ============ COLOR ============ -->
+<section>
+  <div class="eyebrow">02 · Szín</div>
+  <h2>Meleg alapok, egy határozott rózsaszín</h2>
+  <p class="sub">A rózsaszín a hangsúly — sosem a háttér nagy felületein. Alatta homokszínű semlegesek, amitől a felület otthonos és nem klinikai. Kategóriaszínek csak edzésborítókon.</p>
+
+  <h3 style="margin-top:34px">Márka</h3>
+  <div class="grid4">
+    <div class="sw"><div class="chip" style="background:#e5719b"></div><div class="info"><div class="nm">Accent</div><div class="hx">#e5719b · oklch(.66 .155 0)</div></div></div>
+    <div class="sw"><div class="chip" style="background:#d5638a"></div><div class="info"><div class="nm">Accent deep</div><div class="hx">#d5638a · hover, gradiens</div></div></div>
+    <div class="sw"><div class="chip" style="background:#fbeaf1"></div><div class="info"><div class="nm">Accent soft</div><div class="hx">#fbeaf1 · chip, kiemelés</div></div></div>
+    <div class="sw"><div class="chip" style="background:#2a1f24"></div><div class="info"><div class="nm">Ink</div><div class="hx">#2a1f24 · szöveg, gomb</div></div></div>
+  </div>
+
+  <h3 style="margin-top:34px">Semlegesek</h3>
+  <div class="grid4">
+    <div class="sw"><div class="chip" style="background:#faf8f6"></div><div class="info"><div class="nm">Sand 50</div><div class="hx">#faf8f6 · oldal alap</div></div></div>
+    <div class="sw"><div class="chip" style="background:#f6f5f2"></div><div class="info"><div class="nm">Sand 100</div><div class="hx">#f6f5f2 · szekció</div></div></div>
+    <div class="sw"><div class="chip" style="background:#ece7e3"></div><div class="info"><div class="nm">Sand 200</div><div class="hx">#ece7e3 · vonal, halk gomb</div></div></div>
+    <div class="sw"><div class="chip" style="background:#ddd5d0"></div><div class="info"><div class="nm">Sand 300</div><div class="hx">#ddd5d0 · input keret</div></div></div>
+    <div class="sw"><div class="chip" style="background:#b8ada8"></div><div class="info"><div class="nm">Sand 400</div><div class="hx">#b8ada8 · tiltott</div></div></div>
+    <div class="sw"><div class="chip" style="background:#8a7d78"></div><div class="info"><div class="nm">Ink 3</div><div class="hx">#8a7d78 · másodlagos</div></div></div>
+    <div class="sw"><div class="chip" style="background:#5a4b52"></div><div class="info"><div class="nm">Ink 2</div><div class="hx">#5a4b52 · törzsszöveg</div></div></div>
+    <div class="sw"><div class="chip" style="background:#2a1f24"></div><div class="info"><div class="nm">Ink</div><div class="hx">#2a1f24 · cím</div></div></div>
+  </div>
+
+  <h3 style="margin-top:34px">Edzéskategóriák</h3>
+  <div class="grid5">
+    <div class="sw"><div class="chip" style="background:var(--cat-also)"></div><div class="info"><div class="nm">Alsótest</div><div class="hx">ALSÓ · oklch(.66 .155 0)</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cat-felso)"></div><div class="info"><div class="nm">Felsőtest</div><div class="hx">FELSŐ · oklch(.45 .085 320)</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cat-cardio)"></div><div class="info"><div class="nm">Cardio + has</div><div class="hx">CARDIO · oklch(.68 .14 45)</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cat-teljes)"></div><div class="info"><div class="nm">Teljes test</div><div class="hx">TELJES · oklch(.52 .15 355)</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cat-mobility)"></div><div class="info"><div class="nm">Mobility</div><div class="hx">MOBILITY · oklch(.66 .09 155)</div></div></div>
+  </div>
+
+  <div class="note"><strong>Arány — 60 / 30 / 10.</strong> 60% homok és fehér, 30% ink (szöveg), 10% rózsaszín. Ha a rózsaszín 10% fölé megy, a felület olcsóvá és hangossá válik. A hero és az előfizetés sáv a kivétel: ott a rózsaszín viszi a teljes felületet, épp azért, mert máshol nem.</div>
+</section>
+
+<!-- ============ TYPE ============ -->
+<section>
+  <div class="eyebrow">03 · Tipográfia</div>
+  <h2>Poppins és IBM Plex Mono</h2>
+  <p class="sub">A nagy címek vékonyak és kisbetűsek — nyugodtak. A címkék, gombok és metaadatok mono nagybetűsek, ritkított betűközzel. Ez a kettősség adja a márka hangját vizuálisan.</p>
+
+  <div style="margin-top:30px">
+    <div class="tspec"><div><div style="font-weight:300;font-size:56px;letter-spacing:-.035em;line-height:1">A változás otthon kezdődik</div></div><span class="lbl">Display · 300 · -3.5%</span></div>
+    <div class="tspec"><div><div style="font-weight:600;font-size:32px;letter-spacing:-.03em">Négy hét, ami elindít</div></div><span class="lbl">Cím · 600 · -3%</span></div>
+    <div class="tspec"><div><div style="font-weight:300;font-size:28px;letter-spacing:-.022em;text-transform:lowercase">edzés, amikor neked jó</div></div><span class="lbl">Panel cím · 300 · kisbetűs</span></div>
+    <div class="tspec"><div><div style="font-size:16px;line-height:1.6;color:var(--ink-2);max-width:520px">Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz — és egy edző, aki végig veled marad.</div></div><span class="lbl">Törzs · 400 · 16/1.6</span></div>
+    <div class="tspec"><div><div style="font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)">A teljes otthoni edzésprogram · nőknek</div></div><span class="lbl">Eyebrow · mono · 16%</span></div>
+    <div class="tspec"><div><div style="font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase">Kezdd el a programot</div></div><span class="lbl">Gomb · 600 · 10%</span></div>
+  </div>
+</section>
+
+<!-- ============ ICONS ============ -->
+<section>
+  <div class="eyebrow">04 · Ikonok</div>
+  <h2>Az ív nyelvén</h2>
+  <p class="sub">Minden ikon ugyanabból a logikából épül, mint a márkajel: <strong>2 px vonal, kerek végek, kerek csatlakozások, nincs kitöltés</strong>, 24-es rácson. Ahol lehet, egy ív adja a mozgást.</p>
+  <div class="icoset">
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18A10 10 0 0 1 14 8"/><circle cx="19" cy="6" r="2" fill="currentColor" stroke="none"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-5M9 20V9M14 20v-8M19 20V5"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4v16l14-8z"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-8-5-8-11a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 11-8 11z"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7 9 18l-5-5"/></svg></div>
+    <div class="icobox"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3 20a6 6 0 0 1 12 0M15 20a5 5 0 0 1 6-4.5"/></svg></div>
+  </div>
+</section>
+
+<!-- ============ COMPONENTS ============ -->
+<section>
+  <div class="eyebrow">05 · Komponensek</div>
+  <h2>Lekerekített, levegős, megnyugtató</h2>
+  <p class="sub">Nagy sugarak (16–32 px), lágy árnyékok, bőséges belső margó. Minden kattintható elem legalább 44 px magas. A kártyák emelkednek hoverre — ez az egyetlen „játék" a felületen.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Gombok</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:18px">
+        <button class="pill p-primary">Kezdd el</button>
+        <button class="pill p-accent">Csatlakozz</button>
+        <button class="pill p-outline">Csomagok</button>
+        <button class="pill p-quiet">Később</button>
+      </div>
+      <span class="cap">Elsődleges · hangsúlyos · körvonalas · halk</span>
+    </div>
+    <div class="card">
+      <h3>Chipek és mezők</h3>
+      <div class="chipset" style="margin-top:18px"><span class="chip-t">20 edzés</span><span class="chip-t">heti 5</span><span class="chip-t">30 perc</span><span class="chip-t">eszköz nélkül</span></div>
+      <input class="field" style="margin-top:16px" placeholder="Email címed">
+      <span class="cap">Chip: mono, soft háttér · Mező: 1.5 px keret, 16 px sugár</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:40px">Edzéskártya</h3>
+  <p class="sub">A borító a shippelt <code>LxCover</code> képlete: <code>linear-gradient(125deg, oklch(from {c} calc(l - .16) calc(c * .85) h) 0%, {c} 65%, oklch(from {c} calc(l + .07) c h) 100%)</code> — plusz a túllógó sarokgyűrű és a jobb felső fényfolt.</p>
+  <div class="grid5">
+    <div class="listing"><div class="ph cover" style="background:linear-gradient(125deg,oklch(from var(--cat-also) calc(l - .16) calc(c * .85) h) 0%,var(--cat-also) 65%,oklch(from var(--cat-also) calc(l + .07) c h) 100%)"><span class="r"></span><span class="w">ALSÓ</span></div><div class="bd"><div class="t">Fenék &amp; comb égő</div><div class="m">24 perc · Alexa</div></div></div>
+    <div class="listing"><div class="ph cover" style="background:linear-gradient(125deg,oklch(from var(--cat-felso) calc(l - .16) calc(c * .85) h) 0%,var(--cat-felso) 65%,oklch(from var(--cat-felso) calc(l + .07) c h) 100%)"><span class="r"></span><span class="w">FELSŐ</span></div><div class="bd"><div class="t">Tónusos kar &amp; váll</div><div class="m">21 perc · Alexa</div></div></div>
+    <div class="listing"><div class="ph cover" style="background:linear-gradient(125deg,oklch(from var(--cat-cardio) calc(l - .16) calc(c * .85) h) 0%,var(--cat-cardio) 65%,oklch(from var(--cat-cardio) calc(l + .07) c h) 100%)"><span class="r"></span><span class="w">CARDIO</span></div><div class="bd"><div class="t">Zsírégető cardio</div><div class="m">22 perc · Alexa</div></div></div>
+    <div class="listing"><div class="ph cover" style="background:linear-gradient(125deg,oklch(from var(--cat-teljes) calc(l - .16) calc(c * .85) h) 0%,var(--cat-teljes) 65%,oklch(from var(--cat-teljes) calc(l + .07) c h) 100%)"><span class="r"></span><span class="w">TELJES</span></div><div class="bd"><div class="t">Teljes test égő</div><div class="m">28 perc · Alexa</div></div></div>
+    <div class="listing"><div class="ph cover" style="background:linear-gradient(125deg,oklch(from var(--cat-mobility) calc(l - .16) calc(c * .85) h) 0%,var(--cat-mobility) 65%,oklch(from var(--cat-mobility) calc(l + .07) c h) 100%)"><span class="r"></span><span class="w">MOBILITY</span></div><div class="bd"><div class="t">Reggeli mobilitás</div><div class="m">14 perc · Alexa</div></div></div>
+  </div>
+
+  <h3 style="margin-top:40px">Sugár, árnyék, tér</h3>
+  <table>
+    <tr><th>Token</th><th>Érték</th><th>Használat</th></tr>
+    <tr><td><code>--r-sm</code></td><td>10 px</td><td>Kis elemek, thumbnail</td></tr>
+    <tr><td><code>--r-md</code></td><td>16 px</td><td>Mező, chip-doboz, kis kártya</td></tr>
+    <tr><td><code>--r-lg</code></td><td>24 px</td><td>Kártya, listing</td></tr>
+    <tr><td><code>--r-xl</code></td><td>32 px</td><td>Panel, hero sáv, modál</td></tr>
+    <tr><td><code>--sh-1</code></td><td>0 2px 8px -2px rgba(42,31,36,.10)</td><td>Nyugalmi kártya</td></tr>
+    <tr><td><code>--sh-2</code></td><td>0 12px 28px -12px rgba(42,31,36,.22)</td><td>Gomb, kiemelt elem</td></tr>
+    <tr><td><code>--sh-3</code></td><td>0 28px 60px -28px rgba(42,31,36,.34)</td><td>Hover, lebegő panel</td></tr>
+    <tr><td>Térköz</td><td>4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96</td><td>8-as rácsra épül</td></tr>
+  </table>
+</section>
+
+<!-- ============ VOICE ============ -->
+<section>
+  <div class="eyebrow">06 · Hang</div>
+  <h2>Úgy beszélünk, ahogy Alexa</h2>
+  <p class="sub">Tegeződünk. Rövid mondatok. Soha nem szégyenítünk, nem ijesztgetünk, nem ígérünk gyors csodát. A hangsúly a következő lépésen van, nem a végeredményen.</p>
+  <div class="voice">
+    <div class="h">Így igen</div><div class="h no">Így nem</div>
+    <div class="c yes">„Kimaradt egy nap? A heted még megvan.”</div><div class="c no">„Ne hagyd ki! Elveszíted a haladásod!”</div>
+    <div class="c yes">„Napi 30 perc, eszköz nélkül.”</div><div class="c no">„Égesd el a zsírt 7 nap alatt!”</div>
+    <div class="c yes">„Alexa végig veled van.”</div><div class="c no">„Profi edzőink csapata vár!”</div>
+    <div class="c yes">„Lásd, milyen messzire jutottál.”</div><div class="c no">„Nézd meg, mennyit fogytál.”</div>
+  </div>
+  <div class="note"><strong>Három tiltás.</strong> Nincs mérleg-nyelv (kilók, „bikini test”). Nincs sürgetés-pánik („most vagy soha”). Nincs tökéletesség-mítosz — a kihagyott nap normális, és a felület is így beszél róla.</div>
+</section>
+
+<!-- ============ APPLICATIONS ============ -->
+<section>
+  <div class="eyebrow">07 · Alkalmazások</div>
+  <h2>Képernyőn és szöveten</h2>
+  <div class="grid4">
+    <div class="card">
+      <div class="stage" style="background:linear-gradient(160deg,#ece7e3,#ddd5d0)">
+        <div style="width:104px;height:104px;border-radius:29.2%;overflow:hidden;box-shadow:var(--sh-2)"><svg width="104" height="104" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#e5719b"/><g transform="translate(-20,52)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg></div>
+      </div>
+      <span class="cap">App ikon · iOS</span>
+    </div>
+    <div class="card">
+      <div class="stage dark"><svg width="96" height="87" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#f6f5f2" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#f6f5f2"/></g></svg></div>
+      <span class="cap">Hímzés · sötét pólón</span>
+    </div>
+    <div class="card">
+      <div class="stage" style="background:#fff">
+        <div class="lock" style="gap:12px"><svg width="36" height="33" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#2a1f24" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#2a1f24"/></g></svg><span class="wm" style="font-size:22px">LEXFIT</span></div>
+      </div>
+      <span class="cap">Névjegy · egyszínű</span>
+    </div>
+    <div class="card">
+      <div class="stage" style="background:var(--accent)"><div style="width:92px;height:92px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center"><svg width="52" height="47" viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#e5719b" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#e5719b"/></g></svg></div></div>
+      <span class="cap">Közösségi avatar</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:40px">Fájlok</h3>
+  <table>
+    <tr><th>Fájl</th><th>Tartalom</th><th>Hol</th></tr>
+    <tr><td><code>lexfit-mark-accent.svg</code></td><td>Jel, rózsaszín, átlátszó</td><td>Web, app fejléc</td></tr>
+    <tr><td><code>lexfit-mark-ink.svg</code></td><td>Jel, ink, átlátszó</td><td>Nyomda, névjegy, számla</td></tr>
+    <tr><td><code>lexfit-mark-white.svg</code></td><td>Jel, fehér, átlátszó</td><td>Sötét alap, fotó fölött</td></tr>
+    <tr><td><code>lexfit-badge-accent.svg</code></td><td>Körjel, rózsaszín alapon fehér</td><td>Avatar, matrica, patch</td></tr>
+    <tr><td><code>lexfit-badge-ink.svg</code></td><td>Körjel, ink alapon krém</td><td>Sötét merch, bélyegző</td></tr>
+    <tr><td><code>lexfit-01-iv-app.svg</code></td><td>1024×1024 app ikon</td><td>App Store, Icon Composer</td></tr>
+    <tr><td><code>lexfit-01-iv-mono.svg</code></td><td>Jel egyszínben, átlátszó</td><td>Mono réteg, hímzés</td></tr>
+  </table>
+  <div class="note"><strong>Figma:</strong> importálás után futtasd az <code>Object → Outline Stroke</code> parancsot a jelen, mielőtt nyomdába vagy hímzőhöz küldöd — így a vonalvastagság nem skálázódik el. Az app ikont ne kerekítsd le, azt az iOS maszkolja.</div>
+</section>
+
+<div style="height:70px"></div>
+</div>
+</body>
+</html>

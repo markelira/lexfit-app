@@ -375,7 +375,7 @@ function PlayerScreen({ code }: { code: string }) {
                 tokens={pb.tokens}
                 startTime={resumeAt}
                 streamType="on-demand"
-                accentColor="#e5719b"
+                accentColor="#7a9b8d"
                 autoPlay
                 preload="auto"
                 // Fast-start ABR: HLS.js's default first estimate is derived from the

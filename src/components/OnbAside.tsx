@@ -27,7 +27,7 @@ export function OnbAside({
       <span className="ring" aria-hidden="true" />
       <span className="ring two" aria-hidden="true" />
       <div className="a-wm">
-        <span className="hash"><Image src="/lexfit-icon.png" alt="LEXFIT" width={20} height={20} /></span> LEXFIT
+        <span className="hash"><Image src="/lexfit-icon.png" alt="LEXFIT" width={22} height={20} /></span> LEXFIT
       </div>
 
       <div className="aside-body">
@@ -47,7 +47,7 @@ export function OnbAside({
             </div>
             <div className="g-name">
               Alexa{" "}
-              <span style={{ fontWeight: 500, color: "oklch(1 0 0 / 0.68)", fontSize: 12.5 }}>
+              <span style={{ fontWeight: 500, color: "oklch(1 0 168 / 0.68)", fontSize: 12.5 }}>
                 · az edződ
               </span>
             </div>

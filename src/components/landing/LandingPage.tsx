@@ -8,6 +8,8 @@
 // photography exists (see handoff "Assets").
 
 import Link from "next/link";
+import { PRICES } from "@/lib/pricing/config";
+import { formatHuf, perWeekHuf, annualSavingsPct } from "@/lib/pricing/display";
 import {
   CSSProperties,
   ReactNode,
@@ -222,20 +224,44 @@ const badges: [string, string][] = [
 ];
 
 const alexaChapters: [string, string, string][] = [
-  ["A VERSENYZŐ", "10 év a szőnyegen", "linear-gradient(160deg,var(--cat-felso),oklch(.34 .08 318))"],
-  ["A FORDULAT", "2023 — abbahagytam", "linear-gradient(160deg,var(--cat-teljes),oklch(.34 .1 353))"],
+  ["A VERSENYZŐ", "10 év a szőnyegen", "linear-gradient(160deg,var(--cat-felso),oklch(.34 0.05 168))"],
+  ["A FORDULAT", "2023 — abbahagytam", "linear-gradient(160deg,var(--cat-teljes),oklch(.34 0.05 168))"],
   ["A FELISMERÉS", "„Egyedül nem megy”", "linear-gradient(160deg,var(--accent),var(--accent-2))"],
   ["A KÖZÖSSÉG", "17 000+ ember", "linear-gradient(160deg,var(--cat-cardio),oklch(.56 .13 40))"],
   ["AZ ÍGÉRET", "Együtt muszáj", "linear-gradient(160deg,var(--accent-2),var(--cat-felso))"],
 ];
 
+// Real HUF pricing — figures derived from the pricing config (single source of
+// truth), so the landing can never drift from what Stripe charges. J1: every
+// card states the renewal terms. J4: no strikethrough "old" prices and the only
+// savings claim is annual vs 12× monthly.
+// Order puts the annual plan in the CENTER, highlighted + pre-recommended.
+// `role` is carried into the checkout so a card click starts that plan's flow.
 const pricing: {
-  plan: string; old?: string; amt: string; save?: string; saveClass?: string; fine: ReactNode;
+  plan: string; role: string; amt: string; cur: string; badge?: string; save?: string; saveClass?: string; featured?: boolean; fine: ReactNode;
 }[] = [
-  { plan: "Havi", amt: "$29.99", fine: <>$29.99 usd / hó<br />havi számlázás</> },
-  { plan: "Féléves", old: "$179.94 usd", amt: "$99.99", save: "Spórolj 80$", saveClass: "cyan", fine: <>$16.67 usd / hó<br />féléves számlázás</> },
-  { plan: "Éves", old: "$359.88 usd", amt: "$149.99", save: "Spórolj 210$", saveClass: "cyan", fine: <>$12.50 usd / hó<br />éves számlázás</> },
-  { plan: "Örökös", amt: "$299.99", save: "Egyszer fizetsz, örökre a tiéd", saveClass: "coral", fine: <>$299.99 usd<br />egyszeri számlázás</> },
+  {
+    plan: "Heti", role: "week_intro",
+    amt: formatHuf(PRICES.week_intro.amountHuf),
+    cur: "első 7 nap",
+    fine: <>utána {formatHuf(PRICES.week_std.amountHuf)}/hét, automatikusan megújul —<br />bármikor lemondhatod</>,
+  },
+  {
+    plan: "Éves", role: "annual_std",
+    amt: formatHuf(perWeekHuf(PRICES.annual_std.amountHuf)),
+    cur: "/ hét",
+    badge: "Legnépszerűbb",
+    save: `Spórolj ${annualSavingsPct()}%`,
+    saveClass: "cyan",
+    featured: true,
+    fine: <>{formatHuf(PRICES.annual_std.amountHuf)}/év, évente számlázva —<br />automatikusan megújul</>,
+  },
+  {
+    plan: "Havi", role: "month_std",
+    amt: formatHuf(PRICES.month_std.amountHuf),
+    cur: "/ hó",
+    fine: <>havonta automatikusan megújul —<br />bármikor lemondhatod</>,
+  },
 ];
 
 const CTA_START = "/login"; // real conversion path (login → onboarding → app)
@@ -574,6 +600,9 @@ export default function LandingPage() {
                 <Link className="pill pill-dark" href={CTA_START}>Kezdd el a programot</Link>
                 <a className="hero-cta2" href="#youtube">Bemutató →</a>
               </div>
+              <div className="hero-price">
+                Az első heted <b>{formatHuf(PRICES.week_intro.amountHuf)}</b> — utána {formatHuf(PRICES.week_std.amountHuf)}/hét, bármikor lemondható
+              </div>
               <div className="hero-trust">10 év versenysport mögötte · 14 napos garancia</div>
             </div>
             <div className="hero-device">
@@ -641,7 +670,7 @@ export default function LandingPage() {
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M6 5h16v11h-8M4 20l8-9" /></svg>
                 </div>
                 <h3 className="h-thin" style={{ color: "#fff" }}>vidd a<br />nagy képernyőre</h3>
-                <p className="body" style={{ color: "oklch(1 0 0/.8)", maxWidth: 340 }}>Egy koppintás, és a követhető edzésed a TV-n vagy a laptopon fut — Chromecasttal és AirPlay-jel, zökkenőmentesen.</p>
+                <p className="body" style={{ color: "oklch(1 0 168/.8)", maxWidth: 340 }}>Egy koppintás, és a követhető edzésed a TV-n vagy a laptopon fut — Chromecasttal és AirPlay-jel, zökkenőmentesen.</p>
               </div>
               <div className="cast-phone">
                 <div className="cast-beam" />
@@ -769,6 +798,26 @@ export default function LandingPage() {
         </Rise>
       </div>
 
+      {/* PRICE ANCHOR — the value reframe, mid-narrative */}
+      <div className="band-navy sec price-anchor">
+        <Rise className="wrap seq">
+          <div className="eyebrow">A te árad</div>
+          <div className="pa-num">
+            <b>{formatHuf(perWeekHuf(PRICES.annual_std.amountHuf))}</b>
+            <span>/ hét</span>
+          </div>
+          <p className="cap-body pa-lead">
+            Ennyiért van veled Alexa minden reggel — éves tagsággal. Kevesebb, mint egy kávé, és sokkal tovább kitart.
+          </p>
+          <div className="pa-row">
+            <span>Az első heted <b>{formatHuf(PRICES.week_intro.amountHuf)}</b></span>
+            <span>Havonta <b>{formatHuf(PRICES.month_std.amountHuf)}</b></span>
+            <span>Bármikor lemondható</span>
+          </div>
+          <Link className="pill pill-sage" href="#elofizetes">Válaszd ki a csomagod →</Link>
+        </Rise>
+      </div>
+
       {/* RECIPES PANEL */}
       <FeaturePanel
         id="receptek"
@@ -841,17 +890,28 @@ export default function LandingPage() {
           </Rise>
           <Rise className="price-grid">
             {pricing.map((p, i) => (
-              <div key={i} className="price-card">
+              <Link
+                key={i}
+                href={`/subscribe?plan=${p.role}`}
+                className={`price-card ${p.featured ? "featured" : ""}`}
+                aria-label={`${p.plan} csomag kiválasztása`}
+              >
+                {p.badge && <div className="price-badge">{p.badge}</div>}
                 <div className="plan">{p.plan}</div>
                 <div className="rule" />
-                <div className="old">{p.old ?? " "}</div>
                 <div className="amt">{p.amt}</div>
-                <div className="cur">USD</div>
+                <div className="cur">{p.cur}</div>
                 <div className={`save ${p.saveClass ?? ""}`}>{p.save ?? " "}</div>
                 <div className="fine">{p.fine}</div>
-              </div>
+                <div className="price-pick">Ezt választom →</div>
+              </Link>
             ))}
           </Rise>
+          <div className="price-trust">
+            <span>14 napos garancia</span>
+            <span>Bármikor egy kattintással lemondható</span>
+            <span>Biztonságos fizetés · Stripe</span>
+          </div>
           <div className="price-foot">
             <Link className="pill pill-dark" href={CTA_START}>Kezdd el még ma</Link>
           </div>
