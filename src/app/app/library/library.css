@@ -14,13 +14,6 @@
 .lx .lib-search input:focus { box-shadow: inset 0 1px 0 oklch(1 0 168 / 0.8), 0 0 0 3px var(--accent-soft); }
 .lx .lib-search .clr { position: absolute; right: 12px; cursor: pointer; color: var(--ink-3);
   background: none; border: none; font-size: 17px; line-height: 1; display: flex; }
-.lx .lib-refine { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px;
-  cursor: pointer; font-size: 14px; font-weight: 700; color: var(--ink); border: 1px solid var(--line);
-  background: oklch(1 0 168 / 0.6); white-space: nowrap; }
-.lx .lib-refine:hover { background: oklch(1 0 168 / 0.85); }
-.lx .lib-refine.on { background: var(--ink); color: var(--surface); border-color: transparent; }
-.lx .lib-refine .cnt { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px;
-  padding: 0 5px; border-radius: 99px; background: var(--accent); color: white; font-size: 11px; font-weight: 700; }
 
 /* refine panel */
 .lx .lib-refinepanel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 22px;
@@ -47,10 +40,6 @@
 .lx .lib-spot h2 { margin-top: 11px; font-weight: 900; font-size: 40px; line-height: 0.98; letter-spacing: -0.025em; color: white; text-transform: uppercase; text-wrap: balance; }
 .lx .lib-spot p { margin-top: 12px; font-size: 14.5px; line-height: 1.5; color: oklch(1 0 168 / 0.88); text-wrap: pretty; }
 .lx .lib-spot .ctas { display: flex; align-items: center; gap: 11px; margin-top: 20px; }
-.lx .lib-spot .nhb-playw { display: inline-flex; align-items: center; gap: 9px; padding: 12px 22px; border-radius: 999px; border: none; cursor: pointer; font-size: 14.5px; font-weight: 800; color: oklch(0.2 0.02 168); background: oklch(1 0 168 / 0.96); }
-.lx .lib-spot .nhb-playw:hover { background: white; }
-.lx .lib-spot .nhb-info { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px; cursor: pointer; font-size: 13.5px; font-weight: 700; color: white; background: oklch(1 0 168 / 0.16); border: 1px solid oklch(1 0 168 / 0.28); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-.lx .lib-spot .nhb-info:hover { background: oklch(1 0 168 / 0.26); }
 .lx .lib-spot .count { position: absolute; right: 24px; bottom: 22px; z-index: 2; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: oklch(1 0 168 / 0.75); background: oklch(0 0 168 / 0.3); padding: 6px 12px; border-radius: 999px; }
 .lx .lib-spot-dots { display: flex; gap: 8px; margin-top: 18px; }
 .lx .lib-spot-dots button { width: 8px; height: 8px; border-radius: 99px; border: none; cursor: pointer; background: oklch(1 0 168 / 0.35); padding: 0; transition: all 0.2s ease; }
@@ -60,34 +49,84 @@
 
 /* results */
 .lx .lib-resmeta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
-.lx .lib-resmeta .linkish { background: none; border: none; color: var(--accent-ink); font-weight: 600; cursor: pointer; }
+.lx .lib-resmeta-count { font-size: 13.5px; color: var(--ink-2); font-weight: 600; }
+.lx .lib-resmeta-chips { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.lx .lib-resmeta .linkish { background: none; border: none; color: var(--ink-2); font-weight: 600; cursor: pointer; }
+.lx .lib-resmeta .linkish:hover { color: var(--ink); text-decoration: underline; }
+/* No-results header: NINCS TALÁLAT label, restated filters, then a hairline (ref V-empty) */
+.lx .lib-resmeta.is-empty { flex-direction: column; align-items: stretch; gap: 14px; border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 26px; }
+.lx .lib-resmeta-none { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+/* Restated active-filter pill — grayscale (charcoal fill), icon + value + ✕ */
+.lx .lib-fchip { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: #fff; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
+.lx .lib-fchip svg { flex: none; opacity: 0.9; }
+.lx .lib-fchip:hover { background: oklch(from var(--ink) calc(l - 0.05) c h); }
+.lx .lib-fchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 .lx .lib-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 @media (max-width: 920px) { .lx .lib-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 840px) { .lx .lib-grid { grid-template-columns: 1fr; } } /* mobile: one workout card per row */
 
-/* ── video card ── */
-.lx .lvcard { position: relative; }
-.lx .lvcard-art { position: relative; display: flex; width: 100%; aspect-ratio: 16/10; border-radius: 14px;
-  overflow: hidden; border: none; cursor: pointer; padding: 0; text-align: left;
-  box-shadow: 0 7px 20px -12px oklch(0.42 0.03 168 / 0.4); transition: transform 0.16s ease, box-shadow 0.16s ease; }
-.lx .lvcard-art:hover { transform: translateY(-3px); box-shadow: 0 16px 38px -14px oklch(0.45 0.05 168 / 0.45); }
-.lx .lvcard-art .ring { position: absolute; left: -12%; top: -44%; width: 56%; aspect-ratio: 1; border-radius: 50%;
-  border: 18px solid oklch(1 0 168 / 0.12); }
-.lx .lvcard-art .word { position: absolute; left: 12px; bottom: -0.2em; font-weight: 900; font-size: 40px;
-  letter-spacing: -0.04em; line-height: 0.8; color: oklch(1 0 168 / 0.16); white-space: nowrap; }
-.lx .lvcard-art::after { content: ""; position: absolute; inset: 0;
-  background: linear-gradient(to top, oklch(0.18 0.03 168 / 0.78) 0%, oklch(0.18 0.03 168 / 0.1) 45%, transparent 62%); }
-.lx .lvcard-dur { position: absolute; top: 9px; left: 10px; z-index: 2; font-family: var(--mono); font-size: 9.5px;
-  font-weight: 600; letter-spacing: 0.05em; color: oklch(1 0 168 / 0.92); background: oklch(0 0 168 / 0.22);
-  padding: 3px 8px; border-radius: 5px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-.lx .lvcard-play { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center;
-  color: var(--ink); opacity: 0; transition: opacity 0.16s ease; }
-.lx .lvcard-art:hover .lvcard-play { opacity: 1; }
-.lx .lvcard-play svg { width: 46px; height: 46px; padding: 13px; border-radius: 50%; background: oklch(1 0 168 / 0.92);
-  box-shadow: 0 6px 18px oklch(0.2 0.02 168 / 0.4); }
-.lx .lvcard-title { position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 2; font-weight: 800;
-  font-size: 13px; line-height: 1.15; color: white; text-shadow: 0 1px 8px oklch(0 0 168 / 0.4); text-wrap: balance; }
-.lx .lvcard-save { position: absolute; top: 8px; right: 8px; z-index: 3; width: 28px; height: 28px; border-radius: 50%;
-  border: 1px solid oklch(1 0 168 / 0.4); background: oklch(0.2 0.02 168 / 0.4); color: white; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.lx .lvcard-save:hover { background: oklch(0.2 0.02 168 / 0.7); }
-.lx .lvcard-save.on { background: var(--ok); border-color: var(--ok); }
+
+/* Universal empty / no-results state (00 §0.9) — dashed card, grayscale search-× icon */
+.lx .lib-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--sp-3); padding: 56px 24px; border: 1.5px dashed var(--line); border-radius: var(--r-lg); }
+.lx .lib-empty .ic { display: flex; align-items: center; justify-content: center; color: var(--ink); }
+.lx .lib-empty .t { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.lx .lib-empty .s { font-size: 14px; color: var(--ink-2); max-width: 44ch; line-height: 1.5; }
+.lx .lib-empty .s b { color: var(--ink); }
+.lx .lib-empty .acts { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; margin-top: var(--sp-2); }
+
+/* Category tiles + banner (§20.3) — the browse element that navigates, not plays */
+.lx .lib-cats { display: flex; flex-direction: column; gap: 14px; }
+.lx .lib-cats-h { font-size: 16px; font-weight: 800; letter-spacing: -0.015em; }
+.lx .lib-cattiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 1080px) { .lx .lib-cattiles { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .lx .lib-cattiles { grid-template-columns: 1fr 1fr; } }
+.lx .lib-cattile { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 16px 16px 16px 20px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface); text-align: left; cursor: pointer; overflow: hidden; transition: border-color 0.14s ease, background 0.14s ease; }
+.lx .lib-cattile .band { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--cat); }
+.lx .lib-cattile .nm { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; color: var(--ink); }
+.lx .lib-cattile .cnt { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.lx .lib-cattile:hover { border-color: var(--cat); background: var(--surface-2); }
+.lx .lib-cattile:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.lx .lib-catbanner { position: relative; padding: 16px 18px 16px 22px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.lx .lib-catbanner::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--cat); }
+.lx .lib-crumb { display: inline-flex; align-items: center; gap: 5px; background: none; border: none; cursor: pointer; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--ink-3); padding: 0; }
+.lx .lib-crumb:hover { color: var(--accent-2); }
+.lx .lib-crumb:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; border-radius: 4px; }
+.lx .lib-catbanner h1 { font-size: 23px; font-weight: 800; letter-spacing: -0.02em; margin-top: 4px; }
+.lx .lib-catbanner .cnt { font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+
+/* Filter bar — visible dimension chips + dropdowns + sort (§20.2 C1) */
+.lx .lib-filterbar { display: flex; align-items: center; gap: 12px; }
+.lx .lib-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.lx .lib-chip-wrap { position: relative; }
+.lx .lib-chip { display: inline-flex; align-items: center; gap: 6px; height: var(--btn-s); padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; font-weight: 500; text-transform: uppercase;
+  color: var(--ink-2); white-space: nowrap; cursor: pointer; }
+.lx .lib-chip svg { color: var(--ink-3); flex: none; }
+.lx .lib-chip:hover { border-color: var(--ink-3); background: var(--surface-2); }
+.lx .lib-chip.on { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+.lx .lib-chip.on svg { color: var(--ink); }
+.lx .lib-chip:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+.lx .lib-chip-count { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--accent-2); color: #fff; font-size: 10.5px; font-weight: 700; }
+.lx .lib-chip-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; min-width: 200px; max-height: 320px; overflow-y: auto;
+  padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md);
+  box-shadow: 0 20px 50px -20px oklch(0.3 0.03 168 / 0.35); display: flex; flex-direction: column; animation: lxtbMenu 0.13s ease both; }
+.lx .lib-chip-menu.right { left: auto; right: 0; }
+.lx .lib-chip-opt { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; padding: 9px 10px; border: none; background: none; border-radius: 9px; cursor: pointer; font-size: 13.5px; color: var(--ink-2); }
+.lx .lib-chip-opt:hover { background: var(--surface-2); }
+.lx .lib-chip-opt.on { color: var(--accent-ink); font-weight: 700; }
+.lx .lib-chip-opt .box { width: 18px; height: 18px; flex-shrink: 0; border-radius: 6px; border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: center; color: #fff; }
+.lx .lib-chip-opt.on .box { background: var(--accent); border-color: var(--accent); }
+.lx .lib-chip-opt:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+/* mobile: chips scroll, never collapse (§20.5) */
+@media (max-width: 840px) {
+  /* Horizontally scrolling chip strip (§20.5 / reference V6) — first thing on the page,
+     never collapses, never requires vertical scrolling to reach. */
+  .lx .lib-filterbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 8px; -webkit-overflow-scrolling: touch; scroll-padding: 0 4px; }
+  .lx .lib-filterbar::-webkit-scrollbar { display: none; }
+  .lx .lib-chips { flex-wrap: nowrap; flex: none; gap: 8px; }
+  .lx .lib-chip-wrap { flex: 0 0 auto; }
+  .lx .lib-chip { flex: 0 0 auto; white-space: nowrap; }
+}

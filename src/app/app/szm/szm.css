@@ -8,10 +8,12 @@
 .lx .szm-page-pad { padding: 30px 36px 56px 28px; }
 
 /* white play button (also defined in library.css; needed standalone on this route) */
-.lx .nhb-playw { display: inline-flex; align-items: center; gap: 9px; padding: 12px 24px; border-radius: 999px;
-  border: none; cursor: pointer; font-size: 14.5px; font-weight: 800; color: oklch(0.22 0.03 168);
-  background: oklch(1 0 168 / 0.96); box-shadow: 0 8px 24px -10px oklch(0 0 168 / 0.5); white-space: nowrap; }
+.lx .nhb-playw { display: inline-flex; align-items: center; justify-content: center; gap: var(--btn-gap); padding: 12px 24px; border-radius: var(--r-sm);
+  border: 1px solid #fff; cursor: pointer; font-size: 14.5px; font-weight: 800; color: oklch(0.22 0.03 168);
+  background: oklch(1 0 168 / 0.96); white-space: nowrap; }
 .lx .nhb-playw:hover { background: white; }
+.lx .nhb-playw:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.lx .nhb-playw:active { transform: translateY(1px); }
 
 /* a közösségi tartalom aláírás-jegye — bárhol használható kis bélyeg */
 .lx .szm-mark { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono);
@@ -294,7 +296,9 @@
   background: oklch(0.2 0.02 168 / 0.5); border: 1px solid oklch(1 0 168 / 0.28); color: white; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background 0.15s ease, transform 0.12s ease; }
-.lx .szm-pl-fs:hover { background: oklch(0.2 0.02 168 / 0.72); transform: translateY(-1px); }
+.lx .szm-pl-fs:hover { background: oklch(0.2 0.02 168 / 0.72); }
+.lx .szm-pl-fs:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.lx .szm-pl-fs:active { transform: translateY(1px); }
 .lx .szm-pl-portrait:fullscreen { height: 100vh; width: 100vw; max-width: 100vw; aspect-ratio: auto; border-radius: 0; background: #000; }
 .lx .szm-pl-portrait:fullscreen .szm-pl-fs { bottom: 24px; right: 24px; }
 /* CSS-alapú teljes képernyő (sandbox-biztos fallback) */

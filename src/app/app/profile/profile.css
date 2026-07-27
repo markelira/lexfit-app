@@ -56,8 +56,10 @@
 .lx .prof-plan .pd { min-width: 0; flex: 1; }
 .lx .prof-plan .pn { font-size: 17px; font-weight: 800; }
 .lx .prof-plan .pm { font-size: 13px; color: oklch(1 0 168 / 0.7); margin-top: 3px; }
-.lx .prof-plan .pbtn { padding: 11px 20px; border-radius: 999px; border: 1px solid oklch(1 0 168 / 0.35); background: oklch(1 0 168 / 0.12); color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.lx .prof-plan .pbtn { padding: 11px 20px; border-radius: var(--r-sm); border: 1px solid oklch(1 0 168 / 0.35); background: oklch(1 0 168 / 0.12); color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .lx .prof-plan .pbtn:hover { background: oklch(1 0 168 / 0.22); }
+.lx .prof-plan .pbtn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.lx .prof-plan .pbtn:active { transform: translateY(1px); }
 
 .lx .prof-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .lx .prof-actions button { display: inline-flex; align-items: center; gap: 9px; padding: 12px 20px; border-radius: 12px; border: 1px solid var(--line); background: oklch(1 0 168 / 0.6); color: var(--ink-2); font-size: 13.5px; font-weight: 700; cursor: pointer; }

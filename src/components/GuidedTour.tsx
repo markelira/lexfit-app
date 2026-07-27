@@ -250,7 +250,6 @@ function GuidedTour({ onClose, steps = GT_STEPS }: { onClose: (completed: boolea
 /** First-run gate + replay "?" pill. Drop once into the Foundation page. */
 export function GuideController({ autoStart = true, steps = GT_STEPS }: { autoStart?: boolean; steps?: Step[] }) {
   const [phase, setPhase] = useState<null | "welcome" | "tour">(null);
-  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     if (!autoStart) return;
@@ -282,16 +281,6 @@ export function GuideController({ autoStart = true, steps = GT_STEPS }: { autoSt
     <>
       {phase === "welcome" && <WelcomeCarousel onStartTour={() => setPhase("tour")} onSkip={finish} />}
       {phase === "tour" && <GuidedTour onClose={finish} steps={steps} />}
-      {!phase && !dismissed && (
-        <div className="greplay">
-          <button className="grep-main" onClick={() => setPhase("welcome")} title="Hogyan működik?">
-            <span className="q">?</span> Hogyan működik?
-          </button>
-          <button className="grep-x" onClick={() => setDismissed(true)} title="Elrejtés" aria-label="Elrejtés">
-            ✕
-          </button>
-        </div>
-      )}
     </>
   );
 }

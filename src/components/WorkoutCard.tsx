@@ -1,0 +1,138 @@
+"use client";
+
+import { LxIcon } from "@/components/LxIcon";
+import { lxPaths } from "@/lib/icons";
+import { Cover } from "@/components/Cover";
+import { benefitOf } from "@/lib/benefit";
+
+export interface WorkoutCardVideo {
+  code: string;
+  title: string;
+  theme: string;
+  mins: number;
+  format?: string;
+  types?: string[];
+  level?: number;
+  focus?: string[];
+  subtitle?: string | null;
+  thumb?: string | null;
+  muxDuration?: number | null;
+}
+
+// Today's date as YYYY-MM-DD (local) — for the "ma" vs dated completion label.
+const todayStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
+// The trainer avatar is always Alexa (README §4 #4).
+// eslint-disable-next-line @next/next/no-img-element
+const ALEXA_FACE = <img className="wc-ava-img" src="/alexa-av.jpg" alt="" />;
+
+/**
+ * Variant B card (README §4) — YouTube geometry, LEXFIT content.
+ * The whole card plays; the save "+" is an independent nested-safe control.
+ * Completed workouts are NOT dimmed — they gain a check + a timestamp line.
+ */
+export function WorkoutCard({
+  v,
+  isToday = false,
+  isProgram = false,
+  programWeek = null,
+  programWeeks = null,
+  resume,
+  completedAt = null,
+  completedTime = null,
+  saved,
+  onPlay,
+  onToggleSave,
+}: {
+  v: WorkoutCardVideo;
+  isToday?: boolean;
+  isProgram?: boolean;
+  programWeek?: number | null; // this workout's Foundation week (for the avatar ring)
+  programWeeks?: number | null; // total weeks in the programme
+  resume?: number; // 0–1 fraction, if in progress
+  completedAt?: string | null; // YYYY-MM-DD, if completed
+  completedTime?: string | null; // local HH:MM, if recorded
+  saved: boolean;
+  onPlay: (code: string) => void;
+  onToggleSave: (code: string) => void;
+}) {
+  const done = completedAt != null;
+  const frac = done ? 1 : resume;
+  const showBar = frac != null && frac > 0;
+
+  // Avatar ring encodes the user's Foundation week (§4 #4); plain outside the programme.
+  const ringPct =
+    isProgram && programWeek && programWeeks ? Math.round((Math.min(programWeek, programWeeks) / programWeeks) * 100) : null;
+
+  // state line — rendered ONLY when there is state to report (§4 #5)
+  let state: { text: string; done?: boolean } | null = null;
+  if (done) {
+    const when = completedAt ? (completedAt === todayStr() ? "ma" : completedAt) : "";
+    const stamp = [when, completedTime].filter(Boolean).join(" ");
+    state = { text: stamp ? `Megcsináltad · ${stamp}` : "Megcsináltad", done: true };
+  } else if (resume != null && resume > 0 && resume < 1) {
+    const left = Math.max(1, Math.ceil(v.mins * (1 - resume)));
+    state = { text: `${left} perc van hátra` };
+  }
+
+  return (
+    <div className="wc">
+      <div className="wc-thumb">
+        <Cover className="wc-cover-art" theme={v.theme} code={v.code} />
+        {isToday && <span className="wc-ribbon">MAI EDZÉSED</span>}
+        <span className="wc-play" aria-hidden="true">
+          <LxIcon d={lxPaths.play} size={16} fill />
+        </span>
+        <span className="wc-dur">{v.mins} PERC</span>
+        {showBar && (
+          <span className="wc-prog" role="progressbar" aria-valuenow={Math.round((frac ?? 0) * 100)} aria-valuemin={0} aria-valuemax={100}>
+            <i style={{ width: `${Math.round((frac ?? 0) * 100)}%` }} />
+          </span>
+        )}
+      </div>
+
+      <button className="wc-cover" onClick={() => onPlay(v.code)} aria-label={`${v.title} lejátszása`} />
+
+      <div className="wc-body">
+        {ringPct != null ? (
+          <span
+            className="wc-ava ring"
+            style={{ "--wp": ringPct } as React.CSSProperties}
+            aria-hidden="true"
+            title={`Foundation · ${programWeek}. hét`}
+          >
+            <span className="inner">{done ? <LxIcon d={lxPaths.check} size={14} sw={2.6} /> : ALEXA_FACE}</span>
+          </span>
+        ) : (
+          <span className={`wc-ava${done ? " on" : ""}`} aria-hidden="true">
+            {done ? <LxIcon d={lxPaths.check} size={15} sw={2.6} /> : ALEXA_FACE}
+          </span>
+        )}
+        <div className="wc-txt">
+          <div className="wc-name">{v.title}</div>
+          {state ? (
+            <div className={`wc-state${state.done ? " done" : ""}`}>{state.text}</div>
+          ) : (
+            <div className="wc-sub">{benefitOf(v)}</div>
+          )}
+        </div>
+        <button
+          className={`wc-save${saved ? " on" : ""}`}
+          aria-pressed={saved}
+          aria-label={saved ? "Eltávolítás a Listámról" : "Mentés a Listámra"}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleSave(v.code);
+          }}
+        >
+          <span className="dot">
+            {saved ? <LxIcon d={lxPaths.check} size={13} sw={2.6} /> : <LxIcon d={lxPaths.plus} size={14} sw={2.4} />}
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}

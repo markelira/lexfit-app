@@ -3,6 +3,8 @@
 @import "./lx-atoms.css";
 @import "./cards.css";
 @import "./course-cards.css";
+@import "./workout-card.css";
+@import "./mobile.css";
 
 * {
   box-sizing: border-box;

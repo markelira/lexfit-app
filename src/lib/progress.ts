@@ -21,8 +21,9 @@ export interface ProgressState {
   doneCount: number;
   streak: number;
   lastCompletedDate: string | null; // YYYY-MM-DD
-  completed: { code: string; at: unknown }[];
+  completed: { code: string; at: unknown; atTime?: string }[]; // atTime = local HH:MM
   resume: Record<string, number>; // code → seconds
+  resumeAt?: Record<string, number>; // code → epoch ms of last resume write (recency)
 }
 
 /** Create the progress doc on first join (idempotent). */
@@ -46,9 +47,14 @@ export async function getProgress(uid: string): Promise<ProgressState | null> {
   return snap.exists() ? (snap.data() as ProgressState) : null;
 }
 
-/** Persist the resume position (seconds) for a workout. */
+/** Persist the resume position (seconds) for a workout, plus a recency stamp so the
+ *  Kezdőlap "Folytatod" row can order most-recent-first. */
 export async function saveResume(uid: string, code: string, seconds: number): Promise<void> {
-  await setDoc(progressRef(uid), { resume: { [code]: Math.floor(seconds) } }, { merge: true });
+  await setDoc(
+    progressRef(uid),
+    { resume: { [code]: Math.floor(seconds) }, resumeAt: { [code]: Date.now() } },
+    { merge: true },
+  );
 }
 
 const ymd = (d: Date) =>
@@ -70,6 +76,7 @@ export async function markComplete(
 
   const today = new Date();
   const todayStr = ymd(today);
+  const atTime = `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
   const yesterdayStr = ymd(new Date(today.getTime() - 86400000));
 
   let streak = cur.streak ?? 0;
@@ -94,8 +101,9 @@ export async function markComplete(
       streak,
       lastCompletedDate: todayStr,
       currentIndex: Math.max(cur.currentIndex ?? 0, sessionOrder + 1),
-      completed: arrayUnion({ code, at: todayStr }),
+      completed: arrayUnion({ code, at: todayStr, atTime }),
       resume: { [code]: deleteField() },
+      resumeAt: { [code]: deleteField() },
     },
     { merge: true },
   );

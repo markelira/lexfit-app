@@ -1,14 +1,18 @@
 "use client";
 
 import "./library.css";
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
-import { NCard } from "@/components/NCard";
+import { WorkoutCard } from "@/components/WorkoutCard";
+import { Button } from "@/components/Button";
+import { BottomSheet } from "@/components/BottomSheet";
+import { MobileWorkoutSheet, type SheetVideo } from "@/components/MobileWorkoutSheet";
+import { useIsMobile } from "@/lib/useIsMobile";
 import { Rail } from "@/components/Rail";
-import { cardGrad } from "@/lib/categories";
+import { cardGrad, catOf } from "@/lib/categories";
 import { getMyList, setSaved } from "@/lib/mylist";
 import { getProgress } from "@/lib/progress";
 import {
@@ -41,6 +45,34 @@ const RAIL_FILTER: Record<string, SpotFilter> = {
   "15 perc, ami belefér": { kind: "short" },
 };
 
+// Only the two must-have filter dimensions live on the bar. Everything
+// rarer was cut — intensity/type/phase/format added noise without pulling weight.
+const CHIP_DIMS: { key: keyof ActiveFilters; label: string; icon?: string | string[] }[] = [
+  { key: "dur", label: "HOSSZ", icon: lxPaths.clock },
+  { key: "theme", label: "TESTRÉSZ" },
+];
+const CHIP_KEYS = ["dur", "theme"];
+// Leading icon for a restated active-filter pill, keyed by dimension.
+const CHIP_ICON: Partial<Record<keyof ActiveFilters, string | string[]>> = {
+  dur: lxPaths.clock,
+  level: lxPaths.flame,
+};
+
+// Dimensions that round-trip through the URL (§20.2 C2).
+const SYNC_DIMS: (keyof ActiveFilters)[] = ["phase", "theme", "dur", "level", "format", "type"];
+
+// Value equality for two filter sets — lets the URL-read effect bail out (return the
+// same reference) when nothing changed, so it can't loop against the URL-write effect.
+// (This Next version patches history.replaceState → useSearchParams updates, so an
+//  unguarded read effect would re-fire on every write and re-render forever.)
+function sameFilters(a: ActiveFilters, b: ActiveFilters): boolean {
+  for (const k of SYNC_DIMS) {
+    if (a[k].size !== b[k].size) return false;
+    for (const v of a[k]) if (!b[k].has(v)) return false;
+  }
+  return true;
+}
+
 export default function LibraryPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -49,8 +81,29 @@ export default function LibraryPage() {
   const [myList, setMyList] = useState<Set<string>>(new Set());
   const [active, setActive] = useState<ActiveFilters>(emptyFilters);
   const [q, setQ] = useState("");
-  const [refine, setRefine] = useState(false);
   const [resumeMap, setResumeMap] = useState<Record<string, number>>({});
+  const isMobile = useIsMobile();
+  const [filterSheet, setFilterSheet] = useState(false);
+  const [draft, setDraft] = useState<ActiveFilters>(emptyFilters);
+  const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
+  const [openChip, setOpenChip] = useState<string | null>(null); // desktop chip dropdown
+
+  // Read the search + filter state from the URL (top-bar search / quick filters).
+  // Reactive so a shell search while already on the library updates the page.
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const nextQ = searchParams.get("q") ?? "";
+    setQ((prev) => (prev === nextQ ? prev : nextQ));
+    setActive((prev) => {
+      const next = emptyFilters();
+      SYNC_DIMS.forEach((g) => {
+        const val = searchParams.get(g);
+        if (val) next[g] = new Set(val.split(","));
+      });
+      // Return the SAME reference when unchanged → React bails, no re-render, no loop.
+      return sameFilters(prev, next) ? prev : next;
+    });
+  }, [searchParams]);
 
   useEffect(() => {
     loadLibrary().then(setData).catch(() => setFailed(true));
@@ -59,6 +112,36 @@ export default function LibraryPage() {
       getProgress(user.uid).then((p) => p && setResumeMap(p.resume ?? {})).catch(() => {});
     }
   }, [user]);
+
+  // Keep the URL meaningful — q + filter state (§20.2 C2). Linkable, analytics-legible.
+  // Skip the mount write so it can't wipe params we were opened with (e.g. ?q= from the
+  // shell search) before the read effect above has applied them.
+  const didMountWrite = useRef(false);
+  useEffect(() => {
+    if (!didMountWrite.current) { didMountWrite.current = true; return; }
+    const p = new URLSearchParams();
+    if (q.trim()) p.set("q", q.trim());
+    SYNC_DIMS.forEach((g) => {
+      if (active[g].size) p.set(g, [...active[g]].join(","));
+    });
+    const qs = p.toString();
+    window.history.replaceState(null, "", qs ? `/app/library?${qs}` : "/app/library");
+  }, [q, active]);
+
+  // Close a chip dropdown on outside-click / Escape.
+  useEffect(() => {
+    if (!openChip) return;
+    const onDown = (e: MouseEvent) => {
+      if (!(e.target as Element)?.closest?.(".lib-chip-wrap")) setOpenChip(null);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpenChip(null);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [openChip]);
 
   const toggle = (group: keyof ActiveFilters, opt: string) =>
     setActive((a) => {
@@ -111,16 +194,47 @@ export default function LibraryPage() {
   };
   const resumeOf = (v: LibVideo) =>
     resumeMap[v.code] != null ? Math.min(1, resumeMap[v.code] / ((v.muxDuration || v.mins * 60) || 1)) : undefined;
-  const card = (v: LibVideo, browse = false) => (
-    <NCard
+
+  // Mobile: card/row tap opens the detail sheet; desktop plays directly (§M4).
+  const openOrPlay = (code: string) => {
+    const v = data?.videos.find((x) => x.code === code);
+    if (isMobile && v) setSheetVideo(v as SheetVideo);
+    else router.push(`/player/${code}?autostart=1`);
+  };
+
+  // Filter bottom sheet — draft state, count updates live, applies on confirm (§1.5).
+  const cloneFilters = (f: ActiveFilters): ActiveFilters => ({
+    phase: new Set(f.phase), theme: new Set(f.theme), dur: new Set(f.dur),
+    level: new Set(f.level), format: new Set(f.format), type: new Set(f.type),
+  });
+  const openFilterSheet = () => { setDraft(cloneFilters(active)); setFilterSheet(true); };
+  const draftToggle = (group: keyof ActiveFilters, opt: string) =>
+    setDraft((d) => {
+      const next = { ...d, [group]: new Set(d[group]) };
+      next[group].has(opt) ? next[group].delete(opt) : next[group].add(opt);
+      return next;
+    });
+  const applyFilters = () => { setActive(draft); setFilterSheet(false); };
+
+  // Count results under a hypothetical filter set (for the sheet's live count and the
+  // no-results "which filter caused it" suggestion — §0.9).
+  const countWith = (f: ActiveFilters): number => {
+    if (!data) return 0;
+    let r = filterVideos(data.videos, f, data.filters);
+    const term = q.trim().toLowerCase();
+    if (term) r = r.filter((v) => `${v.title} ${v.code} ${v.theme} ${v.types.join(" ")}`.toLowerCase().includes(term));
+    return r.length;
+  };
+
+  const card = (v: LibVideo) => (
+    <WorkoutCard
       key={v.code}
       v={v}
+      isProgram={v.phase != null}
       resume={resumeOf(v)}
       saved={myList.has(v.code)}
-      onToggleSave={() => toggleSave(v.code)}
-      onPlay={(c) => router.push(`/player/${c}?autostart=1`)}
-      pool={data?.videos ?? []}
-      browse={browse}
+      onToggleSave={toggleSave}
+      onPlay={openOrPlay}
     />
   );
 
@@ -130,6 +244,13 @@ export default function LibraryPage() {
   const byTheme = (t: string) => data.videos.filter((v) => v.theme === t);
   const byType = (t: string) => data.videos.filter((v) => v.types.includes(t));
   const byPhase = (p: number | null) => data.videos.filter((v) => v.phase === p);
+
+  // Category tile → applies one theme filter and enters results mode (§20.3).
+  const selectCategory = (theme: string) => {
+    setActive((a) => ({ ...a, theme: new Set([theme]) }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const activeTheme = active.theme.size === 1 ? [...active.theme][0] : null;
   const resumed = data.videos.filter((v) => (resumeMap[v.code] ?? 0) > 0);
   const rails: { title: string; sub?: string; v: LibVideo[] }[] = [
     ...(resumed.length ? [{ title: "Folytatás", sub: "ott veszed fel, ahol abbahagytad", v: resumed }] : []),
@@ -149,68 +270,116 @@ export default function LibraryPage() {
     { title: "Haladóknak", sub: "🔥🔥🔥 ha készen állsz", v: data.videos.filter((x) => x.level === 3) },
   ];
 
+  // Visible filter chips (§20.2 C1) + the Szűrők overflow panel. Renders under the
+  // category tiles in browse mode, and at the top in results mode. Mobile: a
+  // horizontally scrolling strip that never collapses.
+  const filterControls = (
+    <>
+      <div className="lib-filterbar">
+        <div className="lib-chips">
+          {CHIP_DIMS.map(({ key, label, icon }) => {
+            const sel = [...active[key]];
+            const chipLabel = sel.length === 0 ? label : sel.length === 1 ? sel[0].toUpperCase() : `${sel[0].toUpperCase()} +${sel.length - 1}`;
+            return (
+              <div className="lib-chip-wrap" key={key}>
+                <button
+                  type="button"
+                  className={`lib-chip${sel.length ? " on" : ""}`}
+                  aria-expanded={openChip === key}
+                  onClick={() => (isMobile ? openFilterSheet() : setOpenChip((o) => (o === key ? null : key)))}
+                >
+                  {icon && <LxIcon d={icon} size={12} />}
+                  {chipLabel} <LxIcon d={lxPaths.chevronDown} size={12} />
+                </button>
+                {openChip === key && !isMobile && data.filters[key] && (
+                  <div className="lib-chip-menu" role="menu">
+                    {data.filters[key].options.map((o) => {
+                      const on = active[key].has(o);
+                      return (
+                        <button key={o} type="button" className={`lib-chip-opt${on ? " on" : ""}`} aria-pressed={on} onClick={() => toggle(key, o)}>
+                          <span className="box">{on && <LxIcon d={lxPaths.check} size={11} sw={3} />}</span>
+                          {o}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="lib-page fade-in">
-      <div className="lib-bar">
-        <div>
-          <div className="mono">{data.videos.length} VIDEÓ · F · B · R · T · N · M</div>
-          <h1>Videótár</h1>
-        </div>
-        <div className="lib-search">
-          <LxIcon d={lxPaths.search} size={16} />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Keresés cím, kód, kategória…" />
-          {searching && <button className="clr" onClick={() => setQ("")} aria-label="Törlés">×</button>}
-        </div>
-        <button className={`lib-refine${refine || activeCount ? " on" : ""}`} onClick={() => setRefine((r) => !r)}>
-          <LxIcon d={lxPaths.filter} size={15} /> Szűrők
-          {activeCount > 0 && <span className="cnt">{activeCount}</span>}
-        </button>
-      </div>
-
-      {refine && (
-        <div className="lib-refinepanel">
-          {Object.entries(data.filters)
-            .sort((a, b) => a[1].order - b[1].order)
-            .map(([key, g]) => (
-              <div key={key}>
-                <div className="frail-hd">{g.label.toUpperCase()}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  {g.options.map((o) => {
-                    const on = active[key as keyof ActiveFilters].has(o);
-                    return (
-                      <button key={o} className={`frail-opt${on ? " on" : ""}`} onClick={() => toggle(key as keyof ActiveFilters, o)}>
-                        <span className="box">{on && <LxIcon d={lxPaths.check} size={11} sw={3} />}</span>
-                        {o}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
-
       {resultsMode ? (
         <>
-          <div className="lib-resmeta">
-            <span style={{ fontSize: 13.5, color: "var(--ink-2)", fontWeight: 600 }}>{results.length} találat</span>
-            {Object.entries(active).flatMap(([k, s]) =>
-              [...s].map((o) => (
-                <button key={k + o} className="chip on" style={{ fontSize: 12.5, padding: "5px 11px" }} onClick={() => toggle(k as keyof ActiveFilters, o)}>
-                  {o} ✕
-                </button>
-              )),
+          {filterControls}
+          {activeTheme && (
+            <div className="lib-catbanner" style={{ "--cat": catOf(activeTheme).c } as React.CSSProperties}>
+              <button type="button" className="lib-crumb" onClick={clearAll}>
+                <LxIcon d={lxPaths.arrowR} size={14} style={{ transform: "rotate(180deg)" }} /> Videótár
+              </button>
+              <h1>{activeTheme}</h1>
+              <span className="cnt">{results.length} edzés</span>
+            </div>
+          )}
+          <div className={`lib-resmeta${results.length === 0 ? " is-empty" : ""}`}>
+            {results.length === 0 ? (
+              <span className="lib-resmeta-none">Nincs találat</span>
+            ) : (
+              <span className="lib-resmeta-count">{results.length} találat</span>
             )}
-            <button className="linkish" style={{ fontSize: 12.5 }} onClick={clearAll}>Törlés mind</button>
+            <div className="lib-resmeta-chips">
+              {Object.entries(active).flatMap(([k, s]) =>
+                [...s].map((o) => (
+                  <button key={k + o} type="button" className="lib-fchip" onClick={() => toggle(k as keyof ActiveFilters, o)}>
+                    {CHIP_ICON[k as keyof ActiveFilters] && <LxIcon d={CHIP_ICON[k as keyof ActiveFilters]!} size={12} />}
+                    {o.toUpperCase()}
+                    <LxIcon d={lxPaths.close} size={11} sw={2.4} />
+                  </button>
+                )),
+              )}
+              <button className="linkish" style={{ fontSize: 12.5 }} onClick={clearAll}>Törlés mind</button>
+            </div>
           </div>
           {results.length === 0 ? (
-            <div className="card" style={{ padding: "48px 40px", textAlign: "center" }}>
-              <p style={{ fontSize: 16, fontWeight: 700 }}>Ilyen kombináció még nincs.</p>
-              <p style={{ fontSize: 14, color: "var(--ink-2)", marginTop: 8 }}>Vegyél ki egy szűrőt.</p>
-              <button className="btn ghost" style={{ marginTop: 18 }} onClick={clearAll}>Szűrők törlése</button>
-            </div>
+            (() => {
+              const opts = (Object.entries(active) as [keyof ActiveFilters, Set<string>][]).flatMap(([g, s]) =>
+                [...s].map((opt) => ({ g, opt })),
+              );
+              let best: { g: keyof ActiveFilters; opt: string; n: number } | null = null;
+              for (const { g, opt } of opts) {
+                const trial = { ...active, [g]: new Set([...active[g]].filter((o) => o !== opt)) } as ActiveFilters;
+                const n = countWith(trial);
+                if (n > 0 && (!best || n > best.n)) best = { g, opt, n };
+              }
+              return (
+                <div className="lib-empty">
+                  <span className="ic" aria-hidden="true"><LxIcon d={lxPaths.searchX} size={34} sw={1.9} /></span>
+                  {best ? (
+                    <>
+                      <p className="t">Ehhez a szűréshez még nincs edzés.</p>
+                      <p className="s">A „{best.opt}” szűrő nélkül {best.n} edzés van.</p>
+                      <div className="acts">
+                        <Button variant="primary" onClick={() => toggle(best!.g, best!.opt)}>A {best.n} edzés megnézése</Button>
+                        <Button variant="secondary" onClick={clearAll}>Összes szűrő törlése</Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="t">Nincs találat.</p>
+                      <p className="s">{q.trim() ? `A „${q.trim()}” kifejezésre nincs edzés.` : "Vegyél ki egy szűrőt."}</p>
+                      <div className="acts"><Button variant="secondary" onClick={clearAll}>Keresés törlése</Button></div>
+                    </>
+                  )}
+                </div>
+              );
+            })()
           ) : (
-            <div className="lib-grid">{results.map((v) => card(v, true))}</div>
+            <div className="lib-grid">{results.map((v) => card(v))}</div>
           )}
         </>
       ) : (
@@ -222,18 +391,82 @@ export default function LibraryPage() {
             onPlay={(c) => router.push(`/player/${c}?autostart=1`)}
             onBrowse={browseFrom}
           />
-          {rails.filter((r) => r.v.length > 0).map((r) => (
-            <Rail
-              key={r.title}
-              title={r.title}
-              sub={r.sub}
-              items={r.v}
-              renderItem={(v) => card(v, true)}
-              onAll={RAIL_FILTER[r.title] ? () => browseFrom(RAIL_FILTER[r.title]) : undefined}
-            />
-          ))}
+
+          {/* Kategóriák — the one browse element that navigates (applies a filter), not plays (§20.3) */}
+          <section className="lib-cats">
+            <h2 className="lib-cats-h">Kategóriák</h2>
+            <div className="lib-cattiles">
+              {["Alsótest", "Felsőtest", "Cardio + has", "Teljes test", "Mobility / nyújtás", "Tartás-fókusz"].map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className="lib-cattile"
+                  style={{ "--cat": catOf(t).c } as React.CSSProperties}
+                  onClick={() => selectCategory(t)}
+                >
+                  <span className="band" aria-hidden="true" />
+                  <span className="nm">{t}</span>
+                  <span className="cnt">{byTheme(t).length} edzés</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {filterControls}
+
+          {/* Row budget: at most three editorial rows (§20.2 C3). Rest reachable via tiles + chips. */}
+          {rails
+            .filter((r) => ["A te fázisod · 🔨 Építés", "15 perc, ami belefér", "Csendben is megy"].includes(r.title) && r.v.length > 0)
+            .map((r) => (
+              <Rail
+                key={r.title}
+                title={r.title}
+                sub={r.sub}
+                items={r.v}
+                renderItem={(v) => card(v)}
+                onAll={RAIL_FILTER[r.title] ? () => browseFrom(RAIL_FILTER[r.title]) : undefined}
+              />
+            ))}
         </>
       )}
+
+      {isMobile && (
+        <BottomSheet open={filterSheet} onClose={() => setFilterSheet(false)} ariaLabel="Szűrők">
+          <div className="bsheet-head">
+            <span className="rt">Szűrők</span>
+            <button type="button" className="bsheet-clear" onClick={() => setDraft(emptyFilters())}>Törlés mind</button>
+          </div>
+          {Object.entries(data.filters)
+            .filter(([key]) => CHIP_KEYS.includes(key))
+            .sort((a, b) => a[1].order - b[1].order)
+            .map(([key, g]) => (
+              <div className="bsheet-sec" key={key}>
+                <span className="lbl">{g.label}</span>
+                <div className="bsheet-chips">
+                  {g.options.map((o) => {
+                    const on = draft[key as keyof ActiveFilters].has(o);
+                    return (
+                      <button key={o} type="button" className={`chip${on ? " on" : ""}`} aria-pressed={on} onClick={() => draftToggle(key as keyof ActiveFilters, o)}>
+                        {o}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          <div className="bsheet-foot">
+            <Button size="l" variant="primary" fullWidth onClick={applyFilters}>{countWith(draft)} találat megnézése</Button>
+          </div>
+        </BottomSheet>
+      )}
+
+      <MobileWorkoutSheet
+        v={sheetVideo}
+        saved={sheetVideo ? myList.has(sheetVideo.code) : false}
+        onPlay={(c) => { setSheetVideo(null); router.push(`/player/${c}?autostart=1`); }}
+        onToggleSave={toggleSave}
+        onClose={() => setSheetVideo(null)}
+      />
     </div>
   );
 }
@@ -245,10 +478,8 @@ function LibSpotlight({
   count: (theme: string) => number; onPlay: (code: string) => void; onBrowse: (f: SpotFilter) => void;
 }) {
   const s = LIB_SPOTS[spot];
-  useEffect(() => {
-    const t = setInterval(() => setSpot((i) => (i + 1) % LIB_SPOTS.length), 7000);
-    return () => clearInterval(t);
-  }, [setSpot]);
+  // The spotlight does NOT auto-advance (§20.6) — carousels that move on their own
+  // lose the user's place. The dots stay; the user drives.
   return (
     <section className="lib-spot">
       <div className="art" style={{ background: cardGrad(s.theme) }}>
@@ -262,10 +493,8 @@ function LibSpotlight({
         <h2>{s.title}</h2>
         <p>{s.blurb}</p>
         <div className="ctas">
-          <button className="nhb-playw" onClick={() => onPlay(s.play)}>
-            <LxIcon d={lxPaths.play} size={18} fill /> Lejátszás
-          </button>
-          <button className="nhb-info" onClick={() => onBrowse(s.filter)}>Böngészd a válogatást</button>
+          <Button size="m" variant="primary" onDark iconLeft={lxPaths.play} onClick={() => onPlay(s.play)}>Lejátszás</Button>
+          <Button size="m" variant="secondary" onDark onClick={() => onBrowse(s.filter)}>Böngészd a válogatást</Button>
         </div>
         <div className="lib-spot-dots">
           {LIB_SPOTS.map((x, j) => (

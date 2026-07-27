@@ -469,6 +469,7 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+.lx .onb-skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* metrics + textarea */
 .lx .num-row {
@@ -738,19 +739,20 @@
 .lx .onb-primary {
   width: 100%;
   padding: 14px 20px;
-  border-radius: 13px;
-  border: none;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--accent-2);
   background: var(--accent-2);
   color: #fff;
   font-family: inherit;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: var(--shadow-card);
-  transition: transform 0.12s ease;
+  transition: background 0.15s ease;
 }
-.lx .onb-primary:hover { transform: translateY(-1px); }
-.lx .onb-primary[disabled] { opacity: 0.5; cursor: default; transform: none; }
+.lx .onb-primary:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
+.lx .onb-primary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lx .onb-primary:active { transform: translateY(1px); }
+.lx .onb-primary[disabled] { opacity: 0.42; cursor: default; }
 .lx .onb-switch {
   align-self: center;
   background: none;

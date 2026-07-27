@@ -1,0 +1,122 @@
+/* LEXFIT Kezdőlap — Variant B card, home rows, week strip. Scoped under .lx.
+   Palette from lexfit-tokens.css (Eukaliptusz green). */
+
+.lx .home { display: flex; flex-direction: column; gap: 30px; }
+.lx .home-rows { display: flex; flex-direction: column; gap: 28px; }
+
+/* ════════ Billboard additions (chassis reused from foundation.css) ════════ */
+.lx .hb-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.lx .hb-chip {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: oklch(1 0 168 / 0.14);
+  border: 1px solid oklch(1 0 168 / 0.26);
+  padding: 5px 10px;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ════════ Week strip (Apple-Fitness model — RULE 07) ════════ */
+.lx .wstrip {
+  display: grid;
+  grid-template-columns: auto repeat(7, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--wf-chrome);
+  border: 1px solid var(--wf-line);
+}
+.lx .wstrip-ring {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent) calc(var(--p, 0) * 1%), #e4e2de 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.lx .wstrip-ring::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--wf-chrome);
+}
+.lx .wstrip-ring b {
+  position: relative;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.lx .wstrip-day { text-align: center; min-width: 0; }
+.lx .wstrip-day .d { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.06em; color: var(--ink-3); }
+.lx .wstrip-day .dot {
+  height: 30px;
+  border-radius: 7px;
+  margin-top: 5px;
+  background: #ececec;
+  border: 1px solid var(--wf-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+}
+.lx .wstrip-day .dot svg { color: currentColor; }
+.lx .wstrip-day.done .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+.lx .wstrip-day.today .dot { border: 2px solid var(--accent-2); background: #fff; color: var(--accent-2); }
+.lx .wstrip-day.rest .dot { background: transparent; border-style: dashed; color: var(--ink-3); font-size: 12px; }
+.lx .wstrip-note { font-size: 12px; color: var(--ink-3); margin: 9px 2px 0; }
+@media (max-width: 840px) {
+  .lx .wstrip { padding: 12px; gap: 6px; }
+  .lx .wstrip-ring { width: 44px; height: 44px; }
+  .lx .wstrip-day .dot { height: 22px; } /* 11 §11.2 */
+}
+
+/* ════════ Home rows — 4-up, horizontally scrollable, 4th peeks (§3.3) ════════ */
+.lx .hrow-sec { min-width: 0; }
+.lx .hrow-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.lx .hrow-head h3 { font-size: 16px; font-weight: 800; letter-spacing: -0.015em; color: var(--ink); }
+.lx .hrow-head .all {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.lx .hrow-head .all:hover { color: var(--accent-2); }
+.lx .hrow-head .all svg { color: var(--ink-3); }
+.lx .hrow {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 5px 5px 8px;
+  scroll-padding: 5px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.lx .hrow::-webkit-scrollbar { display: none; }
+.lx .hrow > .wc { flex: 0 0 clamp(220px, 26.5%, 288px); scroll-snap-align: start; }
+@media (max-width: 1080px) { .lx .hrow > .wc { flex-basis: clamp(210px, 31%, 300px); } }
+@media (max-width: 840px) { .lx .hrow > .wc { flex-basis: 72%; } }
+
+/* Variant B card styles live in src/app/workout-card.css (global — the card is now
+   the app-wide default, used by Kezdőlap, programme detail and Videótár). */
+
+@media (prefers-reduced-motion: reduce) {
+  .lx .home.fade-in { animation: none; }
+}

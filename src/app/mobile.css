@@ -1,0 +1,83 @@
+/* LEXFIT mobile atoms — bottom sheet + card detail sheet + filter-sheet chips.
+   Global, scoped under .lx. Values from 00-FOUNDATIONS.md. */
+
+/* ── Bottom sheet (01 §1.5) ── */
+.lx.bsheet-root { position: fixed; inset: 0; z-index: 60; }
+.lx .bsheet-scrim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: var(--tabbar-h);
+  background: oklch(0.2 0.02 168 / 0.34);
+  animation: bsheetFade var(--dur-base) var(--ease);
+}
+.lx .bsheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--tabbar-h);
+  max-height: calc(90vh - var(--tabbar-h));
+  overflow-y: auto;
+  background: var(--surface);
+  border-top-left-radius: var(--r-lg);
+  border-top-right-radius: var(--r-lg);
+  padding: 10px var(--sp-4) var(--sp-5);
+  box-shadow: 0 -8px 32px -12px oklch(0.2 0.05 168 / 0.4);
+  animation: bsheetUp var(--dur-base) var(--ease);
+}
+.lx .bsheet-grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin: 2px auto 12px; }
+@keyframes bsheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes bsheetFade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .lx .bsheet { animation: bsheetFade var(--dur-fast) var(--ease); }
+  .lx .bsheet-scrim { animation-duration: var(--dur-fast); }
+}
+
+/* Sheet section header + option chips (filter sheet, detail sheet) */
+.lx .bsheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-1); }
+.lx .bsheet-head .rt { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.lx .bsheet-sec { margin-top: var(--sp-4); }
+.lx .bsheet-sec > .lbl {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: var(--sp-2);
+}
+.lx .bsheet-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.lx .bsheet-foot { margin-top: var(--sp-5); }
+
+
+/* ── Mobile card detail sheet (§M4) ── */
+.lx .mws-art { position: relative; aspect-ratio: 16 / 9; border-radius: var(--r-md); overflow: hidden; display: flex; align-items: flex-end; }
+.lx .mws-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 42%, oklch(0.12 0.02 168 / 0.6) 100%); }
+.lx .mws-title { position: relative; z-index: 1; padding: 10px 12px; font-size: 16px; font-weight: 800; letter-spacing: -0.02em; color: #fff; text-shadow: 0 1px 8px oklch(0.12 0.02 168 / 0.6); }
+.lx .mws-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3); }
+.lx .mws-chip { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.03em; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); padding: 6px 10px; border-radius: 999px; }
+.lx .mws-chip svg { color: var(--ink-3); }
+.lx .mws-whisper { display: flex; gap: var(--sp-2); align-items: flex-start; margin-top: var(--sp-3); font-size: 12.5px; line-height: 1.4; color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--r-sm); padding: 10px 12px; }
+.lx .mws-whisper svg { color: var(--accent-2); flex: none; margin-top: 2px; }
+.lx .mws-blocks { display: flex; gap: 4px; }
+.lx .mws-block { flex: 1; text-align: center; font-family: var(--mono); font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 8px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lx .mws-block.main { background: var(--accent-soft); border-color: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
+.lx .mws-cta { display: flex; gap: var(--sp-2); align-items: stretch; }
+.lx .mws-cta > .lxbtn { flex: 1; }
+.lx .mws-save { flex: none; width: 52px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; color: var(--ink-2); cursor: pointer; }
+.lx .mws-save.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-2); }
+.lx .mws-save:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+/* filter-sheet chips — 44px tap floor, accent fill when selected (ink text per §0.2) */
+.lx .bsheet-chips .chip { min-height: 44px; }
+.lx .bsheet-chips .chip.on { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+.lx .bsheet-clear { background: none; border: none; cursor: pointer; font-family: var(--font); font-size: 12.5px; font-weight: 600; color: var(--accent-2); }
+.lx .bsheet-clear:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+/* results-meta chips scroll horizontally below 840px — they never collapse (§11.3) */
+@media (max-width: 840px) {
+  .lx .lib-resmeta { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .lx .lib-resmeta::-webkit-scrollbar { display: none; }
+}

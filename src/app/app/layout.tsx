@@ -1,63 +1,82 @@
 "use client";
 
 import "./shell.css";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
 import { useAuth } from "@/lib/auth-context";
+import { AppTopBar } from "@/components/AppTopBar";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
+import { getProgress } from "@/lib/progress";
 
+// Four labelled destinations (RULE 02). Icon + permanently visible label on every
+// item, at every breakpoint (F-10). Order matches the shell wireframe.
 const NAV: [string, keyof typeof lxPaths, string][] = [
-  ["/app", "flame", "Foundation"],
+  ["/app", "house", "Kezdőlap"],
   ["/app/library", "grid", "Videótár"],
   ["/app/progress", "chart", "Haladásom"],
-  ["/app/szm", "ballot", "Szavazz Magadra"],
+  ["/app/challenges", "trophy", "Kihívások"],
 ];
+
+const isActive = (href: string, pathname: string) =>
+  href === "/app" ? pathname === "/app" : pathname.startsWith(href);
 
 function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const initial = (user?.displayName?.[0] ?? "?").toUpperCase();
-  const name = user?.displayName?.split(" ")[0] ?? "te";
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    getProgress(user.uid).then((p) => setStreak(p?.streak ?? 0)).catch(() => {});
+  }, [user]);
 
   return (
-    <div className="lx lx-shell" style={{ minHeight: "100dvh", display: "flex", fontSize: 15 }}>
-      <div className="lx-ambient" aria-hidden="true" />
-      <aside className="lx-sidebar">
-        <div className="lx-brand">
-          <span className="mark">
-            <Image src="/lexfit-icon.png" alt="LEXFIT" width={35} height={32} priority />
-          </span>
-          <span className="wm">
-            LEX<span>FIT</span>
-          </span>
-        </div>
+    <div className="lx lx-shell">
+      <AppTopBar streak={streak} />
 
-        <div className="lx-navsec">Menü</div>
-        <nav className="lx-nav">
-          {NAV.map(([href, ic, label]) => (
-            <Link key={href} href={href} className={`nav2${pathname === href ? " on" : ""}`}>
-              <LxIcon d={lxPaths[ic]} size={19} /> {label}
-              {href === "/app/szm" && <span className="szm-newdot">MAI</span>}
+      <div className="lx-body">
+        <aside className="lx-sidebar">
+          <div className="lx-navsec">Menü</div>
+          <nav className="lx-nav">
+            {NAV.map(([href, ic, label]) => {
+              const on = isActive(href, pathname);
+              return (
+                <Link key={href} href={href} className={`nav2${on ? " on" : ""}`} aria-current={on ? "page" : undefined}>
+                  <LxIcon d={lxPaths[ic]} size={19} /> {label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <Link href="/app/szm" className="lx-help">
+            <span className="av">A</span>
+            <span className="pi">
+              <span className="nm">Alexa</span>
+              <span className="sb">segítség</span>
+            </span>
+          </Link>
+        </aside>
+
+        <main className="lx-main">
+          <div className="lx-main-in">{children}</div>
+        </main>
+      </div>
+
+      {/* Mobile bottom tab bar (< 840px) — labels kept, 44px targets (RULE 06 / F-07). */}
+      <nav className="lx-tabbar" aria-label="Fő navigáció">
+        {NAV.map(([href, ic, label]) => {
+          const on = isActive(href, pathname);
+          return (
+            <Link key={href} href={href} className={`lx-tab${on ? " on" : ""}`} aria-current={on ? "page" : undefined}>
+              <span className="ic"><LxIcon d={lxPaths[ic]} size={20} /></span>
+              {label}
             </Link>
-          ))}
-        </nav>
-
-        <Link href="/app/profile" className={`lx-prof${pathname === "/app/profile" ? " on" : ""}`}>
-          <span className="av">{initial}</span>
-          <span className="pi">
-            <span className="nm">{name}</span>
-            <span className="sb">Profil &amp; beállítások</span>
-          </span>
-          <LxIcon d={lxPaths.arrowR} size={17} className="chev" />
-        </Link>
-      </aside>
-
-      <main style={{ flex: 1, minWidth: 0, display: "flex", justifyContent: "center", position: "relative", zIndex: 1 }}>
-        <div style={{ width: "100%", maxWidth: 1208, padding: "30px 36px 48px 28px" }}>{children}</div>
-      </main>
+          );
+        })}
+      </nav>
     </div>
   );
 }

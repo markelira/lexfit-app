@@ -75,14 +75,21 @@
 .lxl .cap-body { font-size: 15px; line-height: 1.55; color: oklch(.235 .014 168/.7); text-align: center; max-width: 660px; margin: 14px auto 0; text-wrap: pretty; }
 
 /* ---- buttons ---- */
-.lxl .pill { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font); font-weight: 600; font-size: 13px; letter-spacing: .1em;
-  text-transform: uppercase; border-radius: 999px; cursor: pointer; padding: 15px 30px; border: none; transition: .22s; }
-.lxl .pill-dark { background: var(--ink); color: #fff; box-shadow: 0 12px 28px -14px oklch(0 0 168/.6); }
-.lxl .pill-dark:hover { transform: translateY(-2px); box-shadow: 0 18px 34px -14px oklch(0 0 168/.6); color: #fff; }
-.lxl .pill-outline { background: transparent; border: 1.4px solid currentColor; color: var(--ink); padding: 13px 28px; }
+/* Marketing CTAs, brought into the button system: flat, 8px radius, colour-only
+   hover, 1px press, focus ring — no pill/shadow/lift. Matches the app buttons. */
+.lxl .pill { display: inline-flex; align-items: center; justify-content: center; gap: var(--btn-gap);
+  font-family: var(--font); font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+  border-radius: var(--r-sm); cursor: pointer; padding: 15px 30px; border: 1px solid transparent; text-decoration: none;
+  transition: background .15s ease, color .15s ease, border-color .15s ease; }
+.lxl .pill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lxl .pill:active { transform: translateY(1px); }
+.lxl .pill-dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+.lxl .pill-dark:hover { background: oklch(from var(--ink) calc(l - 0.04) c h); color: #fff; }
+.lxl .pill-outline { background: transparent; border-color: var(--ink); color: var(--ink); padding: 14px 29px; }
 .lxl .pill-outline:hover { background: var(--ink); color: #fff; }
-.lxl .pill-sage { background: var(--sage); color: var(--ink); }
-.lxl .pill-sage:hover { filter: brightness(1.05); color: var(--ink); }
+.lxl .pill-sage { background: var(--sage); color: var(--ink); border-color: var(--sage); }
+.lxl .pill-sage:hover { filter: brightness(0.97); color: var(--ink); }
+.lxl .hero-cta2:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---- section band + panel ---- */
 .lxl .band-cream { background: var(--cream); }

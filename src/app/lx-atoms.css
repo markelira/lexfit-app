@@ -8,65 +8,144 @@
 }
 
 /* ── buttons (capsules) ── */
+/* Legacy .btn atom, re-pointed at the one button system: flat, 8px radius, focus
+   ring, colour-only hover, 1px press. Call-site sizes are preserved (padding-based)
+   so nothing resizes. New code should use <Button>; this keeps every existing call
+   site consolidated globally without touching each page. */
 .lx .btn {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  border: none;
-  border-radius: 999px;
+  justify-content: center;
+  gap: var(--btn-gap);
+  border: 1px solid var(--ink);
+  border-radius: var(--btn-r);
   padding: 13px 28px;
   font-size: 15px;
   font-weight: 700;
   font-family: var(--font);
+  line-height: 1;
   background: var(--ink);
   color: var(--surface);
   cursor: pointer;
 }
-.lx .btn:hover {
-  background: oklch(from var(--ink) calc(l + 0.08) c h);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-card);
-}
-.lx .btn:active {
-  transform: translateY(0);
-}
-.lx .btn.accent {
-  background: var(--accent-2);
-  color: white;
-  box-shadow: 0 8px 24px -8px oklch(0.500 0.046 168 / 0.55), inset 0 1px 0 oklch(1 0 168 / 0.25);
-}
-.lx .btn.accent:hover {
-  background: oklch(from var(--accent-2) calc(l - 0.05) c h);
-}
-.lx .btn[disabled] {
-  opacity: 0.45;
-  pointer-events: none;
-}
+.lx .btn svg { flex: none; }
+.lx .btn:hover { background: oklch(from var(--ink) calc(l - 0.04) c h); }
+.lx .btn:active:not([disabled]) { transform: translateY(1px); }
+.lx .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lx .btn[disabled] { opacity: 0.42; pointer-events: none; }
+/* primary — accent fill (holds contrast on light and dark surfaces) */
+.lx .btn.accent { background: var(--accent-2); color: #fff; border-color: var(--accent-2); box-shadow: none; }
+.lx .btn.accent:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
+/* ghost — text only */
 .lx .btn.ghost {
-  background: oklch(1 0 168 / 0.5);
-  border: 1px solid oklch(1 0 168 / 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: var(--ink-2);
+  background: none;
+  border-color: transparent;
+  color: var(--accent-2);
   font-weight: 600;
   font-size: 14px;
-  padding: 12px 20px;
-  box-shadow: inset 0 1px 0 oklch(1 0 168 / 0.8);
+  padding: 11px 18px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
-.lx .btn.ghost:hover {
-  background: oklch(1 0 168 / 0.8);
-  color: var(--ink);
-  transform: none;
+.lx .btn.ghost:hover { background: var(--accent-soft); color: var(--accent-2); }
+/* white CTA on dark surfaces (player) */
+.lx .btn.glass-cta { background: #fff; color: var(--ink); border-color: #fff; box-shadow: none; }
+.lx .btn.glass-cta:hover { background: oklch(0.94 0 0); }
+
+/* ── Button system — Button.tsx / IconButton (docs/design_handoff_buttons).
+   Three heights (S/M/L), flat, 8px radius, colour-only hover, 1px press, focus ring
+   on every variant. Heights promote to a 44px floor < 840px via the tokens. ── */
+.lx .lxbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+  height: var(--btn-m);
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--btn-r);
+  font-family: var(--font);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  cursor: pointer;
 }
-.lx .btn.glass-cta {
-  background: oklch(1 0 168 / 0.95);
-  color: var(--ink);
-  font-weight: 700;
-  box-shadow: 0 10px 36px -8px oklch(0 0 168 / 0.45), inset 0 1px 0 white;
+.lx .lxbtn svg { flex: none; }
+.lx .lxbtn.wide { width: 100%; }
+/* sizes — padding/type derived from the height */
+.lx .lxbtn.s { height: var(--btn-s); padding: 0 14px; font-size: 12.5px; }
+.lx .lxbtn.m { height: var(--btn-m); padding: 0 18px; font-size: 13.5px; }
+.lx .lxbtn.l { height: var(--btn-l); padding: 0 24px; font-size: 15px; font-weight: 700; }
+/* emphasis — light surface */
+.lx .lxbtn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+.lx .lxbtn.primary:hover { background: oklch(from var(--ink) calc(l - 0.04) c h); }
+.lx .lxbtn.secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.lx .lxbtn.secondary:hover { background: var(--surface-2); border-color: var(--ink-3); }
+.lx .lxbtn.ghost { background: none; color: var(--accent-2); border-color: transparent; }
+.lx .lxbtn.ghost:hover { background: var(--accent-soft); }
+.lx .lxbtn.destructive { background: none; color: var(--danger); border-color: transparent; }
+.lx .lxbtn.destructive:hover { background: var(--danger-soft); }
+.lx .lxbtn.destructive.solid { background: var(--danger); color: #fff; border-color: var(--danger); }
+.lx .lxbtn.destructive.solid:hover { background: oklch(from var(--danger) calc(l - 0.04) c h); }
+/* emphasis — on dark surfaces (hero, player): primary inverts so contrast holds */
+.lx .lxbtn.on-dark.primary { background: #fff; color: var(--ink); border-color: #fff; }
+.lx .lxbtn.on-dark.primary:hover { background: oklch(0.94 0 0); }
+.lx .lxbtn.on-dark.secondary { background: oklch(1 0 168 / 0.14); color: #fff; border-color: oklch(1 0 168 / 0.3); }
+.lx .lxbtn.on-dark.secondary:hover { background: oklch(1 0 168 / 0.24); }
+.lx .lxbtn.on-dark.ghost { color: #fff; border-color: transparent; }
+.lx .lxbtn.on-dark.ghost:hover { background: oklch(1 0 168 / 0.14); }
+/* states */
+.lx .lxbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lx .lxbtn.on-dark:focus-visible { outline-color: #fff; }
+.lx .lxbtn:active:not(:disabled) { transform: translateY(1px); }
+.lx .lxbtn:disabled, .lx .lxbtn[aria-disabled="true"] { opacity: 0.42; pointer-events: none; }
+/* loading — spinner replaces the icon slot; width does not change */
+.lx .lxbtn-spin {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: lxbtnspin 0.6s linear infinite;
 }
-.lx .btn.glass-cta:hover {
-  background: white;
-  transform: translateY(-1px);
+@keyframes lxbtnspin { to { transform: rotate(360deg); } }
+
+/* icon-only — circular (actions) / square (toolbars). Same ladder + states. */
+.lx .lxbtn-i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--btn-m);
+  height: var(--btn-m);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.lx .lxbtn-i.s { width: var(--btn-s); height: var(--btn-s); }
+.lx .lxbtn-i.l { width: var(--btn-l); height: var(--btn-l); }
+.lx .lxbtn-i.sq { border-radius: var(--r-sm); }
+.lx .lxbtn-i svg { flex: none; }
+.lx .lxbtn-i:hover { background: var(--surface-2); border-color: var(--ink-3); color: var(--ink); }
+.lx .lxbtn-i.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+.lx .lxbtn-i.primary:hover { background: oklch(from var(--ink) calc(l - 0.04) c h); }
+.lx .lxbtn-i.ghost { background: none; border-color: transparent; color: var(--accent-2); }
+.lx .lxbtn-i.ghost:hover { background: var(--accent-soft); }
+.lx .lxbtn-i.on-dark { background: oklch(1 0 168 / 0.14); border-color: oklch(1 0 168 / 0.3); color: #fff; }
+.lx .lxbtn-i.on-dark:hover { background: oklch(1 0 168 / 0.24); }
+.lx .lxbtn-i:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lx .lxbtn-i.on-dark:focus-visible { outline-color: #fff; }
+.lx .lxbtn-i:active:not(:disabled) { transform: translateY(1px); }
+.lx .lxbtn-i:disabled { opacity: 0.42; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lx .lxbtn-spin { animation: none; }
+  .lx .lxbtn:active, .lx .lxbtn-i:active { transform: none; }
 }
 
 /* glass surfaces */

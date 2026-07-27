@@ -396,10 +396,14 @@ function PlayerScreen({ code }: { code: string }) {
               <div className="szm-pl-pause fade-in">
                 <div className="lbl">SZÜNET</div>
                 <div className="big">Levegő.<br />Innen folytatjuk.</div>
-                <div className="ctx">{blocks[active]?.name}</div>
+                <div className="ctx">
+                  Most: {blocks[active]?.name}
+                  {nextBlock && <> · Következik: {nextBlock.name}</>}
+                </div>
                 <button className="btn glass-cta" style={{ marginTop: 6 }} onClick={togglePlay}>
                   ▶ Folytatás
                 </button>
+                <div className="pause-note">A kilépés nem törli a haladásod — bármikor folytathatod.</div>
               </div>
             )}
 

@@ -46,6 +46,11 @@ export interface Video {
   level: number;                // 1–3
   format: string;               // matches a filters/format option
   types: string[];              // matches filters/type options
+  // Benefit subhead (see src/lib/benefit.ts): `focus` = controlled outcome tags
+  // (editable filters/focus), `subtitle` = authored free-text override. Both optional;
+  // absent → the benefit is derived from theme + format/types.
+  focus?: string[];
+  subtitle?: string | null;
   blocks: VideoBlock[];         // exercise breakdown (often empty until authored)
   // Video source — attached via Mux (Phase 3). Library docs may be readable by
   // anyone authed; playback itself is gated by signed Mux URLs.
@@ -161,8 +166,9 @@ export interface Progress {
   currentIndex: number;      // session order of the active workout
   doneCount: number;
   streak: number;
-  completed: { code: string; at: unknown }[];
+  completed: { code: string; at: unknown; atTime?: string }[]; // atTime = local HH:MM
   resume: Record<string, number>;  // videoCode → seconds
+  resumeAt?: Record<string, number>; // videoCode → epoch ms of last resume (recency)
 }
 
 export interface ProgressPhoto {

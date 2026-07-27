@@ -1,34 +1,40 @@
 "use client";
 
 import "./foundation.css";
+import "./home.css";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { ensureProgress, getProgress } from "@/lib/progress";
+import { ensureProgress, getProgress, type ProgressState } from "@/lib/progress";
 import { getMyList, setSaved } from "@/lib/mylist";
 import { NcardModal } from "@/components/NcardModal";
-import { ProgramOverviewModal } from "@/components/ProgramOverviewModal";
-import { NCard } from "@/components/NCard";
-import { Rail } from "@/components/Rail";
+import { WorkoutCard } from "@/components/WorkoutCard";
+import { MobileWorkoutSheet, type SheetVideo } from "@/components/MobileWorkoutSheet";
+import { useIsMobile } from "@/lib/useIsMobile";
+import { Button } from "@/components/Button";
+import { LxIcon } from "@/components/LxIcon";
+import { lxPaths } from "@/lib/icons";
+import { levelWord } from "@/lib/categories";
 import { loadLibrary, type LibVideo } from "@/lib/library";
-import type { Video } from "@/lib/types";
 import { GuideController, GUIDE_START_EVENT } from "@/components/GuidedTour";
 import { JoinCinematic } from "@/components/JoinCinematic";
-import { loadFoundation, type FoundationData, type WorkoutItem } from "@/lib/program";
-import { CheckinWeek } from "@/components/CheckinWeek";
+import { loadFoundation, dayState, type FoundationData, type WorkoutItem } from "@/lib/program";
 import { confirmCheckout } from "@/lib/billing";
 
-export default function FoundationPage() {
+type AnyVideo = WorkoutItem | LibVideo;
+
+export default function KezdolapPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [data, setData] = useState<FoundationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [modalVideo, setModalVideo] = useState<WorkoutItem | null>(null);
-  const [overviewOpen, setOverviewOpen] = useState(false);
   const [myList, setMyList] = useState<Set<string>>(new Set());
-  const [resumeMap, setResumeMap] = useState<Record<string, number>>({});
+  const [progress, setProgress] = useState<ProgressState | null>(null);
   const [cineOpen, setCineOpen] = useState(false);
   const [libVideos, setLibVideos] = useState<LibVideo[]>([]);
+  const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
+  const isMobile = useIsMobile();
 
   const reload = useCallback(async () => {
     if (!user) return;
@@ -41,8 +47,7 @@ export default function FoundationPage() {
     }
   }, [user]);
 
-  // Success-page fulfillment: if we arrived from Checkout, confirm the session
-  // so access is instant (don't wait on the webhook), then clean the URL.
+  // Success-page fulfillment: confirm the Checkout session so access is instant.
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const sid = p.get("session_id");
@@ -59,7 +64,7 @@ export default function FoundationPage() {
     loadLibrary().then((d) => setLibVideos(d.videos)).catch(() => {});
     if (user) {
       getMyList(user.uid).then(setMyList).catch(() => {});
-      getProgress(user.uid).then((p) => p && setResumeMap(p.resume ?? {})).catch(() => {});
+      getProgress(user.uid).then(setProgress).catch(() => {});
     }
   }, [reload, user]);
 
@@ -78,10 +83,9 @@ export default function FoundationPage() {
     if (!user) return;
     await ensureProgress(user.uid);
     await reload();
+    getProgress(user.uid).then(setProgress).catch(() => {});
   }
 
-  // The join CTA plays the cinematic; on completion we do the real join and
-  // hand off to the guided "how it works" walkthrough.
   async function completeJoin() {
     setCineOpen(false);
     await join();
@@ -91,101 +95,107 @@ export default function FoundationPage() {
   if (loading) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
   if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>A Foundation program még nem érhető el.</p>;
 
-  const { program, weeks, joined, doneCount, currentIndex } = data;
-  const total = program.totalSessions;
+  const { program, weeks, joined, doneCount, currentIndex, todayCode } = data;
   const perWeek = program.perWeek || 5;
-  // Current week = how far the user has progressed by COMPLETED videos (a week = perWeek
-  // videos): ≤5 done → week 1, 6–10 → week 2, … capped at the program's week count.
-  const curWeek = joined ? Math.min(weeks.length || 1, Math.max(1, Math.ceil(doneCount / perWeek))) : 1;
-  const todayCode = data.todayCode;
+  // Current week per handout §5: which session you're ON, not how many you've finished.
+  const curWeek = joined ? Math.min(weeks.length || 1, Math.floor(currentIndex / perWeek) + 1) : 1;
+  const programWeeks = program.weeks ?? weeks.length;
+  const name = user?.displayName?.split(" ")[0] ?? "te";
   const play = (code: string | null) => code && router.push(`/player/${code}?autostart=1`);
 
-  const allWorkouts = weeks.flatMap((w) => w.workouts);
-  const name = user?.displayName?.split(" ")[0] ?? "te";
-  const heroPhaseIdx = weeks.find((w) => w.num === curWeek)?.phaseIdx ?? 0;
-  const heroPhase = program.phases[heroPhaseIdx];
-  // final re-measurement week, from the real session data (retest flag), else last week.
-  const retestWeek =
-    weeks.find((w) => w.retest === "final")?.num ??
-    [...weeks].reverse().find((w) => w.retest)?.num ??
-    weeks[weeks.length - 1]?.num ??
-    program.weeks ??
-    null;
-  const upcoming = (joined ? allWorkouts.filter((w) => w.order >= currentIndex) : weeks[0]?.workouts ?? []).slice(0, 8);
-  const pool = allWorkouts.map((w) => ({ ...w, phase: w.phaseIdx }));
-  const resumeFrac = (v: Video) =>
-    resumeMap[v.code] != null ? Math.min(1, resumeMap[v.code] / ((v.muxDuration || v.mins * 60) || 1)) : undefined;
-  const card = (v: WorkoutItem) => (
-    <NCard
-      key={v.code}
-      v={{ ...v, phase: v.phaseIdx }}
-      resume={resumeFrac(v)}
-      saved={myList.has(v.code)}
-      onToggleSave={() => toggleSave(v.code)}
-      onPlay={(c) => play(c)}
-      pool={pool}
-    />
-  );
-  const libCard = (v: LibVideo) => (
-    <NCard
-      key={v.code}
-      v={v}
-      resume={resumeFrac(v)}
-      saved={myList.has(v.code)}
-      onToggleSave={() => toggleSave(v.code)}
-      onPlay={(c) => play(c)}
-      pool={libVideos}
-    />
-  );
+  // lookup that spans both program workouts and the wider library
+  const videoByCode: Record<string, AnyVideo> = {};
+  libVideos.forEach((v) => (videoByCode[v.code] = v));
+  Object.values(data.byCode).forEach((v) => (videoByCode[v.code] = v));
 
-  // ── home rails (Concept 1 — Folytatás & polcok) ──
-  const curWeekWorkouts = weeks.find((w) => w.num === curWeek)?.workouts ?? [];
-  const byTheme = (t: string) => libVideos.filter((v) => v.theme === t);
-  const bonus = libVideos.filter((v) => v.kind === "bonus");
-  const quiet = libVideos.filter((v) => v.types.includes("🔇 Csendes"));
-  const quick = libVideos.filter((v) => v.mins <= 15 && v.kind === "workout");
-  const toLib = () => router.push("/app/library");
+  // On mobile, tapping a card opens the detail sheet (§M4); desktop plays directly.
+  const openOrPlay = (code: string) => {
+    if (isMobile && videoByCode[code]) setSheetVideo(videoByCode[code] as SheetVideo);
+    else play(code);
+  };
+
+  const resumeMap = progress?.resume ?? {};
+  const resumeAt = progress?.resumeAt ?? {};
+  const completedMap: Record<string, { at: string; atTime?: string }> = {};
+  (progress?.completed ?? []).forEach((c) => {
+    completedMap[c.code] = { at: typeof c.at === "string" ? c.at : "", atTime: c.atTime };
+  });
+
+  const resumeFrac = (v: AnyVideo) =>
+    resumeMap[v.code] != null
+      ? Math.min(1, resumeMap[v.code] / ((v.muxDuration || v.mins * 60) || 1))
+      : undefined;
+
+  const cardFor = (v: AnyVideo) => {
+    const item = data.byCode[v.code];
+    const comp = completedMap[v.code];
+    return (
+      <WorkoutCard
+        key={v.code}
+        v={v}
+        isToday={v.code === todayCode}
+        isProgram={!!item}
+        programWeek={item?.week ?? null}
+        programWeeks={programWeeks}
+        resume={resumeFrac(v)}
+        completedAt={comp ? comp.at : null}
+        completedTime={comp?.atTime ?? null}
+        saved={myList.has(v.code)}
+        onPlay={openOrPlay}
+        onToggleSave={toggleSave}
+      />
+    );
+  };
+
+  const todayVideo = todayCode ? (data.byCode[todayCode] as WorkoutItem | undefined) : undefined;
+
+  // ── rows (exact order — §3.3) ──
+  // 1 · Folytatod — in-progress resume entries, most recent first
+  const resumeCodes = Object.keys(resumeMap)
+    .filter((c) => resumeMap[c] > 0 && videoByCode[c])
+    .sort((a, b) => (resumeAt[b] ?? 0) - (resumeAt[a] ?? 0)); // most recent first (§3.3)
+  const rowResume = resumeCodes.map((c) => videoByCode[c]);
+
+  // 2 · A Foundation heted — current week's sessions
+  const rowWeek = joined ? weeks.find((w) => w.num === curWeek)?.workouts ?? [] : [];
+
+  // 3 · Listám
+  const rowList = [...myList].map((c) => videoByCode[c]).filter(Boolean) as AnyVideo[];
+
+  // 4 · Ha csak 15 perced van
+  const rowShort = libVideos.filter((v) => v.mins <= 15 && v.kind === "workout");
+
+  // 5 · Szavazz Magadra · a heti kihívás
+  const rowChallenge = libVideos.filter((v) => v.kind === "bonus");
 
   return (
-    <div className="pg fade-in">
+    <div className="home fade-in">
       <Billboard
         program={program}
         joined={joined}
         name={name}
         curWeek={curWeek}
-        phase={heroPhase}
-        phaseIdx={heroPhaseIdx}
-        doneCount={doneCount}
-        total={total}
-        retestWeek={retestWeek}
+        today={todayVideo}
         onPlayToday={() => play(todayCode)}
-        onOverview={() => setOverviewOpen(true)}
+        onSecondary={() => todayVideo && setModalVideo(todayVideo)}
         onJoin={() => setCineOpen(true)}
       />
 
-      <CheckinWeek />
+      <WeekStrip
+        workouts={weeks.find((w) => w.num === curWeek)?.workouts ?? weeks[0]?.workouts ?? []}
+        joined={joined}
+        doneCount={doneCount}
+        currentIndex={currentIndex}
+        perWeek={perWeek}
+        curWeek={curWeek}
+      />
 
-      <div className="pg-rails">
-        <Rail
-          title={joined ? "Folytatás" : "Az első heted"}
-          sub={joined ? "ott, ahol abbahagytad" : `${upcoming.length} edzés · 1. hét`}
-          items={upcoming}
-          renderItem={card}
-          onAll={() => setOverviewOpen(true)}
-        />
-        <Rail
-          title={`A ${curWeek}. heted`}
-          sub={heroPhase ? `${heroPhase.icon} ${heroPhase.name}` : undefined}
-          items={curWeekWorkouts}
-          renderItem={card}
-          onAll={() => setOverviewOpen(true)}
-        />
-        <Rail title="Kihívások & bónusz" sub="a programon túl" items={bonus} renderItem={libCard} onAll={toLib} />
-        <Rail title="Cardio + has" sub="pulzus fel" items={byTheme("Cardio + has")} renderItem={libCard} onAll={toLib} />
-        <Rail title="Erősödő alsótest" sub="comb · fenék" items={byTheme("Alsótest")} renderItem={libCard} onAll={toLib} />
-        <Rail title="Csendben is megy" sub="🔇 szomszéd-barát" items={quiet} renderItem={libCard} onAll={toLib} />
-        <Rail title="15 perc, ami belefér" sub="gyors rutinok" items={quick} renderItem={libCard} onAll={toLib} />
-        <Rail title="Mobility & nyújtás" sub="lazíts el" items={byTheme("Mobility / nyújtás")} renderItem={libCard} onAll={toLib} />
+      <div className="home-rows">
+        <HomeRow title="A Foundation heted" allLabel="Program" onAll={() => router.push("/app/program/foundation")} cards={rowWeek.map(cardFor)} />
+        <HomeRow title="Folytatod" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowResume.map(cardFor)} />
+        <HomeRow title="Listám" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowList.map(cardFor)} />
+        <HomeRow title="Ha csak 15 perced van" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowShort.map(cardFor)} />
+        <HomeRow title="Szavazz Magadra · a heti kihívás" allLabel="Kihívások" onAll={() => router.push("/app/challenges")} cards={rowChallenge.map(cardFor)} />
       </div>
 
       {modalVideo && (
@@ -198,61 +208,50 @@ export default function FoundationPage() {
           onPlay={(c) => play(c)}
         />
       )}
-      {overviewOpen && (
-        <ProgramOverviewModal
-          program={program}
-          weeks={weeks}
-          joined={joined}
-          doneCount={doneCount}
-          currentIndex={currentIndex}
-          curWeek={curWeek}
-          total={total}
-          myList={myList}
-          onToggleSave={toggleSave}
-          onPlay={(c) => { setOverviewOpen(false); play(c); }}
-          onClose={() => setOverviewOpen(false)}
-        />
-      )}
       {cineOpen && (
         <JoinCinematic
-          name={user?.displayName?.split(" ")[0] ?? "te"}
+          name={name}
           onJoin={completeJoin}
           onClose={() => setCineOpen(false)}
         />
       )}
+      <MobileWorkoutSheet
+        v={sheetVideo}
+        saved={sheetVideo ? myList.has(sheetVideo.code) : false}
+        onPlay={(c) => { setSheetVideo(null); play(c); }}
+        onToggleSave={toggleSave}
+        onClose={() => setSheetVideo(null)}
+      />
       <GuideController />
     </div>
   );
 }
 
-const HERO_TRAINER = "/trainer-underlayer.jpg";
-/** Foundation hero — "Az utad" Netflix billboard. Left-aligned F-stack: greeting,
- *  program pill + phase eyebrow, title, synopsis, phase-progress bar, and one dominant
- *  CTA (today's workout / join). State-aware via `joined`. */
+/* ════════ Billboard — today's workout (§3.1) ════════ */
 function Billboard({
-  program, joined, name, curWeek, phase, phaseIdx, doneCount, total, retestWeek,
-  onPlayToday, onOverview, onJoin,
+  program, joined, name, curWeek, today, onPlayToday, onSecondary, onJoin,
 }: {
   program: FoundationData["program"];
   joined: boolean;
   name: string;
   curWeek: number;
-  phase: FoundationData["program"]["phases"][number] | undefined;
-  phaseIdx: number;
-  doneCount: number;
-  total: number;
-  retestWeek: number | null;
+  today: WorkoutItem | undefined;
   onPlayToday: () => void;
-  onOverview: () => void;
+  onSecondary: () => void;
   onJoin: () => void;
 }) {
+  const equip = !program.equipment || /nincs/i.test(program.equipment) ? "ESZKÖZ NÉLKÜL" : program.equipment.toUpperCase();
+  const eyebrow = joined
+    ? `${program.title.toUpperCase()} · ${curWeek}. HÉT · MAI EDZÉS`
+    : "LEXFIT · 8 HETES PROGRAM";
+
   return (
     <section className="hb">
       <div
         className="hb-art"
         style={{ background: "linear-gradient(120deg, oklch(0.28 0.05 168) 0%, oklch(0.5 0.05 168) 58%, oklch(0.66 0.05 168) 100%)" }}
       />
-      <div className="hb-photo" style={{ backgroundImage: `url(${HERO_TRAINER})` }} aria-hidden="true" />
+      <div className="hb-photo" style={{ backgroundImage: "url(/trainer-underlayer.jpg)" }} aria-hidden="true" />
       <span className="hb-ring" aria-hidden="true" />
       <span className="hb-word" aria-hidden="true">{program.title.toUpperCase()}</span>
       <span className="hb-scrim" aria-hidden="true" />
@@ -263,46 +262,128 @@ function Billboard({
       </div>
 
       <div className="hb-content">
-        <span className="hb-lock">
-          <span className="mk">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6" /></svg>
-          </span>
-          <span className="nm">{program.title.toUpperCase()}</span>
-        </span>
-        <div className="hb-eyebrow">
-          {joined
-            ? `A PROGRAMOD · ${curWeek}. HÉT · ${phase?.icon ?? ""} ${(phase?.name ?? "").toUpperCase()} FÁZIS`
-            : "AZ ÚJ PROGRAMOD"}
-        </div>
-        <h1 className="hb-title">
-          {program.title}
-          <small>{program.hu}</small>
-        </h1>
-        <p className="hb-syn">{program.synopsis}</p>
-        {joined && (
+        <div className="hb-eyebrow">{eyebrow}</div>
+        {joined ? (
           <>
-            <div className="hb-phase" aria-hidden="true">
-              {program.phases.map((_, i) => (
-                <span key={i} className={`hb-seg${i < phaseIdx ? " done" : i === phaseIdx ? " now" : ""}`} />
-              ))}
+            <h1 className="hb-title">{today?.title ?? program.title}</h1>
+            {today && (
+              <div className="hb-chips">
+                <span className="hb-chip">{today.mins} PERC</span>
+                <span className="hb-chip">{levelWord(today.level).toUpperCase()}</span>
+                <span className="hb-chip">{equip}</span>
+              </div>
+            )}
+            <div className="hb-ctas">
+              <Button size="l" variant="primary" onDark iconLeft={lxPaths.play} data-tour="start" onClick={onPlayToday}>
+                Edzés indítása
+              </Button>
+              <Button size="l" variant="secondary" onDark onClick={onSecondary}>Mit fogok ma csinálni?</Button>
             </div>
-            <div className="hb-phaselbl">
-              <span>{doneCount} / {total} EDZÉS KÉSZ</span>
-              {retestWeek != null && <span>VISSZAMÉRÉS: {retestWeek}. HÉT</span>}
+          </>
+        ) : (
+          <>
+            <h1 className="hb-title">
+              {program.title}
+              <small>{program.hu}</small>
+            </h1>
+            <p className="hb-syn">{program.synopsis}</p>
+            <div className="hb-ctas">
+              <Button size="l" variant="primary" onDark iconLeft={lxPaths.play} data-tour="start" onClick={onJoin}>
+                Csatlakozz a programhoz
+              </Button>
+              <Button size="l" variant="secondary" onDark onClick={onSecondary}>Előzetes · 1. nap</Button>
             </div>
           </>
         )}
-        <div className="hb-ctas">
-          <button className="hb-play" data-tour="start" onClick={joined ? onPlayToday : onJoin}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z" /></svg>
-            {joined ? "Mai edzés indítása" : "Csatlakozz a programhoz"}
-          </button>
-          <button className="hb-info" onClick={onOverview}>
-            <span style={{ fontSize: 16 }}>ⓘ</span> Program áttekintése
-          </button>
-        </div>
       </div>
     </section>
   );
 }
 
+/* ════════ Week strip (§3.2) ════════ */
+const WEEK_DAYS: [string, string][] = [
+  ["H", "Hétfő"], ["K", "Kedd"], ["SZE", "Szerda"], ["CS", "Csütörtök"],
+  ["P", "Péntek"], ["SZO", "Szombat"], ["V", "Vasárnap"],
+];
+
+function WeekStrip({
+  workouts, joined, doneCount, currentIndex, perWeek, curWeek,
+}: {
+  workouts: WorkoutItem[];
+  joined: boolean;
+  doneCount: number;
+  currentIndex: number;
+  perWeek: number;
+  curWeek: number;
+}) {
+  if (!workouts.length) return null;
+
+  // map each scheduled session onto its weekday column
+  const byCol: Record<string, "done" | "today" | "todo" | "preview"> = {};
+  workouts.forEach((w) => {
+    const key = (w.day || "").toUpperCase();
+    if (key) byCol[key] = dayState(w.order, joined, doneCount, currentIndex);
+  });
+
+  const doneThisWeek = Math.min(perWeek, Math.max(0, doneCount - (curWeek - 1) * perWeek));
+  const ringPct = perWeek ? Math.round((doneThisWeek / perWeek) * 100) : 0;
+
+  const cls = (s?: string) =>
+    s === "done" ? "done" : s === "today" ? "today" : s == null ? "rest" : "todo";
+  const label = (s?: string) =>
+    s === "done" ? "kész" : s === "today" ? "mai nap · nincs kész" : s == null ? "pihenőnap" : "nincs kész";
+
+  return (
+    <div>
+      <div className="wstrip" role="group" aria-label={`A hét: ${doneThisWeek} / ${perWeek} kész`}>
+        <div
+          className="wstrip-ring"
+          style={{ "--p": ringPct } as React.CSSProperties}
+          role="progressbar"
+          aria-valuenow={doneThisWeek}
+          aria-valuemin={0}
+          aria-valuemax={perWeek}
+          aria-label={`Heti haladás: ${doneThisWeek} / ${perWeek} kész`}
+        >
+          <b>{doneThisWeek}/{perWeek}</b>
+        </div>
+        {WEEK_DAYS.map(([abbr, full]) => {
+          const s = byCol[abbr];
+          const c = cls(s);
+          return (
+            <div key={abbr} className={`wstrip-day ${c}`}>
+              <div className="d">{abbr}</div>
+              <div className="dot" role="img" aria-label={`${full} · ${label(s)}`}>
+                {c === "done" ? <LxIcon d={lxPaths.check} size={15} sw={2.6} /> : c === "rest" ? "☾" : ""}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p className="wstrip-note">A pihenőnap nem töri meg a sorozatot.</p>
+    </div>
+  );
+}
+
+/* ════════ Home row — heading + right link + horizontal scroll ════════ */
+function HomeRow({
+  title, allLabel, onAll, cards,
+}: {
+  title: string;
+  allLabel: string;
+  onAll: () => void;
+  cards: React.ReactNode[];
+}) {
+  if (!cards.length) return null;
+  return (
+    <section className="hrow-sec">
+      <div className="hrow-head">
+        <h3>{title}</h3>
+        <button className="all" onClick={onAll}>
+          {allLabel} <LxIcon d={lxPaths.arrowR} size={14} />
+        </button>
+      </div>
+      <div className="hrow">{cards}</div>
+    </section>
+  );
+}

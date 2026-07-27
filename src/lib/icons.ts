@@ -12,5 +12,15 @@ export const lxPaths: Record<string, string | string[]> = {
   play: "M7 4 L19 12 L7 20 Z",
   lock: ["M6 11 H18 V20 H6 Z", "M9 11 V8 a3 3 0 0 1 6 0 V11"],
   search: ["M11 18 a7 7 0 1 0 0-14 a7 7 0 0 0 0 14 Z", "M16 16 L21 21"],
+  // Magnifier with an × in the lens — the "no results" empty state (§20.2 C4).
+  searchX: ["M11 18 a7 7 0 1 0 0-14 a7 7 0 0 0 0 14 Z", "M16 16 L21 21", "M9 9 L13 13", "M13 9 L9 13"],
   filter: ["M4 5 H20", "M7 12 H17", "M10 19 H14"],
+  // ── Kezdőlap redesign additions (same 24×24 stroke style) ──
+  house: ["M4 11 L12 4 L20 11", "M6 10 V20 H18 V10"],
+  trophy: ["M7 4 H17 V9 a5 5 0 0 1-10 0 Z", "M7 6 H4 a3 3 0 0 0 3 3", "M17 6 H20 a3 3 0 0 1-3 3", "M12 14 V18", "M8 20 H16"],
+  user: ["M12 12 a4 4 0 1 0 0-8 a4 4 0 0 0 0 8 Z", "M4 20 c0-4 3.6-6 8-6 s8 2 8 6"],
+  close: ["M6 6 L18 18", "M18 6 L6 18"],
+  chevD: "M6 9 L12 15 L18 9",
+  chevronDown: "M6 9 L12 15 L18 9", // 00 §0.11 canonical name
+  moon: "M21 12.8 A9 9 0 1 1 11.2 3 A7 7 0 0 0 21 12.8 Z",
 };
