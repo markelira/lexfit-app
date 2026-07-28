@@ -1,70 +1,202 @@
-/* LEXFIT Profil — ported from screen-profile.css. Scoped under .lx. */
-.lx .prof { display: flex; flex-direction: column; gap: 26px; max-width: 1000px; }
-.lx .prof-htitle { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; }
-.lx .prof-htitle small { display: block; font-size: 14px; font-weight: 500; color: var(--ink-3); margin-top: 4px; }
+/* LEXFIT Profil & Beállítások — the settings grammar every phone ships with, in
+   plain Hungarian. Token-only: --r-sm|md|lg radii, --sp-* spacing, --danger for
+   destructive. Green (Eukaliptusz). No literal px radii. (30-PROFIL.md) */
 
-.lx .prof-hero { position: relative; display: flex; align-items: center; gap: 22px; border-radius: 24px; overflow: hidden; padding: 26px 28px; color: white; box-shadow: 0 16px 40px -18px oklch(0.45 0.05 168 / 0.45); background: linear-gradient(120deg, oklch(0.58 0.05 168) 0%, oklch(0.66 0.14 28) 100%); }
-.lx .prof-hero .ring { position: absolute; right: 8%; top: -120%; width: 26%; aspect-ratio: 1; border-radius: 50%; border: 26px solid oklch(1 0 168 / 0.12); pointer-events: none; }
-.lx .prof-ava { width: 84px; height: 84px; flex-shrink: 0; border-radius: 50%; background: oklch(1 0 168 / 0.18); border: 2px solid oklch(1 0 168 / 0.4); display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 900; backdrop-filter: blur(6px); }
-.lx .prof-id { position: relative; z-index: 1; min-width: 0; }
-.lx .prof-id h2 { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; }
-.lx .prof-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.lx .prof-chips .c { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: oklch(1 0 168 / 0.16); border: 1px solid oklch(1 0 168 / 0.26); backdrop-filter: blur(8px); white-space: nowrap; }
-.lx .prof-edit { margin-left: auto; align-self: flex-start; position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; border: 1px solid oklch(1 0 168 / 0.4); background: oklch(1 0 168 / 0.16); color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; backdrop-filter: blur(8px); white-space: nowrap; }
-.lx .prof-edit:hover { background: oklch(1 0 168 / 0.28); }
+/* ── Profil (the mirror) ──────────────────────────────────────────────────── */
+.pf { display: flex; flex-direction: column; gap: var(--sp-5); max-width: 880px; margin: 0 auto; }
 
-.lx .prof-sec { display: flex; align-items: baseline; gap: 11px; margin-bottom: 14px; }
-.lx .prof-sec h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
-.lx .prof-sec .sub { font-size: 13px; color: var(--ink-3); }
+/* load / error / empty */
+.pf-loading { font-family: var(--mono); color: var(--ink-3); margin-top: 40px; }
 
-.lx .prof-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-.lx .prof-card { position: relative; border-radius: 18px; padding: 17px 18px; background: oklch(1 0 168 / 0.72); border: 1px solid oklch(1 0 168 / 0.7); box-shadow: inset 0 1px 0 oklch(1 0 168 / 0.85); display: flex; gap: 14px; align-items: flex-start; }
-.lx .prof-card .ic { width: 44px; height: 44px; flex-shrink: 0; border-radius: 13px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; }
-.lx .prof-card .bd { min-width: 0; flex: 1; }
-.lx .prof-card .lab { font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
-.lx .prof-card .val { font-size: 16px; font-weight: 800; color: var(--ink); margin-top: 4px; letter-spacing: -0.01em; }
-.lx .prof-card .vs { font-size: 12.5px; color: var(--ink-2); margin-top: 3px; line-height: 1.45; text-wrap: pretty; }
-.lx .prof-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
-.lx .prof-tags span { font-size: 12.5px; font-weight: 600; color: var(--accent-ink); background: var(--accent-soft); padding: 5px 11px; border-radius: 999px; }
+/* skeletons — real shapes, no spinner, no layout shift (P9.1 / 00 §0.9) */
+.pf-skel { background: linear-gradient(90deg, var(--surface-2) 25%, var(--line) 37%, var(--surface-2) 63%); background-size: 400% 100%; animation: pf-shimmer 1.4s ease infinite; border-radius: var(--r-sm); }
+@keyframes pf-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+.pf-skel.ava { width: 76px; height: 76px; border-radius: 50%; flex: none; }
+.pf-skel.line { height: 13px; }
+.pf-skel.w40 { width: 40%; } .pf-skel.w60 { width: 60%; } .pf-skel.w30 { width: 30%; }
+.pf-skel.num { height: 26px; width: 44px; margin-bottom: 8px; }
+.pf-skel.strip { height: 34px; }
+.pf-skel-idcard { display: flex; align-items: center; gap: var(--sp-5); }
+.pf-skel-idcard .sk-lines { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.pf-skel-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.pf-fallback { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-4); margin-top: 40px; color: var(--ink-2); font-size: 14px; }
+.pf-empty-cta { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; background: var(--accent-soft); border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px 20px; font-size: 13px; color: var(--accent-ink); }
 
-.lx .prof-why { border-radius: 20px; padding: 24px 26px; color: white; position: relative; overflow: hidden; background: linear-gradient(125deg, oklch(0.3 0.03 168) 0%, oklch(0.42 0.12 10) 100%); box-shadow: 0 14px 36px -18px oklch(0.45 0.12 10 / 0.5); }
-.lx .prof-why .q { font-size: 60px; line-height: 0.6; font-weight: 900; color: oklch(1 0 168 / 0.28); font-family: Georgia, serif; }
-.lx .prof-why p { font-size: 19px; font-weight: 600; line-height: 1.5; letter-spacing: -0.01em; margin-top: 6px; text-wrap: pretty; }
-.lx .prof-why .src { font-size: 12.5px; color: oklch(1 0 168 / 0.7); margin-top: 14px; font-family: var(--mono); }
+.pf-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--sp-5); }
+.pf-card-ttl { display: flex; align-items: center; gap: var(--sp-2); font-size: 14px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: var(--sp-3); }
+.pf-card-ttl svg { color: var(--accent-ink); flex: none; }
 
-.lx .prof-base { display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: center; border-radius: 18px; padding: 20px 24px; background: oklch(1 0 168 / 0.72); border: 1px solid oklch(1 0 168 / 0.7); box-shadow: inset 0 1px 0 oklch(1 0 168 / 0.85); }
-.lx .prof-base .m .lab { font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
-.lx .prof-base .m .v { font-size: 30px; font-weight: 900; letter-spacing: -0.02em; }
-.lx .prof-base .note { font-size: 12.5px; color: var(--accent-ink); background: var(--accent-soft); padding: 10px 14px; border-radius: 12px; line-height: 1.45; max-width: 230px; text-wrap: pretty; }
+/* identity */
+.pf-identity { display: flex; align-items: center; gap: var(--sp-5); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px 22px; }
+.pf-identity .ava-wrap { position: relative; flex: none; }
+.pf-identity .ava { width: 76px; height: 76px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; color: var(--ink-2); background-size: cover; background-position: center; }
+.pf-identity .ava svg { color: var(--ink-3); }
+.pf-identity .ava-edit { position: absolute; right: -2px; bottom: -2px; width: 26px; height: 26px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--ink-2); cursor: pointer; }
+.pf-identity .ava-edit:hover { color: var(--ink); }
+.pf-identity .id-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pf-identity .id-top { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+.pf-identity .id-name { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
+.pf-identity .id-actions { margin-left: auto; display: flex; align-items: center; gap: var(--sp-3); }
+.pf-identity .id-streak { height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent-ink); font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+.pf-identity .id-streak svg { color: var(--accent-2); }
+.pf-identity .id-meta { font-size: 12.5px; color: var(--ink-2); }
 
-.lx .prof-set { border-radius: 18px; overflow: hidden; border: 1px solid oklch(1 0 168 / 0.7); background: oklch(1 0 168 / 0.66); box-shadow: inset 0 1px 0 oklch(1 0 168 / 0.85); }
-.lx .prof-row { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-top: 1px solid var(--line); }
-.lx .prof-row:first-child { border-top: none; }
-.lx .prof-row .rt { min-width: 0; flex: 1; }
-.lx .prof-row .rt b { font-size: 14.5px; font-weight: 700; }
-.lx .prof-row .rt span { display: block; font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
-.lx .prof-seg { display: inline-flex; gap: 4px; background: var(--surface-2); border-radius: 999px; padding: 4px; }
-.lx .prof-seg button { border: none; background: none; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-2); padding: 7px 15px; border-radius: 999px; white-space: nowrap; }
-.lx .prof-seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 2px 8px -3px oklch(0.42 0.03 168 / 0.3); }
-.lx .prof-sw { width: 44px; height: 25px; border-radius: 99px; background: var(--surface-2); position: relative; cursor: pointer; border: 1px solid var(--line); transition: background 0.15s ease; flex-shrink: 0; }
-.lx .prof-sw.on { background: var(--accent); border-color: var(--accent); }
-.lx .prof-sw i { position: absolute; top: 2px; left: 2px; width: 19px; height: 19px; border-radius: 50%; background: #fff; transition: transform 0.16s ease; box-shadow: 0 1px 3px oklch(0.3 0.014 168 / 0.3); }
-.lx .prof-sw.on i { transform: translateX(19px); }
+/* three numbers */
+.pf-stattrio { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
+.pf-stattrio .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 15px 17px; }
+.pf-stattrio .n { font-size: 25px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pf-stattrio .k { font-size: 11px; color: var(--ink-3); margin-top: 5px; }
 
-.lx .prof-plan { display: flex; align-items: center; gap: 18px; border-radius: 20px; padding: 22px 26px; color: white; background: linear-gradient(120deg, oklch(0.26 0.03 168), oklch(0.34 0.05 168)); box-shadow: 0 14px 36px -18px oklch(0.2 0.04 168 / 0.6); }
-.lx .prof-plan .crown { width: 50px; height: 50px; border-radius: 14px; flex-shrink: 0; background: var(--grad-hero); display: flex; align-items: center; justify-content: center; font-size: 24px; }
-.lx .prof-plan .pd { min-width: 0; flex: 1; }
-.lx .prof-plan .pn { font-size: 17px; font-weight: 800; }
-.lx .prof-plan .pm { font-size: 13px; color: oklch(1 0 168 / 0.7); margin-top: 3px; }
-.lx .prof-plan .pbtn { padding: 11px 20px; border-radius: var(--r-sm); border: 1px solid oklch(1 0 168 / 0.35); background: oklch(1 0 168 / 0.12); color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-.lx .prof-plan .pbtn:hover { background: oklch(1 0 168 / 0.22); }
-.lx .prof-plan .pbtn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-.lx .prof-plan .pbtn:active { transform: translateY(1px); }
+/* week strip */
+.pf-weekstrip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.pf-weekstrip .col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pf-weekstrip .dl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.03em; color: var(--ink-3); }
+.pf-weekstrip .cell { width: 100%; height: 34px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--surface-2); display: flex; align-items: center; justify-content: center; color: var(--ink-3); }
+.pf-weekstrip .cell.done { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
+.pf-weekstrip .cell.today { background: var(--surface); border: 2px solid var(--ink); color: var(--ink); }
+.pf-week-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-top: var(--sp-3); }
+.pf-week-foot .sum { font-size: 12.5px; color: var(--ink-2); }
 
-.lx .prof-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.lx .prof-actions button { display: inline-flex; align-items: center; gap: 9px; padding: 12px 20px; border-radius: 12px; border: 1px solid var(--line); background: oklch(1 0 168 / 0.6); color: var(--ink-2); font-size: 13.5px; font-weight: 700; cursor: pointer; }
-.lx .prof-actions button:hover { background: white; color: var(--ink); }
-.lx .prof-actions button.danger { color: var(--accent-2); border-color: oklch(0.85 0.03 168); }
-.lx .prof-actions button.danger:hover { background: var(--accent-soft); }
+/* miért kezdted */
+.pf-why .why-text { font-size: 13px; color: var(--ink-2); font-style: italic; line-height: 1.5; }
+.pf-why .why-src { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-top: var(--sp-2); }
 
-@media (max-width: 860px) { .lx .prof-grid { grid-template-columns: 1fr; } .lx .prof-base { grid-template-columns: 1fr 1fr; } .lx .prof-base .note { grid-column: 1 / -1; max-width: none; } }
+/* ── Beállítások (grouped rows) ───────────────────────────────────────────── */
+.pf-set { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--sp-4); }
+.pf-back { display: inline-flex; align-items: center; gap: 4px; width: max-content; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; }
+.pf-back:hover { color: var(--ink); }
+.pf-set-ttl { font-size: 22px; font-weight: 800; letter-spacing: -0.025em; }
+.pf-set-grid { display: grid; grid-template-columns: 196px 1fr; gap: var(--sp-6); align-items: start; }
+
+.pf-subnav { display: flex; flex-direction: column; gap: 2px; border-right: 1px solid var(--line); padding-right: 14px; }
+.pf-subnav-item { display: flex; align-items: center; gap: var(--sp-2); min-height: 44px; padding: 0 12px; border: none; background: none; border-radius: var(--r-sm); font-size: 12.5px; color: var(--ink-2); cursor: pointer; text-align: left; }
+.pf-subnav-item svg { color: var(--ink-3); flex: none; }
+.pf-subnav-item:hover { background: var(--surface-2); }
+.pf-subnav-item.on { background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
+.pf-subnav-item.on svg { color: var(--accent-ink); }
+
+.pf-set-body { display: flex; flex-direction: column; }
+.pf-set-h2 { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; outline: none; }
+
+.pf-group-wrap { margin-top: var(--sp-4); }
+.pf-glbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 8px; }
+.pf-group { border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
+.pf-group > * + * { border-top: 1px solid var(--line); }
+
+.pf-row { display: flex; align-items: center; gap: 13px; padding: 13px 17px; min-height: 52px; width: 100%; margin: 0; background: none; border: none; text-align: left; font: inherit; color: inherit; }
+.pf-row.tap { cursor: pointer; }
+.pf-row.tap:hover { background: var(--surface-2); }
+.pf-row .ic { width: 20px; display: flex; justify-content: center; color: var(--ink-2); flex: none; }
+.pf-row .tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.pf-row .lb { font-size: 13px; font-weight: 600; }
+.pf-row .ds { font-size: 11.5px; color: var(--ink-3); }
+.pf-row .vl { font-size: 12px; color: var(--ink-2); text-align: right; flex: none; white-space: nowrap; }
+.pf-row .cv { color: var(--ink-3); flex: none; }
+.pf-row.danger .lb, .pf-row.danger .ic { color: var(--danger); }
+.pf-row-pills { flex-wrap: wrap; row-gap: 10px; }
+.pf-row-pills .pf-daypills { flex: 1 0 100%; padding-left: 33px; }
+
+/* toggle */
+.pf-toggle { width: 44px; height: 26px; border-radius: 999px; border: none; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); position: relative; cursor: pointer; flex: none; transition: background var(--dur-fast, 120ms) var(--ease); }
+.pf-toggle .knob { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform var(--dur-fast, 120ms) var(--ease); }
+.pf-toggle.on { background: var(--accent); box-shadow: none; }
+.pf-toggle.on .knob { transform: translateX(18px); }
+.pf-toggle:disabled { opacity: 0.5; cursor: default; }
+
+/* weekday pills */
+.pf-daypills { display: flex; gap: 6px; flex-wrap: wrap; }
+.pf-daypills .pill { min-width: 34px; height: 32px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-family: var(--mono); font-size: 10px; color: var(--ink-2); cursor: pointer; }
+.pf-daypills .pill:hover { border-color: var(--accent); }
+.pf-daypills .pill.on { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
+
+/* subscription panel */
+.pf-subpanel { border: 1.5px solid var(--accent); background: var(--accent-soft); border-radius: var(--r-md); padding: 17px 19px; display: flex; flex-direction: column; gap: var(--sp-2); margin-bottom: var(--sp-2); }
+.pf-subpanel .l1 { font-size: 16px; font-weight: 800; color: var(--accent-ink); }
+.pf-subpanel .l2 { font-size: 12.5px; color: var(--accent-ink); }
+.pf-subpanel-cta { display: flex; gap: var(--sp-3); margin-top: 6px; flex-wrap: wrap; }
+
+/* editor modal / sheet */
+.pf-modal-scrim { position: fixed; inset: 0; background: oklch(0 0 0 / 0.4); display: flex; align-items: center; justify-content: center; z-index: 50; padding: var(--sp-4); }
+.pf-modal { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); width: min(440px, 100%); max-height: 90vh; overflow: auto; display: flex; flex-direction: column; }
+.pf-modal-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.pf-modal-head h2 { font-size: 16px; font-weight: 800; }
+.pf-modal-x { background: none; border: none; color: var(--ink-2); cursor: pointer; display: flex; }
+.pf-modal-x:hover { color: var(--ink); }
+.pf-modal-body { padding: 18px; display: flex; flex-direction: column; gap: var(--sp-3); align-items: flex-start; }
+.pf-modal-foot { display: flex; justify-content: flex-end; gap: var(--sp-3); padding: 14px 18px; border-top: 1px solid var(--line); }
+.pf-editor-note { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.pf-ed-hint { font-size: 12px; color: var(--ink-3); }
+.pf-ed-bigtime { align-self: center; font-size: 34px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.pf-ed-pills { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.pf-ed-pill { min-width: 64px; height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--ink-2); cursor: pointer; font-variant-numeric: tabular-nums; }
+.pf-ed-pill:hover { border-color: var(--accent); }
+.pf-ed-pill.on { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
+.pf-ed-field { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); width: 100%; font-size: 13px; color: var(--ink-2); }
+.pf-ed-field input { height: var(--btn-m, 40px); padding: 0 10px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pf-ed-field input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pf-ed-choices { display: flex; flex-direction: column; gap: var(--sp-2); width: 100%; }
+.pf-ed-choice { display: flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--surface); font-size: 13.5px; font-weight: 600; color: var(--ink); cursor: pointer; text-align: left; }
+.pf-ed-choice:hover { border-color: var(--accent); }
+.pf-ed-choice.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+
+.pf-ed-field2 { display: flex; flex-direction: column; gap: 6px; width: 100%; font-size: 12px; color: var(--ink-2); }
+.pf-ed-field2 input { height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); font-size: 14px; color: var(--ink); }
+.pf-ed-field2 input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pf-ed-err { font-size: 12.5px; color: var(--danger); line-height: 1.4; }
+.pf-photo-actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+
+.pf-save-err { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); background: var(--danger-soft); border: 1px solid var(--danger); border-radius: var(--r-md); padding: 11px 15px; font-size: 13px; color: var(--danger); }
+.pf-save-err button { border: none; background: none; color: var(--danger); font-weight: 700; font-size: 12px; cursor: pointer; text-decoration: underline; }
+
+/* 44px hit area for small glyphs (00 §0.6) */
+.hit44 { position: relative; }
+.hit44::after { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; }
+
+/* mobile section list (P8.3 — Beállítások with no sub-nav) */
+.pf-mobsec { margin-top: var(--sp-4); }
+
+/* ── mobile full pass (P8 §30.5) ──────────────────────────────────────────── */
+@media (max-width: 840px) {
+  .pf-set-grid, .pf-set-grid.mobile { grid-template-columns: 1fr; gap: 0; }
+
+  /* P-02 Profil — centre-stacked identity; streak pill under the meta; the small
+     settings button becomes a compact icon (the avatar menu is the main route). */
+  .pf-identity { flex-direction: column; text-align: center; gap: var(--sp-3); padding: var(--sp-5) var(--sp-4); }
+  .pf-identity .ava { width: 64px; height: 64px; font-size: 26px; }
+  .pf-identity .id-main { align-items: center; }
+  .pf-identity .id-top { flex-direction: column; align-items: center; gap: var(--sp-2); order: 0; }
+  .pf-identity .id-name { font-size: 18px; order: 0; }
+  .pf-identity .id-meta { font-size: 11px; order: 1; }
+  .pf-identity .id-actions { order: 2; margin-left: 0; flex-direction: column; align-items: center; gap: var(--sp-2); }
+  .pf-identity .id-set { display: none; } /* reach settings via the avatar menu */
+
+  .pf-stattrio { gap: var(--sp-2); }
+  .pf-stattrio .stat { padding: var(--sp-3); text-align: center; }
+  .pf-stattrio .n { font-size: 19px; }
+  .pf-stattrio .k { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .pf-week-foot { flex-direction: column; align-items: stretch; gap: var(--sp-2); }
+  .pf-week-foot .lxbtn { width: 100%; }
+
+  .pf-row { min-height: 48px; }
+  .pf-subpanel-cta .lxbtn { flex: 1; }
+
+  /* editors rise as bottom sheets with a safe-area-aware full-width Mentés (P8.4) */
+  .pf-modal-scrim { align-items: flex-end; padding: 0; }
+  .pf-modal { width: 100%; max-height: 88vh; border-radius: var(--r-lg) var(--r-lg) 0 0; }
+  .pf-modal-foot { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+  .pf-modal-foot .lxbtn.primary { flex: 1; }
+}
+
+/* reduced motion (P9.2 / 00 §0.14) */
+@media (prefers-reduced-motion: reduce) {
+  .pf-skel { animation: none; }
+  .pf-toggle, .pf-toggle .knob { transition: none; }
+}
+
+/* focus rings are never clipped */
+.pf-row:focus-visible, .pf-subnav-item:focus-visible, .pf-toggle:focus-visible,
+.pf-daypills .pill:focus-visible, .pf-ed-pill:focus-visible, .pf-ed-choice:focus-visible,
+.pf-subnav-item:focus-visible, .pf-back:focus-visible, .pf-set-h2:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm);
+}

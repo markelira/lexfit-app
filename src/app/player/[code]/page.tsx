@@ -10,7 +10,11 @@ import { useAuth } from "@/lib/auth-context";
 import { Protected, Loader } from "@/components/Protected";
 import { Check } from "@/components/OnbAside";
 import { getPlaybackTokens, type PlaybackResponse } from "@/lib/playback";
-import { ensureProgress, getProgress, markComplete, saveResume } from "@/lib/progress";
+import {
+  ensureProgress, getProgress, saveResume, clearResume,
+  notePendingCompletion, getPendingCompletions, syncMuxProgress, type ProgressState,
+} from "@/lib/progress";
+import { computeStreak, ymd } from "@/lib/streak";
 import { getMyList, setSaved as setSavedRemote } from "@/lib/mylist";
 import { normalizeExercise } from "@/lib/blocks";
 import type { Video, VideoBlock } from "@/lib/types";
@@ -67,6 +71,12 @@ function PlayerScreen({ code }: { code: string }) {
   const [fs, setFs] = useState(false);
   const [result, setResult] = useState<{ streak: number } | null>(null);
   const lastSavedRef = useRef(0);
+  // Watch time + completions come from Mux Data server-side (/api/progress/sync).
+  // The player only tags views with viewer_user_id and drops an optimistic local
+  // marker when a workout visibly completes, bridging Mux's finalization delay.
+  const progRef = useRef<ProgressState | null>(null);
+  const posRef = useRef(0);
+  const durRef = useRef(0);
   // L4 controls: volume, mute, gear menu, elapsed⇄remaining, keyboard help, idle-fade.
   const [vol, setVol] = useState(1);
   const [muted, setMuted] = useState(false);
@@ -96,6 +106,7 @@ function PlayerScreen({ code }: { code: string }) {
       const sess = await getDocs(query(collection(db, "programs", "foundation", "sessions"), where("videoCode", "==", code)));
       if (active && !sess.empty) setSessionOrder(sess.docs[0].data().order ?? 0);
       const prog = await getProgress(user.uid);
+      progRef.current = prog;
       if (active && prog?.resume?.[code]) setResumeAt(prog.resume[code]);
     })();
     return () => { active = false; };
@@ -104,7 +115,7 @@ function PlayerScreen({ code }: { code: string }) {
   // Seed duration from the stored Mux duration so stamped block math is correct
   // before the player's own `loadedmetadata` fires (which then sets the exact value).
   useEffect(() => {
-    if (video?.muxDuration) setDur(video.muxDuration);
+    if (video?.muxDuration) { setDur(video.muxDuration); durRef.current = video.muxDuration; }
   }, [video]);
 
   // Skip the player's own preview stage when arrived via an explicit "play" action
@@ -229,11 +240,24 @@ function PlayerScreen({ code }: { code: string }) {
     }
   }
 
-  async function finish() {
+  // The workout visibly completed. No Firestore write — the authoritative
+  // completion arrives via the Mux sync once the view finalizes. Locally: drop
+  // the pending marker, clear the resume position, and compute the streak
+  // optimistically for the finish screen (identical math to the server's).
+  function finish() {
     setStage("finished");
     if (user) {
-      const r = await markComplete(user.uid, code, sessionOrder);
-      setResult({ streak: r.streak });
+      notePendingCompletion(code);
+      void clearResume(user.uid, code);
+      const p = progRef.current;
+      const dates = new Set([
+        ...((p?.completed ?? []).map((c) => String(c.at))),
+        ...getPendingCompletions().map((c) => c.at),
+        ymd(new Date()),
+      ]);
+      setResult({ streak: computeStreak(dates, new Set(p?.workoutDays ?? []), ymd(new Date())) });
+      // Nudge the sync once Mux has likely finalized the view.
+      setTimeout(() => void syncMuxProgress({ force: true }), 20_000);
     }
   }
 
@@ -242,16 +266,17 @@ function PlayerScreen({ code }: { code: string }) {
     if (!el || !pb) return;
     const onTime = () => {
       const t = el.currentTime ?? 0;
+      posRef.current = t;
       setCur(t);
       if (user && t - lastSavedRef.current >= 5) {
         lastSavedRef.current = t;
         saveResume(user.uid, code, t);
       }
     };
-    const onMeta = () => setDur(el.duration ?? 0);
+    const onMeta = () => { setDur(el.duration ?? 0); durRef.current = el.duration ?? 0; };
     const onPlay = () => setPaused(false);
     const onPause = () => setPaused(true);
-    const onEnd = () => void finish();
+    const onEnd = () => finish();
     el.addEventListener("timeupdate", onTime);
     el.addEventListener("loadedmetadata", onMeta);
     el.addEventListener("play", onPlay);
@@ -263,6 +288,10 @@ function PlayerScreen({ code }: { code: string }) {
       el.removeEventListener("play", onPlay);
       el.removeEventListener("pause", onPause);
       el.removeEventListener("ended", onEnd);
+      // Leaving inside the last 10% still counts — mark it so Haladásom can
+      // show the workout before the Mux view lands.
+      const d = durRef.current;
+      if (d > 0 && posRef.current / d >= 0.9) notePendingCompletion(code);
     };
     // `stage` is required: the token is now prefetched during preview, so `pb` is
     // already set before the player mounts. We must re-run when we enter "playing"
@@ -501,7 +530,14 @@ function PlayerScreen({ code }: { code: string }) {
               <MuxPlayer ref={playerRef} className="pf-video" playbackId={pb.playbackId} tokens={pb.tokens}
                 startTime={resumeAt} streamType="on-demand" accentColor="#7a9b8d" autoPlay preload="auto"
                 initialBandwidthEstimateKbps={3000} initialEstimateSegments={2}
-                metadata={{ video_title: video.title, video_id: video.code }} />
+                metadata={{
+                  video_title: video.title,
+                  video_id: video.code,
+                  // Attribute the view to the user — the /api/progress/sync
+                  // route queries Mux Data by this id (watch time + completions).
+                  viewer_user_id: user?.uid,
+                  video_duration: video.muxDuration ? Math.round(video.muxDuration * 1000) : undefined,
+                }} />
             )}
 
             {/* over-video: two numbers dominate (L2 · L-RULE 01/02) */}

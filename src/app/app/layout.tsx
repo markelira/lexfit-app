@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth-context";
 import { AppTopBar } from "@/components/AppTopBar";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
-import { getProgress } from "@/lib/progress";
+import { getProgress, syncMuxProgress } from "@/lib/progress";
 
 // Four labelled destinations (RULE 02). Icon + permanently visible label on every
 // item, at every breakpoint (F-10). Order matches the shell wireframe.
@@ -30,7 +30,12 @@ function Shell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) return;
-    getProgress(user.uid).then((p) => setStreak(p?.streak ?? 0)).catch(() => {});
+    // Fold any freshly finished Mux views into the progress doc (throttled),
+    // then read the up-to-date streak for the top bar.
+    syncMuxProgress()
+      .then(() => getProgress(user.uid))
+      .then((p) => setStreak(p?.streak ?? 0))
+      .catch(() => {});
   }, [user]);
 
   return (

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Haladásom vázlat / skeleton</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wireframe-kit.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="lexfit-icons.js"></script>
+<style>
+.mile{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px dashed var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.mile>div{padding:15px 16px;border-right:1px dashed var(--line);display:flex;flex-direction:column;gap:5px}
+.mile>div:last-child{border-right:none}
+.mile .w{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;color:var(--ink3)}
+.mile .v{font-size:19px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.mile .s{font-size:10.5px;color:var(--ink3)}
+.mile .done{background:var(--accbg)}
+.mile .done .w,.mile .done .v,.mile .done .s{color:var(--acc)}
+.mile .lock{opacity:.5}
+.mile .lock svg{width:13px;height:13px;stroke:var(--ink3)}
+.cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
+.cmp .side{border:1px dashed var(--line);border-radius:9px;padding:14px 16px;background:var(--fill2);display:flex;flex-direction:column;gap:4px}
+.cmp .side.now{background:var(--accbg);border-color:var(--accln);border-style:solid}
+.cmp .side .w{font-family:var(--mono);font-size:9px;letter-spacing:.09em;color:var(--ink3)}
+.cmp .side .v{font-size:30px;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
+.cmp .side.now .w,.cmp .side.now .v{color:var(--acc)}
+.cmp .gap{text-align:center;font-family:var(--mono);font-size:10px;color:var(--acc);font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:7px;height:96px}
+.bars .b{flex:1;background:var(--fill);border:1px dashed var(--line);border-radius:4px 4px 0 0;position:relative}
+.bars .b.on{background:var(--accbg);border-color:var(--accln);border-style:solid}
+.bars .b span{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:8px;color:var(--ink3)}
+.barwrap{padding-bottom:20px}
+.win{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line2)}
+.win:last-child{border-bottom:none}
+.win svg{width:16px;height:16px;stroke:var(--acc);margin-top:2px;flex:none}
+.win .t{font-size:12.5px;font-weight:600}
+.win .s{font-size:11px;color:var(--ink3);margin-top:2px}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ph{position:relative;border:1px dashed var(--line);border-radius:8px;background:var(--fill);aspect-ratio:3/4;overflow:hidden;display:flex;align-items:flex-end;padding:9px}
+.ph .cap{position:relative;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:var(--ink3);background:rgba(255,255,255,.85);padding:2px 6px;border-radius:3px}
+.ph.locked{opacity:.5;align-items:center;justify-content:center}
+.ph.locked svg{width:18px;height:18px;stroke:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Dashboard skeleton · Haladásom</div>
+<h1>Proof, not encouragement.</h1>
+<p>Every other screen in the product asks the user to do something. This one owes them something back. It answers three questions in descending order of frequency — <b>am I on track this week, am I building a habit, am I actually stronger than I was</b> — and the third one is the reason the whole 8-week programme exists. Structure only.</p>
+<div class="legend">
+<span class="lg"><b>Model</b> · Apple Fitness rings + banking dashboard</span>
+<span class="lg"><b>Numbers</b> · big, tabular, few</span>
+<span class="lg"><b>Payoff</b> · the 8-week visszamérés</span>
+<span class="lg"><b>Icons</b> · Lucide (ISC)</span>
+</div>
+</header>
+
+<!-- ═══ H1 ═══ -->
+<section>
+<div class="head"><span class="sn">H1</span><h2>Three questions, in frequency order</h2></div>
+<p class="lede">The page is stacked by how often each question is asked, not by how impressive the answer looks. A user opens Haladásom most days to check the week; occasionally to admire the streak; and four times in eight weeks to find out whether the programme worked. The layout has to serve all three without any of them needing a tab.</p>
+
+<div class="layout">
+<div class="frame" style="padding:24px;background:#fff">
+<div class="three">
+  <div class="card" style="border-style:solid;border-color:var(--acc)">
+    <div class="lbl" style="color:var(--acc)">Kérdés 01 · szinte minden nap</div>
+    <div style="font-size:17px;font-weight:800;letter-spacing:-.02em">„Jól állok a héten?"</div>
+    <p style="margin:0;font-size:12.5px;color:var(--ink2)">Answered by the ring and the week strip, above the fold, in under a second. This is the default reason the screen is opened.</p>
+    <div class="lbl">Ring · hét-sáv</div>
+  </div>
+  <div class="card">
+    <div class="lbl">Kérdés 02 · hetente</div>
+    <div style="font-size:17px;font-weight:800;letter-spacing:-.02em">„Tartom a szokást?"</div>
+    <p style="margin:0;font-size:12.5px;color:var(--ink2)">Answered by the streak, the total minutes and the 8-week bar chart. Habit is a shape over time, not a number.</p>
+    <div class="lbl">Sorozat · oszlopok</div>
+  </div>
+  <div class="card">
+    <div class="lbl">Kérdés 03 · 4× nyolc hét alatt</div>
+    <div style="font-size:17px;font-weight:800;letter-spacing:-.02em">„Tényleg erősebb lettem?"</div>
+    <p style="margin:0;font-size:12.5px;color:var(--ink2)">Answered only by the visszamérés: the same workout as week 1, measured. Rare, but it is the reason the programme exists.</p>
+    <div class="lbl">Visszamérés</div>
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">RULE 07</div><p><b>Ring, big tabular numbers, week strip.</b> The "am I on track" model is already installed by Apple Fitness and banking apps — reuse it rather than invent a visualisation.</p></div>
+<div class="note"><div class="t">No tabs on this page</div><p>All three answers live on one scroll. A tabbed progress screen hides the rare-but-important third question behind a control nobody clicks.</p></div>
+<div class="note warn"><div class="t">The trap</div><p>Progress screens attract charts. <b>Every chart added here competes with the three questions above</b> — if a graphic does not answer one of them, it does not ship.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ H2 ═══ -->
+<section>
+<div class="head"><span class="sn">H2</span><h2>Haladásom — the full desktop page</h2></div>
+<p class="lede">Week first, habit second, programme third, body last. Note what is absent: no calories, no weight, no comparison with other users.</p>
+
+<div class="layout">
+<div class="frame">
+<div class="app">
+  <div class="topbar">
+    <div class="tb-logo" style="gap:9px"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>LEXFIT</div>
+    <div class="tb-mid"><div class="tb-search"><i data-lucide="search"></i> Keresés…</div></div>
+    <div class="tb-right"><span class="streak"><i data-lucide="flame"></i>13 NAP</span><span class="circ"><i data-lucide="user-round"></i></span></div>
+  </div>
+  <div class="rail">
+    <div class="sec">Menü</div>
+    <div class="nav"><span class="ic"><i data-lucide="house"></i></span><span class="tx">Kezdőlap</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="layout-grid"></i></span><span class="tx">Videótár</span></div>
+    <div class="nav on"><span class="ic"><i data-lucide="chart-column"></i></span><span class="tx">Haladásom</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="trophy"></i></span><span class="tx">Kihívások</span></div>
+  </div>
+  <div class="main">
+    <div style="display:flex;align-items:baseline;gap:12px"><div style="font-size:23px;font-weight:800;letter-spacing:-.025em">Haladásom</div><span class="lbl">Foundation · 4. hét</span></div>
+
+    <div class="two" style="grid-template-columns:1.15fr 1fr">
+      <div class="card" style="flex-direction:row;align-items:center;gap:20px">
+        <div class="ring" style="width:96px;height:96px"></div>
+        <div>
+          <div style="font-size:30px;font-weight:800;letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1">4 / 5</div>
+          <div style="font-size:12.5px;color:var(--ink2);margin-top:5px">edzés ezen a héten</div>
+          <div style="font-size:11.5px;color:var(--acc);font-weight:600;margin-top:6px">+1 a múlt héthez képest</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="lbl">Ez a hét</div>
+        <div class="week">
+          <div class="day done"><div class="d">H</div><div class="dot"><i data-lucide="check"></i></div></div>
+          <div class="day done"><div class="d">K</div><div class="dot"><i data-lucide="check"></i></div></div>
+          <div class="day rest"><div class="d">SZE</div><div class="dot"><i data-lucide="moon"></i></div></div>
+          <div class="day done"><div class="d">CS</div><div class="dot"><i data-lucide="check"></i></div></div>
+          <div class="day today"><div class="d">P</div><div class="dot"></div></div>
+          <div class="day"><div class="d">SZO</div><div class="dot"></div></div>
+          <div class="day done"><div class="d">V</div><div class="dot"><i data-lucide="check"></i></div></div>
+        </div>
+        <div style="font-size:11.5px;color:var(--ink3)">A pihenőnap nem töri meg a sorozatot.</div>
+      </div>
+    </div>
+
+    <div class="three">
+      <div class="stat"><div class="n">13</div><div class="k">napos sorozat</div><div class="d">a leghosszabb eddig</div></div>
+      <div class="stat"><div class="n">412</div><div class="k">perc mozgás összesen</div><div class="d">+94 perc a múlt hónaphoz</div></div>
+      <div class="stat"><div class="n">21</div><div class="k">elvégzett edzés</div><div class="d">4 hét alatt</div></div>
+    </div>
+
+    <div class="card">
+      <div class="ttl"><i data-lucide="chart-column"></i> A nyolc hét</div>
+      <div class="barwrap">
+        <div class="bars">
+          <div class="b on" style="height:52%"><span>1. HÉT</span></div>
+          <div class="b on" style="height:38%"><span>2.</span></div>
+          <div class="b on" style="height:74%"><span>3.</span></div>
+          <div class="b on" style="height:88%"><span>4.</span></div>
+          <div class="b" style="height:26%"><span>5.</span></div>
+          <div class="b" style="height:26%"><span>6.</span></div>
+          <div class="b" style="height:26%"><span>7.</span></div>
+          <div class="b" style="height:26%"><span>8. HÉT</span></div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--ink3)">Heti elvégzett edzések. A halvány oszlopok még előtted vannak.</div>
+    </div>
+
+    <div class="card">
+      <div class="ttl"><i data-lucide="calendar-check"></i> Mérföldkövek</div>
+      <div class="mile">
+        <div class="done"><div class="w">1. HÉT</div><div class="v">4 kör</div><div class="s">Alapmérés · márc. 4.</div></div>
+        <div class="done"><div class="w">3. HÉT</div><div class="v">5 kör</div><div class="s">Első ellenőrzés</div></div>
+        <div><div class="w">5. HÉT</div><div class="v">—</div><div class="s">2 hét múlva</div></div>
+        <div class="lock"><div class="w"><i data-lucide="lock"></i> 8. HÉT</div><div class="v">—</div><div class="s">Nagy visszamérés</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Ring + strip, side by side</div><p>The two answers to question one, together, above the fold. Everything below is optional reading.</p></div>
+<div class="note"><div class="t">Every number has a comparison</div><p>"+1 a múlt héthez", "a leghosszabb eddig". <b>A bare number is a fact; a number with a direction is progress.</b> Banking dashboards do this on every figure.</p></div>
+<div class="note"><div class="t">Future weeks are visible but faded</div><p>The 8-week chart shows where the user is <em>in the arc</em>, not just what they have done. Milestones use the same locked treatment.</p></div>
+<div class="note"><div class="t">Rest days are stated, not implied</div><p>"A pihenőnap nem töri meg a sorozatot" sits under the strip, where the anxiety actually occurs.</p></div>
+<div class="note warn"><div class="t">Absent on purpose</div><p>No calories, no weight, no percentile against other users. Each would answer a question nobody on this programme asked.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ H3 ═══ -->
+<section>
+<div class="head"><span class="sn">H3</span><h2>The visszamérés — the payoff moment</h2></div>
+<p class="lede">Week 8 repeats the week 1 workout exactly. This is the single most important screen in the product, and its design job is unusual: <b>not to encourage, but to prove.</b> The user does not have to believe they improved — they read the difference. Three states: locked, ready, result.</p>
+
+<div class="layout">
+<div style="display:flex;flex-direction:column;gap:20px">
+
+<div class="frame" style="padding:22px;background:#fff">
+<div class="lbl" style="margin-bottom:12px">Állapot A · zárolva (1–7. hét)</div>
+<div class="card" style="opacity:.72">
+  <div class="ttl"><i data-lucide="lock"></i> 8. hét — visszamérés</div>
+  <div style="font-size:13px;color:var(--ink2)">Ugyanaz az edzés, mint az 1. héten. 4 hét múlva nyílik.</div>
+  <div class="cmp">
+    <div class="side"><div class="w">1. HÉT</div><div class="v">4 kör</div></div>
+    <div class="gap">→</div>
+    <div class="side"><div class="w">8. HÉT</div><div class="v" style="color:var(--ink3)">?</div></div>
+  </div>
+</div>
+</div>
+
+<div class="frame" style="padding:22px;background:#fff">
+<div class="lbl" style="margin-bottom:12px">Állapot B · itt a nap</div>
+<div class="card" style="border-style:solid;border-color:var(--acc)">
+  <div class="ttl"><i data-lucide="calendar-check"></i> Ma van a visszamérés</div>
+  <div class="cmp">
+    <div class="side"><div class="w">1. HÉT · MÁRC. 4.</div><div class="v">4 kör</div><div style="font-size:11px;color:var(--ink3)">ennyit bírtál akkor</div></div>
+    <div class="gap">→</div>
+    <div class="side now"><div class="w">MA</div><div class="v">?</div><div style="font-size:11px;color:var(--acc)">ma ez a kérdés</div></div>
+  </div>
+  <div class="whisper"><i data-lucide="message-circle"></i><span>„Emlékszel az első hétre? Ma ugyanazt csinálod. Nem hinned kell, hogy fejlődtél — mérni fogod."</span></div>
+  <div style="display:flex;gap:10px"><span class="btn pri"><i data-lucide="play"></i> Visszamérés indítása</span><span class="btn sec">Mit fogok csinálni?</span></div>
+</div>
+</div>
+
+<div class="frame" style="padding:22px;background:#fff">
+<div class="lbl" style="margin-bottom:12px">Állapot C · eredmény</div>
+<div class="card" style="border-style:solid;border-color:var(--acc)">
+  <div class="ttl"><i data-lucide="check"></i> Nyolc hét — a különbség</div>
+  <div class="cmp">
+    <div class="side"><div class="w">1. HÉT</div><div class="v">4 kör</div><div style="font-size:11px;color:var(--ink3)">18:40 alatt</div></div>
+    <div class="gap">+3 KÖR</div>
+    <div class="side now"><div class="w">8. HÉT · MA</div><div class="v">7 kör</div><div style="font-size:11px;color:var(--acc)">ugyanannyi idő alatt</div></div>
+  </div>
+  <div class="two">
+    <div class="stat"><div class="n">+75%</div><div class="k">több kör ugyanannyi idő alatt</div></div>
+    <div class="stat"><div class="n">0</div><div class="k">kihagyott hét a nyolcból</div></div>
+  </div>
+  <div class="whisper"><i data-lucide="message-circle"></i><span>„Ez nem érzés. Ez adat. Ugyanaz az edzés, ugyanaz a perc — és három körrel több."</span></div>
+  <div style="display:flex;gap:10px"><span class="btn pri">Következő 8 hét</span><span class="btn sec">Megosztás</span></div>
+</div>
+</div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Same workout, same clock</div><p>The comparison is only credible because the variable is controlled. <b>The design has to say that out loud</b> — "ugyanannyi idő alatt" is doing as much work as the number.</p></div>
+<div class="note"><div class="t">Locked ≠ hidden</div><p>State A is visible from week 1 with a "?" in the second box. The unanswered question is the motivation; hiding it wastes seven weeks of anticipation.</p></div>
+<div class="note"><div class="t">Peak–end</div><p>People remember an experience by its peak and its ending. <b>This screen is the peak of the eight weeks</b> — it earns more space and more of Alexa's voice than anything else in the product.</p></div>
+<div class="note"><div class="t">Sharing is offered, never automatic</div><p>Secondary button, after the result. Solo experience first, social as an optional layer.</p></div>
+<div class="note warn"><div class="t">What if the number is worse?</div><p>Not drawn yet, and it must be. Illness, holidays and bad weeks are normal. <b>A design that only works when the number improves is not finished</b> — see the open questions.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ H4 ═══ -->
+<section>
+<div class="head"><span class="sn">H4</span><h2>Non-scale wins and private photos</h2></div>
+<p class="lede">The programme's own framing is that the scale is not the measure. Two blocks carry that: wins in the user's own words, and progress photos that are private by construction — stated as a fact, not offered as a setting.</p>
+
+<div class="layout">
+<div class="two">
+<div class="frame" style="padding:20px">
+  <div class="card" style="border:none;padding:0">
+    <div class="ttl"><i data-lucide="check"></i> Amit észrevettél</div>
+    <div class="win"><i data-lucide="check"></i><div><div class="t">A lépcsőn nem fulladok ki.</div><div class="s">3. hét · a te szavaiddal</div></div></div>
+    <div class="win"><i data-lucide="check"></i><div><div class="t">Reggel könnyebb felkelni.</div><div class="s">2. hét</div></div></div>
+    <div class="win"><i data-lucide="check"></i><div><div class="t">A plank már nem rémálom.</div><div class="s">4. hét</div></div></div>
+    <div class="whisper"><i data-lucide="message-circle"></i><span>„Ezeket te írtad. Ez a fejlődés, amit egy mérleg sosem mutat meg."</span></div>
+    <span class="btn sec" style="align-self:flex-start">+ Új megfigyelés</span>
+  </div>
+</div>
+
+<div class="frame" style="padding:20px">
+  <div class="card" style="border:none;padding:0">
+    <div class="ttl"><i data-lucide="user-round"></i> Haladásfotók</div>
+    <div style="font-size:12px;color:var(--ink2)">Csak te látod. Nem oszthatók meg egy gombnyomással, és nem kerülnek sehova.</div>
+    <div class="photos">
+      <div class="ph"><div class="art"></div><span class="cap">1. HÉT</span></div>
+      <div class="ph"><div class="art"></div><span class="cap">5. HÉT</span></div>
+      <div class="ph locked"><i data-lucide="lock"></i></div>
+    </div>
+    <div style="display:flex;gap:10px"><span class="btn sec">Fotó hozzáadása</span><span class="btn sec">Összehasonlítás</span></div>
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">The user's words, dated</div><p>Non-scale wins are quoted, not paraphrased into product copy. They tie back to the "Miért kezdted" sentence captured at onboarding.</p></div>
+<div class="note"><div class="t">Privacy is stated, not toggled</div><p><b>A setting implies it could be otherwise.</b> Photos are owner-only by construction; the sentence says so before the user uploads anything.</p></div>
+<div class="note"><div class="t">Milestone slots, not a gallery</div><p>Week 1 / 5 / 8, with future slots locked. Three deliberate moments beat an unbounded camera roll.</p></div>
+<div class="note warn"><div class="t">Sensitive by default</div><p>Body photos are the highest-anxiety feature in the product. Nothing here should ever be one tap from a share sheet.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ H5 ═══ -->
+<section>
+<div class="head"><span class="sn">H5</span><h2>Mobile</h2></div>
+<p class="lede">Same order, one column. The ring and strip fill the first screenful; the visszamérés sits directly under them so the rare question is never more than one scroll away.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>H-01</b> · Haladásom</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="brand">Haladásom</span><div style="flex:1"></div><span class="streak"><i data-lucide="flame"></i>13</span><span class="circ" style="width:28px;height:28px"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div class="card" style="flex-direction:row;align-items:center;gap:14px;padding:14px">
+    <div class="ring" style="width:70px;height:70px;border-width:8px"></div>
+    <div><div style="font-size:23px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums">4 / 5</div><div style="font-size:11px;color:var(--ink2)">edzés ezen a héten</div><div style="font-size:10.5px;color:var(--acc);font-weight:600;margin-top:3px">+1 a múlt héthez</div></div>
+  </div>
+  <div class="card" style="padding:12px;gap:9px">
+    <div class="week" style="gap:4px">
+      <div class="day done"><div class="d">H</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day done"><div class="d">K</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day rest"><div class="d">SZE</div><div class="dot" style="height:22px"><i data-lucide="moon"></i></div></div>
+      <div class="day done"><div class="d">CS</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day today"><div class="d">P</div><div class="dot" style="height:22px"></div></div>
+      <div class="day"><div class="d">SZO</div><div class="dot" style="height:22px"></div></div>
+      <div class="day done"><div class="d">V</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+    </div>
+  </div>
+  <div class="three" style="gap:7px">
+    <div class="stat" style="padding:10px;text-align:center"><div class="n" style="font-size:18px">13</div><div class="k" style="font-size:8.5px">nap sorozat</div></div>
+    <div class="stat" style="padding:10px;text-align:center"><div class="n" style="font-size:18px">412</div><div class="k" style="font-size:8.5px">perc</div></div>
+    <div class="stat" style="padding:10px;text-align:center"><div class="n" style="font-size:18px">21</div><div class="k" style="font-size:8.5px">edzés</div></div>
+  </div>
+  <div class="card" style="padding:13px;gap:9px;border-style:solid;border-color:var(--acc)">
+    <div class="ttl" style="font-size:12.5px"><i data-lucide="lock"></i> 8. hét — visszamérés</div>
+    <div class="cmp" style="gap:9px">
+      <div class="side" style="padding:9px 11px"><div class="w">1. HÉT</div><div class="v" style="font-size:20px">4 kör</div></div>
+      <div class="gap" style="font-size:9px">→</div>
+      <div class="side" style="padding:9px 11px"><div class="w">8. HÉT</div><div class="v" style="font-size:20px;color:var(--ink3)">?</div></div>
+    </div>
+    <div style="font-size:10.5px;color:var(--ink3)">4 hét múlva · ugyanaz az edzés</div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab on"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>H-02</b> · Görgetve · a nyolc hét</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="brand">Haladásom</span><div style="flex:1"></div><span class="streak"><i data-lucide="flame"></i>13</span><span class="circ" style="width:28px;height:28px"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div class="card" style="padding:13px;gap:10px">
+    <div class="ttl" style="font-size:12.5px"><i data-lucide="chart-column"></i> A nyolc hét</div>
+    <div class="barwrap" style="padding-bottom:18px">
+      <div class="bars" style="height:74px;gap:5px">
+        <div class="b on" style="height:52%"><span>1</span></div><div class="b on" style="height:38%"><span>2</span></div><div class="b on" style="height:74%"><span>3</span></div><div class="b on" style="height:88%"><span>4</span></div>
+        <div class="b" style="height:26%"><span>5</span></div><div class="b" style="height:26%"><span>6</span></div><div class="b" style="height:26%"><span>7</span></div><div class="b" style="height:26%"><span>8</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="padding:13px;gap:9px">
+    <div class="ttl" style="font-size:12.5px"><i data-lucide="check"></i> Amit észrevettél</div>
+    <div class="win" style="padding:8px 0"><i data-lucide="check"></i><div><div class="t" style="font-size:11.5px">A lépcsőn nem fulladok ki.</div><div class="s" style="font-size:10px">3. hét</div></div></div>
+    <div class="win" style="padding:8px 0"><i data-lucide="check"></i><div><div class="t" style="font-size:11.5px">Reggel könnyebb felkelni.</div><div class="s" style="font-size:10px">2. hét</div></div></div>
+    <span class="btn sec" style="height:38px;align-self:flex-start">+ Új megfigyelés</span>
+  </div>
+  <div class="card" style="padding:13px;gap:9px">
+    <div class="ttl" style="font-size:12.5px"><i data-lucide="user-round"></i> Haladásfotók</div>
+    <div style="font-size:10.5px;color:var(--ink2)">Csak te látod.</div>
+    <div class="photos" style="gap:7px">
+      <div class="ph"><div class="art"></div><span class="cap">1. HÉT</span></div>
+      <div class="ph"><div class="art"></div><span class="cap">5. HÉT</span></div>
+      <div class="ph locked"><i data-lucide="lock"></i></div>
+    </div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab on"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>H-03</b> · Visszamérés · eredmény</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><span class="brand">Visszamérés</span></div>
+<div class="mbody" style="gap:11px">
+  <div style="text-align:center;padding:6px 0">
+    <div style="font-size:19px;font-weight:800;letter-spacing:-.03em">Nyolc hét — a különbség</div>
+  </div>
+  <div class="cmp" style="grid-template-columns:1fr;gap:9px">
+    <div class="side" style="padding:12px 14px"><div class="w">1. HÉT · MÁRC. 4.</div><div class="v" style="font-size:26px">4 kör</div><div style="font-size:10.5px;color:var(--ink3)">18:40 alatt</div></div>
+    <div class="gap" style="font-size:11px">+3 KÖR</div>
+    <div class="side now" style="padding:12px 14px"><div class="w">8. HÉT · MA</div><div class="v" style="font-size:26px">7 kör</div><div style="font-size:10.5px;color:var(--acc)">ugyanannyi idő alatt</div></div>
+  </div>
+  <div class="two" style="gap:7px">
+    <div class="stat" style="padding:11px;text-align:center"><div class="n" style="font-size:19px">+75%</div><div class="k" style="font-size:9px">több kör</div></div>
+    <div class="stat" style="padding:11px;text-align:center"><div class="n" style="font-size:19px">0</div><div class="k" style="font-size:9px">kihagyott hét</div></div>
+  </div>
+  <div class="whisper" style="font-size:11px"><i data-lucide="message-circle"></i><span>„Ez nem érzés. Ez adat. Ugyanaz az edzés, ugyanaz a perc — és három körrel több."</span></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><span class="btn pri" style="height:44px">Következő 8 hét</span><span class="btn sec" style="height:44px">Megosztás</span></div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab on"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Comparison stacks vertically</div><p>On a phone the before/after becomes top/bottom with the delta between them. Side-by-side at 320px would shrink both numbers below the point of impact.</p></div>
+<div class="note"><div class="t">The visszamérés card is on screen one</div><p>Even locked. It is the only element that makes the other numbers mean something.</p></div>
+<div class="note"><div class="t">Tab bar stays</div><p>Including on the result screen. This is a moment, not a modal takeover — the user should be able to walk away from it freely.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ H6 ═══ -->
+<section>
+<div class="head"><span class="sn">H6</span><h2>Haladásom rules</h2></div>
+<div class="rules">
+<div><div class="num">H-RULE 01</div><div><h3>Ring and week strip above the fold, always.</h3><p>Question one is asked most days and must be answered in under a second.</p></div><div class="ev"><b>Evidence</b>RULE 07 — the Apple Fitness / banking model for "am I on track" is already installed.</div></div>
+<div><div class="num">H-RULE 02</div><div><h3>Every number carries a direction.</h3><p>"+1 a múlt héthez", "a leghosszabb eddig". A bare figure is a fact; a compared figure is progress.</p></div><div class="ev"><b>Evidence</b>Standard across banking and fitness dashboards; the comparison is what users actually read.</div></div>
+<div><div class="num">H-RULE 03</div><div><h3>The visszamérés is visible from week 1.</h3><p>Locked, with a "?" where the answer will go. The open question is the motivation.</p></div><div class="ev"><b>Evidence</b>Peak–end rule: the peak of the eight weeks deserves seven weeks of anticipation.</div></div>
+<div><div class="num">H-RULE 04</div><div><h3>Prove, don't cheer.</h3><p>Same workout, same clock, stated explicitly. Alexa's line interprets the number; it never replaces it.</p></div><div class="ev"><b>Evidence</b>The programme's own framing — "nem hinned kell, hogy fejlődtél, mérni fogod".</div></div>
+<div><div class="num">H-RULE 05</div><div><h3>Photos are private by construction.</h3><p>Stated before upload, never one tap from sharing, milestone slots only.</p></div><div class="ev"><b>Evidence</b>Privacy anxiety is the top-cited concern in fitness-app UX reviews.</div></div>
+<div><div class="num">H-RULE 06</div><div><h3>No chart that does not answer one of the three questions.</h3><p>If a graphic cannot be traced to H1, it does not ship.</p></div><div class="ev"><b>Evidence</b>Cognitive load — avoid visual clutter, build on existing models.</div></div>
+</div>
+
+<h3 style="margin-top:44px;font-size:19px;letter-spacing:-.02em">What we are deliberately not doing</h3>
+<div class="dont">
+<div><span class="x">✕</span><span><b>Weight or BMI as a headline.</b> The programme measures against week 1, not against a scale — a weight chart would contradict the product's own framing.</span></div>
+<div><span class="x">✕</span><span><b>Calorie estimates.</b> Unverifiable without a wearable, and they invite exactly the accounting mindset the programme avoids.</span></div>
+<div><span class="x">✕</span><span><b>Percentile rankings against other users.</b> A progress page is about one person; comparison has no home in this product.</span></div>
+<div><span class="x">✕</span><span><b>Breaking the streak on a planned rest day.</b> The forgiveness mechanic is the reason streaks survive real life.</span></div>
+<div><span class="x">✕</span><span><b>A tabbed progress screen.</b> It would hide the visszamérés — the rarest and most important answer — behind a control nobody taps.</span></div>
+<div><span class="x">✕</span><span><b>Auto-sharing results.</b> Offered as a secondary button, after the fact, never as a default.</span></div>
+</div>
+
+<div class="note warn" style="margin-top:26px"><div class="t">Still to settle — one of these matters more than the rest</div><p><b>The visszamérés when the number is flat or worse.</b> Illness, holidays and hard weeks are normal, and a screen that only works on improvement will fail the users who most need it. Options to explore: lead with consistency ("0 kihagyott hét") instead of the delta, surface the non-scale wins in place of the comparison, or let Alexa reframe explicitly. This needs a design pass and a real conversation with Alexa about tone — it should not be improvised in build.</p></div>
+</section>
+
+<footer>LEXFIT · Haladásom skeleton · Structure only — no visual design decisions made</footer>
+</div>
+<script>window.addEventListener("load",function(){window.lexfitIcons&&window.lexfitIcons()});</script>
+</body>
+</html>

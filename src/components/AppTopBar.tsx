@@ -11,6 +11,19 @@ import { useIsMobile } from "@/lib/useIsMobile";
 import { loadLibrary, type LibVideo } from "@/lib/library";
 import { getMyList, setSaved } from "@/lib/mylist";
 import { WorkoutCard } from "@/components/WorkoutCard";
+import { BottomSheet } from "@/components/BottomSheet";
+
+// Avatar menu — six labelled destinations (30 §30.2). Desktop dropdown / mobile
+// bottom sheet share this list. Kijelentkezés is last, coloured, and separated.
+type MenuItem = { label: string; icon: keyof typeof lxPaths; href?: string; action?: "logout"; danger?: boolean };
+const AVATAR_MENU: MenuItem[] = [
+  { label: "Profil", icon: "user", href: "/app/profile" },
+  { label: "Az edzésterved", icon: "calendarCheck", href: "/app/profile/settings?section=plan" },
+  { label: "Emlékeztetők", icon: "bell", href: "/app/profile/settings?section=reminders" },
+  { label: "Beállítások", icon: "sliders", href: "/app/profile/settings" },
+  { label: "Segítség", icon: "messageCircle", href: "/app/szm" },
+  { label: "Kijelentkezés", icon: "logOut", action: "logout", danger: true },
+];
 
 // The LEXFIT mark ("Az Ív") — arc + dot, white glyph on an accent tile.
 function LexMark() {
@@ -62,6 +75,10 @@ export function AppTopBar({ streak }: { streak: number }) {
   const isMobile = useIsMobile();
 
   const initial = (user?.displayName?.[0] ?? user?.email?.[0] ?? "?").toUpperCase();
+  // Menu identity header. Programme · week (30 §30.2) arrives with loadProfile in P4;
+  // until then the sub-line is the account e-mail (real, already loaded).
+  const menuName = user?.displayName || user?.email?.split("@")[0] || "Fiók";
+  const menuSub = user?.email ?? "";
 
   useEffect(() => setRecent(readRecent()), []);
 
@@ -112,9 +129,10 @@ export function AppTopBar({ streak }: { streak: number }) {
     };
   }, [searchOpen, isMobile]);
 
-  // Avatar menu: close on outside-click / Escape (focus returns to the trigger).
+  // Avatar menu (desktop dropdown): close on outside-click / Escape (focus returns
+  // to the trigger). On mobile the BottomSheet owns dismissal, so this stays off.
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen || isMobile) return;
     const onDown = (e: MouseEvent) => {
       if (!menuRef.current?.contains(e.target as Node) && !triggerRef.current?.contains(e.target as Node)) {
         setMenuOpen(false);
@@ -132,7 +150,7 @@ export function AppTopBar({ streak }: { streak: number }) {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [menuOpen]);
+  }, [menuOpen, isMobile]);
 
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -183,6 +201,41 @@ export function AppTopBar({ streak }: { streak: number }) {
     await signOutUser();
     router.push("/login");
   }
+
+  function onMenuItem(item: MenuItem) {
+    setMenuOpen(false);
+    if (item.action === "logout") { void logout(); return; }
+    if (item.href) router.push(item.href);
+  }
+
+  const menuItems = AVATAR_MENU.map((item) => (
+    <button
+      key={item.label}
+      role="menuitem"
+      className={`lxam-item${item.danger ? " danger" : ""}`}
+      onClick={() => onMenuItem(item)}
+    >
+      <LxIcon d={lxPaths[item.icon]} size={16} />
+      <span>{item.label}</span>
+    </button>
+  ));
+  const menuHeader = (
+    <div className="lxam-head">
+      <span className="lxam-ava">
+        {user?.photoURL ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={user.photoURL} alt="" />
+        ) : initial !== "?" ? initial : <LxIcon d={lxPaths.user} size={18} />}
+      </span>
+      <span className="lxam-id">
+        <span className="nm">{menuName}</span>
+        {menuSub && <span className="sb">{menuSub}</span>}
+      </span>
+      {streak > 0 && (
+        <span className="lxam-streak"><LxIcon d={lxPaths.flame} size={13} fill /> {streak}</span>
+      )}
+    </div>
+  );
 
   const hasQuery = q.trim().length > 0;
 
@@ -357,17 +410,21 @@ export function AppTopBar({ streak }: { streak: number }) {
             )}
           </button>
 
-          {menuOpen && (
+          {menuOpen && !isMobile && (
             <div ref={menuRef} className="lxtb-menu" role="menu" aria-label="Fiók">
-              <button role="menuitem" onClick={() => { setMenuOpen(false); router.push("/app/profile"); }}>Profil</button>
-              <button role="menuitem" onClick={() => { setMenuOpen(false); router.push("/app/profile"); }}>Beállítások</button>
-              <button role="menuitem" onClick={() => { setMenuOpen(false); router.push("/app/profile"); }}>Segítség</button>
-              <div className="sep" role="separator" />
-              <button role="menuitem" className="danger" onClick={logout}>Kijelentkezés</button>
+              {menuHeader}
+              {menuItems}
             </div>
           )}
         </div>
       </div>
+
+      <BottomSheet open={menuOpen && isMobile} onClose={() => setMenuOpen(false)} ariaLabel="Fiók menü">
+        <div className="lxam-sheet" role="menu" aria-label="Fiók">
+          {menuHeader}
+          {menuItems}
+        </div>
+      </BottomSheet>
     </header>
   );
 }
