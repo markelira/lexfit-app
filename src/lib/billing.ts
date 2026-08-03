@@ -142,3 +142,16 @@ export async function getSubscription(uid: string): Promise<Subscription | null>
 /** UI access check — same pure rule the server entitlement uses. */
 export const isSubscribed = (sub: Subscription | null): boolean =>
   hasAccessFromData(sub, Date.now());
+
+/**
+ * Where an onboarded user belongs (40 §40.8 truth table): the app if they have
+ * an active entitlement, else checkout. On a read failure default to /app rather
+ * than trapping them at /subscribe — the server re-validates access anyway.
+ */
+export async function paidDestination(uid: string): Promise<"/app" | "/subscribe"> {
+  try {
+    return isSubscribed(await getSubscription(uid)) ? "/app" : "/subscribe";
+  } catch {
+    return "/app";
+  }
+}

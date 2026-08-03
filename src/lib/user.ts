@@ -23,13 +23,14 @@ export interface OnboardingAnswers {
   motiv: string;               // the free-text "why"
   obstacle: string | null;
   days: number;
+  weekdays: number[];          // 1=Mon … 7=Sun; collected in the funnel (P0.3)
   time: string | null;
   env: string[];
 }
 
 export const BLANK_ONBOARDING: OnboardingAnswers = {
   goal: null, level: null, age: null, height: "", weight: "", lifestage: null,
-  focus: [], motiv: "", obstacle: null, days: 5, time: null, env: [],
+  focus: [], motiv: "", obstacle: null, days: 5, weekdays: [], time: null, env: [],
 };
 
 /** Extras captured at email registration (the OAuth path has none). */

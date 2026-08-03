@@ -57,4 +57,6 @@ export const lxPaths: Record<string, string | string[]> = {
   mail: ["M3 5 H21 V19 H3 Z", "M3 6 L12 13 L21 6"],
   shield: ["M12 3 L20 6 V11 c0 5-3.5 8-8 10 c-4.5-2-8-5-8-10 V6 Z"],
   creditCard: ["M3 6 H21 V18 H3 Z", "M3 10 H21", "M6.5 14.5 H10"],
+  // ── Onboarding funnel addition (40 §40; same 24×24 stroke style) ──
+  userRound: ["M12 11 a4 4 0 1 0 0-8 a4 4 0 0 0 0 8 Z", "M4.5 20 a7.5 7.5 0 0 1 15 0"],
 };

@@ -75,8 +75,9 @@ const ONB_LIFESTAGE = [
   { v: "meno",     ic: "🌿", b: "Menopauza idején", s: "Ízület-barát, erő-fókuszú terhelés." },
 ];
 
-// subscription (single plan)
-const ONB_PRICE = { amount: "19 990", perDay: "~666", cur: "Ft", period: "hó" };
+// subscription price removed (B10 / 41 §P6.7): the old "19 990 Ft/hó" literal
+// matched no plan in PRICES. Pricing is derived from PRICES via the display
+// helpers on /subscribe — never a literal in prototype/seed source.
 const ONB_FEATURES = [
   "8 hetes Foundation program — 40 vezetett edzés",
   "Teljes videótár · F·B·R·T·N·M kódrendszer",
@@ -213,6 +214,6 @@ const onbTone = (t) => (t === "Meleg" ? "meleg" : t === "Őszinte" ? "oszinte" :
 const onbName = (s, n) => s.replace("{n}", n);
 
 Object.assign(window, {
-  ONB_NAME, ONB_STEPS, ONB_DAYS, ONB_AGES, ONB_LIFESTAGE, ONB_PRICE, ONB_FEATURES, ONB_TESTIMONIAL,
+  ONB_NAME, ONB_STEPS, ONB_DAYS, ONB_AGES, ONB_LIFESTAGE, ONB_FEATURES, ONB_TESTIMONIAL,
   ONB_COPY, ONB_WEEK, ONB_PHASES, onbTone, onbName,
 });

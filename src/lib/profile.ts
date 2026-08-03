@@ -33,7 +33,10 @@ export interface PlanPrefs {
 export interface Prefs {
   plan: PlanPrefs;
   reminders: {
-    workout: { enabled: boolean; time: string /* "HH:MM" */; weekdays: number[] };
+    // `prompted` = the first-entry reminder card has been answered once (40 §40.9
+    // / P7.3). Persisted here (not localStorage) so the ask never repeats across
+    // devices; the setting itself stays editable in Beállítások.
+    workout: { enabled: boolean; time: string /* "HH:MM" */; weekdays: number[]; prompted?: boolean };
     streakRisk: boolean;
     community: boolean;
     newContent: boolean;

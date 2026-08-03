@@ -49,10 +49,24 @@ function pickWeekdays(days: number): number[] {
   return [...WORK_WEEKDAYS, ...REST_WEEKDAYS].slice(0, days).sort((a, b) => a - b);
 }
 
+/** Sanitise a stored weekday array to unique 1–7 ints, Monday-first. */
+function cleanWeekdays(v: unknown): number[] {
+  if (!Array.isArray(v)) return [];
+  const set = new Set<number>();
+  for (const x of v) {
+    const n = typeof x === "number" ? x : Number(x);
+    if (Number.isInteger(n) && n >= 1 && n <= 7) set.add(n);
+  }
+  return [...set].sort((a, b) => a - b);
+}
+
 /** Derive a full prefs doc from the onboarding answers (idempotent seed source). */
 function deriveFromOnboarding(onb: Record<string, unknown> | null): Prefs {
-  const days = clampDays(onb?.days);
-  const weekdays = pickWeekdays(days);
+  // Honour the specific weekdays the user picked in the funnel (P0.3); only fall
+  // back to the count-derived canonical split when none were stored (legacy onb).
+  const chosen = cleanWeekdays(onb?.weekdays);
+  const days = chosen.length ? chosen.length : clampDays(onb?.days);
+  const weekdays = chosen.length ? chosen : pickWeekdays(days);
   const time = REMINDER_HOUR[String(onb?.time ?? "")] ?? DEFAULT_PREFS.reminders.workout.time;
   const env = Array.isArray(onb?.env) ? (onb!.env as string[]) : [];
   const quietDefault = env.includes("csendes") ? true : DEFAULT_PREFS.playback.quietDefault;

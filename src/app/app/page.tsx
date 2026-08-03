@@ -20,6 +20,9 @@ import { GuideController, GUIDE_START_EVENT } from "@/components/GuidedTour";
 import { JoinCinematic } from "@/components/JoinCinematic";
 import { loadFoundation, dayState, type FoundationData, type WorkoutItem } from "@/lib/program";
 import { confirmCheckout } from "@/lib/billing";
+import { getPrefs, updatePrefs } from "@/lib/prefs";
+import type { Prefs } from "@/lib/profile";
+import { FirstEntry } from "@/components/FirstEntry";
 
 type AnyVideo = WorkoutItem | LibVideo;
 
@@ -31,6 +34,7 @@ export default function KezdolapPage() {
   const [modalVideo, setModalVideo] = useState<WorkoutItem | null>(null);
   const [myList, setMyList] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState<ProgressState | null>(null);
+  const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [cineOpen, setCineOpen] = useState(false);
   const [libVideos, setLibVideos] = useState<LibVideo[]>([]);
   const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
@@ -65,8 +69,23 @@ export default function KezdolapPage() {
     if (user) {
       getMyList(user.uid).then(setMyList).catch(() => {});
       getProgress(user.uid).then(setProgress).catch(() => {});
+      getPrefs(user.uid).then(setPrefs).catch(() => {});
     }
   }, [reload, user]);
+
+  // First-entry reminder card (40 §40.9 / P7.2). P0.6 = email channel, so
+  // "Beállítom" only writes the pref — no OS permission prompt. Both answers set
+  // `prompted` so the card never returns; the toggle stays in Beállítások.
+  const answerReminder = useCallback(
+    async (enabled: boolean) => {
+      if (!user) return;
+      setPrefs((p) =>
+        p ? { ...p, reminders: { ...p.reminders, workout: { ...p.reminders.workout, enabled, prompted: true } } } : p,
+      );
+      await updatePrefs(user.uid, { reminders: { workout: { enabled, prompted: true } } }).catch(() => {});
+    },
+    [user],
+  );
 
   async function toggleSave(code: string) {
     if (!user) return;
@@ -170,6 +189,13 @@ export default function KezdolapPage() {
 
   return (
     <div className="home fade-in">
+      <FirstEntry
+        doneCount={doneCount}
+        prefs={prefs}
+        onSetReminder={() => answerReminder(true)}
+        onDismissReminder={() => answerReminder(false)}
+      />
+
       <Billboard
         program={program}
         joined={joined}
@@ -243,7 +269,7 @@ function Billboard({
   const equip = !program.equipment || /nincs/i.test(program.equipment) ? "ESZKÖZ NÉLKÜL" : program.equipment.toUpperCase();
   const eyebrow = joined
     ? `${program.title.toUpperCase()} · ${curWeek}. HÉT · MAI EDZÉS`
-    : "LEXFIT · 8 HETES PROGRAM";
+    : "LEXFIT · OTTHONI EDZÉS"; // no hardcoded program length (it's data-driven)
 
   return (
     <section className="hb">

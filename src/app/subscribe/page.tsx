@@ -28,7 +28,9 @@ const ANNUAL_PER_WEEK = perWeekHuf(ANNUAL);
 const SAVINGS = annualSavingsPct();
 
 const FEATURES = [
-  "8 hetes Foundation program — 40 vezetett edzés",
+  // Reframed off the stale "8 hetes Foundation — 40 edzés" claim: no fixed
+  // program length, not centred on one program (pending the marketing rewrite).
+  "Vezetett programok, lépésről lépésre",
   "Teljes videótár · F·B·R·T·N·M kódrendszer",
   "Heti közösségi kihívás — együtt, minden héten",
   "Alexa végig veled — follow-along minden edzésen",
@@ -52,6 +54,53 @@ const CHOSEN_BY_ROLE: Record<string, Chosen> = {
   annual_std: { role: "annual_std", title: "Éves tagság", recurring: true, terms: `Ma ${formatHuf(ANNUAL)} egy teljes évre (${formatHuf(ANNUAL_PER_WEEK)}/hét), évente automatikusan megújul.` },
 };
 
+// The three recurring plans, as the radio selection layer (40 §40.7 / P6). Every
+// figure is from PRICES via the display helpers — annual pre-selected. The
+// per-week line makes SPÓROLJ verifiable like-for-like (monthly ÷ 52 weeks via
+// its annualised amount; weekly = the standard weekly).
+type RecurringRole = "annual_std" | "month_std" | "week_intro";
+interface Plan {
+  role: RecurringRole;
+  label: string;
+  amount: string; // headline price
+  unit: string;
+  terms: string;
+  perWeek: string; // like-for-like comparison line
+  badge?: string;
+  savings?: string;
+  ctaAmount: string;
+  ctaPeriod: string; // CTA repeats "{amount} / {period}" (J1)
+}
+const PLANS: Plan[] = [
+  {
+    role: "annual_std", label: "ÉVES",
+    amount: formatHuf(ANNUAL_PER_WEEK), unit: "/ hét",
+    terms: `${formatHuf(ANNUAL)} / év · évente számlázva`,
+    perWeek: `${formatHuf(ANNUAL_PER_WEEK)} / hét`,
+    badge: "LEGNÉPSZERŰBB", savings: `SPÓROLJ ${SAVINGS}%`,
+    ctaAmount: formatHuf(ANNUAL), ctaPeriod: "év",
+  },
+  {
+    role: "month_std", label: "HAVI",
+    amount: formatHuf(MONTH_STD), unit: "/ hó",
+    terms: "Havonta automatikusan megújul",
+    perWeek: `${formatHuf(perWeekHuf(MONTH_STD * 12))} / hét`,
+    ctaAmount: formatHuf(MONTH_STD), ctaPeriod: "hó",
+  },
+  {
+    role: "week_intro", label: "HETI",
+    amount: formatHuf(WEEK_INTRO), unit: "/ első 7 nap",
+    terms: `Utána ${formatHuf(WEEK_STD)} / hét`,
+    perWeek: `${formatHuf(WEEK_STD)} / hét`,
+    ctaAmount: formatHuf(WEEK_INTRO), ctaPeriod: "első 7 nap",
+  },
+];
+const planToChosen = (p: Plan): Chosen => ({ ...CHOSEN_BY_ROLE[p.role] });
+
+// The community whisper + one-off products, kept as secondary links (J4 — no
+// strikethrough, no "kedvezmény"; 40 §40.7).
+const COMMUNITY = "„A Facebook-közösség ingyenes marad — ez az előfizetés a programot nyitja meg.”";
+
 function SubscribeScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -62,6 +111,14 @@ function SubscribeScreen() {
     if (typeof window === "undefined") return null;
     const plan = new URLSearchParams(window.location.search).get("plan");
     return (plan && CHOSEN_BY_ROLE[plan]) || null;
+  });
+  // The radio selection layer (P6); annual pre-selected.
+  const [selected, setSelected] = useState<RecurringRole>("annual_std");
+  // Returned from a cancelled Stripe checkout (cancel_url=/subscribe?canceled=1).
+  // The plan is intact — reassure and let them continue (40 §40.11 / P9.1).
+  const [canceled] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).get("canceled") === "1";
   });
 
   useEffect(() => {
@@ -96,130 +153,114 @@ function SubscribeScreen() {
     return <ConsentStep chosen={chosen} onBack={() => setChosen(null)} />;
   }
 
+  const selectedPlan = PLANS.find((p) => p.role === selected) ?? PLANS[0];
+  const rovingIdx = PLANS.findIndex((p) => p.role === selected);
+
+  const onPlanKeyDown = (i: number) => (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    let next = -1;
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") next = (i + 1) % PLANS.length;
+    else if (e.key === "ArrowUp" || e.key === "ArrowLeft") next = (i - 1 + PLANS.length) % PLANS.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = PLANS.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    setSelected(PLANS[next].role);
+    document.getElementById(`plan-${PLANS[next].role}`)?.focus();
+  };
+
   return (
     <div className="lx">
-      <div className={styles.pricingPage}>
-        <header className={styles.head}>
-          <p className={styles.eyebrow}>SZAVAZZ MAGADRA</p>
-          <h1 className={styles.h1}>Válaszd ki, hogyan kezded</h1>
-          <p className={styles.lede}>
-            Bármelyikkel ugyanaz a teljes hozzáférés. A lemondás mindig egy kattintás.
-          </p>
-        </header>
+      <div className={styles.page}>
+        <main className={styles.card}>
+          <p className={styles.eyebrow}>ELŐFIZETÉS</p>
+          <h1 className={styles.title}>Egy előfizetés. Minden funkció.</h1>
+          <p className={styles.sub}>Bármikor lemondhatod.</p>
 
-        <div className={styles.grid}>
-          {/* HETI */}
-          <div className={styles.tier}>
-            <div className={styles.tierName}>Heti</div>
-            <div className={styles.price}>
-              <span className={styles.bigAmt}>{formatHuf(WEEK_INTRO)}</span>
-              <span className={styles.unit}>első 7 nap</span>
-            </div>
-            {/* J1: renewal terms at EQUAL weight, next to the intro price. */}
-            <p className={styles.renew}>
-              utána {formatHuf(WEEK_STD)}/hét, automatikusan megújul — bármikor egy
-              kattintással lemondhatod.
+          {canceled && (
+            <p className={styles.cancelNote} role="status">
+              Nem történt fizetés. A terved megvan — bármikor folytathatod.
             </p>
+          )}
+
+          {/* P6.1 — radio selection; annual pre-selected. One CTA below, not per card. */}
+          <div className={styles.plans} role="radiogroup" aria-label="Előfizetési csomag">
+            {PLANS.map((p, i) => {
+              const on = p.role === selected;
+              return (
+                <button
+                  key={p.role}
+                  id={`plan-${p.role}`}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  tabIndex={i === rovingIdx ? 0 : -1}
+                  className={`${styles.planOpt} ${on ? styles.planOptOn : ""}`}
+                  onClick={() => setSelected(p.role)}
+                  onKeyDown={onPlanKeyDown(i)}
+                >
+                  {p.badge && <span className={styles.planBadge}>{p.badge}</span>}
+                  <span className={styles.planLeft}>
+                    <span className={styles.planLabel}>{p.label}</span>
+                    <span className={styles.planPriceRow}>
+                      <b className={styles.planAmt}>{p.amount}</b>
+                      <span className={styles.planUnit}>{p.unit}</span>
+                    </span>
+                    <span className={styles.planTerms}>{p.terms}</span>
+                    {/* P6.4 — like-for-like per-week, so SPÓROLJ is verifiable. */}
+                    <span className={styles.planPerWeek}>{p.perWeek}</span>
+                  </span>
+                  <span className={styles.planRight}>
+                    {p.savings && <span className={styles.planSavings}>{p.savings}</span>}
+                    <span className={styles.planTick} aria-hidden="true">
+                      {on && <LxIcon d={lxPaths.check} size={13} sw={3} />}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* P6.3 — the single fixed CTA repeats the exact amount. */}
+          <button
+            className={`${styles.cta} ${styles.ctaMain}`}
+            onClick={() => setChosen(planToChosen(selectedPlan))}
+          >
+            Előfizetek — {selectedPlan.ctaAmount} / {selectedPlan.ctaPeriod}
+          </button>
+          <p className={styles.ctaFoot}>Bármikor lemondható · 14 napos pénzvisszafizetési garancia</p>
+
+          {/* P6.2 — one-off products as secondary links (J4: no strikethrough, no "kedvezmény"). */}
+          <div className={styles.oneoffs}>
             <button
-              className={styles.pick}
-              onClick={() =>
-                setChosen({
-                  role: "week_intro",
-                  title: "Heti tagság",
-                  recurring: true,
-                  terms: `Ma ${formatHuf(WEEK_INTRO)} az első 7 napért, utána ${formatHuf(WEEK_STD)}/hét, automatikusan megújul.`,
-                })
-              }
-            >
-              Kezdd el
-            </button>
-            {/* J4: separate product, NO strikethrough, NO "kedvezmény". */}
-            <button
-              className={styles.oneoff}
-              onClick={() =>
-                setChosen({
-                  role: "week_oneoff",
-                  title: "Egy hét (7 nap)",
-                  recurring: false,
-                  terms: `Egyszeri ${formatHuf(WEEK_ONEOFF)} a 7 napos hozzáférésért. Nem újul meg.`,
-                })
-              }
+              className={styles.oneoffLink}
+              onClick={() => setChosen({ role: "week_oneoff", title: "Egy hét (7 nap)", recurring: false, terms: `Egyszeri ${formatHuf(WEEK_ONEOFF)} a 7 napos hozzáférésért. Nem újul meg.` })}
             >
               Csak egy hetet szeretnék → {formatHuf(WEEK_ONEOFF)}
             </button>
-          </div>
-
-          {/* ÉVES — hero, pre-highlighted */}
-          <div className={`${styles.tier} ${styles.hero}`}>
-            <div className={styles.badge}>Legnépszerűbb · Spórolj {SAVINGS}%</div>
-            <div className={styles.tierName}>Éves</div>
-            <div className={styles.price}>
-              <span className={styles.bigAmt}>{formatHuf(ANNUAL_PER_WEEK)}</span>
-              <span className={styles.unit}>/hét</span>
-            </div>
-            <p className={styles.renew}>{formatHuf(ANNUAL)}/év, évente számlázva. Automatikusan megújul.</p>
             <button
-              className={`${styles.pick} ${styles.pickHero}`}
-              onClick={() =>
-                setChosen({
-                  role: "annual_std",
-                  title: "Éves tagság",
-                  recurring: true,
-                  terms: `Ma ${formatHuf(ANNUAL)} egy teljes évre (${formatHuf(ANNUAL_PER_WEEK)}/hét), évente automatikusan megújul.`,
-                })
-              }
-            >
-              Kezdd el
-            </button>
-            <div className={styles.oneoffSpacer} />
-          </div>
-
-          {/* HAVI */}
-          <div className={styles.tier}>
-            <div className={styles.tierName}>Havi</div>
-            <div className={styles.price}>
-              <span className={styles.bigAmt}>{formatHuf(MONTH_STD)}</span>
-              <span className={styles.unit}>/hó</span>
-            </div>
-            <p className={styles.renew}>Automatikusan megújul havonta — bármikor egy kattintással lemondhatod.</p>
-            <button
-              className={styles.pick}
-              onClick={() =>
-                setChosen({
-                  role: "month_std",
-                  title: "Havi tagság",
-                  recurring: true,
-                  terms: `Ma ${formatHuf(MONTH_STD)}, havonta automatikusan megújul.`,
-                })
-              }
-            >
-              Kezdd el
-            </button>
-            <button
-              className={styles.oneoff}
-              onClick={() =>
-                setChosen({
-                  role: "month_oneoff",
-                  title: "Egy hónap (30 nap)",
-                  recurring: false,
-                  terms: `Egyszeri ${formatHuf(MONTH_ONEOFF)} a 30 napos hozzáférésért. Nem újul meg.`,
-                })
-              }
+              className={styles.oneoffLink}
+              onClick={() => setChosen({ role: "month_oneoff", title: "Egy hónap (30 nap)", recurring: false, terms: `Egyszeri ${formatHuf(MONTH_ONEOFF)} a 30 napos hozzáférésért. Nem újul meg.` })}
             >
               Csak egy hónapot szeretnék → {formatHuf(MONTH_ONEOFF)}
             </button>
           </div>
-        </div>
 
-        <ul className={styles.featRow}>
-          {FEATURES.map((f) => (
-            <li key={f}>
-              <span className={styles.fk}><LxIcon d={lxPaths.check} size={12} sw={3} /></span>
-              {f}
-            </li>
-          ))}
-        </ul>
-        <p className={styles.note}>Biztonságos fizetés a Stripe-pal · A közösség ingyenes marad.</p>
+          {/* P6.5 — feature list + community whisper below the fold. */}
+          <div className={styles.featBlock}>
+            <p className={styles.featHd}>Mind a három csomagban</p>
+            <ul className={styles.feat}>
+              {FEATURES.map((f) => (
+                <li key={f}>
+                  <span className={styles.fk}><LxIcon d={lxPaths.check} size={12} sw={3} /></span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <p className={styles.community}>{COMMUNITY}</p>
+          </div>
+
+          <p className={styles.note}>Biztonságos fizetés a Stripe-pal · A közösség ingyenes marad.</p>
+        </main>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import "./auth.css";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -13,7 +13,9 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
-import { ensureUserDoc, hasOnboarded } from "@/lib/user";
+import { ensureUserDoc, hasOnboarded, saveOnboarding, BLANK_ONBOARDING } from "@/lib/user";
+import { paidDestination } from "@/lib/billing";
+import { readDraft, clearDraft } from "@/lib/onboarding-draft";
 import { Loader } from "@/components/Protected";
 
 type Mode = "login" | "register";
@@ -40,6 +42,8 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
   const [marketing, setMarketing] = useState(false); // register: default UNCHECKED (GDPR opt-in)
   const [busy, setBusy] = useState(false);
 
+  const [attachError, setAttachError] = useState(false);
+
   const pendingRef = useRef<PendingExtra>(null);
   const firstFieldRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -48,22 +52,49 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
 
   const isReg = mode === "register";
 
-  // Redirect the moment we're authenticated: ensure the user doc (writing the
-  // email-register extras if present), then route by onboarding status. Pricing
-  // is intentionally NOT part of auth — plan selection is a later checkout step.
+  // Route once authenticated (40 §40.8). A pre-auth onboarding draft is attached
+  // here — exactly once, idempotently — before any redirect:
+  //  · already onboarded → discard the local draft, go to the app (never re-ask);
+  //  · not onboarded + a draft → save it, then checkout (/subscribe);
+  //  · not onboarded, no draft → finish onboarding.
+  // On attach failure the draft is kept and we retry in place — the user is
+  // never sent back through the questions (40 §40.12 / P3.5). Pricing is not part
+  // of auth — plan selection is the checkout step.
+  const routeAfterAuth = useCallback(async () => {
+    if (!user) return;
+    setAttachError(false);
+    const done = await hasOnboarded(user.uid);
+    if (done) {
+      clearDraft();
+      router.replace(await paidDestination(user.uid));
+      return;
+    }
+    const draft = readDraft();
+    if (draft?.answers && draft.answers.goal != null) {
+      try {
+        await saveOnboarding(user.uid, { ...BLANK_ONBOARDING, ...draft.answers });
+        clearDraft();
+        router.replace("/subscribe");
+      } catch {
+        setAttachError(true);
+      }
+    } else {
+      router.replace("/onboarding");
+    }
+  }, [user, router]);
+
   useEffect(() => {
     if (loading || !user) return;
     let active = true;
     (async () => {
       await ensureUserDoc(user, pendingRef.current ?? undefined);
       pendingRef.current = null;
-      const done = await hasOnboarded(user.uid);
-      if (active) router.replace(done ? "/app" : "/onboarding");
+      if (active) await routeAfterAuth();
     })();
     return () => {
       active = false;
     };
-  }, [user, loading, router]);
+  }, [user, loading, routeAfterAuth]);
 
   // Autofocus the first field on mount / route change (matches the reference).
   useEffect(() => {
@@ -164,8 +195,25 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
     router.push(target === "login" ? "/login" : "/register");
   }
 
-  // While auth resolves or a redirect is pending, show the branded loader.
-  if (loading || user) return <Loader />;
+  // While auth resolves or a redirect is pending, show the branded loader — or,
+  // if attaching the onboarding answers failed, an in-place retry (never a trip
+  // back through the questions — the draft is still in localStorage; P3.5).
+  if (loading) return <Loader />;
+  if (user) {
+    if (attachError) {
+      return (
+        <div className="lx authx">
+          <div className="attach-retry" role="alert">
+            <p>A fiókod elkészült, de a válaszaidat nem tudtuk elmenteni. Újrapróbáljuk?</p>
+            <button type="button" className="submit" onClick={() => void routeAfterAuth()}>
+              <span className="tx">Újra</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return <Loader />;
+  }
 
   return (
     <div className="lx authx">
@@ -196,22 +244,25 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
               <br />
               <b>Együtt muszáj.</b>
             </div>
+            {/* PLACEHOLDER copy pending the marketing rewrite — asserts no fixed
+                program length and is not Foundation-centric. Kept identical to the
+                funnel welcome stats (_mock.ts, P4.7 single-source). */}
             <p className="bsub">
-              4 hetes vezetett program, 100+ edzés és egy közösség, ami megtart. Otthon, eszköz
-              nélkül, napi 30 percben.
+              Vezetett program otthonra, és egy közösség, ami megtart. Eszköz nélkül, napi 30
+              percben.
             </p>
             <div className="bstats">
               <div className="s">
-                <div className="v">4 hét</div>
-                <div className="k">Foundation</div>
+                <div className="v">30 perc</div>
+                <div className="k">egy edzés</div>
               </div>
               <div className="s">
-                <div className="v">100+</div>
-                <div className="k">edzés</div>
+                <div className="v">Otthon</div>
+                <div className="k">eszköz nélkül</div>
               </div>
               <div className="s">
                 <div className="v">17 000+</div>
-                <div className="k">a közösségben</div>
+                <div className="k">a csoportban</div>
               </div>
             </div>
           </div>
