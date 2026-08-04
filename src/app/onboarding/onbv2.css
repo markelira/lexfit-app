@@ -808,3 +808,82 @@
 }
 .lx .fnl-paygoal .mono { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); }
 .lx .fnl-paygoal strong { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Reveal v2 — Apple-Fitness style (skill: apple-design). The week ring is the
+   one bold signature; everything else stays quiet. Motion is transform/opacity
+   only, materializes rather than fades, and reduced-motion cross-fades.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Hero — centred ring + legend + goal headline (Apple "summary" composition). */
+.lx .rv-hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: var(--sp-2); }
+.lx .rv-hero .eyebrow { margin-bottom: var(--sp-5); }
+.lx .rv-hero .reveal-hd { margin-top: var(--sp-5); max-width: 15ch; letter-spacing: -0.02em; }
+
+/* The activity ring — the signature. Draws on mount; count materializes after. */
+.lx .wr { position: relative; }
+.lx .wr svg { display: block; }
+.lx .wr-track { stroke: var(--surface-2); }
+.lx .wr-prog { stroke: url(#wr-grad); animation: wrDraw 1100ms cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 140ms; }
+@keyframes wrDraw { from { stroke-dashoffset: var(--c); } }
+.lx .wr-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; animation: wrNum 460ms ease both; animation-delay: 420ms; }
+@keyframes wrNum { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: none; } }
+.lx .wr-n { font-size: 46px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--ink); }
+.lx .wr-l { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+
+/* Weekday legend — which days are training (Mon-first). */
+.lx .rv-legend { display: flex; gap: 6px; margin-top: var(--sp-4); }
+.lx .rv-ld { min-width: 24px; height: 24px; padding: 0 5px; display: grid; place-items: center; border-radius: 999px; font-size: 11px; font-weight: 600; color: var(--ink-3); background: var(--surface-2); }
+.lx .rv-ld.on { background: var(--accent-2); color: #fff; }
+
+/* Alexa's obstacle reassurance — coach voice, quiet and centred. */
+.lx .rv-coach { margin-top: var(--sp-5); font-size: 13.5px; line-height: 1.5; color: var(--ink-2); text-align: center; text-wrap: pretty; }
+
+/* Plan summary — stat tiles + honest computed pace footer (Apple summary card). */
+.lx .rv-card { margin-top: var(--sp-5); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
+.lx .rv-stats { display: grid; grid-template-columns: 1fr 1fr; }
+.lx .rv-stat { padding: var(--sp-4); display: flex; flex-direction: column; gap: 5px; border-bottom: 1px solid var(--line); }
+.lx .rv-stat:nth-child(odd) { border-right: 1px solid var(--line); }
+.lx .rv-stat:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: 0; }
+.lx .rv-k { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); }
+.lx .rv-v { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.25; }
+.lx .rv-pace { padding: var(--sp-4); background: var(--accent-soft); display: flex; flex-direction: column; gap: 3px; }
+.lx .rv-pace strong { font-size: 14px; font-weight: 700; color: var(--ink); }
+.lx .rv-pace span { font-size: 11.5px; color: var(--ink-2); line-height: 1.45; }
+
+/* The first-workout card reads as the "thickest" surface — deliberate depth. */
+.lx .fnl-reveal .fnl-workout { border-radius: var(--r-lg); box-shadow: 0 12px 30px -16px rgba(24, 32, 29, 0.30); }
+
+/* Materialize the reveal in a staggered sequence (transform/opacity only). */
+.lx .fnl-scroll.rv2 { animation: none; }
+.lx .rv2 > * { animation: rvIn 480ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lx .rv2 > *:nth-child(1) { animation-delay: 0ms; }
+.lx .rv2 > *:nth-child(2) { animation-delay: 90ms; }
+.lx .rv2 > *:nth-child(3) { animation-delay: 150ms; }
+.lx .rv2 > *:nth-child(4) { animation-delay: 210ms; }
+.lx .rv2 > *:nth-child(5) { animation-delay: 270ms; }
+.lx .rv2 > *:nth-child(6) { animation-delay: 330ms; }
+.lx .rv2 > *:nth-child(7) { animation-delay: 390ms; }
+@keyframes rvIn { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: none; } }
+
+/* The "building your plan" moment — centred, honest, reflects real inputs. */
+.lx .fnl-building { justify-content: center; }
+.lx .fnl-buildwrap { margin: auto; display: flex; flex-direction: column; align-items: center; gap: var(--sp-5); padding: var(--sp-6); text-align: center; }
+.lx .fnl-buildstatus { min-height: 20px; }
+.lx .bs-line { display: block; font-size: 13px; color: var(--ink-2); animation: bsIn 320ms ease both; }
+@keyframes bsIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+.lx .fnl-buildbar { width: 168px; height: 4px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.lx .fnl-buildbar > span { display: block; height: 100%; width: var(--p, 0%); background: var(--accent-2); border-radius: 999px; transition: width 480ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Press feedback on the primary CTA (skill §1 — respond on press). */
+.lx .fnl-cta { transition: transform var(--dur-fast) ease, background var(--dur-base) ease; }
+.lx .fnl-cta:active { transform: scale(0.985); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lx .wr-prog, .lx .wr-c, .lx .rv2 > *, .lx .bs-line { animation: none; }
+  .lx .fnl-buildbar > span, .lx .fnl-cta { transition: none; }
+  .lx .fnl-cta:active { transform: none; }
+}
+@media (prefers-contrast: more) {
+  .lx .rv-ld { border: 1px solid var(--ink-3); }
+}

@@ -22,7 +22,6 @@ import { OptionList } from "@/components/onboarding/OptionList";
 import { Segmented } from "@/components/onboarding/Segmented";
 import { Whisper } from "@/components/onboarding/Whisper";
 import { FlameRating } from "@/components/onboarding/FlameRating";
-import { WeekStrip } from "@/components/profile/WeekStrip";
 import type { WeekCellState } from "@/lib/profile";
 import { MOCK } from "./_mock";
 
@@ -566,11 +565,104 @@ function WhyStep({
   );
 }
 
-// ── Step 08 — the reveal: a personalized plan that CONSUMES every answer
-// (research — docs/onboarding-personalization-plan.md). Goal headline → quoted
-// "why" → reflected obstacle → summary chips (focus/level/days/time/safety) →
-// their weekday calendar → honest pace trajectory → real F001 → social proof.
-// No placeholder beats, no body numbers, no fixed length. CTA → plan. ──
+// ── Step 08 — the reveal. Apple-Fitness-style (skill: apple-design): the week
+// ring is the signature; everything else stays quiet. A once-per-session
+// "building your plan" moment (honest, reflects real inputs) materializes into
+// the plan. Consumes every answer: ring=days, legend=weekdays, headline=goal,
+// quote=why, coach line=obstacle, stat tiles=focus/level/time/env, pace=days.
+// Motion is transform/opacity only; reduced-motion cross-fades (skill §11/§14). ──
+const REVEAL_SEEN_KEY = "lx_reveal_built";
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+const revealSeen = () => {
+  try { return sessionStorage.getItem(REVEAL_SEEN_KEY) === "1"; } catch { return false; }
+};
+const markRevealSeen = () => { try { sessionStorage.setItem(REVEAL_SEEN_KEY, "1"); } catch { /* private mode */ } };
+
+// The activity ring — one green arc filled to days/7, the count in the centre.
+// Draws on mount via CSS (stroke-dashoffset from a --c custom prop); structure
+// is information — the arc IS the share of the week that is training.
+function WeekRing({ days, size = 132 }: { days: number; size?: number }) {
+  const stroke = 12;
+  const rad = (size - stroke) / 2;
+  const c = 2 * Math.PI * rad;
+  const target = c * (1 - Math.max(0, Math.min(days, 7)) / 7);
+  const half = size / 2;
+  return (
+    <div className="wr" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+        <defs>
+          <linearGradient id="wr-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="var(--accent)" />
+            <stop offset="1" stopColor="var(--accent-2)" />
+          </linearGradient>
+        </defs>
+        <circle className="wr-track" cx={half} cy={half} r={rad} strokeWidth={stroke} fill="none" />
+        <circle
+          className="wr-prog" cx={half} cy={half} r={rad} strokeWidth={stroke} fill="none"
+          strokeLinecap="round" transform={`rotate(-90 ${half} ${half})`}
+          style={{ "--c": `${c}px`, strokeDasharray: c, strokeDashoffset: target } as React.CSSProperties}
+        />
+      </svg>
+      <div className="wr-c">
+        <span className="wr-n tabular">{days}</span>
+        <span className="wr-l mono">nap / hét</span>
+      </div>
+    </div>
+  );
+}
+
+const LEGEND_LETTERS = ["H", "K", "Sz", "Cs", "P", "Sz", "V"];
+function WeekdayLegend({ cells }: { cells: { weekday: number; state: WeekCellState }[] }) {
+  return (
+    <div className="rv-legend" role="group" aria-label="Edzésnapok">
+      {LEGEND_LETTERS.map((lb, i) => {
+        const on = cells.find((cc) => cc.weekday === i + 1)?.state === "todo";
+        return (
+          <span key={i} className={`rv-ld${on ? " on" : ""}`} aria-label={`${lb} ${on ? "edzésnap" : "pihenő"}`}>
+            {lb}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+// The honest "building your plan" moment (research: labor illusion lifts perceived
+// value; skill §11 — never fake-long). Status lines reflect real answers.
+function BuildingPlan({ a, onDone }: { a: FunnelAnswers; onDone: () => void }) {
+  const r = MOCK.reveal;
+  const lines = useMemo(() => {
+    const focus = a.focus ? r.focusPhrase[a.focus] : null;
+    return [
+      "Elemzem a válaszaidat",
+      focus ? `Fókusz: ${focus}` : "Kiválasztom az edzéseidet",
+      `Heti ${a.days} edzés összeáll`,
+      "Kész",
+    ];
+  }, [a, r]);
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const stepMs = 540;
+    const iv = setInterval(() => setI((x) => (x < lines.length - 1 ? x + 1 : x)), stepMs);
+    const done = setTimeout(onDone, stepMs * lines.length + 220);
+    return () => { clearInterval(iv); clearTimeout(done); };
+  }, [lines.length, onDone]);
+  return (
+    <div className="fnl-main fnl fnl-reveal fnl-building" aria-busy="true">
+      <div className="fnl-buildwrap">
+        <WeekRing days={a.days} />
+        <div className="fnl-buildstatus" role="status" aria-live="polite">
+          <span key={i} className="bs-line">{lines[i]}</span>
+        </div>
+        <div className="fnl-buildbar" aria-hidden="true">
+          <span style={{ "--p": `${((i + 1) / lines.length) * 100}%` } as React.CSSProperties} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Reveal({
   a, weekCells, onBack, onNext, headRef,
 }: {
@@ -580,26 +672,29 @@ function Reveal({
   onNext: () => void;
   headRef: React.Ref<HTMLHeadingElement>;
 }) {
+  // Play the build moment once per session; reduced-motion skips straight in.
+  const [built, setBuilt] = useState(() => prefersReducedMotion() || revealSeen());
+  const finish = useCallback(() => { markRevealSeen(); setBuilt(true); }, []);
+  if (!built) return <BuildingPlan a={a} onDone={finish} />;
+
   const r = MOCK.reveal;
   const headline = (r.outcomes[a.goal ?? "ero"] ?? r.outcomes.ero).headline;
   const fw = FIRST_WORKOUT;
   const why = a.why.trim();
   const obstacleLine = a.obstacle ? r.obstaclePhrase[a.obstacle] : null;
 
-  // Summary chips — one per answer, echoed back so the fixed plan reads as a
-  // computed, personal result (research: perceived personalization drives pay).
+  // Stat tiles — every answer echoed back (Apple "summary" tiles). Only the
+  // answers with a value render; days lives in the ring.
   const timeChip = MOCK.time.options.find((o) => o.v === a.time)?.label;
   const envReal = a.env.filter((e) => e !== "none");
-  const chips = [
-    a.focus ? r.focusPhrase[a.focus] : "",
-    a.level ? r.levelPhrase[a.level] : "",
-    `Heti ${a.days} edzés`,
-    timeChip ?? "",
-    envReal.length === 1 ? r.envChip[envReal[0]] : envReal.length > 1 ? r.envChipMany : "",
-  ].filter(Boolean);
+  const envChip = envReal.length === 1 ? r.envChip[envReal[0]] : envReal.length > 1 ? r.envChipMany : null;
+  const stats = [
+    a.focus ? { k: "Fókusz", v: r.focusPhrase[a.focus] } : null,
+    a.level ? { k: "Tempó", v: r.levelPhrase[a.level] } : null,
+    timeChip ? { k: "Mikor", v: timeChip } : null,
+    { k: "Figyelek", v: envChip ?? "Nincs külön kérés" },
+  ].filter(Boolean) as { k: string; v: string }[];
 
-  // Honest effort/consistency trajectory — computed from days (monthly cadence),
-  // NO body numbers and NO fixed program length (user rule).
   const paceLine = r.paceLine
     .replace("{days}", String(a.days))
     .replace("{sessions}", String(a.days * 4));
@@ -611,50 +706,46 @@ function Reveal({
           <LxIcon d={lxPaths.chevronLeft} size={18} />
         </button>
       </div>
-      <div className="fnl-scroll">
-        {/* Hero — goal-tied capability headline (Alexa's voice). */}
-        <div className="eyebrow mono">{r.eyebrow}</div>
-        <h1 className="reveal-hd" ref={headRef} tabIndex={-1}>{headline}</h1>
+      <div className="fnl-scroll rv2">
+        {/* Hero — the ring is the signature; count = days/week, legend = which days. */}
+        <div className="rv-hero">
+          <div className="eyebrow mono">{r.eyebrow}</div>
+          <WeekRing days={a.days} />
+          <WeekdayLegend cells={weekCells} />
+          <h1 className="reveal-hd" ref={headRef} tabIndex={-1}>{headline}</h1>
+        </div>
 
-        {/* Their own "why", quoted back — the emotional anchor (was discarded). */}
+        {/* Their own words, quoted back — the emotional anchor. */}
         {why && (
-          <figure className="fnl-quote">
+          <figure className="fnl-quote rv-i">
             <span className="fq-l mono">{r.whyLabel}</span>
             <blockquote>„{why}”</blockquote>
             <figcaption>— {r.whyEcho}</figcaption>
           </figure>
         )}
 
-        {/* Obstacle reflected back — Alexa's reassurance (was discarded). */}
-        {obstacleLine && <Whisper>{`„${obstacleLine}”`}</Whisper>}
+        {/* Alexa's reassurance for the obstacle they named. */}
+        {obstacleLine && <p className="rv-coach rv-i">{obstacleLine}</p>}
 
-        {/* Summary chips — every answer, echoed as a computed result. */}
-        {chips.length > 0 && (
-          <>
-            <span className="reveal-wl mono">{r.chipsLabel}</span>
-            <ul className="fnl-chips">
-              {chips.map((c, i) => <li key={i} className="fnl-chip">{c}</li>)}
-            </ul>
-          </>
-        )}
+        {/* Plan summary — stat tiles + honest, computed pace footer. */}
+        <section className="rv-card rv-i" aria-label={r.chipsLabel}>
+          <div className="rv-stats">
+            {stats.map((s) => (
+              <div className="rv-stat" key={s.k}>
+                <span className="rv-k mono">{s.k}</span>
+                <span className="rv-v">{s.v}</span>
+              </div>
+            ))}
+          </div>
+          <div className="rv-pace">
+            <strong className="tabular">{paceLine}</strong>
+            <span>{r.paceNote}</span>
+          </div>
+        </section>
 
-        {/* Restated week — proof the plan is built from THEIR weekdays. */}
-        <span className="reveal-wl mono">{r.weekLabel}</span>
-        <div className="fnl-weekcard">
-          <WeekStrip week={weekCells} />
-          <p className="wc-sum">{r.phaseLabel}</p>
-        </div>
-
-        {/* Honest pace/consistency trajectory, computed from days. */}
-        <span className="reveal-wl mono">{r.paceLabel}</span>
-        <div className="fnl-pace">
-          <strong className="tabular">{paceLine}</strong>
-          <p>{r.paceNote}</p>
-        </div>
-
-        {/* The concrete first step — always F001. */}
-        <span className="reveal-wl mono">{r.workoutLabel}</span>
-        <div className="fnl-workout">
+        {/* The concrete first step — the material card (deliberate depth). */}
+        <span className="reveal-wl mono rv-i">{r.workoutLabel}</span>
+        <div className="fnl-workout rv-i">
           <div className="thumb">
             <span className="flag mono">1. NAP</span>
             <span className="dur mono tabular">{fw.mins} PERC</span>
@@ -662,7 +753,7 @@ function Reveal({
           <div className="wtitle">Foundation · {fw.title}</div>
         </div>
 
-        <p className="reveal-social mono">{r.social}</p>
+        <p className="reveal-social mono rv-i">{r.social}</p>
       </div>
       <div className="fnl-foot">
         <button className="fnl-cta" onClick={onNext}>{r.cta}</button>
