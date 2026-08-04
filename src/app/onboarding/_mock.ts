@@ -43,6 +43,21 @@ export const MOCK = {
     ] satisfies OptionItem[],
   },
 
+  // Focus area — the body-positive rewrite of "problem areas" (research: the
+  // single biggest untapped "this is mine" lever for a women-first app). Framed
+  // as "where you want to feel stronger", never "trouble zones". Single-select.
+  focus: {
+    heading: "Hol szeretnél erősödni?",
+    sub: "Egyet válassz — erre teszek majd külön hangsúlyt. Később módosítható.",
+    options: [
+      { v: "fenek", icon: lxPaths.flame, label: "Fenék, comb", sub: "Stabil, erős alsótest." },
+      { v: "core", icon: lxPaths.gauge, label: "Has, törzs", sub: "Erős törzs, biztos tartás." },
+      { v: "kar", icon: lxPaths.dumbbell, label: "Kar, váll", sub: "Feszes, erős felsőtest." },
+      { v: "tartas", icon: lxPaths.userRound, label: "Hát, tartás", sub: "Egyenes gerinc, nyitott mellkas." },
+      { v: "teljes", icon: lxPaths.layoutGrid, label: "Teljes test", sub: "Mindenből egyensúlyban." },
+    ] satisfies OptionItem[],
+  },
+
   level: {
     heading: "Hol tartasz most?",
     sub: "Ne becsüld túl és ne is alá — ehhez igazítjuk a tempót.",
@@ -94,6 +109,20 @@ export const MOCK = {
     ] satisfies OptionItem[],
   },
 
+  // Obstacle — "what stopped you before?" (research: reflect it back on the
+  // reveal, pre-empt the churn reason). Empathy, not failure. Single-select.
+  obstacle: {
+    heading: "Mi állított meg eddig?",
+    sub: "Hogy tudjam, mire figyeljek — és mikor bátorítsalak. Nincs rossz válasz.",
+    options: [
+      { v: "ido", icon: lxPaths.clock, label: "Nem volt rá időm", sub: "Sose jött ki a naptárból." },
+      { v: "motiv", icon: lxPaths.rotateCcw, label: "Elfogyott a lendület", sub: "Elkezdtem, de abbamaradt." },
+      { v: "tudas", icon: lxPaths.search, label: "Nem tudtam, mit csináljak", sub: "Túl sok infó, semmi rendszer." },
+      { v: "serules", icon: lxPaths.shield, label: "Fájdalom vagy sérülés", sub: "Óvatosnak kellett lennem." },
+      { v: "elso", icon: lxPaths.play, label: "Most vágok bele először", sub: "Eddig nem próbáltam igazán." },
+    ] satisfies OptionItem[],
+  },
+
   why: {
     heading: "És miért most?",
     sub: "Egy mondat elég. Ezt később visszahozom neked — akkor, amikor nehéz lesz.",
@@ -104,38 +133,52 @@ export const MOCK = {
     skip: "Most kihagyom",
   },
 
+  // The reveal now CONSUMES every answer (research: perceived personalization =
+  // echo the user's own inputs back). Copy is real & honest — NO weight numbers,
+  // NO fixed program length, NO placeholder beats. The "trajectory" is effort/
+  // consistency (days → monthly cadence + habit), never a body outcome.
   reveal: {
     eyebrow: "A te terved",
+    whyLabel: "Amiért belevágtál",
+    whyEcho: "Ezt viszem végig veled.",
+    chipsLabel: "Ezt raktam össze neked",
     weekLabel: "Ez a heted",
+    phaseLabel: "1. blokk · Alapozás",
+    paceLabel: "A tempód",
+    // {days}/{sessions} filled at render — computed, honest, no fixed length.
+    paceLine: "Heti {days} edzés · havonta ~{sessions} alkalom",
+    paceNote: "A lényeg a rendszer, nem a sebesség — pár hét, és magától megy.",
     workoutLabel: "Az első edzésed",
+    social: "17 000+ nő már velünk edz.",
     whisper: "„Ezt a hetet a válaszaidból raktam össze. Ha nem passzol, együtt átírjuk.”",
     cta: "Mentsük el a tervedet",
-    // Goal-branched 3-beat outcome arc (research: show the personalized payoff
-    // right before payment). Headline per goal is real (so branching is visible);
-    // the 3 beats — 1. hét → néhány hét → a cél — are PLACEHOLDER, capability/
-    // habit-based (NO weight numbers, NO fixed length). USER SUPPLIES final copy.
+    // Goal → the reveal headline (real per-goal capability line). Also reused at
+    // the pay step. No beats, no fixed-length claim.
     outcomes: {
-      ero: {
-        headline: "Erősebb, energikusabb tested lesz.",
-        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
-      },
-      forma: {
-        headline: "Formálódsz — fokozatosan, fenntarthatóan.",
-        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
-      },
-      vissza: {
-        headline: "Visszatérsz a mozgáshoz — nulláról, szépen.",
-        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
-      },
-      tartas: {
-        headline: "Jobb tartás, kevesebb fájdalom.",
-        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
-      },
-      szokas: {
-        headline: "Végre meglesz a napi mozgás-szokásod.",
-        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
-      },
-    } as Record<string, { headline: string; beats: [string, string, string] }>,
+      ero: { headline: "Erősebb, energikusabb tested lesz." },
+      forma: { headline: "Formálódsz — fokozatosan, fenntarthatóan." },
+      vissza: { headline: "Visszatérsz a mozgáshoz — nulláról, szépen." },
+      tartas: { headline: "Jobb tartás, kevesebb fájdalom." },
+      szokas: { headline: "Végre meglesz a napi mozgás-szokásod." },
+    } as Record<string, { headline: string }>,
+    // Focus → a short chip phrase for the summary row.
+    focusPhrase: {
+      fenek: "Fenék-comb fókusz", core: "Törzs-fókusz", kar: "Felsőtest-fókusz",
+      tartas: "Tartás-fókusz", teljes: "Teljes test",
+    } as Record<string, string>,
+    // Level → a tempo chip + how Alexa frames the pace.
+    levelPhrase: { 1: "Nyugodt tempó", 2: "Lendületes tempó", 3: "Erős kihívás" } as Record<number, string>,
+    // Env → a compact safety chip (the sentence-shaped envPhrase is too long here).
+    envChip: { csendes: "Csendes", fal: "Támaszos", terd: "Térdkímélő", hat: "Hátkímélő" } as Record<string, string>,
+    envChipMany: "Rád szabva",
+    // Obstacle → Alexa's reassurance, reflected back (empathy, not failure).
+    obstaclePhrase: {
+      ido: "Tudom, hogy az idő a legszűkösebb — ezért napi 30 perc, és kész.",
+      motiv: "A lendület el szokott fogyni — ezért viszlek végig, lépésről lépésre.",
+      tudas: "Nem kell kitalálnod semmit — mindig megmondom, mi a következő.",
+      serules: "Óvatosak leszünk — minden mozdulathoz van kíméletes változat.",
+      elso: "Az első lépés a legnehezebb — innentől már együtt csináljuk.",
+    } as Record<string, string>,
   },
 
   // Napszak → reveal phrasing (40 §40.5 "reggelente").

@@ -764,23 +764,36 @@
 .lx .fnl-day:hover .dot { border-color: var(--accent); }
 .lx .fnl-day:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
 
-/* ── Reveal outcome arc (personalized plan → outcome; docs research). ── */
-.lx .fnl-arc { list-style: none; margin: var(--sp-4) 0 var(--sp-5); padding: 0; }
-.lx .fnl-beat { position: relative; padding: 0 0 16px 26px; }
-.lx .fnl-beat:last-child { padding-bottom: 0; }
-.lx .fnl-beat .node {
-  position: absolute; left: 0; top: 2px; width: 12px; height: 12px; border-radius: 50%;
-  border: 2px solid var(--line); background: var(--surface);
+/* ── Reveal composition — every answer echoed back (docs research). ── */
+
+/* The user's own "why", quoted back (the emotional anchor). */
+.lx .fnl-quote {
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--accent-2);
+  background: var(--accent-soft);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
 }
-.lx .fnl-beat::before {
-  content: ""; position: absolute; left: 5px; top: 14px; bottom: 0; width: 2px; background: var(--line);
+.lx .fnl-quote .fq-l { display: block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-ink); }
+.lx .fnl-quote blockquote { margin: 4px 0 0; font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.4; text-wrap: pretty; }
+.lx .fnl-quote figcaption { margin-top: 6px; font-size: 12px; color: var(--ink-2); }
+
+/* Summary chips — one pill per answer (focus/level/days/time/safety). */
+.lx .fnl-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.lx .fnl-chip {
+  font-size: 12px; font-weight: 600; color: var(--ink-2);
+  padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
 }
-.lx .fnl-beat:last-child::before { display: none; }
-.lx .fnl-beat .ab-t { display: block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-.lx .fnl-beat .ab-x { display: block; font-size: 14px; color: var(--ink-2); line-height: 1.4; margin-top: 2px; }
-.lx .fnl-beat.goal .node { background: var(--accent-2); border-color: var(--accent-2); }
-.lx .fnl-beat.goal .ab-t { color: var(--accent-ink); }
-.lx .fnl-beat.goal .ab-x { color: var(--ink); font-weight: 700; }
+
+/* Honest pace/consistency trajectory (computed from days; no body claim). */
+.lx .fnl-pace {
+  padding: var(--sp-3) var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface);
+}
+.lx .fnl-pace strong { display: block; font-size: 15px; font-weight: 700; color: var(--ink); }
+.lx .fnl-pace p { margin: 4px 0 0; font-size: 12px; color: var(--ink-3); line-height: 1.45; }
+
+/* One honest social-proof line, closing the reveal. */
+.lx .reveal-social { margin-top: var(--sp-5); font-size: 11px; letter-spacing: 0.04em; color: var(--ink-3); text-align: center; }
 
 /* Pay step — repeat the goal outcome above checkout (research). */
 .lx .fnl-paygoal {

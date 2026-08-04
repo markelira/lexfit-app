@@ -30,26 +30,31 @@ import { MOCK } from "./_mock";
 // welcome has no q. Onboarding is now part of one flow ending in payment
 // (pay-to-join). (E1 — docs/onboarding-embedded-plan.md)
 const STEPS = [
-  "welcome", "goal", "level", "days", "time", "env", "why", "reveal", "plan", "account", "pay",
+  "welcome", "goal", "focus", "level", "days", "time", "env", "obstacle", "why",
+  "reveal", "plan", "account", "pay",
 ] as const;
 type StepId = (typeof STEPS)[number];
 const Q_OF: Record<StepId, string | null> = {
-  welcome: null, goal: "1", level: "2", days: "3", time: "4", env: "5", why: "why",
-  reveal: "reveal", plan: "plan", account: "account", pay: "pay",
+  welcome: null, goal: "1", focus: "2", level: "3", days: "4", time: "5", env: "6",
+  obstacle: "7", why: "why", reveal: "reveal", plan: "plan", account: "account", pay: "pay",
 };
 const STEP_OF_Q: Record<string, StepId> = {
-  "1": "goal", "2": "level", "3": "days", "4": "time", "5": "env", why: "why",
-  reveal: "reveal", plan: "plan", account: "account", pay: "pay",
+  "1": "goal", "2": "focus", "3": "level", "4": "days", "5": "time", "6": "env",
+  "7": "obstacle", why: "why", reveal: "reveal", plan: "plan", account: "account", pay: "pay",
 };
-// Question number for the counter/progress (goal=1 … env=5). Non-questions → 5.
-const QUESTION_NO: Partial<Record<StepId, number>> = { goal: 1, level: 2, days: 3, time: 4, env: 5 };
+// Question number for the counter/progress (goal=1 … obstacle=7). Non-questions → 7.
+const QUESTION_NO: Partial<Record<StepId, number>> = {
+  goal: 1, focus: 2, level: 3, days: 4, time: 5, env: 6, obstacle: 7,
+};
+const QUESTION_TOTAL = 7;
 // Monday-first day letters for the week selector (wireframe).
 const DAY_LETTERS = ["H", "K", "SZE", "CS", "P", "SZO", "V"];
 
 // Per-step heading text (for the live-region announcement + counters).
 const HEADINGS: Partial<Record<StepId, string>> = {
-  goal: MOCK.goal.heading, level: MOCK.level.heading, days: MOCK.days.heading,
-  time: MOCK.time.heading, env: MOCK.env.heading, why: MOCK.why.heading, reveal: "A terved kész",
+  goal: MOCK.goal.heading, focus: MOCK.focus.heading, level: MOCK.level.heading,
+  days: MOCK.days.heading, time: MOCK.time.heading, env: MOCK.env.heading,
+  obstacle: MOCK.obstacle.heading, why: MOCK.why.heading, reveal: "A terved kész",
   plan: "Válaszd ki, hogyan kezded", account: "Készítsd el a fiókod", pay: "Már csak egy lépés",
 };
 
@@ -78,37 +83,41 @@ const FUNNEL_PLANS: {
 
 interface FunnelAnswers {
   goal: string | null;
+  focus: string | null; // single primary focus area (persisted as OnboardingAnswers.focus[])
   level: number | null;
   days: number;
   weekdays: number[];
   time: string | null;
   env: string[];
+  obstacle: string | null; // "what stopped you before"
   why: string;
   plan: string; // chosen pricing role; default = the low-friction weekly intro (data-backed, E1)
 }
 const INITIAL: FunnelAnswers = {
-  goal: null, level: null, days: MOCK.days.recommended,
-  weekdays: [...MOCK.days.defaults[MOCK.days.recommended]], time: null, env: [], why: "",
-  plan: "week_intro",
+  goal: null, focus: null, level: null, days: MOCK.days.recommended,
+  weekdays: [...MOCK.days.defaults[MOCK.days.recommended]], time: null, env: [],
+  obstacle: null, why: "", plan: "week_intro",
 };
 
 // FunnelAnswers ↔ the persisted draft (OnboardingAnswers-shaped, so it attaches
 // verbatim on registration). `why` is stored under its canonical `motiv` field.
 function draftFromFunnel(a: FunnelAnswers): DraftAnswers {
   return {
-    goal: a.goal, level: a.level, days: a.days, weekdays: a.weekdays,
-    time: a.time, env: a.env, motiv: a.why,
+    goal: a.goal, focus: a.focus ? [a.focus] : [], level: a.level, days: a.days,
+    weekdays: a.weekdays, time: a.time, env: a.env, obstacle: a.obstacle, motiv: a.why,
   };
 }
 function funnelFromDraft(a: DraftAnswers): FunnelAnswers {
   const days = a.days ?? INITIAL.days;
   return {
     goal: a.goal ?? null,
+    focus: a.focus?.[0] ?? null,
     level: a.level ?? null,
     days,
     weekdays: a.weekdays ?? [...(MOCK.days.defaults[days] ?? INITIAL.weekdays)],
     time: a.time ?? null,
     env: a.env ?? [],
+    obstacle: a.obstacle ?? null,
     why: a.motiv ?? "",
     plan: INITIAL.plan, // plan isn't persisted in the draft yet (E4 resume-at-pay)
   };
@@ -218,9 +227,10 @@ export function OnboardingV2() {
 
   const canNext = useMemo(() => {
     if (step === "goal") return answers.goal != null;
+    if (step === "focus") return answers.focus != null;
     if (step === "level") return answers.level != null;
     if (step === "days") return answers.weekdays.length >= 1;
-    return true; // time/env/why are non-blocking
+    return true; // time/env/obstacle/why are non-blocking
   }, [step, answers]);
 
   // Polite step-change announcement (40 §40.12) — reliable across screen readers
@@ -229,20 +239,11 @@ export function OnboardingV2() {
     if (step === "welcome") return "";
     const h = HEADINGS[step] ?? "";
     const no = QUESTION_NO[step];
-    return no ? `${no}. kérdés az 5-ből. ${h}` : h;
+    return no ? `${no}. kérdés a ${QUESTION_TOTAL}-ből. ${h}` : h;
   }, [step]);
 
-  // Reveal summary, assembled from the user's own answers (O-RULE 05).
-  const envPhrase = useMemo(() => {
-    const real = answers.env.filter((e) => e !== "none");
-    if (real.length === 0) return MOCK.envPhraseNone;
-    if (real.length === 1) return MOCK.envPhrase[real[0]] ?? MOCK.envPhraseMany;
-    return MOCK.envPhraseMany;
-  }, [answers.env]);
-  const weekSummary = `Heti ${answers.days} edzés · ${
-    answers.time ? MOCK.timePhrase[answers.time] : "bármikor"
-  } · ${envPhrase}`;
-
+  // The reveal composes its summary from the user's own answers (O-RULE 05);
+  // it reads `answers` directly, so nothing is pre-assembled here.
   const weekCells: { weekday: number; state: WeekCellState }[] = useMemo(
     () =>
       Array.from({ length: 7 }, (_, i) => ({
@@ -285,8 +286,7 @@ export function OnboardingV2() {
             )}
             {step === "reveal" && (
               <Reveal
-                goal={answers.goal}
-                summary={weekSummary}
+                a={answers}
                 weekCells={weekCells}
                 onBack={() => go(-1)}
                 onNext={() => goto("plan")}
@@ -369,8 +369,13 @@ function QuestionStep({
 }) {
   const no = QUESTION_NO[step]!;
   const q =
-    step === "goal" ? MOCK.goal : step === "level" ? MOCK.level : step === "days" ? MOCK.days
-    : step === "time" ? MOCK.time : MOCK.env;
+    step === "goal" ? MOCK.goal
+    : step === "focus" ? MOCK.focus
+    : step === "level" ? MOCK.level
+    : step === "days" ? MOCK.days
+    : step === "time" ? MOCK.time
+    : step === "env" ? MOCK.env
+    : MOCK.obstacle;
 
   // Single-choice steps auto-advance after a brief highlight; multi-select /
   // free-text / the days compound wait for the "Tovább" button (user request).
@@ -386,7 +391,7 @@ function QuestionStep({
     <StepFrame
       onBack={onBack}
       progressCurrent={no}
-      counter={`${no} / 5`}
+      counter={`${no} / ${QUESTION_TOTAL}`}
       heading={q.heading}
       sub={q.sub}
       headingRef={headingRef}
@@ -402,6 +407,15 @@ function QuestionStep({
           items={MOCK.goal.options}
           value={answers.goal}
           onChange={(v) => pick("goal", v as string | null)}
+        />
+      )}
+
+      {step === "focus" && (
+        <OptionList
+          ariaLabel={MOCK.focus.heading}
+          items={MOCK.focus.options}
+          value={answers.focus}
+          onChange={(v) => pick("focus", v as string | null)}
         />
       )}
 
@@ -491,6 +505,15 @@ function QuestionStep({
           onChange={(v) => set("env", v as string[])}
         />
       )}
+
+      {step === "obstacle" && (
+        <OptionList
+          ariaLabel={MOCK.obstacle.heading}
+          items={MOCK.obstacle.options}
+          value={answers.obstacle}
+          onChange={(v) => pick("obstacle", v as string | null)}
+        />
+      )}
     </StepFrame>
   );
 }
@@ -509,7 +532,7 @@ function WhyStep({
   return (
     <StepFrame
       onBack={onBack}
-      progressCurrent={5}
+      progressCurrent={QUESTION_TOTAL}
       counter="Kész"
       heading={w.heading}
       sub={w.sub}
@@ -543,23 +566,44 @@ function WhyStep({
   );
 }
 
-// ── Step 08 — the reveal: a personalized PLAN WITH AN OUTCOME (research —
-// docs). Goal-tied 3-beat arc (the payoff) → restated week (proof it's theirs)
-// → first workout (concrete first step). CTA leads into plan selection. ──
-const ARC_LABELS = ["1. hét", "Néhány hét", "A cél"];
+// ── Step 08 — the reveal: a personalized plan that CONSUMES every answer
+// (research — docs/onboarding-personalization-plan.md). Goal headline → quoted
+// "why" → reflected obstacle → summary chips (focus/level/days/time/safety) →
+// their weekday calendar → honest pace trajectory → real F001 → social proof.
+// No placeholder beats, no body numbers, no fixed length. CTA → plan. ──
 function Reveal({
-  goal, summary, weekCells, onBack, onNext, headRef,
+  a, weekCells, onBack, onNext, headRef,
 }: {
-  goal: string | null;
-  summary: string;
+  a: FunnelAnswers;
   weekCells: { weekday: number; state: WeekCellState }[];
   onBack: () => void;
   onNext: () => void;
   headRef: React.Ref<HTMLHeadingElement>;
 }) {
   const r = MOCK.reveal;
-  const arc = r.outcomes[goal ?? "ero"] ?? r.outcomes.ero;
+  const headline = (r.outcomes[a.goal ?? "ero"] ?? r.outcomes.ero).headline;
   const fw = FIRST_WORKOUT;
+  const why = a.why.trim();
+  const obstacleLine = a.obstacle ? r.obstaclePhrase[a.obstacle] : null;
+
+  // Summary chips — one per answer, echoed back so the fixed plan reads as a
+  // computed, personal result (research: perceived personalization drives pay).
+  const timeChip = MOCK.time.options.find((o) => o.v === a.time)?.label;
+  const envReal = a.env.filter((e) => e !== "none");
+  const chips = [
+    a.focus ? r.focusPhrase[a.focus] : "",
+    a.level ? r.levelPhrase[a.level] : "",
+    `Heti ${a.days} edzés`,
+    timeChip ?? "",
+    envReal.length === 1 ? r.envChip[envReal[0]] : envReal.length > 1 ? r.envChipMany : "",
+  ].filter(Boolean);
+
+  // Honest effort/consistency trajectory — computed from days (monthly cadence),
+  // NO body numbers and NO fixed program length (user rule).
+  const paceLine = r.paceLine
+    .replace("{days}", String(a.days))
+    .replace("{sessions}", String(a.days * 4));
+
   return (
     <div className="fnl-main fnl fnl-reveal">
       <div className="fnl-top">
@@ -568,26 +612,44 @@ function Reveal({
         </button>
       </div>
       <div className="fnl-scroll">
-        {/* The outcome (hero) — goal-tied headline + 3-beat progression. */}
+        {/* Hero — goal-tied capability headline (Alexa's voice). */}
         <div className="eyebrow mono">{r.eyebrow}</div>
-        <h1 className="reveal-hd" ref={headRef} tabIndex={-1}>
-          {arc.headline}
-        </h1>
-        <ol className="fnl-arc">
-          {arc.beats.map((beat, i) => (
-            <li key={i} className={`fnl-beat${i === arc.beats.length - 1 ? " goal" : ""}`}>
-              <span className="node" aria-hidden="true" />
-              <span className="ab-t mono">{ARC_LABELS[i]}</span>
-              <span className="ab-x">{beat}</span>
-            </li>
-          ))}
-        </ol>
+        <h1 className="reveal-hd" ref={headRef} tabIndex={-1}>{headline}</h1>
 
-        {/* Restated week — proof the plan is built from THEIR answers. */}
+        {/* Their own "why", quoted back — the emotional anchor (was discarded). */}
+        {why && (
+          <figure className="fnl-quote">
+            <span className="fq-l mono">{r.whyLabel}</span>
+            <blockquote>„{why}”</blockquote>
+            <figcaption>— {r.whyEcho}</figcaption>
+          </figure>
+        )}
+
+        {/* Obstacle reflected back — Alexa's reassurance (was discarded). */}
+        {obstacleLine && <Whisper>{`„${obstacleLine}”`}</Whisper>}
+
+        {/* Summary chips — every answer, echoed as a computed result. */}
+        {chips.length > 0 && (
+          <>
+            <span className="reveal-wl mono">{r.chipsLabel}</span>
+            <ul className="fnl-chips">
+              {chips.map((c, i) => <li key={i} className="fnl-chip">{c}</li>)}
+            </ul>
+          </>
+        )}
+
+        {/* Restated week — proof the plan is built from THEIR weekdays. */}
         <span className="reveal-wl mono">{r.weekLabel}</span>
         <div className="fnl-weekcard">
           <WeekStrip week={weekCells} />
-          <p className="wc-sum">{summary}</p>
+          <p className="wc-sum">{r.phaseLabel}</p>
+        </div>
+
+        {/* Honest pace/consistency trajectory, computed from days. */}
+        <span className="reveal-wl mono">{r.paceLabel}</span>
+        <div className="fnl-pace">
+          <strong className="tabular">{paceLine}</strong>
+          <p>{r.paceNote}</p>
         </div>
 
         {/* The concrete first step — always F001. */}
@@ -600,12 +662,10 @@ function Reveal({
           <div className="wtitle">Foundation · {fw.title}</div>
         </div>
 
-        <Whisper strong>{r.whisper}</Whisper>
+        <p className="reveal-social mono">{r.social}</p>
       </div>
       <div className="fnl-foot">
-        <button className="fnl-cta" onClick={onNext}>
-          {r.cta}
-        </button>
+        <button className="fnl-cta" onClick={onNext}>{r.cta}</button>
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
-// The 5-segment funnel progress bar (40 §40.4). One segment per question;
-// `current` filled. role="progressbar" with real values (40 §40.12 a11y).
+// The funnel progress bar (40 §40.4). One segment per question; `current`
+// filled. role="progressbar" with real values (40 §40.12 a11y).
 export function StepProgress({
   current,
-  total = 5,
+  total = 7,
 }: {
-  current: number; // number of filled segments (1–5); the "why" step fills all 5
+  current: number; // number of filled segments (1–7); the "why" step fills all 7
   total?: number;
 }) {
   const now = Math.max(0, Math.min(current, total));
