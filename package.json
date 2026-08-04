@@ -27,6 +27,7 @@
     "@mux/mux-node": "^14.1.1",
     "@mux/mux-player-react": "^3.13.0",
     "@mux/mux-uploader-react": "^1.5.0",
+    "@stripe/react-stripe-js": "^6.8.0",
     "@stripe/stripe-js": "^9.8.0",
     "firebase": "^12.15.0",
     "firebase-admin": "^13.10.0",

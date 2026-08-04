@@ -2,7 +2,6 @@
 
 import "./auth.css";
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   browserLocalPersistence,
@@ -16,6 +15,7 @@ import { useAuth } from "@/lib/auth-context";
 import { ensureUserDoc, hasOnboarded, saveOnboarding, BLANK_ONBOARDING } from "@/lib/user";
 import { paidDestination } from "@/lib/billing";
 import { readDraft, clearDraft } from "@/lib/onboarding-draft";
+import { AuthBrand } from "@/components/auth/AuthBrand";
 import { Loader } from "@/components/Protected";
 
 type Mode = "login" | "register";
@@ -218,70 +218,8 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
   return (
     <div className="lx authx">
       <div className="authx-shell">
-        {/* ── LEFT · brand panel ── */}
-        <aside className="authx-brand">
-          <div className="bmark">
-            <span className="bmark-ico">
-              <svg viewBox="0 0 680 616" aria-hidden="true">
-                <g transform="translate(-192,-152)">
-                  <path
-                    d="M248 712A400 400 0 0 1 648 312"
-                    fill="none"
-                    stroke="#ffffff"
-                    strokeWidth="112"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="800" cy="224" r="72" fill="#ffffff" />
-                </g>
-              </svg>
-            </span>
-            <span className="wm">LEXFIT</span>
-          </div>
-
-          <div className="bbody">
-            <div className="bquote">
-              Egyedül nehéz.
-              <br />
-              <b>Együtt muszáj.</b>
-            </div>
-            {/* PLACEHOLDER copy pending the marketing rewrite — asserts no fixed
-                program length and is not Foundation-centric. Kept identical to the
-                funnel welcome stats (_mock.ts, P4.7 single-source). */}
-            <p className="bsub">
-              Vezetett program otthonra, és egy közösség, ami megtart. Eszköz nélkül, napi 30
-              percben.
-            </p>
-            <div className="bstats">
-              <div className="s">
-                <div className="v">30 perc</div>
-                <div className="k">egy edzés</div>
-              </div>
-              <div className="s">
-                <div className="v">Otthon</div>
-                <div className="k">eszköz nélkül</div>
-              </div>
-              <div className="s">
-                <div className="v">17 000+</div>
-                <div className="k">a csoportban</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bfoot">
-            <div className="bav">
-              <Image
-                src="/trainer-underlayer.jpg"
-                alt="Alexa, a LEXFIT alapítója és edzője"
-                width={44}
-                height={44}
-              />
-            </div>
-            <div className="t">
-              <b>Alexa</b>
-              <span>Alapító · minden edzést ő vezet</span>
-            </div>
-          </div>
-        </aside>
+        {/* ── LEFT · brand panel (shared with the /register wizard) ── */}
+        <AuthBrand />
 
         {/* ── RIGHT · auth column ── */}
         <main className="authx-auth">
@@ -505,7 +443,7 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
   );
 }
 
-function authErrorHu(err: unknown): string {
+export function authErrorHu(err: unknown): string {
   const code = (err as { code?: string })?.code ?? "";
   switch (code) {
     case "auth/email-already-in-use":
@@ -534,7 +472,7 @@ function authErrorHu(err: unknown): string {
   }
 }
 
-function GoogleMark() {
+export function GoogleMark() {
   return (
     <svg viewBox="0 0 48 48" aria-hidden="true">
       <path
@@ -557,7 +495,7 @@ function GoogleMark() {
   );
 }
 
-function AppleMark() {
+export function AppleMark() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -568,7 +506,7 @@ function AppleMark() {
   );
 }
 
-function EyeIcon({ off }: { off: boolean }) {
+export function EyeIcon({ off }: { off: boolean }) {
   return off ? (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
       <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" />

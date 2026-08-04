@@ -33,6 +33,7 @@ export async function POST(req: Request) {
     role?: string;
     autoRenew?: boolean;
     immediateStart?: boolean;
+    embedded?: boolean; // E2 — embedded Checkout (return clientSecret instead of a redirect url)
   };
   const role = body.role;
   if (!role || !isCheckoutRole(role)) {
@@ -80,12 +81,19 @@ export async function POST(req: Request) {
     scheduleWeekly: String(scheduleWeekly),
   };
 
+  const embedded = body.embedded === true;
   const session = await getStripe().checkout.sessions.create({
     mode: recurring ? "subscription" : "payment",
     customer,
     line_items: [{ price, quantity: 1 }],
-    success_url: `${origin}/app?sub=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/subscribe?canceled=1`,
+    // Embedded Checkout mounts on our page and returns via return_url; the
+    // redirect form (kept until /subscribe is retired) uses success/cancel urls.
+    ...(embedded
+      ? { ui_mode: "embedded_page" as const, return_url: `${origin}/app?sub=success&session_id={CHECKOUT_SESSION_ID}` }
+      : {
+          success_url: `${origin}/app?sub=success&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${origin}/subscribe?canceled=1`,
+        }),
     client_reference_id: token.uid,
     locale: "hu",
     // Collect name + billing address for the NAV-compliant invoice (F0.6),
@@ -100,5 +108,7 @@ export async function POST(req: Request) {
 
   await logEvent("checkout_started", { uid: token.uid, props: { role, consentId } });
 
-  return NextResponse.json({ url: session.url });
+  return NextResponse.json(
+    embedded ? { clientSecret: session.client_secret } : { url: session.url },
+  );
 }

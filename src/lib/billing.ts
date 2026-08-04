@@ -50,6 +50,19 @@ export async function startCheckout(role: string, consents: Consents): Promise<v
   window.location.href = body.url as string;
 }
 
+/** E2 — create an embedded Checkout session; returns its client_secret so the
+ *  page can mount <EmbeddedCheckout>. Consent is recorded server-side first. */
+export async function fetchEmbeddedClientSecret(role: string, consents: Consents): Promise<string> {
+  const body = await postJson("/api/stripe/checkout", {
+    role,
+    autoRenew: consents.autoRenew ?? undefined,
+    immediateStart: consents.immediateStart,
+    embedded: true,
+  });
+  if (!body.clientSecret) throw new Error("Stripe hiba");
+  return body.clientSecret as string;
+}
+
 /** Request withdrawal (14-day right, J2). Returns the refunded amount in Ft. */
 export async function requestWithdrawal(): Promise<number> {
   const body = await postJson("/api/withdrawal");

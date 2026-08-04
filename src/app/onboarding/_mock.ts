@@ -105,16 +105,37 @@ export const MOCK = {
   },
 
   reveal: {
-    eyebrow: "Kész is",
-    heading: "Ez lesz az első heted.",
+    eyebrow: "A te terved",
+    weekLabel: "Ez a heted",
     workoutLabel: "Az első edzésed",
-    firstWorkout: {
-      flag: "1. NAP",
-      duration: "22 PERC",
-      title: "Foundation · alapozás",
-    },
     whisper: "„Ezt a hetet a válaszaidból raktam össze. Ha nem passzol, együtt átírjuk.”",
     cta: "Mentsük el a tervedet",
+    // Goal-branched 3-beat outcome arc (research: show the personalized payoff
+    // right before payment). Headline per goal is real (so branching is visible);
+    // the 3 beats — 1. hét → néhány hét → a cél — are PLACEHOLDER, capability/
+    // habit-based (NO weight numbers, NO fixed length). USER SUPPLIES final copy.
+    outcomes: {
+      ero: {
+        headline: "Erősebb, energikusabb tested lesz.",
+        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
+      },
+      forma: {
+        headline: "Formálódsz — fokozatosan, fenntarthatóan.",
+        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
+      },
+      vissza: {
+        headline: "Visszatérsz a mozgáshoz — nulláról, szépen.",
+        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
+      },
+      tartas: {
+        headline: "Jobb tartás, kevesebb fájdalom.",
+        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
+      },
+      szokas: {
+        headline: "Végre meglesz a napi mozgás-szokásod.",
+        beats: ["Az első teljes edzésed — beindul a mozgás.", "[néhány hét — pótlandó]", "[a cél — pótlandó]"],
+      },
+    } as Record<string, { headline: string; beats: [string, string, string] }>,
   },
 
   // Napszak → reveal phrasing (40 §40.5 "reggelente").

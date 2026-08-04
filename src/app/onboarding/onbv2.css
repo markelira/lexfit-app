@@ -6,25 +6,28 @@
    legacy .onb-* layer during the flag window).
    ─────────────────────────────────────────────────────────────────────── */
 
+/* Full-screen layout (not a centered card): the shell fills the viewport. */
 .lx .fnl-stage {
   min-height: 100dvh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 28px;
   background: var(--bg);
 }
 
 .lx .fnl-shell {
   width: 100%;
-  max-width: 1000px;
-  height: min(700px, calc(100dvh - 56px));
+  min-height: 100dvh;
   display: flex;
   overflow: hidden;
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line);
   background: var(--surface);
-  box-shadow: var(--shadow-card);
+}
+
+/* Content column stays readable within the wide pane, centered. */
+.lx .fnl-top,
+.lx .fnl-scroll,
+.lx .fnl-foot {
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
 }
 
 .lx .tabular { font-variant-numeric: tabular-nums; }
@@ -219,9 +222,9 @@
   display: block;
   width: 100%;
   padding: 0;
-  font-size: 19px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1.15;
   color: var(--ink);
   text-wrap: balance;
@@ -229,10 +232,10 @@
 .lx .fnl-q:focus { outline: none; }
 .lx .fnl-q:focus-visible { outline: none; }
 .lx .fnl-sub {
-  font-size: 11.5px;
+  font-size: 14px;
   color: var(--ink-2);
-  margin-top: var(--sp-1);
-  line-height: 1.45;
+  margin-top: var(--sp-2);
+  line-height: 1.5;
   text-wrap: pretty;
 }
 .lx .fnl-fields { margin-top: var(--sp-4); }
@@ -273,8 +276,8 @@
 .lx .fnl-opt.on .ic { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
 .lx .fnl-opt .lead { flex-shrink: 0; display: flex; align-items: center; }
 .lx .fnl-opt .tx { flex: 1; min-width: 0; }
-.lx .fnl-opt .tx b { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: -0.01em; }
-.lx .fnl-opt .tx small { display: block; font-size: 10.5px; color: var(--ink-3); margin-top: 2px; line-height: 1.35; }
+.lx .fnl-opt .tx b { display: block; font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+.lx .fnl-opt .tx small { display: block; font-size: 12px; color: var(--ink-3); margin-top: 2px; line-height: 1.4; }
 .lx .fnl-opt.on .tx b { color: var(--accent-ink); }
 .lx .fnl-opt .mk {
   width: 22px;
@@ -476,18 +479,19 @@
 .lx .fnl .pf-daypills .pill.on { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
 .lx .fnl .pf-daypills .pill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* ── Entrance (P1.6): opacity/transform only, ≤ --dur-base ── */
-.lx .fnl-main, .lx .fnl-reveal { animation: fnlIn var(--dur-base) cubic-bezier(0.22, 1, 0.36, 1) both; }
-@keyframes fnlIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+/* ── Step transition: the chrome (back · progress · CTA) holds still; only the
+      question BODY cross-fades + rises in on each step. Clean forward motion,
+      opacity/transform only. ── */
+.lx .fnl-scroll { animation: fnlStepIn 280ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes fnlStepIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .lx .fnl-main, .lx .fnl-reveal { animation: none; }
+  .lx .fnl-scroll { animation: none; }
   .lx .fnl-opt, .lx .fnl-cta, .lx .fnl-prog .seg, .lx .fnl-back { transition: none; }
 }
 
 /* ── Mobile (40 §40.6 — no brand panel, mark only) ── */
 @media (max-width: 840px) {
-  .lx .fnl-stage { padding: 0; align-items: stretch; }
-  .lx .fnl-shell { max-width: 520px; height: 100dvh; border-radius: 0; border: none; box-shadow: none; }
+  .lx .fnl-shell { min-height: 100dvh; }
   .lx .fnl-aside { display: none; }
   .lx .fnl-mark { display: flex; }
   .lx .fnl-top { padding: 16px 22px 6px; }
@@ -496,3 +500,298 @@
   .lx .fnl-welcome .fnl-scroll.center { padding: 22px; }
   .lx .welcome-hd { font-size: 30px; }
 }
+
+/* ── Plan picker (E1) — PlanCard radios + one-off links in the funnel shell. ── */
+.lx .fnl-plans { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
+.lx .fnl-plan {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "label mk" "price mk" "terms mk";
+  align-items: center;
+  column-gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 13px 15px;
+  min-height: 74px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.lx .fnl-plan:hover { border-color: var(--accent); }
+.lx .fnl-plan:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lx .fnl-plan.on { border-color: var(--accent); background: var(--accent-soft); }
+.lx .fnl-plan .badge {
+  position: absolute;
+  top: -0.6rem;
+  left: 14px;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--grad-hero);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.lx .fnl-plan .plan-label { grid-area: label; font-size: 10px; letter-spacing: 0.08em; color: var(--ink-3); }
+.lx .fnl-plan.on .plan-label { color: var(--accent-ink); }
+.lx .fnl-plan .plan-price { grid-area: price; display: flex; align-items: baseline; gap: 4px; margin-top: 2px; }
+.lx .fnl-plan .plan-price b { font-size: 22px; font-weight: 800; letter-spacing: -0.035em; color: var(--ink); }
+.lx .fnl-plan .plan-price em { font-size: 11px; font-weight: 600; font-style: normal; color: var(--ink-3); }
+.lx .fnl-plan .plan-terms { grid-area: terms; font-size: 10.5px; color: var(--ink-2); margin-top: 3px; line-height: 1.35; }
+.lx .fnl-plan .mk {
+  grid-area: mk;
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lx .fnl-plan.on .mk { background: var(--accent-2); border-color: var(--accent-2); }
+
+.lx .fnl-oneoffs { display: flex; flex-direction: column; gap: var(--sp-1); align-items: center; margin-top: var(--sp-4); }
+.lx .fnl-oneoff { background: none; border: 0; color: var(--ink-3); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; padding: 4px; }
+.lx .fnl-oneoff:hover { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+.lx .fnl-oneoff.on { color: var(--accent-ink); text-decoration: underline; }
+.lx .fnl-oneoff:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
+
+/* ── Account step — RegisterForm (E1.2), funnel-styled. ── */
+.lx .fnl-authform { margin-top: var(--sp-4); }
+.lx .fnl-sso-row { display: flex; flex-direction: column; gap: var(--sp-2); }
+.lx .fnl-sso {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; min-height: 46px; padding: 0 16px;
+  border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface);
+  font-family: inherit; font-size: 14px; font-weight: 700; color: var(--ink); cursor: pointer;
+  transition: border-color var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+.lx .fnl-sso:hover { transform: translateY(-1px); border-color: var(--accent); }
+.lx .fnl-sso[disabled] { opacity: 0.5; cursor: default; transform: none; }
+.lx .fnl-sso svg { width: 18px; height: 18px; }
+.lx .fnl-or {
+  display: flex; align-items: center; gap: 12px; margin: var(--sp-3) 0;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink-3);
+}
+.lx .fnl-or::before, .lx .fnl-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.lx .fnl-eform { display: flex; flex-direction: column; gap: var(--sp-3); }
+.lx .fnl-field { display: flex; flex-direction: column; gap: 5px; }
+.lx .fnl-field label { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.lx .fnl-field input {
+  width: 100%; min-height: 44px; padding: 0 13px;
+  border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface);
+  font-family: inherit; font-size: 14px; color: var(--ink); outline: none;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.lx .fnl-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px oklch(from var(--accent) l c h / 0.15); }
+.lx .fnl-field.bad input { border-color: var(--danger); }
+.lx .fnl-pw { position: relative; display: flex; align-items: center; }
+.lx .fnl-pw input { padding-right: 44px; }
+.lx .fnl-eye {
+  position: absolute; right: 6px; width: 34px; height: 34px; border: 0; background: none;
+  color: var(--ink-3); display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 999px;
+}
+.lx .fnl-eye:hover { color: var(--ink); }
+.lx .fnl-eye svg { width: 18px; height: 18px; }
+.lx .fnl-ferr { font-size: 11px; color: var(--danger); }
+.lx .fnl-fhint { font-size: 11px; color: var(--ink-3); }
+.lx .fnl-check { display: flex; gap: 9px; align-items: flex-start; font-size: 12px; color: var(--ink-2); line-height: 1.4; cursor: pointer; }
+.lx .fnl-check input { margin-top: 2px; width: 16px; height: 16px; flex: none; accent-color: var(--accent-2); cursor: pointer; }
+.lx .fnl-formerr { font-size: 12.5px; color: var(--danger); text-align: center; margin-top: var(--sp-2); }
+.lx .fnl-legal { font-size: 11px; color: var(--ink-3); text-align: center; line-height: 1.5; margin-top: var(--sp-3); }
+.lx .fnl-legal a { color: var(--accent-ink); }
+
+/* ── Pay step — embedded Stripe Checkout (E2). ── */
+.lx .fnl-pay { margin-top: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-3); }
+.lx .fnl-paysum {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2);
+}
+.lx .fnl-paysum .lbl { font-size: 10px; letter-spacing: 0.08em; color: var(--ink-3); }
+.lx .fnl-paysum .amt { font-size: 22px; font-weight: 800; letter-spacing: -0.035em; color: var(--ink); }
+.lx .fnl-paysum .terms { font-size: 11px; color: var(--ink-2); }
+.lx .fnl-embed { border: 1px solid var(--line); border-radius: var(--r-md); padding: 6px; background: var(--surface); min-height: 200px; }
+
+/* register-or-login extras (account step) */
+.lx .fnl-notice { font-size: 12.5px; color: var(--accent-ink); text-align: center; margin-bottom: var(--sp-2); }
+.lx .fnl-authtoggle {
+  display: block; width: 100%; margin-top: var(--sp-3);
+  background: none; border: 0; color: var(--accent-2); font-family: inherit;
+  font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;
+}
+.lx .fnl-authtoggle:hover { text-decoration: underline; text-underline-offset: 3px; }
+.lx .fnl-authtoggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NORMATIVE onboarding geometry — docs/design_handoff_onboarding_layout
+   "Fix the geometry, keep the look." Scoped to .fnl-wiz. Keeps the sage
+   brand gradient (auth.css) + dark-ink CTA; corrects the 8 layout defects.
+   ═══════════════════════════════════════════════════════════════════════ */
+.lx.authx { --accent-soft: var(--soft); } /* selected fill = eucalyptus soft */
+
+/* Shell: 100dvh, exact 50/50, no gutter, no page scroll (defects 04, 08) */
+.lx.authx.fnl-wiz { min-height: 0; }
+.fnl-wiz .authx-shell { height: 100dvh; grid-template-columns: 1fr 1fr; overflow: hidden; }
+
+/* Left brand pane — mark top / hero centred / founder bottom (defect 03) */
+.fnl-wiz .authx-brand { order: 1; padding: 44px 52px 40px; }
+.fnl-wiz .bbody { margin: auto 0; padding: 0; max-width: 460px; }
+.fnl-wiz .bquote { font-size: 48px; line-height: 1.05; letter-spacing: -0.035em; font-weight: 300; }
+.fnl-wiz .bquote b { font-weight: 700; }
+.fnl-wiz .bfoot { margin-top: 0; padding-top: 24px; }
+@media (max-width: 1279.98px) { .fnl-wiz .bquote { font-size: 40px; } }
+
+/* Right pane = flex column that holds ONE centred content column */
+.fnl-wiz .fnl-col {
+  order: 2; /* green brand left · content right */
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  padding: 44px 0 40px;
+  min-width: 0;
+  overflow: hidden;
+}
+/* THE one axis: header · body · action are all children of this column;
+   nothing inside sets its own width/margin (defects 01, 02, 05) */
+.fnl-wiz .fnl-main {
+  width: min(480px, 100% - 96px);
+  margin-inline: auto;
+  margin-block: auto;
+  max-height: 760px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.fnl-wiz .fnl-top,
+.fnl-wiz .fnl-scroll,
+.fnl-wiz .fnl-foot { max-width: none; margin-inline: 0; width: auto; }
+/* Header row — 40px on EVERY step (title lands on one y; defect 05) */
+.fnl-wiz .fnl-top { flex: none; height: 40px; padding: 0; gap: 16px; }
+.fnl-wiz .fnl-back { width: 40px; height: 40px; margin-left: 0; border-radius: 10px; }
+/* Body — only scroll region; title 32px below the header */
+.fnl-wiz .fnl-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 32px 0 0; gap: 12px; }
+/* Action bar — grows down from its border-top; body absorbs (defect 02) */
+.fnl-wiz .fnl-foot { flex: none; margin-top: 28px; padding: 20px 0 0; border-top: 1px solid var(--line); gap: 12px; }
+
+/* Fixed type scale — no vw/clamp (defect 06) */
+.fnl-wiz .fnl-q { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+.fnl-wiz .fnl-sub { font-size: 15px; line-height: 1.5; max-width: 40ch; color: var(--ink-2); }
+.fnl-wiz .welcome-hd { font-size: 34px; font-weight: 800; }
+.fnl-wiz .fnl-reveal .reveal-hd { font-size: 30px; font-weight: 800; }
+
+/* Option rows — inherit the 480 axis; description clamps to 2 lines (defect 07) */
+.fnl-wiz .fnl-opts { gap: 10px; }
+.fnl-wiz .fnl-opt { min-height: 68px; padding: 14px 16px; border-radius: 14px; }
+.fnl-wiz .fnl-opt .ic { width: 40px; height: 40px; border-radius: 10px; }
+.fnl-wiz .fnl-opt .tx b { font-size: 16px; }
+.fnl-wiz .fnl-opt .tx small {
+  font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.fnl-wiz .fnl-opt .mk { width: 24px; height: 24px; }
+
+/* Controls */
+.fnl-wiz .fnl-cta {
+  background: var(--ink); border: 1px solid var(--ink); color: #fff;
+  min-height: 56px; height: 56px; border-radius: 12px; font-size: 16px; font-weight: 700;
+}
+.fnl-wiz .fnl-cta:hover { background: #0f1512; }
+.fnl-wiz .fnl-cta[disabled] { opacity: 0.5; }
+.fnl-wiz .fnl-textarea { min-height: 104px; border-radius: 12px; }
+.fnl-wiz .fnl-alt, .fnl-wiz .fnl-skip { font-size: 12.5px; }
+
+/* Tablet 768–1023: single column, centred 440 measure, brand hidden */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .fnl-wiz .authx-shell { grid-template-columns: 1fr; }
+  .fnl-wiz .authx-brand { display: none; }
+  .fnl-wiz .fnl-main { width: min(440px, 100% - 40px); }
+  .fnl-wiz .fnl-q { font-size: 27px; }
+  .fnl-wiz .fnl-scroll { padding-top: 28px; }
+}
+
+/* Mobile <768: single column, sticky action bar, safe-area, brand dropped */
+@media (max-width: 767.98px) {
+  .fnl-wiz .authx-shell { grid-template-columns: 1fr; height: 100dvh; }
+  .fnl-wiz .authx-brand { display: none; }
+  .fnl-wiz .fnl-col { padding: 0; }
+  .fnl-wiz .fnl-main { width: 100%; max-width: none; max-height: none; margin: 0; flex: 1; min-height: 0; height: auto; }
+  .fnl-wiz .fnl-top {
+    height: 56px; padding: 0 20px; border-bottom: 1px solid var(--line); background: var(--surface);
+  }
+  .fnl-wiz .fnl-scroll {
+    padding: 20px 20px 0; gap: 10px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  }
+  .fnl-wiz .fnl-foot {
+    margin-top: 0; padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line); background: var(--surface);
+  }
+  .fnl-wiz .fnl-q { font-size: 24px; line-height: 1.2; }
+  .fnl-wiz .fnl-sub { font-size: 14px; }
+  .fnl-wiz .fnl-cta { min-height: 52px; height: 52px; }
+  .fnl-wiz .fnl-opts { gap: 8px; }
+  .fnl-wiz .fnl-opt { min-height: 64px; padding: 12px 14px; border-radius: 12px; }
+  .fnl-wiz .fnl-opt .ic { width: 36px; height: 36px; border-radius: 9px; }
+  .fnl-wiz .fnl-opt .tx b { font-size: 15px; }
+  .fnl-wiz .fnl-opt .tx small { font-size: 13px; }
+  .fnl-wiz .fnl-mark { display: none; }
+}
+
+/* ── Days step: interactive week selector (wireframe .day/.dot 1:1). ── */
+.lx .fnl-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: var(--sp-3); }
+.lx .fnl-day { text-align: center; border: 0; background: none; padding: 0; cursor: pointer; }
+.lx .fnl-day .d { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.03em; color: var(--ink-3); }
+.lx .fnl-day .dot {
+  height: 34px;
+  margin-top: 5px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.lx .fnl-day.done .dot { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
+.lx .fnl-day.done .d { color: var(--accent-ink); }
+.lx .fnl-day:hover .dot { border-color: var(--accent); }
+.lx .fnl-day:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
+
+/* ── Reveal outcome arc (personalized plan → outcome; docs research). ── */
+.lx .fnl-arc { list-style: none; margin: var(--sp-4) 0 var(--sp-5); padding: 0; }
+.lx .fnl-beat { position: relative; padding: 0 0 16px 26px; }
+.lx .fnl-beat:last-child { padding-bottom: 0; }
+.lx .fnl-beat .node {
+  position: absolute; left: 0; top: 2px; width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid var(--line); background: var(--surface);
+}
+.lx .fnl-beat::before {
+  content: ""; position: absolute; left: 5px; top: 14px; bottom: 0; width: 2px; background: var(--line);
+}
+.lx .fnl-beat:last-child::before { display: none; }
+.lx .fnl-beat .ab-t { display: block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.lx .fnl-beat .ab-x { display: block; font-size: 14px; color: var(--ink-2); line-height: 1.4; margin-top: 2px; }
+.lx .fnl-beat.goal .node { background: var(--accent-2); border-color: var(--accent-2); }
+.lx .fnl-beat.goal .ab-t { color: var(--accent-ink); }
+.lx .fnl-beat.goal .ab-x { color: var(--ink); font-weight: 700; }
+
+/* Pay step — repeat the goal outcome above checkout (research). */
+.lx .fnl-paygoal {
+  margin-top: var(--sp-3);
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.lx .fnl-paygoal .mono { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); }
+.lx .fnl-paygoal strong { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }

@@ -1,4 +1,7 @@
-// The onboarding funnel (40 §40). Anonymous-first by design — no <Protected>,
-// no flag: the P3 inversion is complete (onboarding → auth → checkout → app) and
-// the legacy auth-first page has been removed.
-export { OnboardingV2 as default } from "./OnboardingV2";
+import { redirect } from "next/navigation";
+
+// The funnel moved to /register (E1.3 — one join wizard). /onboarding is kept as
+// a permanent redirect so old links / deep-links still land in the flow.
+export default function OnboardingRedirect() {
+  redirect("/register");
+}
