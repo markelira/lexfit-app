@@ -186,7 +186,9 @@
   cursor: pointer;
   transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
 }
+.lx .fnl-back { transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-fast) ease; }
 .lx .fnl-back:hover { background: var(--surface-2); color: var(--ink); }
+.lx .fnl-back:active { transform: scale(0.9); }
 .lx .fnl-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .lx .fnl-back-spacer { width: 34px; }
 
@@ -259,6 +261,7 @@
 }
 .lx .fnl-opt.has-sub { min-height: 68px; }
 .lx .fnl-opt:hover { transform: translateY(-1px); border-color: var(--accent); }
+.lx .fnl-opt:active { transform: scale(0.985); }
 .lx .fnl-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .lx .fnl-opt.on { border-color: var(--accent); background: var(--accent-soft); }
 .lx .fnl-opt .ic {
@@ -349,10 +352,21 @@
 .lx .fnl-foot {
   flex-shrink: 0;
   padding: 16px 32px 24px;
-  border-top: 1px solid var(--line);
+  position: relative;
+  background: var(--surface);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
+}
+/* Scroll-edge effect (skill §12): content fades under the floating action,
+   instead of a hard 1px divider. */
+.lx .fnl-foot::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: -28px;
+  height: 28px;
+  background: linear-gradient(to top, var(--surface), transparent);
+  pointer-events: none;
 }
 .lx .fnl-cta {
   width: 100%;
@@ -432,7 +446,7 @@
 .lx .fnl-whisper.strong { font-size: 13.5px; }
 
 /* reveal */
-.lx .fnl-reveal .reveal-hd { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; margin-top: var(--sp-2); }
+.lx .fnl-reveal .reveal-hd { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.12; margin-top: var(--sp-2); text-wrap: balance; }
 .lx .fnl-reveal .reveal-hd:focus { outline: none; }
 .lx .reveal-wl { display: block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin: var(--sp-5) 0 var(--sp-2); }
 .lx .fnl-workout { border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
