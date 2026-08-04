@@ -903,66 +903,44 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   Step-aware BrandPanel — graphic-led (skill: apple-design). Each step is a
-   built illustration; almost no words. Lives in the .authx-brand light frame.
-   docs/onboarding-left-panels.md
+   Step-aware BrandPanel — image-led, Apple style (skill: apple-design). A
+   full-bleed photo per step, a dark bottom scrim, wordmark top, one short
+   caption. Photos: public/onboarding/{key}.jpg. docs/onboarding-left-panels.md
    ════════════════════════════════════════════════════════════════════════ */
 
-.lx .authx-brand .bp-graphic {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  animation: bpIn 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.lx .authx-brand.bp-img { position: relative; overflow: hidden; padding: 0; background: #16201b; }
+.lx .authx-brand.bp-img::before,
+.lx .authx-brand.bp-img::after { display: none; } /* drop the light-panel décor */
+
+/* The photo + scrim + caption cross-fade (materialize) on step change. */
+.lx .bp-stage { position: absolute; inset: 0; animation: bpImgIn 560ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes bpImgIn { from { opacity: 0; transform: scale(1.035); } to { opacity: 1; transform: none; } }
+.lx .bp-photo { object-fit: cover; object-position: center; }
+.lx .bp-scrim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(14, 18, 16, 0.92) 0%, rgba(14, 18, 16, 0.55) 24%, rgba(14, 18, 16, 0) 52%);
 }
-@keyframes bpIn { from { opacity: 0; transform: translateY(12px) scale(0.985); } to { opacity: 1; transform: none; } }
 
-.lx .authx-brand .bp-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 26px; }
+/* Wordmark — constant, white, over the image (stays put across steps). */
+.lx .authx-brand.bp-img .bp-mark { position: absolute; top: 46px; left: 56px; z-index: 4; color: #fff; }
+.lx .authx-brand.bp-img .bp-mark .wm { color: #fff; }
 
-/* The illustration is the hero — everything else is quiet. */
-.lx .authx-brand .bp-art { width: 100%; max-width: 340px; display: flex; justify-content: center; }
-.lx .authx-brand .bp-svg { width: 100%; height: auto; overflow: visible; }
-.lx .authx-brand .bp-svg line,
-.lx .authx-brand .bp-svg circle,
-.lx .authx-brand .bp-svg path,
-.lx .authx-brand .bp-svg rect { animation: bpArt 620ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-@keyframes bpArt { from { opacity: 0; } to { opacity: 1; } }
+/* Caption — bottom-left, one line (or a slogan). */
+.lx .bp-cap { position: absolute; left: 56px; right: 56px; bottom: 54px; z-index: 4; color: #fff; }
+.lx .bp-cap .bp-eyebrow { display: block; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255, 255, 255, 0.82); margin-bottom: 14px; }
+.lx .bp-cap .bp-line { display: block; font-size: clamp(22px, 2.2vw, 30px); font-weight: 600; line-height: 1.22; letter-spacing: -0.02em; text-wrap: balance; text-shadow: 0 1px 24px rgba(0, 0, 0, 0.3); }
+.lx .bp-cap .bp-slogan { display: block; font-weight: 300; font-size: clamp(30px, 3.2vw, 46px); line-height: 1.08; letter-spacing: -0.03em; text-wrap: balance; text-shadow: 0 1px 24px rgba(0, 0, 0, 0.3); }
+.lx .bp-cap .bp-slogan b { font-weight: 700; }
+.lx .bp-cap .bp-by { font-weight: 400; opacity: 0.72; font-size: 0.58em; letter-spacing: 0.02em; }
 
-/* Captions: a slogan, a quote, or a single quiet line. */
-.lx .authx-brand .bp-slogan { display: block; margin-top: 30px; font-weight: 300; font-size: clamp(28px, 3vw, 42px); line-height: 1.08; letter-spacing: -0.03em; color: var(--ink); text-wrap: balance; }
-.lx .authx-brand .bp-slogan b { font-weight: 700; }
-.lx .authx-brand .bp-quote { font-size: clamp(26px, 2.6vw, 34px); }
-.lx .authx-brand .bp-cap { display: block; margin-top: 30px; font-size: 15px; line-height: 1.5; color: var(--ink-2); max-width: 300px; text-wrap: balance; }
-.lx .authx-brand .bp-cap b { font-weight: 700; color: var(--ink); }
-
-/* time — a device screen (dark, like the real player) + a cast glyph. */
-.lx .authx-brand .bp-device { display: flex; align-items: flex-end; gap: 16px; }
-.lx .authx-brand .bp-screen { width: 210px; background: #12100e; border-radius: 20px; padding: 20px; text-align: left; box-shadow: 0 18px 44px -20px rgba(24, 32, 29, 0.55); }
-.lx .authx-brand .bp-scr-rep { display: block; font-size: 10px; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.5); }
-.lx .authx-brand .bp-scr-now { display: block; font-size: 27px; font-weight: 800; letter-spacing: -0.02em; color: #fff; margin-top: 16px; }
-.lx .authx-brand .bp-scr-cd { display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px; }
-.lx .authx-brand .bp-scr-cd span { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
-.lx .authx-brand .bp-scr-cd b { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; color: #8fc7ae; }
-.lx .authx-brand .bp-scr-next { display: block; font-size: 11px; color: rgba(255, 255, 255, 0.6); margin-top: 14px; }
-.lx .authx-brand .bp-cast { width: 40px; height: 34px; margin-bottom: 8px; }
-
-/* why — Alexa portrait, ringed. */
-.lx .authx-brand .bp-portrait { position: relative; width: 172px; height: 172px; }
-.lx .authx-brand .bp-portrait img { width: 168px; height: 168px; border-radius: 50%; object-fit: cover; object-position: center top; position: absolute; inset: 2px; }
-.lx .authx-brand .bp-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent-2); opacity: 0.5; }
-
-/* Mobile: the panel collapses under the content — shrink the art, keep it. */
+/* Mobile: the panel collapses under the content — show it as a photo banner. */
 @media (max-width: 768px) {
-  .lx .authx-brand .bp-art { max-width: 200px; }
-  .lx .authx-brand .bp-eyebrow { margin-bottom: 16px; }
-  .lx .authx-brand .bp-slogan { font-size: 26px; margin-top: 18px; }
-  .lx .authx-brand .bp-cap { margin-top: 16px; font-size: 14px; }
-  .lx .authx-brand .bp-screen { width: 180px; }
+  .lx .authx-brand.bp-img { min-height: 240px; }
+  .lx .authx-brand.bp-img .bp-mark { top: 22px; left: 24px; }
+  .lx .bp-cap { left: 24px; right: 24px; bottom: 22px; }
+  .lx .bp-cap .bp-line { font-size: 20px; }
+  .lx .bp-cap .bp-slogan { font-size: 26px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lx .authx-brand .bp-graphic,
-  .lx .authx-brand .bp-svg line,
-  .lx .authx-brand .bp-svg circle,
-  .lx .authx-brand .bp-svg path,
-  .lx .authx-brand .bp-svg rect { animation: none; }
+  .lx .bp-stage { animation: none; }
 }
