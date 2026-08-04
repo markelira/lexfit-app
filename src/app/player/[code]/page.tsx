@@ -80,6 +80,7 @@ function PlayerScreen({ code }: { code: string }) {
   // L4 controls: volume, mute, gear menu, elapsed⇄remaining, keyboard help, idle-fade.
   const [vol, setVol] = useState(1);
   const [muted, setMuted] = useState(false);
+  const [castAvail, setCastAvail] = useState(false); // a real cast target exists
   const [gearOpen, setGearOpen] = useState(false);
   const [showRemain, setShowRemain] = useState(false);
   const [keysOpen, setKeysOpen] = useState(false);
@@ -329,6 +330,50 @@ function PlayerScreen({ code }: { code: string }) {
     setMuted(next);
     if (el) el.muted = next;
   };
+  // Cast to TV. mux-player proxies the media API; the underlying <video> carries
+  // AirPlay (Safari) + the Remote Playback API (Chromecast-capable Chrome). We
+  // gate the cast UI on real device availability so we never show a dead button.
+  const getVideo = () => {
+    const p = playerRef.current; // mux-player element (useRef<any>)
+    return p?.media?.nativeEl ?? p?.media ?? p ?? null;
+  };
+  const castToTv = () => {
+    const v = getVideo();
+    if (!v) return;
+    try {
+      if (typeof v.webkitShowPlaybackTargetPicker === "function") { v.webkitShowPlaybackTargetPicker(); return; }
+      if (v.remote?.prompt) v.remote.prompt().catch(() => {});
+    } catch { /* no cast target — button is only shown when available anyway */ }
+  };
+  // Watch for cast targets once the media element exists (it mounts after "playing").
+  useEffect(() => {
+    if (stage !== "playing") return;
+    let disposed = false;
+    let cleanup = () => {};
+    const attach = (): boolean => {
+      const v = getVideo();
+      if (!v) return false;
+      if (typeof v.webkitShowPlaybackTargetPicker === "function") {
+        const onAvail = (e: { availability?: string }) => setCastAvail(e.availability === "available");
+        v.addEventListener("webkitplaybacktargetavailabilitychanged", onAvail);
+        cleanup = () => v.removeEventListener("webkitplaybacktargetavailabilitychanged", onAvail);
+        return true;
+      }
+      if (v.remote?.watchAvailability) {
+        v.remote.watchAvailability((a: boolean) => setCastAvail(a))
+          .then((id: number) => { if (disposed) v.remote.cancelWatchAvailability(id).catch(() => {}); else cleanup = () => v.remote.cancelWatchAvailability(id).catch(() => {}); })
+          .catch(() => {});
+        return true;
+      }
+      return false;
+    };
+    if (!attach()) {
+      const iv = setInterval(() => { if (attach()) clearInterval(iv); }, 400);
+      const stop = setTimeout(() => clearInterval(iv), 4000);
+      cleanup = () => { clearInterval(iv); clearTimeout(stop); };
+    }
+    return () => { disposed = true; cleanup(); setCastAvail(false); };
+  }, [stage]);
   const toggleFs = () => {
     const el = frameRef.current;
     if (!document.fullscreenElement && el?.requestFullscreen) el.requestFullscreen().catch(() => {});
@@ -517,7 +562,7 @@ function PlayerScreen({ code }: { code: string }) {
         <button className="pf-ex" onClick={exit}><LxIcon d={lxPaths.chevronLeft} size={16} /> Kilépés</button>
         <div className="pf-ttl"><span className="nm">{video.title}</span><span className="c">{video.code} · FOUNDATION · {video.theme.toUpperCase()}</span></div>
         <div className="pf-toprt">
-          <button className="pf-ico" aria-label="Lejátszás TV-n"><LxIcon d={lxPaths.cast} size={16} /></button>
+          {castAvail && <button className="pf-ico" onClick={castToTv} aria-label="Lejátszás TV-n"><LxIcon d={lxPaths.cast} size={16} /></button>}
           <button className={`pf-ico${muted ? " on" : ""}`} onClick={toggleMute} aria-label={muted ? "Hang be" : "Némítás"}><LxIcon d={muted ? lxPaths.volumeX : lxPaths.volume2} size={16} /></button>
           <button className="pf-ico" onClick={() => setKeysOpen((v) => !v)} aria-label="Gyorsbillentyűk"><LxIcon d={lxPaths.ellipsis} size={16} /></button>
         </div>
@@ -569,7 +614,7 @@ function PlayerScreen({ code }: { code: string }) {
                   <button onClick={exit} aria-label="Kilépés"><LxIcon d={lxPaths.chevronDown} size={18} /></button>
                   <div className="rt">
                     <button onClick={() => setHud((v) => !v)} aria-label={hud ? "Adatok elrejtése" : "Adatok mutatása"}><LxIcon d={hud ? lxPaths.eye : lxPaths.eyeOff} size={17} /></button>
-                    <button aria-label="TV-re"><LxIcon d={lxPaths.cast} size={17} /></button>
+                    {castAvail && <button onClick={castToTv} aria-label="TV-re"><LxIcon d={lxPaths.cast} size={17} /></button>}
                     <button onClick={() => setKeysOpen((v) => !v)} aria-label="Továbbiak"><LxIcon d={lxPaths.ellipsisV} size={17} /></button>
                   </div>
                 </div>
@@ -670,7 +715,7 @@ function PlayerScreen({ code }: { code: string }) {
                 <button className="r" onClick={cycleSpeed}><LxIcon d={lxPaths.gauge} size={15} /> Sebesség <span className="v">{speed}×</span></button>
                 <div className="r"><LxIcon d={lxPaths.captions} size={15} /> Felirat <span className="v">MAGYAR</span></div>
                 <div className="r"><LxIcon d={lxPaths.settings} size={15} /> Minőség <span className="v">AUTO · 1080p</span></div>
-                <div className="r"><LxIcon d={lxPaths.cast} size={15} /> Lejátszás TV-n <span className="v">AIRPLAY</span></div>
+                {castAvail && <button className="r" onClick={castToTv}><LxIcon d={lxPaths.cast} size={15} /> Lejátszás TV-n <span className="v">AIRPLAY</span></button>}
               </div>
             )}
           </div>
@@ -721,7 +766,7 @@ function PlayerScreen({ code }: { code: string }) {
           </div>
           <div className="pf-pills">
             <button className={`pf-pill${saved ? " on" : ""}`} onClick={toggleSave}><LxIcon d={saved ? lxPaths.check : lxPaths.plus} size={13} /> {saved ? "Mentve" : "Mentés"}</button>
-            <button className="pf-pill"><LxIcon d={lxPaths.cast} size={13} /> TV-re</button>
+            {castAvail && <button className="pf-pill" onClick={castToTv}><LxIcon d={lxPaths.cast} size={13} /> TV-re</button>}
           </div>
           <div className="pf-chrow">
             <span className="ava"><img src="/alexa-av.jpg" alt="" /></span>
