@@ -47,7 +47,7 @@ export const MOCK = {
   },
 
   // Focus area — the body-positive rewrite of "problem areas" (research: the
-  // single biggest untapped "this is mine" lever for a women-first app). Framed
+  // single biggest untapped "this is mine" lever). Framed
   // as "where you want to feel stronger", never "trouble zones". Single-select.
   focus: {
     heading: "Hol szeretnél erősödni?",

@@ -593,7 +593,7 @@ export default function LandingPage() {
           </div>
           <div className="hero-body">
             <div className="hero-copy">
-              <div className="hero-eyebrow">A teljes otthoni edzésprogram · nőknek</div>
+              <div className="hero-eyebrow">A teljes otthoni edzésprogram</div>
               <h1>A változás<br /><b>otthon kezdődik</b></h1>
               <p className="body">Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz — és egy edző, aki végig veled marad.</p>
               <div className="hero-row">

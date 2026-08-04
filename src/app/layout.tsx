@@ -22,7 +22,7 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "LEXFIT",
-  description: "LEXFIT — vezetett, nőközpontú edzésprogram.",
+  description: "LEXFIT — vezetett otthoni edzésprogram.",
 };
 
 export default function RootLayout({
