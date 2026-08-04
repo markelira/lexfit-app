@@ -17,7 +17,7 @@ import { StepFrame } from "@/components/onboarding/StepFrame";
 import { PlanCard } from "@/components/onboarding/PlanCard";
 import { EmbeddedPay } from "@/components/onboarding/EmbeddedPay";
 import { RegisterForm } from "@/components/auth/RegisterForm";
-import { AuthBrand } from "@/components/auth/AuthBrand";
+import { BrandPanel } from "@/components/onboarding/BrandPanel";
 import { OptionList } from "@/components/onboarding/OptionList";
 import { Segmented } from "@/components/onboarding/Segmented";
 import { Whisper } from "@/components/onboarding/Whisper";
@@ -255,7 +255,7 @@ export function OnboardingV2() {
   return (
     <div className="lx authx fnl-wiz">
       <div className="authx-shell">
-        <AuthBrand />
+        <BrandPanel step={step} />
         <main className="fnl-col">
           <div className="fnl-sr" role="status" aria-live="polite">
             {liveLabel}

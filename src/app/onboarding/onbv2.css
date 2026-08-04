@@ -901,3 +901,92 @@
 @media (prefers-contrast: more) {
   .lx .rv-ld { border: 1px solid var(--ink-3); }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Step-aware BrandPanel (left column) — one strong element per step, quiet
+   around it (skill: apple-design). Lives in the .authx-brand light frame.
+   docs/onboarding-left-panels.md
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* The swapping middle body cross-fades on step change (keyed remount). */
+.lx .authx-brand .bp-swap { animation: bpIn 440ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes bpIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.lx .authx-brand .bp-eyebrow { display: block; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 18px; }
+.lx .authx-brand .bp-head { font-weight: 700; font-size: clamp(24px, 2.5vw, 32px); line-height: 1.14; letter-spacing: -0.02em; color: var(--ink); text-wrap: balance; }
+.lx .authx-brand .bp-slogan { font-weight: 300; font-size: clamp(28px, 3vw, 42px); line-height: 1.08; letter-spacing: -0.03em; }
+.lx .authx-brand .bp-slogan b { font-weight: 700; }
+.lx .authx-brand .bp-sub { font-size: 15.5px; line-height: 1.6; color: var(--ink-2); margin-top: 18px; max-width: 400px; }
+.lx .authx-brand .bp-note { font-size: 14px; line-height: 1.55; color: var(--ink-2); margin-top: 20px; max-width: 380px; text-wrap: pretty; }
+.lx .authx-brand .bp-note b { font-weight: 600; color: var(--ink); }
+.lx .authx-brand .bp-visual { margin-top: 24px; }
+
+/* welcome stats (reuses the AuthBrand look) */
+.lx .authx-brand .bp-stats { display: flex; gap: 30px; margin-top: 34px; flex-wrap: wrap; }
+.lx .authx-brand .bp-stats .v { font-weight: 700; font-size: 24px; letter-spacing: -0.02em; line-height: 1; color: var(--ink); }
+.lx .authx-brand .bp-stats .k { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); margin-top: 7px; }
+
+/* community — overlapping faces + the group number */
+.lx .authx-brand .bp-faces { display: flex; }
+.lx .authx-brand .bp-face { width: 34px; height: 34px; margin-left: -8px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; background: var(--accent-2); border: 2px solid #eef5f1; }
+.lx .authx-brand .bp-face:first-child { margin-left: 0; }
+.lx .authx-brand .bp-face.bp-more { background: var(--ink); }
+.lx .authx-brand .bp-bignum { margin-top: 16px; }
+.lx .authx-brand .bp-bignum b { display: block; font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
+.lx .authx-brand .bp-bignum span { display: block; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); margin-top: 8px; }
+
+/* chips (focus categories / env situations) */
+.lx .authx-brand .bp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.lx .authx-brand .bp-chip { font-size: 13px; font-weight: 600; color: var(--ink); background: rgba(255, 255, 255, 0.66); border: 1px solid rgba(24, 32, 29, 0.10); border-radius: 999px; padding: 7px 13px; }
+
+/* levels */
+.lx .authx-brand .bp-levels { display: flex; flex-direction: column; gap: 10px; }
+.lx .authx-brand .bp-level { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(24, 32, 29, 0.08); border-radius: var(--r-md); padding: 10px 14px; }
+.lx .authx-brand .bp-flame { font-size: 14px; letter-spacing: -2px; }
+.lx .authx-brand .bp-lv b { font-weight: 700; font-size: 14px; color: var(--ink); }
+.lx .authx-brand .bp-lv span { display: block; font-size: 12px; color: var(--ink-2); margin-top: 1px; }
+
+/* week rhythm strip */
+.lx .authx-brand .bp-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.lx .authx-brand .bp-wd { background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(24, 32, 29, 0.08); border-radius: 10px; padding: 8px 4px; text-align: center; min-height: 62px; display: flex; flex-direction: column; gap: 5px; }
+.lx .authx-brand .bp-wd .bp-wl { font-size: 11px; font-weight: 700; color: var(--accent-ink); }
+.lx .authx-brand .bp-wd .bp-ww { font-size: 9.5px; line-height: 1.2; color: var(--ink-2); }
+.lx .authx-brand .bp-wd.rest { background: transparent; border-style: dashed; }
+.lx .authx-brand .bp-wd.rest .bp-ww { color: var(--ink-3); }
+
+/* player mock — a dark "screen" on the light panel (the real player is dark) */
+.lx .authx-brand .bp-player { background: #12100e; border-radius: var(--r-lg); padding: 18px; box-shadow: 0 16px 40px -18px rgba(24, 32, 29, 0.5); }
+.lx .authx-brand .bp-pl-rep { font-size: 10px; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.55); }
+.lx .authx-brand .bp-pl-next { font-size: 11px; color: rgba(255, 255, 255, 0.6); margin-top: 4px; }
+.lx .authx-brand .bp-pl-next b { color: #fff; font-weight: 600; }
+.lx .authx-brand .bp-pl-now { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: #fff; margin-top: 14px; }
+.lx .authx-brand .bp-pl-cd { display: flex; align-items: baseline; justify-content: space-between; margin-top: 6px; }
+.lx .authx-brand .bp-pl-cd span { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+.lx .authx-brand .bp-pl-cd b { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; color: #8fc7ae; }
+
+/* founder story */
+.lx .authx-brand .bp-story { display: flex; align-items: center; gap: 16px; }
+.lx .authx-brand .bp-photo { width: 76px; height: 76px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(255, 255, 255, 0.7); }
+.lx .authx-brand .bp-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.lx .authx-brand .bp-chapters { display: flex; flex-direction: column; gap: 3px; }
+.lx .authx-brand .bp-chapters span { font-size: 14px; font-weight: 600; color: var(--ink); }
+.lx .authx-brand .bp-chapters span:last-child { color: var(--ink-2); font-weight: 500; }
+.lx .authx-brand .bp-story + .bp-slogan { margin-top: 22px; font-size: clamp(26px, 2.6vw, 34px); }
+
+/* founder promise */
+.lx .authx-brand .bp-promise { display: flex; flex-direction: column; gap: 6px; font-weight: 500; }
+.lx .authx-brand .bp-promise span { font-size: 17px; color: var(--ink-2); }
+.lx .authx-brand .bp-promise .bp-em { font-weight: 800; font-size: 26px; letter-spacing: -0.02em; color: var(--ink); margin-top: 6px; }
+
+/* Mobile: the panel collapses under the content — drop the heavy visuals,
+   keep the eyebrow + headline + note compact (skill §6 simplicity). */
+@media (max-width: 768px) {
+  .lx .authx-brand .bp-visual { display: none; }
+  .lx .authx-brand .bp-swap { padding: 4px 0; }
+  .lx .authx-brand .bp-head { font-size: 22px; }
+  .lx .authx-brand .bp-slogan { font-size: 26px; }
+  .lx .authx-brand .bp-note { margin-top: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lx .authx-brand .bp-swap { animation: none; }
+}

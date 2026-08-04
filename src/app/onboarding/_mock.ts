@@ -13,8 +13,11 @@ import type { OptionItem } from "@/components/onboarding/OptionRow";
 export const MOCK = {
   welcome: {
     eyebrow: "LEXFIT · OTTHONI EDZÉS",
-    line1: "Egyedül nehéz.",
-    line2: "Együtt muszáj.",
+    // The slogan "A változás otthon kezdődik" lives on the LEFT brand panel
+    // (persistent identity); the right hero invites action so they don't mirror.
+    // "Egyedül nehéz. Együtt muszáj." is reserved for community/belonging panels.
+    line1: "Rakjuk össze",
+    line2: "a heted.",
     sub: "Alexa vagyok. 30 perc, csak egy matrac, és egy közösség mögötted. Pár kérdés, és kész a heted.",
     cta: "Kezdjük",
     loginPrompt: "Van már fiókod?",
@@ -26,7 +29,7 @@ export const MOCK = {
     stats: [
       { n: "30 perc", l: "egy edzés" },
       { n: "Otthon", l: "eszköz nélkül" },
-      { n: "17 000+", l: "a csoportban" },
+      { n: "1 200+", l: "csoporttag" },
     ],
   },
 
@@ -149,7 +152,7 @@ export const MOCK = {
     paceLine: "Heti {days} edzés · havonta ~{sessions} alkalom",
     paceNote: "A lényeg a rendszer, nem a sebesség — pár hét, és magától megy.",
     workoutLabel: "Az első edzésed",
-    social: "17 000+ nő már velünk edz.",
+    social: "1 200+ csoporttag — akik már velünk csinálják.",
     whisper: "„Ezt a hetet a válaszaidból raktam össze. Ha nem passzol, együtt átírjuk.”",
     cta: "Mentsük el a tervedet",
     // Goal → the reveal headline (real per-goal capability line). Also reused at
