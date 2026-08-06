@@ -22,6 +22,7 @@ import { secToClock } from "@/lib/time";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { FinishShareEntry } from "@/components/finish/FinishShareEntry";
+import { FinishComplete } from "@/components/finish/FinishComplete";
 import { buildFinishData } from "@/lib/finish-data";
 
 const CAT: Record<string, { c: string; word: string }> = {
@@ -658,28 +659,21 @@ function PlayerScreen({ code }: { code: string }) {
               </div>
             )}
 
-            {/* END (L3) */}
+            {/* END (L3) — redesigned completion moment + share examples */}
             {isFinished && (
-              <div className="pf-full end fade-in">
-                <span className="pf-end-ic"><Check size={30} /></span>
-                <div className="h">Megcsináltad.</div>
-                <div className="s">{video.title} · {video.mins} perc · a sorozatod <b>{result?.streak ?? 1} napos</b> lett</div>
-                <button className="pf-share" onClick={() => setShareOpen(true)}>
-                  <LxIcon d={lxPaths.play} size={15} /> Oszd meg egy szelfivel
-                </button>
-                <div className="q">Hogy ment ma?</div>
-                <div className="pf-rate">
-                  {["Könnyű volt", "Jó volt", "Kemény volt"].map((f) => (<button key={f} onClick={exit}>{f}</button>))}
-                </div>
-                {nextSess && (
-                  <button className="pf-upnext" onClick={() => router.push(`/player/${nextSess.code}?autostart=1`)}>
-                    <span className="th" style={{ background: grad(nextSess.theme) }} />
-                    <div><div className="k">KÖVETKEZIK</div><div className="n">{nextSess.title}</div></div>
-                    <div className="c"><b>{upCount}</b>mp</div>
-                  </button>
-                )}
-                <button className="pf-skip" onClick={exit}>Most nem · kihagyom</button>
-              </div>
+              <FinishComplete
+                title={video.title}
+                mins={video.mins}
+                streak={result?.streak ?? 1}
+                onShare={() => setShareOpen(true)}
+                onSkip={exit}
+                next={nextSess ? {
+                  title: nextSess.title,
+                  grad: grad(nextSess.theme),
+                  count: upCount,
+                  onGo: () => router.push(`/player/${nextSess.code}?autostart=1`),
+                } : null}
+              />
             )}
 
             {/* Finish share — selfie + data overlay (mobile: inline camera; desktop: QR handoff) */}

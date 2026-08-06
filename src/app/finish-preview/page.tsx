@@ -6,6 +6,8 @@ import { OVERLAY_DIRS, OVERLAY_NAME, type FinishData, type OverlayDir } from "@/
 import { renderFinishImage } from "@/lib/finish-raster";
 import { FinishShare } from "@/components/finish/FinishShare";
 import { FinishShareEntry } from "@/components/finish/FinishShareEntry";
+import { FinishComplete } from "@/components/finish/FinishComplete";
+import { cardGrad } from "@/lib/categories";
 
 // Not linked anywhere — a visual bench for the 5 overlays (like /cards-preview).
 const SAMPLE_REF: FinishData = { reps: 340, mins: 28, streak: 13, theme: "Fenék & comb", title: "Fenék & comb", week: 4 };
@@ -73,7 +75,7 @@ function RasterRow({ data, scrim }: { data: FinishData; scrim: boolean }) {
 
 export default function FinishPreviewPage() {
   const [scrim, setScrim] = useState(false);
-  const [share, setShare] = useState<null | "mobile" | "entry" | "review">(null);
+  const [share, setShare] = useState<null | "mobile" | "entry" | "review" | "complete">(null);
   useEffect(() => {
     // The ?share benches open the camera / create handoff sessions — dev only.
     if (typeof window === "undefined" || process.env.NODE_ENV === "production") return;
@@ -81,10 +83,20 @@ export default function FinishPreviewPage() {
     if (p === "1") setShare("mobile");
     else if (p === "entry") setShare("entry");
     else if (p === "review") setShare("review");
+    else if (p === "complete") setShare("complete");
   }, []);
   if (share === "mobile") return <FinishShare data={SAMPLE_REAL} onClose={() => setShare(null)} />;
   if (share === "review") return <FinishShare data={SAMPLE_REAL} startInReview onClose={() => setShare(null)} />;
   if (share === "entry") return <FinishShareEntry open data={SAMPLE_REAL} onClose={() => setShare(null)} />;
+  if (share === "complete") return (
+    <div style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden" }}>
+      <FinishComplete
+        title="Láb alapokról" mins={28} streak={13}
+        onShare={() => setShare(null)} onSkip={() => setShare(null)}
+        next={{ title: "Felsőtest indító", grad: cardGrad("Felsőtest"), count: 5, onGo: () => {} }}
+      />
+    </div>
+  );
 
   return (
     <div style={{ background: "#eceae6", minHeight: "100vh", padding: "40px 32px 80px", fontFamily: "var(--font)" }}>
