@@ -28,6 +28,8 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
   const [offset, setOffset] = useState({ x: 0, y: 0 }); // drag-nudge, reference-space px
   const [lead, setLead] = useState<LeadKey | undefined>(undefined); // data-swap: hero metric
   const [busy, setBusy] = useState(false);
+  const [facing, setFacing] = useState<"user" | "environment">("user");
+  const isFront = facing === "user";
   const dir: OverlayDir = OVERLAY_DIRS[idx];
   const shown: FinishData = { ...data, lead };
   const leads = availableLeads(shown);
@@ -47,11 +49,20 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
     let stream: MediaStream | null = null;
     (async () => {
       setCamErr(null);
+      // Only hint a width — forcing a portrait 1080×1920 made the browser pick a
+      // cropped/zoomed sensor mode. A width-only ideal keeps the native ~1x FOV;
+      // the 9:16 crop happens on capture + object-fit on the preview.
+      const constraints = (fm: MediaTrackConstraints["facingMode"]): MediaStreamConstraints => ({
+        video: { facingMode: fm, width: { ideal: 1920 } },
+        audio: false,
+      });
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user", width: { ideal: 1080 }, height: { ideal: 1920 } },
-          audio: false,
-        });
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraints({ exact: facing }));
+        } catch {
+          // No camera with that exact facing (e.g. laptop) → fall back to any.
+          stream = await navigator.mediaDevices.getUserMedia(constraints(facing));
+        }
         if (cancelled) { stream.getTracks().forEach((t) => t.stop()); return; }
         streamRef.current = stream;
         if (videoRef.current) {
@@ -67,7 +78,7 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
       stream?.getTracks().forEach((t) => t.stop());
       if (streamRef.current === stream) streamRef.current = null;
     };
-  }, [stage]);
+  }, [stage, facing]);
 
   function capture() {
     const v = videoRef.current;
@@ -82,7 +93,7 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
     c.width = Math.round(sw); c.height = Math.round(sh);
     const ctx = c.getContext("2d")!;
     ctx.save();
-    ctx.translate(c.width, 0); ctx.scale(-1, 1); // mirror to match the selfie preview
+    if (isFront) { ctx.translate(c.width, 0); ctx.scale(-1, 1); } // mirror the selfie (front only)
     ctx.drawImage(v, sx, sy, sw, sh, 0, 0, c.width, c.height);
     ctx.restore();
     setStillUrl(c.toDataURL("image/jpeg", 0.92));
@@ -184,7 +195,12 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
         >
           {stage === "camera" ? (
             <>
-              <video ref={videoRef} className="fsh-video" playsInline muted />
+              <video ref={videoRef} className={`fsh-video${isFront ? " front" : ""}`} playsInline muted />
+              {!camErr && (
+                <button className="fsh-flip" onClick={() => setFacing((f) => (f === "user" ? "environment" : "user"))} aria-label="Kamera váltása">
+                  <LxIcon d={lxPaths.rotateCw} size={18} />
+                </button>
+              )}
               {camErr && (
                 <div className="fsh-camerr">
                   <p>{camErr}</p>

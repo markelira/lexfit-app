@@ -38,7 +38,18 @@
 .fsh-video, .fsh-still {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
 }
-.fsh-video { transform: scaleX(-1); } /* selfie mirror (still is pre-mirrored on capture) */
+.fsh-video.front { transform: scaleX(-1); } /* selfie mirror (front only; still is pre-mirrored on capture) */
+
+/* Flip front/back camera — sits inside the preview frame, bottom-right. */
+.fsh-flip {
+  position: absolute; right: 12px; bottom: 12px; z-index: 4;
+  width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+  background: rgba(0,0,0,.42); border: 1px solid rgba(255,255,255,.28);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.fsh-flip svg { stroke: currentColor; }
+.fsh-flip:active { transform: scale(.92); }
 
 .fsh-camerr {
   position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
