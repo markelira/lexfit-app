@@ -1,0 +1,41 @@
+# Scheduled jobs that Vercel Hobby can't run (hourly / >2 crons). GitHub Actions
+# schedules them for free at any interval and just hits the CRON_SECRET-guarded
+# API routes. Reminders match by the hour, so Actions' scheduling delay is fine.
+#
+# Repo secrets required (Settings → Secrets and variables → Actions):
+#   CRON_SECRET     — same value as the Vercel/production env var
+#   PROD_BASE_URL   — production origin, no trailing slash (e.g. https://lexfit-app.vercel.app)
+#
+# NB: scheduled workflows only run from the default branch (main).
+name: Cron
+
+on:
+  schedule:
+    - cron: "0 * * * *"    # hourly — workout reminders
+    - cron: "30 3 * * *"   # daily 03:30 UTC — purge deleted accounts
+  workflow_dispatch:        # manual trigger for testing
+
+jobs:
+  workout-reminders:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fire workout reminders
+        run: |
+          curl -fsS -X GET "${PROD_BASE_URL}/api/cron/workout-reminders" \
+            -H "Authorization: Bearer ${CRON_SECRET}"
+        env:
+          PROD_BASE_URL: ${{ secrets.PROD_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+  purge-accounts:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 3 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge accounts past the 30-day window
+        run: |
+          curl -fsS -X GET "${PROD_BASE_URL}/api/cron/purge-accounts" \
+            -H "Authorization: Bearer ${CRON_SECRET}"
+        env:
+          PROD_BASE_URL: ${{ secrets.PROD_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

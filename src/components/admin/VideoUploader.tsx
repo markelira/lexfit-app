@@ -17,12 +17,17 @@ export function VideoUploader({
   initialStatus,
   initialPlaybackId,
   onBound,
+  uploadPath = "/api/mux/upload",
+  finalizePath = "/api/mux/finalize",
 }: {
   code: string;
   initialStatus: MuxStatus;
   initialPlaybackId: string | null;
   /** Fired when an upload starts and binds to this code (so the code can be locked). */
   onBound?: () => void;
+  /** Override the Mux endpoints (e.g. the challengeVideos pipeline). */
+  uploadPath?: string;
+  finalizePath?: string;
 }) {
   const [status, setStatus] = useState<MuxStatus>(initialStatus);
   const [playbackId, setPlaybackId] = useState<string | null>(initialPlaybackId);
@@ -38,7 +43,7 @@ export function VideoUploader({
     setIsError(false);
     setMsg("Feltöltés előkészítése…");
     onBound?.(); // the upload creates videos/{code} — lock the code from here
-    const { url, uploadId } = await adminJson<{ url: string; uploadId: string }>("/api/mux/upload", {
+    const { url, uploadId } = await adminJson<{ url: string; uploadId: string }>(uploadPath, {
       method: "POST",
       body: JSON.stringify({ code }),
     });
@@ -55,7 +60,7 @@ export function VideoUploader({
     if (!uploadId) return;
     for (let i = 0; i < 40; i++) {
       try {
-        const state = await adminJson<{ status: string; playbackId?: string | null }>("/api/mux/finalize", {
+        const state = await adminJson<{ status: string; playbackId?: string | null }>(finalizePath, {
           method: "POST",
           body: JSON.stringify({ code, uploadId }),
         });

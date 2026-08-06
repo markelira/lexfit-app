@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Kihívások vázlat / skeleton</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wireframe-kit.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="lexfit-icons.js"></script>
+<style>
+.fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line2)}
+.chip.ghost{background:none;border-style:dashed}
+.chip .cnt{background:var(--acc);color:#fff;border-radius:999px;padding:1px 6px;font-size:8.5px}
+/* series card */
+.sc{display:flex;flex-direction:column;gap:8px}
+.sc .thumb{position:relative;border:1px dashed var(--line);border-radius:6px;background:var(--fill);aspect-ratio:16/9;overflow:hidden}
+.sc .days{position:absolute;right:6px;bottom:7px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px}
+.sc .stack{position:absolute;left:6px;top:6px;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:3px;padding:2px 6px;font-family:var(--mono);font-size:8.5px;color:var(--ink2)}
+.sc .stack svg{width:10px;height:10px;stroke:var(--ink2)}
+.sc .ribbon{position:absolute;left:0;top:8px;background:var(--acc);color:#fff;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;padding:3px 8px;border-radius:0 3px 3px 0}
+.sc .body{display:flex;gap:9px;align-items:flex-start}
+.sc .txt{flex:1;min-width:0}
+.sc .name{font-size:12px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+.sc .state{font-size:10.5px;color:var(--ink2);margin-top:3px}
+.sc .state.done{color:var(--acc);font-weight:600}
+.sc .save{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.sc .save svg{width:13px;height:13px;stroke:var(--ink2)}
+.sc .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;border:1.5px solid var(--ink);background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center}
+.sc .play svg{width:14px;height:14px;fill:var(--ink);stroke:var(--ink)}
+.prog{position:absolute;left:0;right:0;bottom:0;height:4px;background:#dadada}
+.prog i{display:block;height:100%;background:var(--acc)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.hrow{display:grid;grid-auto-flow:column;grid-auto-columns:calc(25% - 12px);gap:16px;overflow:hidden}
+.rh{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:9px}
+.rt{font-size:14.5px;font-weight:700;letter-spacing:-.01em}
+/* playlist header */
+.plhead{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:end;border:1px dashed var(--line);border-radius:10px;background:#fff;padding:20px 22px}
+.plart{position:relative;border:1px dashed var(--line);border-radius:8px;background:var(--fill);aspect-ratio:16/10;overflow:hidden}
+.plhead h1{font-size:28px;font-weight:800;letter-spacing:-.035em;margin:0;line-height:1.02}
+.plhead .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc)}
+.plhead .d{font-size:12.5px;color:var(--ink2);margin-top:8px;max-width:56ch}
+.plmeta{display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap}
+.plact{display:flex;gap:10px;margin-top:14px;align-items:center}
+/* day list */
+.dl{border:1px dashed var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.di{display:flex;align-items:center;gap:13px;padding:11px 16px;border-bottom:1px solid var(--line2);min-height:56px}
+.di:last-child{border-bottom:none}
+.di .ix{width:26px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink3);flex:none}
+.di .ix svg{width:15px;height:15px;stroke:var(--acc)}
+.di .th{position:relative;width:76px;flex:none;border:1px dashed var(--line);border-radius:4px;background:var(--fill);aspect-ratio:16/9;overflow:hidden}
+.di .nm{flex:1;min-width:0;font-size:12.5px;font-weight:600}
+.di .sub{font-size:10.5px;color:var(--ink3);margin-top:2px;font-weight:400}
+.di .tm{font-family:var(--mono);font-size:10px;color:var(--ink3)}
+.di .go{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.di .go svg{width:13px;height:13px;fill:var(--ink2);stroke:var(--ink2)}
+.di.on{background:var(--accbg)}
+.di.on .nm{color:var(--acc);font-weight:700}
+.di.on .go{background:var(--acc);border-color:var(--acc)}
+.di.on .go svg{fill:#fff;stroke:#fff}
+.di.done .nm{color:var(--ink3)}
+.di.lock{opacity:.55}
+.empty{border:1px dashed var(--line);border-radius:10px;background:#fff;padding:32px 26px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:11px}
+.empty svg{width:28px;height:28px;stroke:var(--ink3)}
+.fb{display:flex;align-items:center;gap:12px;border:1px dashed var(--line);border-radius:10px;background:var(--fill2);padding:14px 17px}
+.fb svg{width:18px;height:18px;stroke:var(--acc);flex:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Dashboard skeleton · Kihívások — a Szavazz Magadra archívum</div>
+<h1>An archive, not a feed.</h1>
+<p>Correction to the earlier draft. The voting and the posting happen <b>in the Facebook group</b> — that is where the community already lives, and the product should not try to move it. What belongs here is the <b>archive</b>: every weekly Szavazz Magadra challenge the group has already been through, browsable, sortable, and completable alone at any time. That makes this a second library, not a social network — so it inherits the Videótár logic, not the Facebook one.</p>
+<div class="legend">
+<span class="lg"><b>Unit</b> · a challenge = a multi-day series</span>
+<span class="lg"><b>Model</b> · playlist / album — Spotify, YouTube</span>
+<span class="lg"><b>Browse</b> · rows → grid, the Videótár switch</span>
+<span class="lg"><b>Social</b> · stays on Facebook</span>
+</div>
+</header>
+
+<!-- ═══ C1 ═══ -->
+<section>
+<div class="head"><span class="sn">C1</span><h2>What changed, and what it implies</h2></div>
+<p class="lede">A feed and an archive are different products with different conventions. Getting this right removes a whole category of work — no composer, no moderation, no reactions — and replaces it with a pattern the audience already knows even better than the Facebook one.</p>
+
+<div class="layout">
+<div class="frame" style="padding:24px;background:#fff">
+<div class="two">
+  <div class="card" style="border-style:solid;border-color:var(--warn)">
+    <div class="lbl" style="color:var(--warn)">A korábbi feltételezés</div>
+    <div style="font-size:17px;font-weight:800;letter-spacing:-.02em">Közösségi hírfolyam a termékben</div>
+    <p style="margin:0;font-size:12.5px;color:var(--ink2)">Posts, reactions, a composer, moderation, privacy defaults. Facebook's grammar rebuilt inside LEXFIT — duplicating a place the members are already in, and asking them to be active in two.</p>
+  </div>
+  <div class="card" style="border-style:solid;border-color:var(--acc)">
+    <div class="lbl" style="color:var(--acc)">A valóság</div>
+    <div style="font-size:17px;font-weight:800;letter-spacing:-.02em">A kihívások archívuma</div>
+    <p style="margin:0;font-size:12.5px;color:var(--ink2)">Every past weekly challenge, kept, sorted and re-playable. The Facebook group stays the live room; the app becomes the shelf you take things off — alone, whenever.</p>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px">
+  <div class="card"><div class="lbl">Következmény 01</div><div style="font-size:13.5px;font-weight:700">Ez egy második könyvtár.</div><p style="margin:0;font-size:12px;color:var(--ink2)">So it inherits Videótár's rules wholesale: rows while browsing, grid on intent, visible filter chips, count before grid.</p></div>
+  <div class="card"><div class="lbl">Következmény 02</div><div style="font-size:13.5px;font-weight:700">A tétel egy sorozat, nem egy videó.</div><p style="margin:0;font-size:12px;color:var(--ink2)">A challenge is 5–14 days. That is a playlist — Spotify album, YouTube playlist, Netflix series. The card and the detail page follow that grammar.</p></div>
+  <div class="card"><div class="lbl">Következmény 03</div><div style="font-size:13.5px;font-weight:700">A közösség egy link.</div><p style="margin:0;font-size:12px;color:var(--ink2)">One honest way out to the Facebook group where the voting happens. No feed, no composer, no reactions inside the product.</p></div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Label follows content</div><p>With the feed gone, <b>"Közösség" is the wrong word for this destination.</b> Drawn here as <b>Kihívások</b> — the plain word for what is inside. "Szavazz Magadra" stays as the name of the series.</p></div>
+<div class="note"><div class="t">Cheaper and more familiar</div><p>The archive pattern is better known to this audience than a social feed <em>and</em> costs less to build. Both arguments point the same way.</p></div>
+<div class="note"><div class="t">Icon changes too</div><p>People (<b>users</b>) no longer describes the destination. A trophy or flag glyph is the conventional archive-of-challenges mark.</p></div>
+<div class="note warn"><div class="t">One thing is lost</div><p>The in-product sense of "I'm not alone". <b>Where does that now live?</b> Options: participant counts on a challenge, the Facebook link-out, or Alexa's line on the detail page. Worth deciding deliberately rather than by omission.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ C2 ═══ -->
+<section>
+<div class="head"><span class="sn">C2</span><h2>The unit — a challenge card is a series card</h2></div>
+<p class="lede">A workout card promises one session; a challenge card promises a commitment. The difference has to be legible at thumbnail size, and every app the audience uses solves it the same way: a stack mark, a count of parts, and a progress bar across the whole series.</p>
+
+<div class="layout">
+<div class="frame" style="padding:24px;background:#fff">
+<div class="grid4">
+  <div>
+    <div class="lbl" style="margin-bottom:9px">Elkezdetlen</div>
+    <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>7 RÉSZ</span><span class="days">7 NAP</span></div>
+      <div class="body"><div class="txt"><div class="name">7 napos has-kihívás</div><div class="state">2024. november</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+  </div>
+  <div>
+    <div class="lbl" style="margin-bottom:9px">Folyamatban</div>
+    <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>14 RÉSZ</span><span class="days">14 NAP</span><span class="prog"><i style="width:36%"></i></span></div>
+      <div class="body"><div class="txt"><div class="name">14 napos reggeli flow</div><div class="state">5 / 14 nap kész</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+  </div>
+  <div>
+    <div class="lbl" style="margin-bottom:9px">Kész</div>
+    <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>5 RÉSZ</span><span class="days">5 NAP</span><span class="prog"><i style="width:100%"></i></span></div>
+      <div class="body"><div class="txt"><div class="name">5 napos tartás-kihívás</div><div class="state done">Megcsináltad · januárban</div></div><span class="save"><i data-lucide="check"></i></span></div></div>
+  </div>
+  <div>
+    <div class="lbl" style="margin-bottom:9px">A hónap kiemeltje</div>
+    <div class="sc"><div class="thumb"><div class="art"></div><span class="ribbon">A CSOPORT VÁLASZTÁSA</span><span class="days">10 NAP</span><span class="play"><i data-lucide="play"></i></span></div>
+      <div class="body"><div class="txt"><div class="name">10 napos alsótest</div><div class="state">2025. március</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Stack mark, top-left</div><p><b>"7 RÉSZ" with a layers glyph</b> — the universal signal that an item contains other items. Playlists, albums and series all mark it in the same corner.</p></div>
+<div class="note"><div class="t">Duration is in days, not minutes</div><p>The badge keeps its engraved bottom-right position but changes unit. For a challenge the commitment is calendar length; per-day minutes belong on the detail page.</p></div>
+<div class="note"><div class="t">Progress spans the series</div><p>"5 / 14 nap kész" with the bar across the whole challenge. Same Netflix borrowing as the workout card, one level up.</p></div>
+<div class="note"><div class="t">Title only, state below</div><p>Consistent with Variant B: heading plus a line that appears only when there is state to report — here the month, the progress, or the completion.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ C3 ═══ -->
+<section>
+<div class="head"><span class="sn">C3</span><h2>The archive — browse and sort</h2></div>
+<p class="lede">Identical two-mode logic to Videótár: rows while browsing, a grid the moment a filter or sort is applied. The filter dimensions are different because the questions are different — how long a commitment, what it works, and whether I have done it already.</p>
+
+<div class="layout">
+<div style="display:flex;flex-direction:column;gap:22px">
+
+<div class="frame">
+<div class="app">
+  <div class="topbar">
+    <div class="tb-logo" style="gap:9px"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>LEXFIT</div>
+    <div class="tb-mid"><div class="tb-search"><i data-lucide="search"></i> Keresés…</div></div>
+    <div class="tb-right"><span class="streak"><i data-lucide="flame"></i>13 NAP</span><span class="circ"><i data-lucide="user-round"></i></span></div>
+  </div>
+  <div class="rail">
+    <div class="sec">Menü</div>
+    <div class="nav"><span class="ic"><i data-lucide="house"></i></span><span class="tx">Kezdőlap</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="layout-grid"></i></span><span class="tx">Videótár</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="chart-column"></i></span><span class="tx">Haladásom</span></div>
+    <div class="nav on"><span class="ic"><i data-lucide="trophy"></i></span><span class="tx">Kihívások</span></div>
+  </div>
+  <div class="main">
+    <div style="display:flex;align-items:baseline;gap:12px"><div style="font-size:23px;font-weight:800;letter-spacing:-.025em">Kihívások</div><span class="lbl">Szavazz Magadra · 38 kihívás</span></div>
+    <div style="font-size:13px;color:var(--ink2);max-width:70ch">Minden heti kihívás, amit a csoportban végigcsináltunk. Bármelyiket elkezdheted, bármikor, a saját tempódban.</div>
+
+    <div class="fbar">
+      <span class="chip ghost"><i data-lucide="clock"></i>HOSSZ <i data-lucide="chevron-down"></i></span>
+      <span class="chip ghost">TESTRÉSZ <i data-lucide="chevron-down"></i></span>
+      <span class="chip ghost"><i data-lucide="check"></i>ÁLLAPOT <i data-lucide="chevron-down"></i></span>
+      <span class="chip"><i data-lucide="sliders-horizontal"></i>SZŰRŐK</span>
+      <div style="margin-left:auto"><span class="chip ghost"><i data-lucide="arrow-up-down"></i>LEGÚJABB ELŐL</span></div>
+    </div>
+
+    <div>
+      <div class="rh"><span class="rt">Folytatod</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+      <div class="hrow">
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>14 RÉSZ</span><span class="days">14 NAP</span><span class="prog"><i style="width:36%"></i></span></div><div class="body"><div class="txt"><div class="name">14 napos reggeli flow</div><div class="state">5 / 14 nap kész</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>7 RÉSZ</span><span class="days">7 NAP</span><span class="prog"><i style="width:72%"></i></span></div><div class="body"><div class="txt"><div class="name">7 napos has-kihívás</div><div class="state">5 / 7 nap kész</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="sc" style="opacity:.35"><div class="thumb"><div class="art"></div></div><div class="body"><div class="txt"><div class="name">—</div></div></div></div>
+        <div class="sc" style="opacity:.2"><div class="thumb"><div class="art"></div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="rh"><span class="rt">A legutóbbi hetek</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+      <div class="hrow">
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="ribbon">ÚJ</span><span class="days">10 NAP</span></div><div class="body"><div class="txt"><div class="name">10 napos alsótest</div><div class="state">2025. március</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>7 RÉSZ</span><span class="days">7 NAP</span></div><div class="body"><div class="txt"><div class="name">7 napos hát &amp; tartás</div><div class="state">2025. február</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>5 RÉSZ</span><span class="days">5 NAP</span><span class="prog"><i style="width:100%"></i></span></div><div class="body"><div class="txt"><div class="name">5 napos tartás</div><div class="state done">Megcsináltad</div></div><span class="save"><i data-lucide="check"></i></span></div></div>
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>14 RÉSZ</span><span class="days">14 NAP</span></div><div class="body"><div class="txt"><div class="name">14 napos cardio</div><div class="state">2025. január</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="rh"><span class="rt">Ha csak egy hetet vállalsz</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+      <div class="hrow">
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="days">5 NAP</span></div><div class="body"><div class="txt"><div class="name">5 napos reggeli ébresztő</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="days">7 NAP</span></div><div class="body"><div class="txt"><div class="name">7 napos nyújtás</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="days">7 NAP</span></div><div class="body"><div class="txt"><div class="name">7 napos core</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="sc"><div class="thumb"><div class="art"></div><span class="days">6 NAP</span></div><div class="body"><div class="txt"><div class="name">6 napos mobilitás</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      </div>
+    </div>
+
+    <div class="fb"><i data-lucide="users"></i><div style="flex:1;font-size:12.5px;color:var(--ink2)"><b style="color:var(--ink)">A szavazás a Facebook-csoportban zajlik.</b> Ott döntjük el, mi legyen a következő heti kihívás — itt pedig bármikor újra elővehető az összes eddigi.</div><span class="btn sec">Ugrás a csoportba</span></div>
+  </div>
+</div>
+</div>
+
+<div class="frame" style="padding:22px;background:#fff">
+<div class="lbl" style="margin-bottom:12px">Rendezett nézet · szűrő aktív → rács</div>
+<div class="fbar" style="margin-bottom:14px">
+  <span class="chip on"><i data-lucide="clock"></i>7 NAP ALATT <i data-lucide="x"></i></span>
+  <span class="chip on"><i data-lucide="check"></i>MÉG NEM CSINÁLTAM <i data-lucide="x"></i></span>
+  <span class="chip ghost">TESTRÉSZ <i data-lucide="chevron-down"></i></span>
+  <span class="chip ghost" style="border:none">Törlés mind</span>
+  <div style="margin-left:auto"><span class="chip ghost"><i data-lucide="arrow-up-down"></i>LEGRÖVIDEBB ELŐL</span></div>
+</div>
+<div class="lbl" style="margin-bottom:11px">11 kihívás</div>
+<div class="grid4">
+  <div class="sc"><div class="thumb"><div class="art"></div><span class="days">5 NAP</span></div><div class="body"><div class="txt"><div class="name">5 napos reggeli ébresztő</div><div class="state">2024. szeptember</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+  <div class="sc"><div class="thumb"><div class="art"></div><span class="days">6 NAP</span></div><div class="body"><div class="txt"><div class="name">6 napos mobilitás</div><div class="state">2024. október</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+  <div class="sc"><div class="thumb"><div class="art"></div><span class="days">7 NAP</span></div><div class="body"><div class="txt"><div class="name">7 napos nyújtás</div><div class="state">2024. december</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+  <div class="sc"><div class="thumb"><div class="art"></div><span class="days">7 NAP</span></div><div class="body"><div class="txt"><div class="name">7 napos core</div><div class="state">2025. február</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+</div>
+</div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">V-RULE 01, reused</div><p><b>Intent switches the mode.</b> Any filter or sort → grid; clear everything → rows. The user learns this once and it works in two destinations.</p></div>
+<div class="note"><div class="t">"Állapot" is the new dimension</div><p>Elkezdetlen / folyamatban / kész. In an archive the most useful filter is <b>"what haven't I done yet"</b> — Videótár has no equivalent because a workout is repeatable by nature.</p></div>
+<div class="note"><div class="t">Sort defaults to newest</div><p>An archive is read backwards from now. "Legrövidebb elől" is the second most useful, for the user browsing by commitment size.</p></div>
+<div class="note"><div class="t">The Facebook link is honest and last</div><p>One row at the foot of the page explaining the division of labour. <b>Not a banner, not a modal</b> — the app is not competing with the group.</p></div>
+<div class="note warn"><div class="t">Row budget again</div><p>Three rows plus the link-out. With 38 challenges the temptation is a row per theme; that would make the page longer than the archive is deep.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ C4 ═══ -->
+<section>
+<div class="head"><span class="sn">C4</span><h2>A challenge — the playlist page</h2></div>
+<p class="lede">Cover, title, what it is, one loud button, then a numbered list of days. This is the Spotify album page and the YouTube playlist page, and it is the correct grammar for anything with an intended order. Days already done are checked; the next one is highlighted; later days stay open — a challenge is not a locked corridor.</p>
+
+<div class="layout">
+<div style="display:flex;flex-direction:column;gap:20px">
+
+<div class="frame">
+<div class="app">
+  <div class="topbar">
+    <div class="tb-logo" style="gap:9px"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>LEXFIT</div>
+    <div class="tb-mid"><div class="tb-search"><i data-lucide="search"></i> Keresés…</div></div>
+    <div class="tb-right"><span class="streak"><i data-lucide="flame"></i>13 NAP</span><span class="circ"><i data-lucide="user-round"></i></span></div>
+  </div>
+  <div class="rail">
+    <div class="sec">Menü</div>
+    <div class="nav"><span class="ic"><i data-lucide="house"></i></span><span class="tx">Kezdőlap</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="layout-grid"></i></span><span class="tx">Videótár</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="chart-column"></i></span><span class="tx">Haladásom</span></div>
+    <div class="nav on"><span class="ic"><i data-lucide="trophy"></i></span><span class="tx">Kihívások</span></div>
+  </div>
+  <div class="main">
+    <div class="lbl"><i data-lucide="chevron-left"></i> Kihívások</div>
+    <div class="plhead">
+      <div class="plart"><div class="art"></div></div>
+      <div>
+        <div class="k">Szavazz Magadra · 2024. november</div>
+        <h1>7 napos has-kihívás</h1>
+        <div class="d">Hét nap, napi 10–14 perc. A csoport ezt szavazta meg novemberben — most bármikor végigcsinálhatod a saját tempódban.</div>
+        <div class="plmeta"><span class="chip"><i data-lucide="layers"></i>7 RÉSZ</span><span class="chip"><i data-lucide="clock"></i>NAPI 10–14 PERC</span><span class="chip">HAS &amp; CORE</span><span class="chip"><i data-lucide="dumbbell"></i>ESZKÖZ NÉLKÜL</span></div>
+        <div class="plact">
+          <span class="btn pri"><i data-lucide="play"></i> Folytatás — 6. nap</span>
+          <span class="btn sec"><i data-lucide="plus"></i> Listám</span>
+          <span class="lbl" style="margin-left:6px">5 / 7 nap kész</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dl">
+      <div class="di done"><span class="ix"><i data-lucide="check"></i></span><div class="th"><div class="art"></div></div><div class="nm">1. nap · Alapozás<div class="sub">Megcsináltad · márc. 2.</div></div><span class="tm">10 PERC</span><span class="go"><i data-lucide="play"></i></span></div>
+      <div class="di done"><span class="ix"><i data-lucide="check"></i></span><div class="th"><div class="art"></div></div><div class="nm">2. nap · Alsó has<div class="sub">Megcsináltad · márc. 3.</div></div><span class="tm">12 PERC</span><span class="go"><i data-lucide="play"></i></span></div>
+      <div class="di done"><span class="ix"><i data-lucide="check"></i></span><div class="th"><div class="art"></div></div><div class="nm">3. nap · Oldalsó has</div><span class="tm">12 PERC</span><span class="go"><i data-lucide="play"></i></span></div>
+      <div class="di done"><span class="ix"><i data-lucide="check"></i></span><div class="th"><div class="art"></div></div><div class="nm">4. nap · Plank-nap</div><span class="tm">11 PERC</span><span class="go"><i data-lucide="play"></i></span></div>
+      <div class="di done"><span class="ix"><i data-lucide="check"></i></span><div class="th"><div class="art"></div></div><div class="nm">5. nap · Kombináció</div><span class="tm">14 PERC</span><span class="go"><i data-lucide="play"></i></span></div>
+      <div class="di on"><span class="ix">6</span><div class="th"><div class="art"></div></div><div class="nm">6. nap · Kitartás<div class="sub">Itt tartasz</div></div><span class="tm">13 PERC</span><span class="go"><i data-lucide="play"></i></span></div>
+      <div class="di"><span class="ix">7</span><div class="th"><div class="art"></div></div><div class="nm">7. nap · Záró kör</div><span class="tm">14 PERC</span><span class="go"><i data-lucide="play"></i></span></div>
+    </div>
+
+    <div class="fb"><i data-lucide="users"></i><div style="flex:1;font-size:12.5px;color:var(--ink2)">Ezt a kihívást <b style="color:var(--ink)">312-en</b> csinálták végig a csoporttal novemberben.</div><span class="btn sec">A csoport posztja</span></div>
+  </div>
+</div>
+</div>
+
+<div class="frame" style="padding:22px;background:#fff">
+<div class="lbl" style="margin-bottom:12px">Elkezdetlen kihívás · a fejléc egyetlen különbsége</div>
+<div class="plhead">
+  <div class="plart"><div class="art"></div></div>
+  <div>
+    <div class="k">Szavazz Magadra · 2025. március</div>
+    <h1>10 napos alsótest</h1>
+    <div class="d">Tíz nap, napi 15–20 perc. A csoport márciusi választása.</div>
+    <div class="plmeta"><span class="chip"><i data-lucide="layers"></i>10 RÉSZ</span><span class="chip"><i data-lucide="clock"></i>NAPI 15–20 PERC</span><span class="chip">ALSÓTEST</span></div>
+    <div class="plact"><span class="btn pri"><i data-lucide="play"></i> Kihívás indítása</span><span class="btn sec"><i data-lucide="plus"></i> Listám</span></div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">The album page, unchanged</div><p>Cover left, title and metadata right, one filled play button, numbered list below. <b>Spotify and YouTube both do exactly this</b>, and so does every podcast app on the phone.</p></div>
+<div class="note"><div class="t">"Folytatás — 6. nap"</div><p>The button names the next action rather than the object. A returning user never has to work out where they stopped.</p></div>
+<div class="note"><div class="t">Later days are not locked</div><p>Ordered, not gated. Locking days would punish the user who has ten minutes today and twenty tomorrow — and this archive exists precisely for self-paced use.</p></div>
+<div class="note"><div class="t">Completed days stay playable</div><p>Greyed label, check in the index column, play control still live. <b>Done is not spent.</b></p></div>
+<div class="note warn"><div class="t">Where "not alone" now lives</div><p>"312-en csinálták végig a csoporttal" — a fact about the past, not a leaderboard. This is the one place the social dimension survives inside the product.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ C5 ═══ -->
+<section>
+<div class="head"><span class="sn">C5</span><h2>Mobile</h2></div>
+<p class="lede">Archive rows with a peek, then the playlist page as a full screen. Because a challenge runs alongside the Foundation plan rather than replacing it, the Kezdőlap keeps its own hero — the challenge appears there only as a "Folytatod" row entry.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>C-01</b> · Kihívások</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="brand">Kihívások</span><div class="msearch"><i data-lucide="search"></i> Keresés…</div></div>
+<div class="mbody" style="gap:11px">
+  <div style="display:flex;gap:6px;overflow:hidden"><span class="chip ghost" style="font-size:8.5px"><i data-lucide="clock"></i>HOSSZ</span><span class="chip ghost" style="font-size:8.5px">TESTRÉSZ</span><span class="chip ghost" style="font-size:8.5px"><i data-lucide="check"></i>ÁLLAPOT</span></div>
+  <div>
+    <div class="rh" style="margin-bottom:7px"><span class="rt" style="font-size:12.5px">Folytatod</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div style="display:grid;grid-auto-flow:column;grid-auto-columns:72%;gap:9px;overflow:hidden">
+      <div class="sc"><div class="thumb"><div class="art"></div><span class="stack"><i data-lucide="layers"></i>14 RÉSZ</span><span class="days">14 NAP</span><span class="prog"><i style="width:36%"></i></span></div><div class="body"><div class="txt"><div class="name" style="font-size:11px">14 napos reggeli flow</div><div class="state" style="font-size:9.5px">5 / 14 nap kész</div></div></div></div>
+      <div class="sc"><div class="thumb"><div class="art"></div><span class="days">7 NAP</span><span class="prog"><i style="width:72%"></i></span></div><div class="body"><div class="txt"><div class="name" style="font-size:11px">7 napos has</div></div></div></div>
+    </div>
+  </div>
+  <div>
+    <div class="rh" style="margin-bottom:7px"><span class="rt" style="font-size:12.5px">A legutóbbi hetek</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div style="display:grid;grid-auto-flow:column;grid-auto-columns:72%;gap:9px;overflow:hidden">
+      <div class="sc"><div class="thumb"><div class="art"></div><span class="ribbon">ÚJ</span><span class="days">10 NAP</span></div><div class="body"><div class="txt"><div class="name" style="font-size:11px">10 napos alsótest</div><div class="state" style="font-size:9.5px">2025. március</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      <div class="sc"><div class="thumb"><div class="art"></div><span class="days">7 NAP</span></div><div class="body"><div class="txt"><div class="name" style="font-size:11px">7 napos hát</div></div></div></div>
+    </div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab on"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>C-02</b> · Kihívás · playlist</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><span class="brand" style="font-size:12px">7 napos has-kihívás</span></div>
+<div class="mbody" style="gap:10px">
+  <div class="plart" style="aspect-ratio:16/9"><div class="art"></div></div>
+  <div>
+    <div class="k" style="font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc)">Szavazz Magadra · 2024. november</div>
+    <div style="font-size:17px;font-weight:800;letter-spacing:-.03em;margin-top:4px">7 napos has-kihívás</div>
+    <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap"><span class="chip" style="font-size:8.5px"><i data-lucide="layers"></i>7 RÉSZ</span><span class="chip" style="font-size:8.5px"><i data-lucide="clock"></i>NAPI 10–14 PERC</span></div>
+  </div>
+  <span class="btn pri" style="height:44px;width:100%"><i data-lucide="play"></i> Folytatás — 6. nap</span>
+  <div class="lbl">5 / 7 nap kész</div>
+  <div class="dl">
+    <div class="di done" style="padding:8px 11px;min-height:48px"><span class="ix"><i data-lucide="check"></i></span><div class="nm" style="font-size:11.5px">4. nap · Plank-nap</div><span class="tm">11 PERC</span></div>
+    <div class="di done" style="padding:8px 11px;min-height:48px"><span class="ix"><i data-lucide="check"></i></span><div class="nm" style="font-size:11.5px">5. nap · Kombináció</div><span class="tm">14 PERC</span></div>
+    <div class="di on" style="padding:8px 11px;min-height:48px"><span class="ix">6</span><div class="nm" style="font-size:11.5px">6. nap · Kitartás</div><span class="go"><i data-lucide="play"></i></span></div>
+    <div class="di" style="padding:8px 11px;min-height:48px"><span class="ix">7</span><div class="nm" style="font-size:11.5px">7. nap · Záró kör</div><span class="tm">14 PERC</span></div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab on"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>C-03</b> · Kész · lezárás</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mbody" style="justify-content:center;align-items:center;text-align:center;gap:16px;padding:24px">
+  <div style="width:80px;height:80px;border-radius:50%;background:var(--accbg);border:2px solid var(--acc);display:flex;align-items:center;justify-content:center"><i data-lucide="trophy" style="width:36px;height:36px;stroke:var(--acc)"></i></div>
+  <div><div style="font-size:20px;font-weight:800;letter-spacing:-.025em">Végigcsináltad.</div><div style="font-size:12.5px;color:var(--ink2);margin-top:5px">7 napos has-kihívás · 7 / 7 nap</div></div>
+  <div class="whisper" style="text-align:left"><i data-lucide="message-circle"></i><span>„Ezt novemberben a csoport együtt csinálta. Most te, egyedül, ugyanúgy végig."</span></div>
+  <div style="width:100%;display:flex;flex-direction:column;gap:8px"><span class="btn pri" style="height:44px">Következő kihívás</span><span class="btn sec" style="height:44px">Vissza a Kihívásokhoz</span></div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab on"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Playlist page, one column</div><p>Cover, title, chips, one full-width button in the thumb zone, then the day list. Identical to how the phone's own podcast and music apps present a series.</p></div>
+<div class="note"><div class="t">A challenge does not take over the home screen</div><p>It runs alongside Foundation. The Kezdőlap hero stays the programme; the challenge appears as a Folytatod card.</p></div>
+<div class="note"><div class="t">Completion is a moment</div><p>Trophy, what you did, one line from Alexa, and the next challenge offered. Same shape as the workout completion screen so the pattern is learned once.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ C6 ═══ -->
+<section>
+<div class="head"><span class="sn">C6</span><h2>Kihívások rules</h2></div>
+<div class="rules">
+<div><div class="num">C-RULE 01</div><div><h3>This is an archive, and it behaves like Videótár.</h3><p>Rows while browsing, grid on intent, visible filter chips, count before grid.</p></div><div class="ev"><b>Evidence</b>V-RULE 01–04, already established. Two destinations, one learned behaviour.</div></div>
+<div><div class="num">C-RULE 02</div><div><h3>A challenge is a playlist.</h3><p>Stack mark and part count on the card; cover, metadata, one play button and a numbered list on the page.</p></div><div class="ev"><b>Evidence</b>Spotify album / YouTube playlist — the universal grammar for ordered collections.</div></div>
+<div><div class="num">C-RULE 03</div><div><h3>Ordered, never gated.</h3><p>Days are numbered and the next one is highlighted, but every day is playable at any time.</p></div><div class="ev"><b>Evidence</b>The archive exists for self-paced solo use; locking contradicts its reason to exist.</div></div>
+<div><div class="num">C-RULE 04</div><div><h3>Duration in days on the card, minutes on the page.</h3><p>The commitment question comes first; the per-session question comes second.</p></div><div class="ev"><b>Evidence</b>Badge keeps its engraved position; only the unit changes with the object.</div></div>
+<div><div class="num">C-RULE 05</div><div><h3>The Facebook group is linked, not imitated.</h3><p>One honest row explaining where voting happens, plus a participant count per challenge.</p></div><div class="ev"><b>Evidence</b>The community already exists elsewhere; duplicating it splits it and moderates nothing.</div></div>
+<div><div class="num">C-RULE 06</div><div><h3>A challenge runs alongside Foundation, never replaces it.</h3><p>The home hero stays the programme; the challenge appears in Folytatod.</p></div><div class="ev"><b>Evidence</b>One primary commitment per user; two competing "today" answers on the home screen is the failure mode.</div></div>
+</div>
+
+<h3 style="margin-top:44px;font-size:19px;letter-spacing:-.02em">What we are deliberately not doing</h3>
+<div class="dont">
+<div><span class="x">✕</span><span><b>An in-product feed, composer or reactions.</b> The room is on Facebook. Building a second one splits the conversation and creates a moderation surface nobody owns.</span></div>
+<div><span class="x">✕</span><span><b>Locking day 4 until day 3 is done.</b> Ordered guidance, not a corridor.</span></div>
+<div><span class="x">✕</span><span><b>Leaderboards of who finished a challenge fastest.</b> A participant count is a fact; a ranking is a competition.</span></div>
+<div><span class="x">✕</span><span><b>Expiring challenges.</b> The whole point of an archive is that nothing expires — a past week is a permanent asset.</span></div>
+<div><span class="x">✕</span><span><b>Letting a challenge hijack the Kezdőlap hero.</b> Foundation is the product's spine; challenges are parallel.</span></div>
+<div><span class="x">✕</span><span><b>Importing Facebook comments into the app.</b> Read-only mirrors of a live conversation are stale by definition and imply a reply box that does not exist.</span></div>
+</div>
+
+<div class="note warn" style="margin-top:26px"><div class="t">Still to settle</div><p>Three: whether the destination is called <b>Kihívások</b> (drawn here) or keeps the <b>Szavazz Magadra</b> name; whether a challenge should be able to <b>reschedule the Foundation week</b> or simply sit beside it; and where the "I'm not alone" feeling now lives, since the feed is gone — the participant count is a start, but it may not be enough on its own.</p></div>
+</section>
+
+<footer>LEXFIT · Kihívások skeleton · Structure only — supersedes the earlier Közösség feed draft</footer>
+</div>
+<script>window.addEventListener("load",function(){window.lexfitIcons&&window.lexfitIcons()});</script>
+</body>
+</html>

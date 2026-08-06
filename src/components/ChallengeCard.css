@@ -1,0 +1,69 @@
+/* Kihívások series card — self-contained styles so the card works on any page
+   (the archive, the Kezdőlap row, …). A 9:16-leaning portrait poster. */
+
+.chc {
+  width: 158px; flex: none; display: flex; flex-direction: column; gap: 9px;
+  background: none; border: none; padding: 0; cursor: pointer; text-align: left; font: inherit;
+}
+.chc-art {
+  position: relative; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 0 rgba(0,0,0,.04); isolation: isolate;
+  transition: box-shadow .22s ease, transform .22s cubic-bezier(.2,.7,.3,1);
+}
+.chc:hover .chc-art { box-shadow: 0 10px 26px -12px rgba(0,0,0,.35); transform: translateY(-2px); }
+.chc:active .chc-art { transform: translateY(0) scale(.985); transition-duration: .09s; }
+.chc:focus-visible { outline: none; }
+.chc:focus-visible .chc-art { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+/* Generated cover: centered category word + a faint brand-arc ring. */
+.chc-word {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding: 0 12px; text-align: center; font-weight: 800; font-size: 15px; letter-spacing: 0.02em;
+  color: rgba(255,255,255,.94); text-shadow: 0 1px 12px rgba(0,0,0,.18); z-index: 1;
+}
+.chc-ring {
+  position: absolute; width: 128%; aspect-ratio: 1; right: -34%; top: -20%;
+  border: 1.5px solid rgba(255,255,255,.16); border-radius: 50%; z-index: 0;
+}
+
+.chc-stack {
+  position: absolute; left: 7px; top: 7px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.92); border-radius: 5px; padding: 3px 7px;
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.04em; color: var(--ink);
+}
+.chc-stack svg { stroke: var(--ink); }
+.chc-ribbon {
+  position: absolute; left: 0; top: 40px; z-index: 2;
+  background: var(--accent); color: #fff; font-family: var(--mono);
+  font-size: 8.5px; letter-spacing: 0.07em; padding: 3px 9px; border-radius: 0 4px 4px 0;
+}
+.chc-days {
+  position: absolute; right: 7px; bottom: 9px; z-index: 2;
+  background: rgba(20,20,20,.82); color: #fff; font-family: var(--mono);
+  font-size: 9px; letter-spacing: 0.03em; padding: 2px 7px; border-radius: 4px;
+}
+.chc-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.35); z-index: 2; }
+.chc-prog i { display: block; height: 100%; background: var(--accent); }
+
+.chc-body { display: flex; align-items: flex-start; gap: 8px; }
+.chc-txt { flex: 1; min-width: 0; }
+.chc-name { font-size: 12.5px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.22; color: var(--ink); }
+.chc-state { font-size: 10.5px; color: var(--ink-2); margin-top: 3px; }
+.chc-state.done { color: var(--accent-2); font-weight: 600; }
+.chc-save {
+  width: 26px; height: 26px; flex: none; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: border-color .14s ease, background .14s ease, transform .12s ease;
+}
+.chc-save svg { stroke: var(--ink-2); }
+.chc-save:hover { border-color: var(--accent); }
+.chc-save:active { transform: scale(.88); }
+.chc-save.on { background: var(--accent); border-color: var(--accent); }
+.chc-save.on svg { stroke: #fff; }
+.chc-save:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .chc-art, .chc-save { transition: none; }
+  .chc:hover .chc-art, .chc:active .chc-art { transform: none; }
+}

@@ -1,0 +1,179 @@
+/* Kihívások — the Szavazz Magadra archive. A second library that inherits the
+   Videótár grammar (rows → grid on intent), but its unit is a 9:16-leaning
+   portrait series card. Uses the app's existing brand tokens throughout. */
+
+.ch-page { display: flex; flex-direction: column; gap: 22px; padding-bottom: 40px; }
+
+/* ── Header ── */
+.ch-head { display: flex; flex-direction: column; gap: 6px; }
+.ch-head-row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.ch-head-row h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.025em; color: var(--ink); margin: 0; }
+.ch-eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-2); }
+.ch-lede { font-size: 13.5px; color: var(--ink-2); max-width: 68ch; margin: 0; }
+
+/* ── Filter bar (chips + sort) ── */
+.ch-filterbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.ch-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ch-chip-wrap { position: relative; }
+.ch-sort { margin-left: auto; }
+
+.ch-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface);
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap; transition: border-color .14s, background .14s, color .14s;
+}
+.ch-chip:hover { border-color: var(--accent); }
+.ch-chip.ghost { background: none; }
+.ch-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ch-chip.on svg { stroke: #fff; }
+.ch-chip svg { stroke: currentColor; }
+.ch-chip:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.ch-chip-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; min-width: 190px;
+  display: flex; flex-direction: column; gap: 2px; padding: 6px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 12px 30px -12px rgba(0,0,0,.22);
+}
+.ch-chip-menu.right { left: auto; right: 0; }
+.ch-chip-opt {
+  display: flex; align-items: center; gap: 9px; padding: 8px 9px; border-radius: 8px;
+  background: none; border: none; cursor: pointer; text-align: left;
+  font-size: 12.5px; color: var(--ink); font-family: inherit;
+}
+.ch-chip-opt:hover { background: var(--surface-2); }
+.ch-chip-opt .box {
+  width: 17px; height: 17px; flex: none; border-radius: 5px; border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+.ch-chip-opt.on .box { background: var(--accent); border-color: var(--accent); }
+.ch-chip-opt.on .box svg { stroke: #fff; }
+
+/* ── Results meta ── */
+.ch-resmeta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ch-resmeta-count { font-size: 14px; font-weight: 700; color: var(--ink); }
+.ch-resmeta.is-empty .ch-resmeta-count { color: var(--ink-3); }
+.ch-resmeta-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ch-fchip {
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px;
+  border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-ink);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; cursor: pointer;
+}
+.ch-fchip svg { stroke: currentColor; }
+
+/* ── Grid of series cards ── */
+.ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 18px 16px; }
+.ch-grid .chc { width: 100%; }
+
+/* ── Empty state ── */
+.ch-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
+  padding: 48px 24px; border: 1px dashed var(--line); border-radius: 14px; background: var(--surface);
+}
+.ch-empty .ic { color: var(--ink-3); }
+.ch-empty .t { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0; }
+.ch-empty .s { font-size: 13px; color: var(--ink-2); margin: 0; }
+.ch-empty .acts { margin-top: 6px; }
+
+/* ── The Facebook link-out (honest, last — not a banner) ── */
+.ch-fb {
+  display: flex; align-items: center; gap: 12px; margin-top: 6px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); padding: 15px 18px;
+}
+.ch-fb > svg { stroke: var(--accent-2); flex: none; }
+.ch-fb .tx { flex: 1; font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+.ch-fb .tx b { color: var(--ink); }
+.ch-fb-btn {
+  flex: none; display: inline-flex; align-items: center; height: 38px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  font-size: 12.5px; font-weight: 600; text-decoration: none; white-space: nowrap;
+}
+.ch-fb-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+/* The series card (.chc*) styles live with the component — ChallengeCard.css —
+   so the card renders correctly anywhere it's used (archive + Kezdőlap row). */
+
+@media (max-width: 640px) {
+  .ch-head-row h1 { font-size: 22px; }
+  .ch-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px 12px; }
+  /* Chips become a horizontally scrolling strip that never collapses (C-01). */
+  .ch-filterbar { gap: 6px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 12px; }
+  .ch-filterbar::-webkit-scrollbar { display: none; }
+  .ch-chips { flex-wrap: nowrap; }
+  .ch-chip { flex: none; }
+  .ch-sort { margin-left: 4px; }
+}
+
+/* ══ Playlist detail page (C4) ══ */
+.chp-back {
+  display: inline-flex; align-items: center; gap: 5px; align-self: flex-start;
+  background: none; border: none; cursor: pointer; padding: 2px 0;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2);
+}
+.chp-back:hover { color: var(--accent-ink); }
+.chp-back svg { stroke: currentColor; }
+
+.chp-head { display: grid; grid-template-columns: 220px 1fr; gap: 26px; align-items: start; }
+.chp-cover {
+  position: relative; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; isolation: isolate;
+  box-shadow: 0 12px 32px -16px rgba(0,0,0,.4);
+}
+.chp-cover-word {
+  position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; padding: 0 16px;
+  text-align: center; font-weight: 800; font-size: 19px; letter-spacing: 0.02em; color: rgba(255,255,255,.94);
+  text-shadow: 0 1px 14px rgba(0,0,0,.2);
+}
+.chp-meta { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.chp-eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-2); }
+.chp-title { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.04; color: var(--ink); margin: 2px 0 0; }
+.chp-syn { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; max-width: 60ch; margin: 2px 0 0; }
+.chp-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.chp-chip {
+  display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 11px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface);
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.05em; color: var(--ink-2);
+}
+.chp-chip svg { stroke: var(--ink-2); }
+.chp-acts { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.chp-progtext { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--ink-3); }
+
+/* Numbered day list — ordered, never gated. */
+.chp-days { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); }
+.chp-day {
+  display: flex; align-items: center; gap: 13px; padding: 11px 16px; min-height: 60px;
+  border: none; border-bottom: 1px solid var(--line); background: none; cursor: pointer; text-align: left; font: inherit; width: 100%;
+}
+.chp-day:last-child { border-bottom: none; }
+.chp-day:hover { background: var(--surface-2); }
+.chp-day .ix {
+  width: 26px; flex: none; text-align: center; font-family: var(--mono); font-size: 12px; color: var(--ink-3);
+  display: flex; align-items: center; justify-content: center;
+}
+.chp-day .ix svg { stroke: var(--accent-2); }
+.chp-day .th { width: 54px; aspect-ratio: 3 / 4; flex: none; border-radius: 6px; }
+.chp-day .nm { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: var(--ink); }
+.chp-day .nm .sub { display: block; font-size: 10.5px; font-weight: 400; color: var(--ink-3); margin-top: 2px; }
+.chp-day .tm { font-family: var(--mono); font-size: 10px; color: var(--ink-3); flex: none; white-space: nowrap; }
+.chp-day .go {
+  width: 32px; height: 32px; flex: none; border-radius: 50%; border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+.chp-day .go svg { stroke: var(--ink-2); fill: none; }
+.chp-day.on { background: var(--accent-soft); }
+.chp-day.on .nm { color: var(--accent-ink); font-weight: 700; }
+.chp-day.on .ix { color: var(--accent-ink); font-weight: 700; }
+.chp-day.on .go { background: var(--accent); border-color: var(--accent); }
+.chp-day.on .go svg { stroke: #fff; }
+.chp-day.done .nm { color: var(--ink-3); }
+
+@media (max-width: 720px) {
+  .chp-head { grid-template-columns: 1fr; gap: 16px; }
+  .chp-cover { width: 62%; max-width: 240px; }
+  .chp-title { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ch-chip { transition: none; }
+}

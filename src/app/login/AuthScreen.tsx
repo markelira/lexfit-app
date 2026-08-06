@@ -1,8 +1,7 @@
 "use client";
 
 import "./auth.css";
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   browserLocalPersistence,
@@ -13,7 +12,10 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
-import { ensureUserDoc, hasOnboarded } from "@/lib/user";
+import { ensureUserDoc, hasOnboarded, saveOnboarding, BLANK_ONBOARDING } from "@/lib/user";
+import { paidDestination } from "@/lib/billing";
+import { readDraft, clearDraft } from "@/lib/onboarding-draft";
+import { AuthBrand } from "@/components/auth/AuthBrand";
 import { Loader } from "@/components/Protected";
 
 type Mode = "login" | "register";
@@ -40,6 +42,8 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
   const [marketing, setMarketing] = useState(false); // register: default UNCHECKED (GDPR opt-in)
   const [busy, setBusy] = useState(false);
 
+  const [attachError, setAttachError] = useState(false);
+
   const pendingRef = useRef<PendingExtra>(null);
   const firstFieldRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -48,22 +52,49 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
 
   const isReg = mode === "register";
 
-  // Redirect the moment we're authenticated: ensure the user doc (writing the
-  // email-register extras if present), then route by onboarding status. Pricing
-  // is intentionally NOT part of auth — plan selection is a later checkout step.
+  // Route once authenticated (40 §40.8). A pre-auth onboarding draft is attached
+  // here — exactly once, idempotently — before any redirect:
+  //  · already onboarded → discard the local draft, go to the app (never re-ask);
+  //  · not onboarded + a draft → save it, then checkout (/subscribe);
+  //  · not onboarded, no draft → finish onboarding.
+  // On attach failure the draft is kept and we retry in place — the user is
+  // never sent back through the questions (40 §40.12 / P3.5). Pricing is not part
+  // of auth — plan selection is the checkout step.
+  const routeAfterAuth = useCallback(async () => {
+    if (!user) return;
+    setAttachError(false);
+    const done = await hasOnboarded(user.uid);
+    if (done) {
+      clearDraft();
+      router.replace(await paidDestination(user.uid));
+      return;
+    }
+    const draft = readDraft();
+    if (draft?.answers && draft.answers.goal != null) {
+      try {
+        await saveOnboarding(user.uid, { ...BLANK_ONBOARDING, ...draft.answers });
+        clearDraft();
+        router.replace("/subscribe");
+      } catch {
+        setAttachError(true);
+      }
+    } else {
+      router.replace("/onboarding");
+    }
+  }, [user, router]);
+
   useEffect(() => {
     if (loading || !user) return;
     let active = true;
     (async () => {
       await ensureUserDoc(user, pendingRef.current ?? undefined);
       pendingRef.current = null;
-      const done = await hasOnboarded(user.uid);
-      if (active) router.replace(done ? "/app" : "/onboarding");
+      if (active) await routeAfterAuth();
     })();
     return () => {
       active = false;
     };
-  }, [user, loading, router]);
+  }, [user, loading, routeAfterAuth]);
 
   // Autofocus the first field on mount / route change (matches the reference).
   useEffect(() => {
@@ -164,73 +195,31 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
     router.push(target === "login" ? "/login" : "/register");
   }
 
-  // While auth resolves or a redirect is pending, show the branded loader.
-  if (loading || user) return <Loader />;
+  // While auth resolves or a redirect is pending, show the branded loader — or,
+  // if attaching the onboarding answers failed, an in-place retry (never a trip
+  // back through the questions — the draft is still in localStorage; P3.5).
+  if (loading) return <Loader />;
+  if (user) {
+    if (attachError) {
+      return (
+        <div className="lx authx">
+          <div className="attach-retry" role="alert">
+            <p>A fiókod elkészült, de a válaszaidat nem tudtuk elmenteni. Újrapróbáljuk?</p>
+            <button type="button" className="submit" onClick={() => void routeAfterAuth()}>
+              <span className="tx">Újra</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return <Loader />;
+  }
 
   return (
     <div className="lx authx">
       <div className="authx-shell">
-        {/* ── LEFT · brand panel ── */}
-        <aside className="authx-brand">
-          <div className="bmark">
-            <span className="bmark-ico">
-              <svg viewBox="0 0 680 616" aria-hidden="true">
-                <g transform="translate(-192,-152)">
-                  <path
-                    d="M248 712A400 400 0 0 1 648 312"
-                    fill="none"
-                    stroke="#ffffff"
-                    strokeWidth="112"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="800" cy="224" r="72" fill="#ffffff" />
-                </g>
-              </svg>
-            </span>
-            <span className="wm">LEXFIT</span>
-          </div>
-
-          <div className="bbody">
-            <div className="bquote">
-              Egyedül nehéz.
-              <br />
-              <b>Együtt muszáj.</b>
-            </div>
-            <p className="bsub">
-              4 hetes vezetett program, 100+ edzés és egy közösség, ami megtart. Otthon, eszköz
-              nélkül, napi 30 percben.
-            </p>
-            <div className="bstats">
-              <div className="s">
-                <div className="v">4 hét</div>
-                <div className="k">Foundation</div>
-              </div>
-              <div className="s">
-                <div className="v">100+</div>
-                <div className="k">edzés</div>
-              </div>
-              <div className="s">
-                <div className="v">17 000+</div>
-                <div className="k">a közösségben</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bfoot">
-            <div className="bav">
-              <Image
-                src="/trainer-underlayer.jpg"
-                alt="Alexa, a LEXFIT alapítója és edzője"
-                width={44}
-                height={44}
-              />
-            </div>
-            <div className="t">
-              <b>Alexa</b>
-              <span>Alapító · minden edzést ő vezet</span>
-            </div>
-          </div>
-        </aside>
+        {/* ── LEFT · brand panel (shared with the /register wizard) ── */}
+        <AuthBrand />
 
         {/* ── RIGHT · auth column ── */}
         <main className="authx-auth">
@@ -454,7 +443,7 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
   );
 }
 
-function authErrorHu(err: unknown): string {
+export function authErrorHu(err: unknown): string {
   const code = (err as { code?: string })?.code ?? "";
   switch (code) {
     case "auth/email-already-in-use":
@@ -483,7 +472,7 @@ function authErrorHu(err: unknown): string {
   }
 }
 
-function GoogleMark() {
+export function GoogleMark() {
   return (
     <svg viewBox="0 0 48 48" aria-hidden="true">
       <path
@@ -506,7 +495,7 @@ function GoogleMark() {
   );
 }
 
-function AppleMark() {
+export function AppleMark() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -517,7 +506,7 @@ function AppleMark() {
   );
 }
 
-function EyeIcon({ off }: { off: boolean }) {
+export function EyeIcon({ off }: { off: boolean }) {
   return off ? (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
       <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" />

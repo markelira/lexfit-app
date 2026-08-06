@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Onboarding vázlat / skeleton</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wireframe-kit.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="lexfit-icons.js"></script>
+<style>
+table{width:100%;border-collapse:collapse;margin-top:24px;font-size:13.5px;background:#fff}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink);padding:12px 14px;font-weight:500;vertical-align:bottom;background:var(--fill2)}
+td{padding:12px 14px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--ink2)}
+td strong{color:var(--ink);font-weight:600}
+td.keep{color:var(--acc);font-weight:600}
+td.cut{color:var(--warn);font-weight:600}
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:24px;border:1px dashed var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.flow>div{padding:15px 15px 17px;border-right:1px dashed var(--line)}
+.flow>div:last-child{border-right:none}
+.flow .s{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--acc);text-transform:uppercase}
+.flow h4{margin:7px 0 0;font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+.flow p{margin:5px 0 0;font-size:11.5px;color:var(--ink2);line-height:1.4}
+.flow .auth{background:var(--accbg)}
+.flow .auth .s,.flow .auth h4,.flow .auth p{color:var(--acc)}
+/* question screen bits */
+.stepbar{display:flex;gap:4px;align-items:center}
+.stepbar i{height:4px;border-radius:2px;background:var(--fill);flex:1;display:block;border:1px solid var(--line)}
+.stepbar i.on{background:var(--acc);border-color:var(--acc)}
+.qhd{font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+.qsub{font-size:11.5px;color:var(--ink2);margin-top:5px}
+.opt{display:flex;align-items:center;gap:11px;border:1.5px solid var(--line);border-radius:10px;background:#fff;padding:9px 12px;min-height:52px}
+.opt .oi{width:34px;height:34px;border-radius:8px;background:var(--fill);border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.opt .oi svg{width:17px;height:17px;stroke:var(--ink2)}
+.opt .ot{flex:1;min-width:0}
+.opt .ob{font-size:12.5px;font-weight:700;letter-spacing:-.01em}
+.opt .os{font-size:10.5px;color:var(--ink3);margin-top:2px}
+.opt .ck{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center}
+.opt .ck svg{width:12px;height:12px;stroke:#fff}
+.opt.on{border-color:var(--acc);background:var(--accbg)}
+.opt.on .oi{background:var(--acc);border-color:var(--acc)}
+.opt.on .oi svg{stroke:#fff}
+.opt.on .ob{color:var(--acc)}
+.opt.on .ck{background:var(--acc);border-color:var(--acc)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;border:1px solid var(--line);border-radius:999px;background:var(--fill2);padding:4px}
+.seg span{text-align:center;padding:9px 0;border-radius:999px;font-size:12px;font-weight:600;color:var(--ink2)}
+.seg span.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(24,32,29,.12)}
+.ta{border:1.5px solid var(--line);border-radius:10px;background:#fff;min-height:82px;padding:12px 13px;font-size:12px;color:var(--ink3);line-height:1.45}
+/* auth split */
+.authshell{display:grid;grid-template-columns:1.02fr .98fr;min-height:430px}
+.brandp{background:linear-gradient(160deg,#eaf4ef 0%,var(--accbg) 46%,#d3e8de 100%);padding:26px 30px;display:flex;flex-direction:column;border-right:1.5px solid var(--ink)}
+.brandp .mark{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 5px 13px -6px rgba(24,32,29,.45)}
+.brandp .mark svg{width:19px;height:17px;display:block}
+.brandp .hl{font-size:26px;font-weight:300;letter-spacing:-.03em;line-height:1.08;margin:auto 0 0}
+.brandp .hl b{font-weight:700;display:block}
+.brandp .st{display:flex;gap:22px;margin-top:16px}
+.brandp .st div{display:flex;flex-direction:column}
+.brandp .st .v{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.brandp .st .k{font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;color:var(--ink2);text-transform:uppercase}
+.brandp .ft{margin-top:auto;padding-top:16px;border-top:1px solid rgba(24,32,29,.12);display:flex;align-items:center;gap:10px}
+.authcol{background:#fff;padding:26px 30px;display:flex;align-items:center;justify-content:center}
+.authcard{width:100%;max-width:300px;display:flex;flex-direction:column;gap:11px}
+.tog2{display:grid;grid-template-columns:1fr 1fr;gap:4px;border:1px solid var(--line);border-radius:999px;background:var(--fill2);padding:4px}
+.tog2 span{text-align:center;padding:8px 0;border-radius:999px;font-size:12px;font-weight:600;color:var(--ink2)}
+.tog2 span.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(24,32,29,.12)}
+.oauth{height:44px;border:1.5px solid var(--line);border-radius:11px;display:flex;align-items:center;justify-content:center;gap:9px;font-size:12.5px;font-weight:600;color:var(--ink2);background:#fff}
+.oauth svg{width:16px;height:16px;stroke:var(--ink2)}
+.divider{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase}
+.divider::before,.divider::after{content:"";height:1px;background:var(--line);flex:1}
+.inp{height:44px;border:1.5px solid var(--line);border-radius:11px;background:#fff;display:flex;align-items:center;padding:0 13px;font-size:12px;color:var(--ink3)}
+.inp .lab{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase}
+.fieldlab{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:5px;display:block}
+.plancard{border:1.5px solid var(--acc);border-radius:11px;background:var(--accbg);padding:15px 17px;display:flex;flex-direction:column;gap:8px}
+.plancard .p{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--acc)}
+.plansel{position:relative;border:1.5px solid var(--line);border-radius:11px;background:#fff;padding:13px 15px;display:flex;flex-direction:column;gap:3px;min-height:74px}
+.plansel .ck{position:absolute;top:13px;right:13px;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center}
+.plansel .ck svg{width:12px;height:12px;stroke:#fff}
+.plansel .pl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--ink3)}
+.plansel .pr{font-size:22px;font-weight:800;letter-spacing:-.035em;line-height:1.05}
+.plansel .pr span{font-size:11px;font-weight:600;letter-spacing:0;color:var(--ink3)}
+.plansel .ps{font-size:10.5px;color:var(--ink3)}
+.plansel .badge{position:absolute;top:-8px;left:13px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:8px;letter-spacing:.1em;padding:3px 8px;border-radius:999px}
+.plansel .save{align-self:flex-start;margin-top:4px;font-family:var(--mono);font-size:8.5px;letter-spacing:.09em;color:var(--acc);background:var(--accbg);border:1px solid var(--accln);border-radius:4px;padding:2px 7px}
+.plansel.on{border-color:var(--acc);background:var(--accbg)}
+.plansel.on .pl,.plansel.on .pr,.plansel.on .ps{color:var(--acc)}
+.plansel.on .pr span{color:var(--acc)}
+.plansel.on .ck{background:var(--acc);border-color:var(--acc)}
+.plansel.on .save{background:#fff}
+.feat{display:flex;gap:8px;align-items:flex-start;font-size:11.5px;color:var(--ink2)}
+.feat svg{width:13px;height:13px;stroke:var(--acc);margin-top:2px;flex:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Dashboard skeleton · Onboarding + Auth</div>
+<h1>Ask only what the product will actually use.</h1>
+<p>Onboarding is the last thing to design, not the first — because until the screens exist you cannot know what they need. Now they exist, and every question can be traced to a place it appears. The existing flow asks <b>nine</b> question screens before the paywall; the app currently consumes <b>five</b> answers. This document proposes the sequence, the dependency map behind it, and where the existing <span class="mono">LEXFIT Auth</span> page sits in it.</p>
+<div class="legend">
+<span class="lg"><b>Model</b> · Duolingo / Nike Training Club onboarding</span>
+<span class="lg"><b>Auth</b> · the existing split-screen page, unchanged</span>
+<span class="lg"><b>Order</b> · value → questions → plan → account → payment</span>
+<span class="lg"><b>Mobile-first</b> · one question per screen</span>
+</div>
+</header>
+
+<!-- ═══ O1 ═══ -->
+<section>
+<div class="head"><span class="sn">O1</span><h2>The dependency map — what each answer is for</h2></div>
+<p class="lede">Every question in onboarding is a drop-off point, so each one has to earn its place by changing something the user will see. This table traces the existing questions to the screens already drawn. Five feed the product today; four do not yet.</p>
+
+<div class="layout">
+<div>
+<table>
+<thead><tr><th style="width:19%">Kérdés</th><th style="width:31%">Hol jelenik meg</th><th style="width:16%">Döntés</th><th>Indoklás</th></tr></thead>
+<tbody>
+<tr><td><strong>Cél</strong><br><span class="lbl">goal</span></td><td>Kezdőlap sor-sorrend · Videótár ajánlások · Alexa hangneme</td><td class="keep">Marad</td><td>The only answer that shapes what appears on the home screen. Non-negotiable.</td></tr>
+<tr><td><strong>Szint</strong><br><span class="lbl">level</span></td><td>Foundation belépési pont · intenzitás-szűrő alapértéke</td><td class="keep">Marad</td><td>Determines which week of Foundation the user starts in. Wrong answer here is felt on day one.</td></tr>
+<tr><td><strong>Napok / hét</strong><br><span class="lbl">days</span></td><td>Hét-sáv · Haladásom gyűrű (4/5) · Profil edzésterv · sorozat-logika</td><td class="keep">Marad</td><td>Appears on four separate screens. The single most-reused answer in the product.</td></tr>
+<tr><td><strong>Napszak</strong><br><span class="lbl">time</span></td><td>Emlékeztető alapértelmezett időpontja (07:15)</td><td class="keep">Marad</td><td>Feeds the one notification the product turns on by default. Cheap to ask, directly used.</td></tr>
+<tr><td><strong>Környezet / eszköz</strong><br><span class="lbl">env</span></td><td>Kártya „eszköz nélkül" jelölése · variációk · Profil</td><td class="keep">Marad</td><td>Filters content and shows on the card. Also the accessibility answer — knees, back, quiet.</td></tr>
+<tr><td><strong>Miért kezdted</strong><br><span class="lbl">why</span></td><td>Profil · Haladásom · Alexa hivatkozásai</td><td class="keep">Új — kell</td><td><b>Not currently asked as free text.</b> Both Profil and Haladásom quote it. It is the most human thing in the product and nothing captures it.</td></tr>
+<tr><td><strong>Fókusz-területek</strong><br><span class="lbl">focus</span></td><td>—</td><td class="cut">Később</td><td>Overlaps with Cél. Ask it in-app after week 1, when the user has context to answer well.</td></tr>
+<tr><td><strong>Korábbi akadály</strong><br><span class="lbl">obstacle</span></td><td>—</td><td class="cut">Később</td><td>Excellent question, no consumer yet. Belongs where it can act — a check-in after the first missed week.</td></tr>
+<tr><td><strong>Életszakasz</strong><br><span class="lbl">lifestage</span></td><td>—</td><td class="cut">Később</td><td>Pregnancy, postpartum, menopause. Sensitive and important — but asked at the point where variations are offered, not before an account exists.</td></tr>
+<tr><td><strong>Életkor</strong><br><span class="lbl">age</span></td><td>—</td><td class="cut">Később</td><td>Nothing in the product branches on it. Collect at profile level if analytics need it.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Nine screens → five</div><p>Lean onboarding is the pattern in the reference set — <b>Nike Training Club's flow is six steps.</b> Every removed question is a place the user does not abandon.</p></div>
+<div class="note"><div class="t">Progressive profiling</div><p>Cut questions are <b>deferred, not deleted.</b> Focus after week 1, obstacle after the first missed week, life stage where variations are offered.</p></div>
+<div class="note"><div class="t">One addition</div><p>"Miért kezdted" is quoted on two screens already drawn and captured nowhere. <b>It is the only new question this document adds.</b></p></div>
+<div class="note warn"><div class="t">Life stage needs care</div><p>Pregnancy and postpartum change what is safe. Deferring it is a judgement call, not a safety call — <b>if the programme adapts materially, it must be asked up front instead.</b></p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ O2 ═══ -->
+<section>
+<div class="head"><span class="sn">O2</span><h2>The sequence — and where Auth sits</h2></div>
+<p class="lede">Account creation comes <em>after</em> the plan is revealed. The user answers five quick questions, sees the week that was built for them, and only then is asked for an email — at the moment the thing being signed up for is concrete. This is the existing Auth page's own assumption: its register pane already says <span class="mono">„a csomagot a következő lépésben választod ki"</span>.</p>
+
+<div class="layout">
+<div>
+<div class="flow">
+  <div><div class="s">01</div><h4>Üdvözlés</h4><p>„Egyedül nehéz. Együtt muszáj." Alexa, one promise, one button. No form.</p></div>
+  <div><div class="s">02–06</div><h4>Öt kérdés</h4><p>Cél · szint · napok · napszak · környezet. One per screen, back always available.</p></div>
+  <div><div class="s">07</div><h4>Miért kezdted</h4><p>One free sentence. Skippable — but asked while motivation is highest.</p></div>
+  <div><div class="s">08</div><h4>A heted</h4><p>The plan, built from the answers. The payoff before the ask.</p></div>
+  <div class="auth"><div class="s">09 · MEGLÉVŐ OLDAL</div><h4>LEXFIT Auth</h4><p>Register pane of the existing split-screen page. Unchanged.</p></div>
+  <div><div class="s">10</div><h4>Előfizetés</h4><p>Három csomag, az éves előválasztva. Then straight into the first workout.</p></div>
+</div>
+
+<div class="two" style="margin-top:22px">
+  <div class="card" style="border-style:solid;border-color:var(--acc)">
+    <div class="lbl" style="color:var(--acc)">Miért így</div>
+    <div style="font-size:15px;font-weight:800;letter-spacing:-.02em">A kérdések előbb, a fiók utóbb.</div>
+    <p style="margin:0;font-size:12.5px;color:var(--ink2)">Answering five taps costs nothing and builds investment; typing an email costs something and is easier to refuse. By step 9 the user has a plan with their name on it — the account is now the way to keep it, not a toll gate.</p>
+  </div>
+  <div class="card">
+    <div class="lbl">Amit az Auth oldal már feltételez</div>
+    <div style="font-size:15px;font-weight:800;letter-spacing:-.02em">Nincs ár az auth oldalon.</div>
+    <p style="margin:0;font-size:12.5px;color:var(--ink2)">Its handoff is explicit: pricing was deliberately removed and the register lede promises plan selection "in the next step". That only makes sense with checkout after auth — which is exactly this order.</p>
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Defer sign-up</div><p>The Duolingo pattern: <b>let people taste the value before asking who they are.</b> Here the taste is the generated week.</p></div>
+<div class="note"><div class="t">Auth page unchanged</div><p>No redesign needed. It is already high-fidelity and structurally correct — this document only fixes <em>where in the flow it appears</em>.</p></div>
+<div class="note"><div class="t">Answers survive the account</div><p>The five answers are held locally and attached on registration. <b>A user who bounces at auth and returns must not be re-interrogated.</b></p></div>
+<div class="note warn"><div class="t">Free-tier question</div><p>If any workout is ever free, the natural place is between step 8 and 9 — do one before signing up. Not drawn; depends on a business decision.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ O3 ═══ -->
+<section>
+<div class="head"><span class="sn">O3</span><h2>The question screen — one pattern, five times</h2></div>
+<p class="lede">One question per screen, a progress bar that shows the end is near, a back arrow that always works, and options big enough to hit without looking. Nothing on these screens is novel: this is the shape of every onboarding the audience has completed in the last five years.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>01</b> · Üdvözlés</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mbody" style="justify-content:space-between;padding:20px">
+  <div style="display:flex;align-items:center;gap:9px"><span class="lexmark lg"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span style="font-weight:800;font-size:14px;letter-spacing:-.02em">LEXFIT</span></div>
+  <div style="display:flex;flex-direction:column;gap:11px">
+    <div class="lbl">Otthoni edzés</div>
+    <div style="font-size:27px;font-weight:300;letter-spacing:-.035em;line-height:1.06">Egyedül nehéz.<b style="display:block;font-weight:700">Együtt muszáj.</b></div>
+    <div style="font-size:12.5px;color:var(--ink2);line-height:1.45">Alexa vagyok. 30 perc, csak egy matrac, és egy közösség mögötted. Pár kérdés, és kész a heted.</div>
+    <div style="display:flex;gap:18px;margin-top:6px">
+      <div><div style="font-size:16px;font-weight:800;letter-spacing:-.02em">8 hét</div><div class="lbl" style="font-size:8.5px">Foundation</div></div>
+      <div><div style="font-size:16px;font-weight:800;letter-spacing:-.02em">200+</div><div class="lbl" style="font-size:8.5px">edzés</div></div>
+      <div><div style="font-size:16px;font-weight:800;letter-spacing:-.02em">17 000+</div><div class="lbl" style="font-size:8.5px">a csoportban</div></div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:9px">
+    <span class="btn pri" style="height:46px">Kezdjük</span>
+    <div style="text-align:center;font-size:11px;color:var(--ink3)">Van már fiókod? <b style="color:var(--acc)">Lépj be</b></div>
+  </div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>02</b> · Cél</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop" style="background:#fff;border-color:var(--line2)"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><div class="stepbar" style="flex:1"><i class="on"></i><i></i><i></i><i></i><i></i></div><span class="lbl" style="font-size:8.5px">1 / 5</span></div>
+<div class="mbody" style="gap:10px">
+  <div><div class="qhd">Mi hozott ide?</div><div class="qsub">Egyet válassz — ez adja az edzéseid fókuszát. Később módosítható.</div></div>
+  <div class="opt on"><span class="oi"><i data-lucide="flame"></i></span><span class="ot"><span class="ob">Erősebb, energikusabb test</span><span class="os">Hogy bírjam a napot.</span></span><span class="ck"><i data-lucide="check"></i></span></div>
+  <div class="opt"><span class="oi"><i data-lucide="chart-column"></i></span><span class="ot"><span class="ob">Lefogyni, formálódni</span><span class="os">Fokozatosan, fenntarthatóan.</span></span><span class="ck"></span></div>
+  <div class="opt"><span class="oi"><i data-lucide="moon"></i></span><span class="ot"><span class="ob">Visszatérni a mozgáshoz</span></span><span class="ck"></span></div>
+  <div class="opt"><span class="oi"><i data-lucide="user-round"></i></span><span class="ot"><span class="ob">Jobb tartás, kevesebb fájdalom</span></span><span class="ck"></span></div>
+  <div class="opt"><span class="oi"><i data-lucide="calendar-check"></i></span><span class="ot"><span class="ob">Napi mozgás-szokás</span></span><span class="ck"></span></div>
+  <span class="btn pri" style="height:46px;margin-top:auto">Tovább</span>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>04</b> · Napok / hét</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop" style="background:#fff;border-color:var(--line2)"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><div class="stepbar" style="flex:1"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="lbl" style="font-size:8.5px">3 / 5</span></div>
+<div class="mbody" style="gap:13px">
+  <div><div class="qhd">Hány nap fér bele?</div><div class="qsub">Ebből épül a heted. Bármikor változtathatod.</div></div>
+  <div class="seg"><span>3</span><span>4</span><span class="on">5</span><span>6</span></div>
+  <div style="text-align:center;font-size:11.5px;color:var(--acc);font-weight:600">ajánlott · heti 5 edzés</div>
+  <div class="card" style="padding:13px;gap:9px">
+    <div class="lbl">Így néz majd ki a heted</div>
+    <div class="week" style="gap:4px">
+      <div class="day done"><div class="d">H</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day done"><div class="d">K</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day rest"><div class="d">SZE</div><div class="dot" style="height:22px"><i data-lucide="moon"></i></div></div>
+      <div class="day done"><div class="d">CS</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day done"><div class="d">P</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day rest"><div class="d">SZO</div><div class="dot" style="height:22px"><i data-lucide="moon"></i></div></div>
+      <div class="day done"><div class="d">V</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+    </div>
+    <div style="font-size:10.5px;color:var(--ink3)">A pihenőnap is a terv része — nem töri meg a sorozatot.</div>
+  </div>
+  <span class="btn pri" style="height:46px;margin-top:auto">Tovább</span>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>05</b> · Környezet · többválasztós</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop" style="background:#fff;border-color:var(--line2)"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><div class="stepbar" style="flex:1"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><span class="lbl" style="font-size:8.5px">5 / 5</span></div>
+<div class="mbody" style="gap:9px">
+  <div><div class="qhd">Van bármi, amire figyeljek?</div><div class="qsub">Többet is választhatsz. Ehhez igazítom a variációkat.</div></div>
+  <div class="opt on"><span class="oi"><i data-lucide="moon"></i></span><span class="ot"><span class="ob">Csendben kell</span><span class="os">Szomszéd-barát, ugrálás nélkül.</span></span><span class="ck"><i data-lucide="check"></i></span></div>
+  <div class="opt"><span class="oi"><i data-lucide="dumbbell"></i></span><span class="ot"><span class="ob">Van falam / székem</span></span><span class="ck"></span></div>
+  <div class="opt on"><span class="oi"><i data-lucide="user-round"></i></span><span class="ot"><span class="ob">Kíméld a térdem</span></span><span class="ck"><i data-lucide="check"></i></span></div>
+  <div class="opt"><span class="oi"><i data-lucide="chart-column"></i></span><span class="ot"><span class="ob">Vigyázz a hátamra</span></span><span class="ck"></span></div>
+  <div class="opt"><span class="oi"><i data-lucide="check"></i></span><span class="ot"><span class="ob">Nincs külön kérésem</span></span><span class="ck"></span></div>
+  <span class="btn pri" style="height:46px;margin-top:auto">Tovább</span>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>07</b> · Miért kezdted · ÚJ</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop" style="background:#fff;border-color:var(--line2)"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><div class="stepbar" style="flex:1"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><span class="lbl" style="font-size:8.5px">Kész</span></div>
+<div class="mbody" style="gap:12px">
+  <div><div class="qhd">És miért most?</div><div class="qsub">Egy mondat elég. Ezt később visszahozom neked — akkor, amikor nehéz lesz.</div></div>
+  <div class="ta">Pl. „Hogy a lépcsőn ne fulladjak ki, és bírjam a gyerekekkel."</div>
+  <div class="whisper"><i data-lucide="message-circle"></i><span>„Ezt csak te fogod látni. Nem kell szépnek lennie — elég, ha igaz."</span></div>
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <span class="btn pri" style="height:46px">Mehet</span>
+    <div style="text-align:center;font-size:11px;color:var(--ink3)">Most kihagyom</div>
+  </div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">One question per screen</div><p>The Duolingo / NTC shape. It keeps each decision small, makes the back button meaningful, and lets the progress bar tell the truth.</p></div>
+<div class="note"><div class="t">Progress bar with a visible end</div><p><b>"3 / 5" beside a segmented bar.</b> An unbounded flow is the single biggest predictor of abandonment in a question sequence.</p></div>
+<div class="note"><div class="t">Options are 56px tall</div><p>52px for a single line, ~68px when an explanation is shown — both well above the 44px floor. Radio semantics on single-choice, checkbox on multi — the tick shape differs accordingly.</p></div>
+<div class="note"><div class="t">Show the consequence immediately</div><p>Choosing 5 days draws the week strip <em>on that screen</em>. The user sees the product being built rather than filling in a form.</p></div>
+<div class="note warn"><div class="t">Icons, not emoji</div><p>The existing flow uses emoji (💪🔥🌱). <b>Drawn here with the Lucide set</b> for consistency with the app and legibility for a 35+ audience — but this is a brand-voice call, not a research verdict.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ O4 ═══ -->
+<section>
+<div class="head"><span class="sn">O4</span><h2>The payoff, the account, the plan</h2></div>
+<p class="lede">Steps 8–10. The reveal has to feel built rather than generic; the auth page is used exactly as it exists; checkout states the price plainly and immediately hands over to the first workout.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>08</b> · A heted</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mbody" style="gap:12px">
+  <div class="lbl">Kész is</div>
+  <div class="qhd" style="font-size:21px">Ez lesz az első heted.</div>
+  <div class="card" style="padding:13px;gap:9px">
+    <div class="week" style="gap:4px">
+      <div class="day today"><div class="d">H</div><div class="dot" style="height:24px"></div></div>
+      <div class="day done"><div class="d">K</div><div class="dot" style="height:24px"></div></div>
+      <div class="day rest"><div class="d">SZE</div><div class="dot" style="height:24px"><i data-lucide="moon"></i></div></div>
+      <div class="day done"><div class="d">CS</div><div class="dot" style="height:24px"></div></div>
+      <div class="day done"><div class="d">P</div><div class="dot" style="height:24px"></div></div>
+      <div class="day rest"><div class="d">SZO</div><div class="dot" style="height:24px"><i data-lucide="moon"></i></div></div>
+      <div class="day done"><div class="d">V</div><div class="dot" style="height:24px"></div></div>
+    </div>
+    <div style="font-size:10.5px;color:var(--ink3)">Heti 5 edzés · reggelente · csendes variációkkal</div>
+  </div>
+  <div class="lbl">Az első edzésed</div>
+  <div class="cb" style="display:flex;flex-direction:column;gap:7px">
+    <div style="position:relative;border:1px dashed var(--line);border-radius:6px;background:var(--fill);aspect-ratio:16/9;overflow:hidden"><div class="art"></div><span style="position:absolute;right:6px;bottom:6px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:8.5px;padding:2px 5px;border-radius:3px">22 PERC</span><span style="position:absolute;left:0;top:8px;background:var(--acc);color:#fff;font-family:var(--mono);font-size:8px;letter-spacing:.08em;padding:3px 7px;border-radius:0 3px 3px 0">1. NAP</span></div>
+    <div style="font-size:12px;font-weight:700">Foundation · alapozás</div>
+  </div>
+  <div class="whisper"><i data-lucide="message-circle"></i><span>„Ezt a hetet a válaszaidból raktam össze. Ha nem passzol, együtt átírjuk."</span></div>
+  <span class="btn pri" style="height:46px;margin-top:auto">Mentsük el a tervedet</span>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>09</b> · Auth · mobil</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mbody" style="gap:11px">
+  <div style="display:flex;align-items:center;gap:9px"><span class="lexmark lg"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span style="font-weight:800;font-size:13px;letter-spacing:-.02em">LEXFIT</span></div>
+  <div class="tog2"><span>Belépés</span><span class="on">Regisztráció</span></div>
+  <div><div class="qhd" style="font-size:18px">Kezdjük el.</div><div class="qsub">Hozz létre egy fiókot — a csomagot a következő lépésben választod ki.</div></div>
+  <div class="oauth"><svg viewBox="0 0 48 48" aria-hidden="true" style="width:16px;height:16px;flex:none"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.5 7l7.6 5.9c4.4-4.1 6.6-10.1 6.6-17.4z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C1 16.4 0 20.1 0 24s1 7.6 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.7-3.7-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg> Regisztráció Google-lel</div>
+  <div class="oauth"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;flex:none"><path fill="#18201d" d="M16.4 12.8c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.6.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.5.8 1.2 1.8 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.9.8 3.1.7c1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.6-3.8zM14 4.9c.7-.8 1.1-1.9 1-3-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.4z"/></svg> Regisztráció Apple-lel</div>
+  <div class="divider">vagy</div>
+  <div><span class="fieldlab">Keresztneved</span><div class="inp">Réka</div></div>
+  <div><span class="fieldlab">E-mail cím</span><div class="inp">nev@pelda.hu</div></div>
+  <span class="btn pri" style="height:46px">Fiók létrehozása</span>
+  <div style="text-align:center;font-family:var(--mono);font-size:8.5px;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:5px"><i data-lucide="shield" style="width:11px;height:11px"></i> 14 napos pénzvisszafizetési garancia</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>10</b> · Előfizetés · 3 csomag</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop" style="background:#fff;border-color:var(--line2)"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><span class="brand" style="font-size:12.5px">Előfizetés</span></div>
+<div class="mbody" style="gap:9px">
+  <div><div class="qhd" style="font-size:17px">Egy előfizetés. Minden funkció.</div><div class="qsub">Bármikor lemondhatod.</div></div>
+
+  <div class="plansel on">
+    <span class="badge">LEGNÉPSZERŰBB</span>
+    <span class="ck"><i data-lucide="check"></i></span>
+    <div class="pl">ÉVES</div>
+    <div class="pr">767 Ft <span>/ hét</span></div>
+    <div class="ps">39 900 Ft / év · évente számlázva</div>
+    <span class="save">SPÓROLJ 44%</span>
+  </div>
+
+  <div class="plansel">
+    <span class="ck"></span>
+    <div class="pl">HAVI</div>
+    <div class="pr">5990 Ft <span>/ hó</span></div>
+    <div class="ps">Havonta automatikusan megújul</div>
+  </div>
+
+  <div class="plansel">
+    <span class="ck"></span>
+    <div class="pl">HETI</div>
+    <div class="pr">490 Ft <span>/ első 7 nap</span></div>
+    <div class="ps">Utána 1990 Ft / hét</div>
+  </div>
+
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:7px">
+    <span class="btn pri" style="height:46px">Előfizetek — 39 900 Ft / év</span>
+    <div style="text-align:center;font-size:10.5px;color:var(--ink3)">Bármikor lemondható · 14 napos pénzvisszafizetési garancia</div>
+  </div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>10b</b> · Mi van benne · legörgetve</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop" style="background:#fff;border-color:var(--line2)"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><span class="brand" style="font-size:12.5px">Előfizetés</span></div>
+<div class="mbody" style="gap:10px">
+  <div class="plansel on" style="padding:11px 13px">
+    <span class="ck"><i data-lucide="check"></i></span>
+    <div class="pl">ÉVES · KIVÁLASZTVA</div>
+    <div class="pr" style="font-size:19px">767 Ft <span>/ hét</span></div>
+    <div class="ps">39 900 Ft / év</div>
+  </div>
+  <div class="lbl">Mind a három csomagban</div>
+  <div style="display:flex;flex-direction:column;gap:7px">
+    <div class="feat"><i data-lucide="check"></i>8 hetes Foundation — 40 vezetett edzés</div>
+    <div class="feat"><i data-lucide="check"></i>Teljes videótár, 200+ edzés</div>
+    <div class="feat"><i data-lucide="check"></i>Minden eddigi Szavazz Magadra kihívás</div>
+    <div class="feat"><i data-lucide="check"></i>Heti visszamérés — 5. és 8. hét</div>
+    <div class="feat"><i data-lucide="check"></i>Csendes és ízület-kímélő variációk</div>
+  </div>
+  <div class="whisper"><i data-lucide="message-circle"></i><span>„A Facebook-közösség ingyenes marad — ez az előfizetés a programot nyitja meg."</span></div>
+  <span class="btn pri" style="height:46px;margin-top:auto">Előfizetek — 39 900 Ft / év</span>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>11</b> · Első belépés</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch"><i data-lucide="search"></i> Keresés…</div><span class="circ" style="width:28px;height:28px"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div style="position:relative;border:1px dashed var(--line);border-radius:8px;background:var(--fill);overflow:hidden;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;min-height:180px">
+    <div class="art"></div>
+    <div class="lbl" style="position:relative">Foundation · 1. hét · hétfő</div>
+    <div style="position:relative;font-size:18px;font-weight:800;letter-spacing:-.025em">Alapozás</div>
+    <div style="position:relative;display:flex;gap:5px"><span class="chip" style="font-size:8.5px"><i data-lucide="clock"></i>22 PERC</span><span class="chip" style="font-size:8.5px">CSENDES</span></div>
+    <span class="btn pri" style="height:44px;position:relative"><i data-lucide="play"></i> Kezdjük az elsőt</span>
+  </div>
+  <div class="whisper"><i data-lucide="message-circle"></i><span>„Itt vagyok. Az első nap a legnehezebb — utána már csak csináljuk."</span></div>
+  <div class="card" style="padding:12px;gap:8px">
+    <div class="lbl">Beállítanál egy emlékeztetőt?</div>
+    <div style="font-size:11.5px;color:var(--ink2)">Reggel 07:15-kor szólok az edzésnapjaidon.</div>
+    <div style="display:flex;gap:8px"><span class="btn sec" style="height:38px;flex:1">Most nem</span><span class="btn pri" style="height:38px;flex:1">Beállítom</span></div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">The reveal is the receipt</div><p>It restates the answers as a plan — "heti 5 edzés · reggelente · csendes variációkkal". <b>The user should recognise their own inputs</b>, otherwise the questions felt pointless.</p></div>
+<div class="note"><div class="t">"Mentsük el a tervedet"</div><p>The button into auth names what registering protects. Not "Regisztráció" — the account is a means, the plan is the thing.</p></div>
+<div class="note"><div class="t">Permission asked in context</div><p>The notification prompt appears <b>after</b> the first home screen, with the time already filled from the napszak answer, and "Most nem" as a real option.</p></div>
+<div class="note warn"><div class="t">Price stated once, plainly</div><p>Three plans, one selected, and <b>the CTA repeats the exact amount being charged</b> — „Előfizetek — 39 900 Ft / év". The existing sales-page audit flagged price clarity as a P1; do not repeat that here.</p></div>
+<div class="note"><div class="t">The live pricing model</div><p><b>Heti 490 Ft (első 7 nap, utána 1990 Ft/hét) · Havi 5990 Ft · Éves 39 900 Ft (767 Ft/hét, −44%).</b> Taken from the pricing page. Note <span class="mono">onboarding/onb-data.jsx</span> still hard-codes 19 990 Ft / hó — that is stale and needs correcting.</p></div>
+<div class="note"><div class="t">Select, then one button</div><p>Three cards each with their own CTA is the desktop pricing-table convention; on mobile the familiar pattern is <b>radio-style selection plus a single fixed action</b>. Keeps RULE 05 — one loud button per screen.</p></div>
+<div class="note"><div class="t">Normalised to a week</div><p>Every plan also shown per week, so the comparison is like-for-like. That is what makes „SPÓROLJ 44%" verifiable rather than a claim.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ O5 ═══ -->
+<section>
+<div class="head"><span class="sn">O5</span><h2>Desktop — the same flow in the Auth page's frame</h2></div>
+<p class="lede">Desktop reuses the auth page's split-screen: brand panel left, the changing content right. That means one shell for the whole flow, and the moment the user reaches step 9 the right column simply becomes the existing register pane — no visual transition at all.</p>
+
+<div class="layout">
+<div style="display:flex;flex-direction:column;gap:20px">
+
+<div class="frame">
+<div class="authshell">
+  <div class="brandp">
+    <div class="mark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></div>
+    <div class="hl">Egyedül nehéz.<b>Együtt muszáj.</b></div>
+    <div class="st">
+      <div><span class="v">8 hét</span><span class="k">Foundation</span></div>
+      <div><span class="v">200+</span><span class="k">edzés</span></div>
+      <div><span class="v">17 000+</span><span class="k">a csoportban</span></div>
+    </div>
+    <div class="ft"><span class="circ" style="width:34px;height:34px"><i data-lucide="user-round"></i></span><div><div style="font-size:12.5px;font-weight:700">Alexa</div><div style="font-size:10.5px;color:var(--ink2)">Alapító · minden edzést ő vezet</div></div></div>
+  </div>
+  <div class="authcol">
+    <div class="authcard">
+      <div style="display:flex;align-items:center;gap:10px"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><div class="stepbar" style="flex:1"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="lbl" style="font-size:8.5px">3 / 5</span></div>
+      <div><div class="qhd">Hány nap fér bele?</div><div class="qsub">Ebből épül a heted.</div></div>
+      <div class="seg"><span>3</span><span>4</span><span class="on">5</span><span>6</span></div>
+      <div class="week" style="gap:5px">
+        <div class="day done"><div class="d">H</div><div class="dot" style="height:24px"><i data-lucide="check"></i></div></div>
+        <div class="day done"><div class="d">K</div><div class="dot" style="height:24px"><i data-lucide="check"></i></div></div>
+        <div class="day rest"><div class="d">SZE</div><div class="dot" style="height:24px"><i data-lucide="moon"></i></div></div>
+        <div class="day done"><div class="d">CS</div><div class="dot" style="height:24px"><i data-lucide="check"></i></div></div>
+        <div class="day done"><div class="d">P</div><div class="dot" style="height:24px"><i data-lucide="check"></i></div></div>
+        <div class="day rest"><div class="d">SZO</div><div class="dot" style="height:24px"><i data-lucide="moon"></i></div></div>
+        <div class="day done"><div class="d">V</div><div class="dot" style="height:24px"><i data-lucide="check"></i></div></div>
+      </div>
+      <span class="btn pri" style="height:46px">Tovább</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="frame">
+<div class="authshell">
+  <div class="brandp">
+    <div class="mark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></div>
+    <div class="hl">Egyedül nehéz.<b>Együtt muszáj.</b></div>
+    <div class="st">
+      <div><span class="v">8 hét</span><span class="k">Foundation</span></div>
+      <div><span class="v">200+</span><span class="k">edzés</span></div>
+      <div><span class="v">17 000+</span><span class="k">a csoportban</span></div>
+    </div>
+    <div class="ft"><span class="circ" style="width:34px;height:34px"><i data-lucide="user-round"></i></span><div><div style="font-size:12.5px;font-weight:700">Alexa</div><div style="font-size:10.5px;color:var(--ink2)">Alapító · minden edzést ő vezet</div></div></div>
+  </div>
+  <div class="authcol">
+    <div class="authcard">
+      <div style="text-align:right;font-size:11px;color:var(--ink3)">Van már fiókod? <b style="color:var(--acc)">Lépj be</b></div>
+      <div class="tog2"><span>Belépés</span><span class="on">Regisztráció</span></div>
+      <div><div class="qhd" style="font-size:22px">Kezdjük el.</div><div class="qsub">Hozz létre egy fiókot — a csomagot a következő lépésben választod ki.</div></div>
+      <div class="oauth"><svg viewBox="0 0 48 48" aria-hidden="true" style="width:16px;height:16px;flex:none"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.5 7l7.6 5.9c4.4-4.1 6.6-10.1 6.6-17.4z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C1 16.4 0 20.1 0 24s1 7.6 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.7-3.7-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg> Regisztráció Google-lel</div>
+      <div class="oauth"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;flex:none"><path fill="#18201d" d="M16.4 12.8c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.6.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.5.8 1.2 1.8 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.9.8 3.1.7c1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.6-3.8zM14 4.9c.7-.8 1.1-1.9 1-3-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.4z"/></svg> Regisztráció Apple-lel</div>
+      <div class="divider">vagy</div>
+      <div><span class="fieldlab">Keresztneved</span><div class="inp">Réka</div></div>
+      <div><span class="fieldlab">E-mail cím</span><div class="inp">nev@pelda.hu</div></div>
+      <div><span class="fieldlab">Jelszó</span><div class="inp" style="justify-content:space-between">••••••••<i data-lucide="eye" style="width:14px;height:14px;stroke:var(--ink3)"></i></div></div>
+      <span class="btn pri" style="height:46px">Fiók létrehozása</span>
+      <div style="text-align:center;font-family:var(--mono);font-size:8.5px;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:5px"><i data-lucide="shield" style="width:11px;height:11px"></i> 14 napos pénzvisszafizetési garancia</div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">One shell, two contents</div><p>The brand panel never moves between step 1 and step 9. <b>The auth page stops being a separate destination</b> and becomes the last card in a sequence the user is already inside.</p></div>
+<div class="note warn"><div class="t">One correction the auth page needs</div><p>Its form is used exactly as built. But the brand panel still reads <b>„4 hét / 100+ edzés / a közösségben"</b>, while Foundation is eight weeks and the library is 200+ everywhere else in this skeleton — and „közösség" is now the Facebook group. <b>Drawn here with the corrected figures;</b> <span class="mono">LEXFIT Auth.html</span> needs the same edit.</p></div>
+<div class="note warn"><div class="t">The mobile decision the handoff flagged</div><p>Its README warns that stacking pushes the form below the fold under 940px. <b>In this flow that is solved for free</b> — mobile steps never show the brand panel, only the mark. Worth confirming that is the chosen answer.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ O6 ═══ -->
+<section>
+<div class="head"><span class="sn">O6</span><h2>Onboarding rules</h2></div>
+<div class="rules">
+<div><div class="num">O-RULE 01</div><div><h3>No question without a consumer.</h3><p>Every question maps to a screen that displays or uses its answer. If it maps to nothing, it waits.</p></div><div class="ev"><b>Evidence</b>The dependency map in O1 — nine asked, five used.</div></div>
+<div><div class="num">O-RULE 02</div><div><h3>Value before account, account before payment.</h3><p>Five questions → the plan → registration → checkout.</p></div><div class="ev"><b>Evidence</b>Deferred sign-up is the Duolingo pattern; the Auth page's own copy already assumes checkout comes after it.</div></div>
+<div><div class="num">O-RULE 03</div><div><h3>One question per screen, with a visible end.</h3><p>Segmented progress bar plus "3 / 5". Back always available and non-destructive.</p></div><div class="ev"><b>Evidence</b>The shape of every onboarding this audience has completed recently.</div></div>
+<div><div class="num">O-RULE 04</div><div><h3>Show the consequence on the same screen.</h3><p>Choosing 5 days draws the week; choosing "csendben" says what changes.</p></div><div class="ev"><b>Evidence</b>Makes the form feel like building rather than filling; reduces the "why are you asking" drop-off.</div></div>
+<div><div class="num">O-RULE 05</div><div><h3>The reveal restates the answers.</h3><p>The plan screen quotes the inputs back so the questions visibly paid off.</p></div><div class="ev"><b>Evidence</b>Peak–end — the reveal is the emotional peak of the flow and its justification.</div></div>
+<div><div class="num">O-RULE 06</div><div><h3>Permissions are asked in context, later.</h3><p>Notifications after the first home screen, pre-filled from the napszak answer, with a real "Most nem".</p></div><div class="ev"><b>Evidence</b>Permission language must state why; up-front prompts are refused and never re-asked.</div></div>
+</div>
+
+<h3 style="margin-top:44px;font-size:19px;letter-spacing:-.02em">What we are deliberately not doing</h3>
+<div class="dont">
+<div><span class="x">✕</span><span><b>Asking for an email first.</b> The most refusable request placed where the user has invested nothing.</span></div>
+<div><span class="x">✕</span><span><b>Nine question screens.</b> Four of them currently feed nothing. Defer, don't delete.</span></div>
+<div><span class="x">✕</span><span><b>An unbounded flow.</b> No progress bar means no idea when it ends — the strongest abandonment predictor here.</span></div>
+<div><span class="x">✕</span><span><b>A notification permission prompt before the first workout.</b> Refused by default, and refusals are permanent.</span></div>
+<div><span class="x">✕</span><span><b>Pricing on the auth page.</b> Removed deliberately in that redesign; do not reintroduce it.</span></div>
+<div><span class="x">✕</span><span><b>Re-asking the questions after a bounce at auth.</b> Answers are held locally and attached on registration.</span></div>
+</div>
+
+<div class="note warn" style="margin-top:26px"><div class="t">Still to settle</div><p>Three: whether <b>életszakasz</b> (pregnancy / postpartum / menopause) is safety-critical enough to belong up front rather than deferred — a trainer question, not a design one; whether the option icons use <b>Lucide or the existing emoji</b>; and whether a <b>free first workout</b> sits between the reveal and registration, which depends on a business decision rather than this skeleton.</p></div>
+</section>
+
+<footer>LEXFIT · Onboarding skeleton · Structure only — the Auth page is used as built</footer>
+</div>
+<script>window.addEventListener("load",function(){window.lexfitIcons&&window.lexfitIcons()});</script>
+</body>
+</html>

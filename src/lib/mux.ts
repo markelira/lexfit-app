@@ -16,15 +16,33 @@ export async function createAssetFromUrl(url: string, code: string) {
   });
 }
 
-/** Create a direct (browser) upload bound to a workout code. Signed playback. */
-export async function createDirectUpload(code: string, corsOrigin: string) {
+// Kihívások day videos live in a SEPARATE collection (challengeVideos/) from the
+// Videótár library (videos/). The shared Mux webhook can't tell them apart from
+// the doc id alone, so challenge uploads namespace their passthrough with this
+// prefix; `passthroughTarget` maps a passthrough back to the right collection.
+export const CHALLENGE_PASSTHROUGH_PREFIX = "cv:";
+
+/** Create a direct (browser) upload bound to a code. Signed playback.
+ *  Pass `passthrough` to override the default (used to namespace challenge videos). */
+export async function createDirectUpload(code: string, corsOrigin: string, opts?: { passthrough?: string }) {
   return mux.video.uploads.create({
     cors_origin: corsOrigin,
     new_asset_settings: {
       playback_policies: ["signed"],
-      passthrough: code,
+      passthrough: opts?.passthrough ?? code,
     },
   });
+}
+
+/** Resolve a Mux asset passthrough to its Firestore collection + doc id. */
+export function passthroughTarget(
+  passthrough: string | null | undefined,
+): { collection: "videos" | "challengeVideos"; code: string } | null {
+  if (!passthrough) return null;
+  if (passthrough.startsWith(CHALLENGE_PASSTHROUGH_PREFIX)) {
+    return { collection: "challengeVideos", code: passthrough.slice(CHALLENGE_PASSTHROUGH_PREFIX.length) };
+  }
+  return { collection: "videos", code: passthrough };
 }
 
 export interface AssetState {

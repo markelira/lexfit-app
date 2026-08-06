@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Dashboard vázlat / skeleton v1</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--ink:#19211e;--ink2:#44544d;--ink3:#5c6e66;--line:#c9c9c9;--line2:#e2e2e2;
+--fill:#ececec;--fill2:#f5f5f5;--paper:#fbfbfa;--white:#fff;
+--acc:#4a6c5e;--accent:#7a9b8d;--accbg:#e1f1ea;--accln:#bcd8cc;--warn:#b4652a;
+--mono:"IBM Plex Mono",monospace;--sans:"Inter Tight",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#efeeec;color:var(--ink);font-family:var(--sans);line-height:1.5}
+a{color:var(--acc)}a:hover{color:var(--ink)}
+.wrap{max-width:1480px;margin:0 auto;padding:0 36px 90px}
+.mono{font-family:var(--mono)}
+/* ── document chrome ── */
+header.doc{padding:54px 0 26px;border-bottom:2px solid var(--ink)}
+header.doc .kick{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+header.doc h1{font-size:clamp(34px,4.6vw,56px);font-weight:800;letter-spacing:-.035em;line-height:1;margin:14px 0 0;max-width:20ch}
+header.doc p{max-width:70ch;color:var(--ink2);font-size:16px;margin:18px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.lg{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--line);border-radius:4px;background:var(--white);color:var(--ink2)}
+.lg b{color:var(--acc)}
+/* ── steps ── */
+.step{padding:64px 0 0}
+.step>.head{display:flex;align-items:baseline;gap:18px;border-bottom:1px dashed var(--line);padding-bottom:14px}
+.step .sn{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--acc);text-transform:uppercase;white-space:nowrap}
+.step h2{font-size:27px;font-weight:700;letter-spacing:-.025em;margin:0}
+.step .lede{color:var(--ink2);font-size:15px;max-width:78ch;margin:14px 0 0}
+.layout{display:grid;grid-template-columns:1fr 268px;gap:30px;align-items:start;margin-top:28px}
+/* ── wireframe primitives ── */
+.frame{background:var(--white);border:1.5px solid var(--ink);border-radius:5px;overflow:hidden;box-shadow:6px 6px 0 rgba(0,0,0,.06)}
+.frame.phone{width:340px;border-radius:22px;margin:0 auto}
+.box{background:var(--fill);border:1px dashed var(--line);border-radius:4px}
+.bx{background:var(--fill);border:1px dashed var(--line);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink3);text-align:center;text-transform:uppercase;padding:6px}
+.solid{background:var(--ink);color:#fff;border:none}
+.acc{background:var(--accbg);border:1px solid #bcd8cc;color:var(--acc)}
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);display:inline-flex;align-items:center;gap:5px}
+svg[data-lucide],.lucide{width:1em;height:1em;stroke-width:2;flex:none;vertical-align:-.14em}
+.nav .ic svg,.mtab .ic svg{width:19px;height:19px;stroke:var(--ink2)}
+.nav.on .ic svg,.mtab.on .ic svg{stroke:#fff}
+.nav .ic,.mtab .ic{background:none;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center}
+.nav.on .ic,.mtab.on .ic{border-style:solid;border-color:var(--acc);background:var(--acc)}
+.play svg{width:15px;height:15px;fill:var(--ink);stroke:var(--ink)}
+.save svg,.cb .save svg{width:13px;height:13px;stroke:var(--ink2)}
+.tb-search svg,.lib-ic svg{width:14px;height:14px;stroke:var(--ink3)}
+.circ svg{width:16px;height:16px;stroke:var(--ink3)}
+.circ{display:flex;align-items:center;justify-content:center}
+.streak svg{width:13px;height:13px;stroke:var(--warn);fill:none}
+.cb .ava svg{width:15px;height:15px;stroke:var(--ink3)}
+.cb .ava.on svg{stroke:var(--acc)}
+.lbl svg{width:12px;height:12px;stroke:currentColor}
+.chip svg{width:11px;height:11px;stroke:var(--ink2)}
+.ttl{font-weight:700;letter-spacing:-.01em}
+.gline{height:9px;background:var(--fill);border-radius:3px}
+.gline.s{width:55%}.gline.m{width:78%}.gline.xs{width:34%}
+.circ{border-radius:50%;background:var(--fill);border:1px dashed var(--line)}
+/* tag chips referencing research */
+.tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:var(--accbg);color:var(--acc);border:1px solid #bcd8cc;white-space:nowrap}
+.tag.k{background:#fff3e6;color:var(--warn);border-color:#e8cbaa}
+/* annotation column */
+.notes{position:sticky;top:20px;display:flex;flex-direction:column;gap:14px}
+.note{background:var(--white);border:1px solid var(--line2);border-left:3px solid var(--acc);border-radius:4px;padding:12px 14px}
+.note .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--acc)}
+.note p{margin:6px 0 0;font-size:13px;color:var(--ink2);line-height:1.45}
+.note p b{color:var(--ink);font-weight:600}
+.note.keep{border-left-color:var(--warn)}.note.keep .t{color:var(--warn)}
+/* ── the app shell wireframe ── */
+.app{display:grid;grid-template-columns:212px 1fr;min-height:760px}
+.topbar{grid-column:1/-1;height:60px;border-bottom:1.5px solid var(--ink);display:grid;grid-template-columns:212px 1fr auto;align-items:center;background:var(--fill2)}
+.tb-logo{padding:0 18px;font-weight:800;letter-spacing:-.02em;font-size:16px;border-right:1px dashed var(--line);height:100%;display:flex;align-items:center}
+.tb-mid{padding:0 22px;display:flex;align-items:center;gap:10px}
+.tb-search{flex:1;max-width:440px;height:34px;border:1px solid var(--line);border-radius:999px;background:#fff;display:flex;align-items:center;gap:9px;padding:0 14px}
+.tb-right{display:flex;align-items:center;gap:14px;padding:0 20px}
+.rail{border-right:1.5px solid var(--ink);padding:16px 12px;display:flex;flex-direction:column;gap:6px;background:var(--fill2)}
+.rail .sec{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:8px 8px 4px}
+.nav{display:flex;align-items:center;gap:11px;padding:11px 10px;border-radius:6px;border:1px dashed transparent}
+.nav .ic{width:20px;height:20px;border-radius:4px;background:var(--fill);border:1px dashed var(--line);flex:none}
+.nav .tx{font-size:13.5px;font-weight:500;color:var(--ink2)}
+.nav.on{background:var(--accbg);border-color:#bcd8cc}
+.nav.on .tx{color:var(--acc);font-weight:700}
+.nav.on .ic{background:var(--acc);border-style:solid;border-color:var(--acc)}
+.main{padding:22px 26px 34px;display:flex;flex-direction:column;gap:24px;background:var(--paper);min-width:0}
+/* hero */
+.hero{height:296px;border:1px dashed var(--line);border-radius:6px;background:var(--fill);position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;gap:12px;overflow:hidden}
+.hero 
+/* Az Ív — the LEXFIT mark. Accent tile, white glyph (a logo is a graphic; the
+   ink-on-accent text rule does not apply to it). */
+.lexmark{width:22px;height:22px;border-radius:6px;background:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 3px 8px -4px rgba(24,32,29,.45)}
+.lexmark svg{width:13px;height:12px;display:block}
+.lexmark.lg{width:32px;height:32px;border-radius:9px}
+.lexmark.lg svg{width:18px;height:16px}
+.lexmark.xl{width:44px;height:44px;border-radius:12px}
+.lexmark.xl svg{width:24px;height:22px}
+.art{position:absolute;inset:0;background:repeating-linear-gradient(135deg,#e6e6e6 0 12px,#efefef 12px 24px)}
+.hero>*{position:relative}
+.hero .h1{font-size:30px;font-weight:800;letter-spacing:-.03em}
+.btnrow{display:flex;align-items:center;gap:12px;margin-top:6px}
+.btn{height:42px;padding:0 22px;border-radius:6px;display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600}
+.btn.pri{background:var(--ink);color:#fff}.btn svg{width:16px;height:16px;fill:currentColor;stroke:currentColor}
+.btn.sec{background:rgba(255,255,255,.75);border:1px solid var(--line);color:var(--ink2)}
+/* rows */
+.rh{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:9px}
+.row .rt{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.card{border:1px dashed var(--line);border-radius:5px;background:var(--fill);height:124px;position:relative;padding:9px;display:flex;flex-direction:column;justify-content:space-between}
+.card .meta{display:flex;gap:5px;flex-wrap:wrap;padding-right:24px}
+.chip{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:3px;padding:2px 5px;color:var(--ink2)}
+.card .name{font-size:11px;font-weight:600;color:var(--ink2);line-height:1.3}
+.card .prog{position:absolute;left:0;right:0;bottom:0;height:4px;background:#dadada}
+.card .prog i{display:block;height:100%;background:var(--acc);width:42%}
+.card .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink);background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:12px}
+.card .save{position:absolute;top:7px;right:7px;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink2)}
+/* ── Variant B card (selected) ── */
+.cb{display:flex;flex-direction:column;gap:9px}
+.cb .thumb{position:relative;border:1px dashed var(--line);border-radius:5px;background:var(--fill);aspect-ratio:16/9;overflow:hidden}
+.cb .dur{position:absolute;right:6px;bottom:8px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:9px;letter-spacing:.04em;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.cb .ribbon{position:absolute;left:0;top:9px;background:var(--acc);color:#fff;font-family:var(--mono);font-size:8.5px;letter-spacing:.09em;padding:3px 8px 3px 7px;border-radius:0 3px 3px 0}
+.cb .body{display:flex;gap:9px;align-items:flex-start}
+.cb .ava{width:30px;height:30px;border-radius:50%;background:var(--fill);border:1px dashed var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--ink3)}
+.cb .ava.on{border-style:solid;border-color:var(--acc);color:var(--acc)}
+.cb .txt{flex:1;min-width:0}
+.cb .name{font-size:12.5px;font-weight:700;letter-spacing:-.01em;line-height:1.3}
+.cb .meta2{font-size:11px;color:var(--ink2);margin-top:3px}
+.cb .meta2.done{color:var(--acc);font-weight:600}
+.cb .meta3{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--ink3);margin-top:3px}
+.cb .save{position:static;width:24px;height:24px;flex:none}
+.cb .whisper{font-size:10.5px;line-height:1.35;color:var(--acc);background:var(--accbg);border:1px solid var(--accln);border-radius:4px;padding:5px 8px;margin-top:5px}
+.cb .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;border:1.5px solid var(--ink);background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:13px}
+.cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+/* week strip */
+.week{display:grid;grid-template-columns:auto repeat(7,1fr);gap:10px;align-items:center;border:1px dashed var(--line);border-radius:6px;padding:14px 16px;background:var(--fill2)}
+.ring{width:56px;height:56px;border-radius:50%;border:7px solid var(--fill);border-top-color:var(--acc);border-right-color:var(--acc)}
+.day{text-align:center}
+.day .d{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.08em}
+.day .dot{height:30px;border-radius:5px;background:var(--fill);border:1px dashed var(--line);margin-top:5px}
+.day.done .dot{background:var(--acc);border-color:var(--acc)}
+.day.today .dot{border:2px solid var(--ink);background:#fff}
+/* mobile */
+.mtop{height:52px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--fill2)}
+.mbody{padding:14px;display:flex;flex-direction:column;gap:16px;background:var(--paper);height:520px;overflow:hidden}
+.mrow{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.mtabs{height:66px;border-top:1.5px solid var(--ink);display:grid;grid-template-columns:repeat(4,1fr);background:var(--fill2)}
+.mtab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--ink3);text-transform:uppercase}
+.mtab .ic{width:22px;height:22px;border-radius:5px;background:var(--fill);border:1px dashed var(--line)}
+.mtab.on{color:var(--acc)}.mtab.on .ic{background:var(--acc);border-color:var(--acc)}
+/* misc grids */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.anat{display:grid;grid-template-columns:260px 1fr;gap:26px;align-items:start;margin-top:24px}
+.anatlist{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line2)}
+.anatlist>div{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line2);font-size:13.5px;color:var(--ink2)}
+.anatlist .n{font-family:var(--mono);font-size:10px;color:#fff;background:var(--ink);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+.anatlist b{color:var(--ink);font-weight:600}
+.bigcard{border:1.5px solid var(--ink);border-radius:6px;background:var(--fill);height:212px;position:relative;padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+.pin{position:absolute;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;display:flex;align-items:center;justify-content:center;z-index:3}
+.smallframe{border:1.5px solid var(--ink);border-radius:5px;background:var(--white);overflow:hidden;box-shadow:5px 5px 0 rgba(0,0,0,.05)}
+.sfh{padding:11px 14px;border-bottom:1px dashed var(--line);font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);background:var(--fill2)}
+.sfb{padding:14px;display:flex;flex-direction:column;gap:10px;min-height:250px}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:26px;border:1px dashed var(--line);border-radius:6px;overflow:hidden;background:var(--white)}
+.flow>div{padding:16px 16px 18px;border-right:1px dashed var(--line)}
+.flow>div:last-child{border-right:none}
+.flow .s{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--acc);text-transform:uppercase}
+.flow h4{margin:8px 0 0;font-size:14px;font-weight:700;letter-spacing:-.01em}
+.flow p{margin:6px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.4}
+footer{margin-top:70px;padding-top:22px;border-top:2px solid var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+@media(max-width:1180px){.layout{grid-template-columns:1fr}.notes{position:static;flex-direction:row;flex-wrap:wrap}.note{flex:1 1 260px}}
+</style>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="lexfit-icons.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Dashboard redesign · Step 1 of the build — structure only</div>
+<h1>The familiar skeleton.</h1>
+<p>Low-fidelity layout for the new LEXFIT dashboard. Every region below is placed because of a specific finding in the familiarity research — nothing here is a taste decision. No colour, no photography, no copy polish: this pass fixes <b>where things live and what shape they are</b>. Visual design comes after this is signed off.</p>
+<div class="legend">
+<span class="lg"><b>F-01…F-10</b> · audit finding</span>
+<span class="lg"><b>RULE 01…08</b> · redesign rule</span>
+<span class="lg" style="border-color:#e8cbaa;color:var(--warn)"><b>KEEP</b> · already conventional, protect it</span>
+<span class="lg"><b>Card</b> · Variant B (YouTube geometry) — selected</span>
+<span class="lg"><b>Icons</b> · Lucide (ISC) — the open set closest to iOS / YouTube / Material</span>
+<span class="lg">Dashed box = content placeholder</span>
+<span class="lg">Solid black = the one loud action</span>
+</div>
+</header>
+
+<!-- ════════ STEP 1 · SHELL ════════ -->
+<section class="step">
+<div class="head"><span class="sn">Step 01</span><h2>Global shell — the chrome that never moves</h2></div>
+<p class="lede">Four things must be on screen at every moment, on every route: where I am, where else I can go, how I search, and who I am. The current build hides two of them. This is the frame everything else is drawn inside.</p>
+
+<div class="layout">
+<div class="frame">
+<div class="app">
+  <div class="topbar">
+    <div class="tb-logo" style="gap:9px"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>LEXFIT</div>
+    <div class="tb-mid">
+      <div class="tb-search"><i data-lucide="search"></i><span class="lbl">Keresés edzés, kategória, hossz…</span></div>
+    </div>
+    <div class="tb-right">
+      <div class="bx streak" style="height:32px;padding:0 12px;border-radius:999px;gap:6px"><i data-lucide="flame"></i> 12 NAP</div>
+      <div class="circ" style="width:34px;height:34px"><i data-lucide="user-round"></i></div>
+    </div>
+  </div>
+  <div class="rail">
+    <div class="sec">Menü</div>
+    <div class="nav on"><span class="ic"><i data-lucide="house"></i></span><span class="tx">Kezdőlap</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="layout-grid"></i></span><span class="tx">Videótár</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="chart-column"></i></span><span class="tx">Haladásom</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="trophy"></i></span><span class="tx">Kihívások</span></div>
+    <div style="flex:1"></div>
+    <div class="bx" style="height:64px">Alexa · segítség<br>(másodlagos, alul)</div>
+  </div>
+  <div class="main">
+    <div class="bx" style="height:560px;font-size:11px">A ROUTE TARTALMA<br>(lásd Step 02–05)</div>
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">F-01 · RULE 01</div><p><b>No collapse control.</b> The rail is permanent. NN/g measured hidden desktop nav at 27% usage vs 48% visible, ≥39% slower tasks, +21% perceived difficulty.</p></div>
+<div class="note"><div class="t">F-02 · RULE 03</div><p><b>Search moves into the shell.</b> Open text field, top, toward the right — Nielsen's canonical Jakob's Law pattern. It was previously reachable only inside Videótár.</p></div>
+<div class="note"><div class="t">F-03 · RULE 02</div><p><b>Kezdőlap, not Foundation.</b> Four destinations in the user's words. Foundation is a programme living inside Kezdőlap — a product, not a place.</p></div>
+<div class="note"><div class="t">F-04</div><p><b>Avatar top-right.</b> Circular, opens Profil / Beállítások / Segítség / Kijelentkezés. The most engraved position on the web.</p></div>
+<div class="note"><div class="t">F-08</div><p><b>Streak in the header.</b> Flame + day count, visible on every route. One daily behaviour, reinforced everywhere.</p></div>
+<div class="note keep"><div class="t">KEEP · F-10</div><p>Icon <b>plus</b> a permanently visible label on every nav item. Never hover-only, never icon-only — not at any breakpoint.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ════════ STEP 2 · KEZDŐLAP ════════ -->
+<section class="step">
+<div class="head"><span class="sn">Step 02</span><h2>Kezdőlap — billboard + stacked rows</h2></div>
+<p class="lede">The chassis stays: a billboard hero over vertically stacked horizontal rows. This is the layout the audience meets nightly on Netflix, and the literature calls it the de-facto standard for streaming recommendation. What changes is the <em>order</em> of the rows and the <em>content of the cards</em>.</p>
+
+<div class="layout">
+<div class="frame">
+<div class="app">
+  <div class="topbar">
+    <div class="tb-logo" style="gap:9px"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>LEXFIT</div>
+    <div class="tb-mid"><div class="tb-search"><i data-lucide="search"></i><span class="lbl">Keresés…</span></div></div>
+    <div class="tb-right"><div class="bx streak" style="height:32px;padding:0 12px;border-radius:999px;gap:5px"><i data-lucide="flame"></i> 12</div><div class="circ" style="width:34px;height:34px"><i data-lucide="user-round"></i></div></div>
+  </div>
+  <div class="rail">
+    <div class="sec">Menü</div>
+    <div class="nav on"><span class="ic"><i data-lucide="house"></i></span><span class="tx">Kezdőlap</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="layout-grid"></i></span><span class="tx">Videótár</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="chart-column"></i></span><span class="tx">Haladásom</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="trophy"></i></span><span class="tx">Kihívások</span></div>
+  </div>
+  <div class="main">
+
+    <!-- hero -->
+    <div class="hero">
+      <div class="art"></div>
+      <div class="lbl">FOUNDATION · 4. HÉT · MAI EDZÉS</div>
+      <div class="h1">Teljes test — EMOM</div>
+      <div style="display:flex;gap:6px"><span class="chip">28 PERC</span><span class="chip">KÖZEPES</span><span class="chip">ESZKÖZ NÉLKÜL</span></div>
+      <div class="btnrow">
+        <span class="btn pri"><i data-lucide="play"></i> Edzés indítása</span>
+        <span class="btn sec">Mit fogok ma csinálni?</span>
+      </div>
+    </div>
+
+    <!-- week strip -->
+    <div class="week">
+      <div class="ring"></div>
+      <div class="day done"><div class="d">H</div><div class="dot"></div></div>
+      <div class="day done"><div class="d">K</div><div class="dot"></div></div>
+      <div class="day"><div class="d">SZE</div><div class="dot"></div></div>
+      <div class="day today"><div class="d">CS</div><div class="dot"></div></div>
+      <div class="day"><div class="d">P</div><div class="dot"></div></div>
+      <div class="day"><div class="d">SZO</div><div class="dot"></div></div>
+      <div class="day"><div class="d">V</div><div class="dot"></div></div>
+    </div>
+
+    <!-- row 1 -->
+    <div class="row">
+      <div class="rh"><span class="rt">Folytatod</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+      <div class="cards4">
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="ribbon">MAI EDZÉSED</span><span class="dur">28 PERC</span><span class="prog"><i style="width:42%"></i></span></div>
+          <div class="body"><div class="ava on">A</div><div class="txt"><div class="name">Fenék &amp; comb — EMOM</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">18 PERC</span><span class="prog"><i style="width:70%"></i></span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Reggeli cardio flow</div><div class="meta2">5 perc van hátra</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">30 PERC</span><span class="play"><i data-lucide="play"></i></span><span class="prog"><i style="width:16%"></i></span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Teljes test — kihívás</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">12 PERC</span><span class="prog"><i style="width:88%"></i></span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Esti mobilitás</div><div class="meta2">2 perc van hátra</div></div><span class="save"><i data-lucide="check"></i></span></div></div>
+      </div>
+    </div>
+
+    <!-- row 2 -->
+    <div class="row">
+      <div class="rh"><span class="rt">A Foundation heted</span><span class="lbl">Program <i data-lucide="chevron-right"></i></span></div>
+      <div class="cards4">
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="ribbon">MAI EDZÉSED</span><span class="dur">28 PERC</span></div>
+          <div class="body"><div class="ava on">A</div><div class="txt"><div class="name">Csütörtök · teljes test</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">28 PERC</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Péntek · cardio</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">PIHENŐNAP</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Szombat</div><div class="whisper">„A pihenőnap is a terv része — a sorozatod megmarad."</div></div></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">20 PERC</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Vasárnap · mobilitás</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      </div>
+    </div>
+
+    <!-- row 3 -->
+    <div class="row">
+      <div class="rh"><span class="rt">Listám</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+      <div class="cards4">
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">15 PERC</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Hát &amp; tartás</div></div><span class="save"><i data-lucide="check"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">35 PERC</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Tánc-cardio</div></div><span class="save"><i data-lucide="check"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">10 PERC</span><span class="prog"><i style="width:100%"></i></span></div>
+          <div class="body"><div class="ava on">✓</div><div class="txt"><div class="name">Esti nyújtás</div><div class="meta2 done">Megcsináltad · ma 07:40</div></div><span class="save"><i data-lucide="check"></i></span></div></div>
+        <div class="cb" style="opacity:.35"><div class="thumb"><div class="art"></div></div><div class="body"><div class="ava"></div><div class="txt"><div class="gline m"></div><div class="gline s" style="margin-top:6px"></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- row 4 -->
+    <div class="row">
+      <div class="rh"><span class="rt">Ha csak 15 perced van</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+      <div class="cards4">
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">8 PERC</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Reggeli ébresztő</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">12 PERC</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Has &amp; core</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">15 PERC</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Fenék-sorozat</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">10 PERC</span></div>
+          <div class="body"><div class="ava">A</div><div class="txt"><div class="name">Nyak &amp; váll oldás</div><div class="whisper">„Ha ma sokat ültél, ezt válaszd."</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      </div>
+    </div>
+
+    <!-- row 5 -->
+    <div class="row">
+      <div class="rh"><span class="rt">Szavazz Magadra · a heti kihívás</span><span class="lbl">Kihívások <i data-lucide="chevron-right"></i></span></div>
+      <div class="cards4">
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">7 NAP</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name">Kihívás kártya</div><div class="meta2">324-en csinálják</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">14 NAP</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name">Kihívás kártya</div><div class="meta2">118-an csinálják</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">5 NAP</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name">Kihívás kártya</div><div class="meta2">96-an csinálják</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+        <div class="cb" style="opacity:.35"><div class="thumb"><div class="art"></div></div><div class="body"><div class="ava"></div><div class="txt"><div class="gline m"></div><div class="gline s" style="margin-top:6px"></div></div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note keep"><div class="t">KEEP · F-09</div><p><b>Billboard + stacked rows survives untouched.</b> It is the correct chassis and the audience already knows how to read it. Only the row internals change.</p></div>
+<div class="note"><div class="t">RULE 05</div><p><b>One loud action per screen.</b> "Edzés indítása" is the only solid-fill button in the viewport. Nielsen: a quiet primary CTA gets overlooked because every other app shouts.</p></div>
+<div class="note"><div class="t">RULE 07</div><p><b>Ring + week strip, high on the page.</b> The "am I on track?" mental model is already installed by Apple Fitness and banking apps — reuse it rather than invent.</p></div>
+<div class="note"><div class="t">Netflix · resume</div><p><b>"Folytatod" is the first row under the hero</b>, with a progress bar along the bottom edge of each card. The most-used row on Netflix maps exactly to mid-programme users.</p></div>
+<div class="note"><div class="t">F-08 save pattern</div><p><b>A "+" beside every card's text block</b> sends it to Listám. One click, no dialog, visible state change (+ → ✓).</p></div>
+<div class="note"><div class="t">Card = Variant B</div><p><b>All rows use the selected YouTube-geometry card</b> — four per row rather than five, since B is taller. <b>Title only under the thumbnail</b>; the second line appears only when there is a state to report.</p></div>
+<div class="note"><div class="t">Row order rationale</div><p>Resume → today's programme → my saved → low-commitment → community. Each row answers a likelier question than the one below it.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ════════ STEP 3 · CARD ANATOMY ════════ -->
+<section class="step">
+<div class="head"><span class="sn">Step 03</span><h2>Card &amp; row anatomy — Variant B, selected</h2></div>
+<p class="lede">This is the highest-leverage change in the whole document. The SIGIR '26 eye-tracking analysis found the top-left item of a row was examined by 90.82% of users while its own heading was examined by 25.77% — at least 65% of people looked at the artwork and never at the label. <b>Variant B (the YouTube video-item) is the selected direction</b>: nothing depends on hover, everything is permanently legible, and the geometry is the most-parsed card layout on the internet. Differentiation comes from the <em>content</em> of the slots, never their position — see the separate Variant B differentiation document.</p>
+
+<div class="anat">
+<div style="position:relative;padding:10px 22px">
+<span class="pin" style="top:2px;right:10px">1</span>
+<span class="pin" style="top:36%;left:8px">2</span>
+<span class="pin" style="top:2px;left:8px">3</span>
+<span class="pin" style="bottom:72px;left:8px">4</span>
+<span class="pin" style="bottom:30px;left:8px">5</span>
+<span class="pin" style="bottom:30px;right:10px">6</span>
+<div class="cb">
+  <div class="thumb"><div class="art"></div><span class="ribbon">MAI EDZÉSED</span><span class="dur">28 PERC</span><span class="play"><i data-lucide="play"></i></span><span class="prog"><i style="width:42%"></i></span></div>
+  <div class="body"><div class="ava on">A</div><div class="txt"><div class="name">Fenék &amp; comb — EMOM</div></div><span class="save"><i data-lucide="plus"></i></span></div>
+</div>
+</div>
+<div class="anatlist">
+<div><span class="n">1</span><span><b>Duration badge, bottom-right of the thumbnail — but in words: "28 PERC".</b> The position is an engraved convention and never moves; the wording says "workout", not "video".</span></div>
+<div><span class="n">2</span><span><b>Filled play triangle in a circle, centred, on hover.</b> The most universal affordance in video. The whole card is the click target.</span></div>
+<div><span class="n">3</span><span><b>"MAI EDZÉSED" ribbon.</b> Exactly one card per day may wear it. Streaming platforms recommend; LEXFIT schedules — this is the concept they have no equivalent for.</span></div>
+<div><span class="n">4</span><span><b>Alexa in the channel-avatar slot</b>, with a ring encoding your Foundation week. Because the trainer never changes, the slot is free to carry a second fact.</span></div>
+<div><span class="n">5</span><span><b>Title only, nothing under it.</b> Duration lives on the badge and intensity in the artwork — a descriptive line under every title is noise that slows scanning. The line under the title is reserved for <b>state</b>: "5 perc van hátra", "Megcsináltad · ma 07:40".</span></div>
+<div><span class="n">6</span><span><b>Save "+" right of the text block</b>, turning to ✓ in place. Plus a progress bar hugging the bottom of the thumbnail when partially done.</span></div>
+</div>
+</div>
+
+<div class="two" style="margin-top:34px">
+<div class="smallframe">
+<div class="sfh">Row behaviour — desktop</div>
+<div class="sfb" style="min-height:auto">
+<div style="display:flex;align-items:center;gap:8px">
+<div class="cards4" style="grid-template-columns:repeat(3,1fr);flex:1">
+<div class="cb"><div class="thumb"><div class="art"></div><span class="dur">28 PERC</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name">Cím</div></div></div></div>
+<div class="cb"><div class="thumb"><div class="art"></div><span class="dur">18 PERC</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name">Cím</div></div></div></div>
+<div class="cb" style="opacity:.5"><div class="thumb"><div class="art"></div><span class="dur">30 PERC</span></div><div class="body"><div class="ava"></div><div class="txt"><div class="gline m"></div></div></div></div>
+</div>
+<div class="bx" style="width:30px;height:120px"><i data-lucide="chevron-right"></i></div>
+</div>
+<p style="font-size:13px;color:var(--ink2);margin:0">4 cards visible per row (B is taller than a bare tile), arrow slides more in from the right, the next card peeks to signal there is more. Users swipe only when committed — so the first two cards must earn it.</p>
+</div>
+</div>
+<div class="smallframe">
+<div class="sfh">Row heading — demoted, not deleted</div>
+<div class="sfb" style="min-height:auto">
+<div class="rh" style="margin:0"><span class="rt">Ha csak 15 perced van</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+<div class="cards4" style="grid-template-columns:repeat(3,1fr)">
+<div class="cb"><div class="thumb"><div class="art"></div><span class="dur">8 PERC</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name">Cím</div></div></div></div>
+<div class="cb"><div class="thumb"><div class="art"></div><span class="dur">12 PERC</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name">Cím</div></div></div></div>
+<div class="cb" style="opacity:.5"><div class="thumb"><div class="art"></div><span class="dur">15 PERC</span></div><div class="body"><div class="ava"></div><div class="txt"><div class="gline m"></div></div></div></div>
+</div>
+<p style="font-size:13px;color:var(--ink2);margin:0">Keep headings for the ~26% who read them and for screen readers. Design as if nobody does — the duration badge and the thumbnail do the work. "Összes →" sits at the row end where Netflix puts it.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ════════ STEP 4 · MOBILE ════════ -->
+<section class="step">
+<div class="head"><span class="sn">Step 04</span><h2>Mobile — a bottom tab bar, not a squeezed sidebar</h2></div>
+<p class="lede">Below ~840px the rail becomes a fixed bottom tab bar: four destinations, icon plus permanent label, filled icon for the active tab, 44×44px minimum targets. This is what every Hungarian phone user touches daily in Instagram, YouTube, Facebook and WhatsApp. Search and avatar move into a slim top bar.</p>
+
+<div class="layout">
+<div style="display:flex;gap:34px;justify-content:center;flex-wrap:wrap">
+
+<div class="frame phone">
+<div class="mtop">
+  <span class="ttl" style="font-size:14px">LEXFIT</span>
+  <div class="tb-search" style="height:30px;flex:1"><i data-lucide="search"></i><span class="lbl" style="font-size:9px">Keresés…</span></div>
+  <div class="bx streak" style="height:26px;padding:0 8px;border-radius:999px;font-size:9px;gap:4px"><i data-lucide="flame"></i>12</div>
+  <div class="circ" style="width:28px;height:28px;flex:none"><i data-lucide="user-round"></i></div>
+</div>
+<div class="mbody">
+  <div class="hero" style="height:200px;padding:16px">
+    <div class="art"></div>
+    <div class="lbl" style="font-size:9px">FOUNDATION · 4. HÉT</div>
+    <div class="h1" style="font-size:20px">Teljes test — EMOM</div>
+    <div style="display:flex;gap:5px"><span class="chip">28 PERC</span><span class="chip">KÖZEPES</span></div>
+    <div class="btnrow"><span class="btn pri" style="height:44px;width:100%;justify-content:center"><i data-lucide="play"></i> Edzés indítása</span></div>
+  </div>
+  <div class="week" style="grid-template-columns:repeat(7,1fr);padding:10px">
+    <div class="day done"><div class="d">H</div><div class="dot" style="height:22px"></div></div>
+    <div class="day done"><div class="d">K</div><div class="dot" style="height:22px"></div></div>
+    <div class="day"><div class="d">SZE</div><div class="dot" style="height:22px"></div></div>
+    <div class="day today"><div class="d">CS</div><div class="dot" style="height:22px"></div></div>
+    <div class="day"><div class="d">P</div><div class="dot" style="height:22px"></div></div>
+    <div class="day"><div class="d">SZO</div><div class="dot" style="height:22px"></div></div>
+    <div class="day"><div class="d">V</div><div class="dot" style="height:22px"></div></div>
+  </div>
+  <div class="row">
+    <div class="rh"><span class="rt" style="font-size:13px">Folytatod</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div class="mrow">
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="ribbon">MAI</span><span class="dur">28 PERC</span><span class="prog"><i style="width:42%"></i></span></div><div class="body"><div class="ava on">A</div><div class="txt"><div class="name" style="font-size:11.5px">Fenék &amp; comb</div></div></div></div>
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">18 PERC</span><span class="prog"><i style="width:70%"></i></span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name" style="font-size:11.5px">Reggeli cardio</div></div></div></div>
+    </div>
+  </div>
+</div>
+<div class="mtabs">
+  <div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+  <div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+  <div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+  <div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div>
+
+<div class="frame phone">
+<div class="mtop"><span class="bx" style="width:26px;height:26px"><i data-lucide="chevron-left"></i></span><span class="ttl" style="font-size:13px">Keresés</span></div>
+<div class="mbody">
+  <div class="tb-search" style="height:40px;flex:none"><i data-lucide="search"></i><span class="lbl">Keresés edzés, kategória, hossz…</span></div>
+  <div class="lbl">Gyors szűrők</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <span class="chip" style="padding:6px 10px">10 PERC ALATT</span><span class="chip" style="padding:6px 10px">ALSÓTEST</span><span class="chip" style="padding:6px 10px">CARDIO</span><span class="chip" style="padding:6px 10px">MOBILITÁS</span><span class="chip" style="padding:6px 10px">KEZDŐ</span>
+  </div>
+  <div class="lbl" style="margin-top:6px">Legutóbbi keresések</div>
+  <div class="gline m"></div><div class="gline s"></div><div class="gline xs"></div>
+  <div class="bx" style="height:150px;margin-top:8px">EREDMÉNY-RÁCS<br>(2 oszlop)</div>
+</div>
+<div class="mtabs">
+  <div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+  <div class="mtab on"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+  <div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+  <div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">RULE 06 · F-07</div><p><b>Fixed bottom tabs, 3–5 destinations.</b> Apple HIG has long recommended the tab bar; Material moved to bottom nav for primary destinations in 2016.</p></div>
+<div class="note"><div class="t">F-10 at every breakpoint</div><p><b>Labels stay under the icons.</b> The temptation to drop them on small screens is exactly where the familiarity is lost.</p></div>
+<div class="note"><div class="t">F-02 on mobile</div><p>Search stays reachable in one tap from the top bar of every screen — it does not retreat into Videótár again on small screens.</p></div>
+<div class="note"><div class="t">Targets</div><p><b>44×44px minimum</b> on every tab, the save "+" and the play control. Carried over from the audit already run on the Apple TV page.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ════════ STEP 5 · OTHER ROUTES ════════ -->
+<section class="step">
+<div class="head"><span class="sn">Step 05</span><h2>The other three destinations — same shell, borrowed grammar</h2></div>
+<p class="lede">Each route reuses the shell exactly and borrows the structure of one reference app. Nothing below is designed yet; these are the skeletons that keep the four destinations consistent with each other.</p>
+
+<div class="three">
+
+<div class="smallframe">
+<div class="sfh">Videótár · reference: YouTube / Spotify library</div>
+<div class="sfb">
+<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip acc" style="padding:5px 9px">MIND</span><span class="chip" style="padding:5px 9px">ALSÓTEST</span><span class="chip" style="padding:5px 9px">CARDIO</span><span class="chip" style="padding:5px 9px">10 PERC</span><span class="chip" style="padding:5px 9px;display:inline-flex;align-items:center;gap:4px"><i data-lucide="sliders-horizontal"></i> SZŰRŐK</span></div>
+<div class="row"><div class="rh"><span class="rt" style="font-size:13px">Kategóriák</span></div><div class="cards" style="grid-template-columns:repeat(3,1fr)"><div class="card" style="height:56px"><div class="name">Alsótest</div></div><div class="card" style="height:56px"><div class="name">Cardio</div></div><div class="card" style="height:56px"><div class="name">Mobilitás</div></div></div></div>
+<div class="row"><div class="rh"><span class="rt" style="font-size:13px">Legnépszerűbb</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div><div class="cards4" style="grid-template-columns:repeat(3,1fr)">
+<div class="cb"><div class="thumb"><div class="art"></div><span class="dur">28 PERC</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name" style="font-size:11px">Cím</div></div></div></div>
+<div class="cb"><div class="thumb"><div class="art"></div><span class="dur">18 PERC</span></div><div class="body"><div class="ava">A</div><div class="txt"><div class="name" style="font-size:11px">Cím</div></div></div></div>
+<div class="cb" style="opacity:.5"><div class="thumb"><div class="art"></div><span class="dur">12 PERC</span></div><div class="body"><div class="ava"></div><div class="txt"><div class="gline m"></div></div></div></div>
+</div></div>
+<p style="font-size:12.5px;color:var(--ink2);margin:auto 0 0">Browse mode = rows. The moment the user types or picks a filter, the page switches to a <b>result grid</b> — the YouTube behaviour. Filter chips stay visible above the results.</p>
+</div>
+</div>
+
+<div class="smallframe">
+<div class="sfh">Haladásom · reference: Apple Fitness / banking</div>
+<div class="sfb">
+<div style="display:flex;gap:14px;align-items:center"><div class="ring"></div><div style="flex:1"><div class="gline m"></div><div class="gline s" style="margin-top:7px"></div></div></div>
+<div class="week" style="grid-template-columns:repeat(7,1fr);padding:10px">
+  <div class="day done"><div class="d">H</div><div class="dot" style="height:20px"></div></div><div class="day done"><div class="d">K</div><div class="dot" style="height:20px"></div></div><div class="day"><div class="d">SZE</div><div class="dot" style="height:20px"></div></div><div class="day today"><div class="d">CS</div><div class="dot" style="height:20px"></div></div><div class="day"><div class="d">P</div><div class="dot" style="height:20px"></div></div><div class="day"><div class="d">SZO</div><div class="dot" style="height:20px"></div></div><div class="day"><div class="d">V</div><div class="dot" style="height:20px"></div></div>
+</div>
+<div class="cards" style="grid-template-columns:repeat(3,1fr)"><div class="card" style="height:66px"><div class="name">Sorozat</div></div><div class="card" style="height:66px"><div class="name">Percek</div></div><div class="card" style="height:66px"><div class="name">Edzések</div></div></div>
+<div class="bx" style="height:78px">HÉT 1 → MOST · VISSZAMÉRÉS</div>
+<p style="font-size:12.5px;color:var(--ink2);margin:auto 0 0">Ring, big tabular numbers, week strip, "this week vs last week". No bespoke visualisations — the model is already installed.</p>
+</div>
+</div>
+
+<div class="smallframe">
+<div class="sfh">Kihívások · reference: Spotify playlist</div>
+<div class="sfb">
+<div class="bx" style="height:46px">SZŰRŐK · HOSSZ · TESTRÉSZ · ÁLLAPOT</div>
+<div class="row"><div class="rh" style="margin:0 0 7px"><span class="rt" style="font-size:13px">Folytatod</span></div><div class="cards" style="grid-template-columns:repeat(2,1fr)"><div class="card" style="height:70px"><div class="meta"><span class="chip">14 NAP</span></div><div class="name">5 / 14 nap kész</div></div><div class="card" style="height:70px"><div class="meta"><span class="chip">7 NAP</span></div><div class="name">5 / 7 nap kész</div></div></div></div>
+<div class="row"><div class="rh" style="margin:0 0 7px"><span class="rt" style="font-size:13px">A legutóbbi hetek</span></div><div class="cards" style="grid-template-columns:repeat(3,1fr)"><div class="card" style="height:62px"></div><div class="card" style="height:62px"></div><div class="card" style="height:62px"></div></div></div>
+<p style="font-size:12.5px;color:var(--ink2);margin:auto 0 0">Not a feed. The Szavazz Magadra weeks, archived and re-playable alone. A challenge is a <b>playlist</b>: stack mark, day count, progress across the series. Voting stays in the Facebook group.</p>
+</div>
+</div>
+
+</div>
+</section>
+
+<!-- ════════ STEP 6 · SEQUENCE ════════ -->
+<section class="step">
+<div class="head"><span class="sn">Step 06</span><h2>What to build, in what order</h2></div>
+<p class="lede">The first three steps are removals and moves, not a redesign — they can ship before anything is visually designed, and they are the ones that decide whether a first-time user feels lost.</p>
+<div class="flow">
+<div><div class="s">Ship 1</div><h4>Un-hide the shell</h4><p>Delete the collapse toggle. Move search into the header. Move the avatar top-right. Rename Foundation → Kezdőlap.</p></div>
+<div><div class="s">Ship 2</div><h4>Rebuild the card</h4><p>Variant B everywhere: "28 PERC" badge, Alexa avatar, title only, save "+", progress bar, MAI ribbon. Second line for state only.</p></div>
+<div><div class="s">Ship 3</div><h4>Re-order the rows</h4><p>Folytatod first, then the Foundation week, then Listám, then short workouts, then community.</p></div>
+<div><div class="s">Ship 4</div><h4>Mobile tab bar</h4><p>Bottom tabs below 840px, labels kept, 44px targets, slim top bar for search + avatar.</p></div>
+<div><div class="s">Ship 5</div><h4>Streak &amp; forgiveness</h4><p>Flame in the header; the rest day protects the streak instead of breaking it.</p></div>
+</div>
+<div class="note" style="margin-top:26px;border-left-color:var(--warn)"><div class="t" style="color:var(--warn)">Open question before visual design</div><p>One structural decision is <b>not</b> settled by the research and should be tested with five real users: whether the week strip belongs above or below the first row. Cheap to test, expensive to guess. (The fourth destination is now <b>Kihívások</b> — the Szavazz Magadra archive; see its own skeleton.)</p></div>
+</section>
+
+<footer>LEXFIT · Dashboard skeleton v1 · Structure only — no visual design decisions have been made in this document</footer>
+
+</div>
+<script>window.addEventListener("load",function(){window.lexfitIcons&&window.lexfitIcons()});</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+/* Finish-share overlay layer. Pure white type, no shadow (the reference's rule).
+   The .fs-layer is the exact 284×505 reference box, scaled to fill .fs-ol. */
+
+.fs-ol {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+.fs-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  font-family: var(--font, "Poppins", sans-serif);
+  color: #fff;
+}
+
+/* A positioned block of overlay content. */
+.fs-blk { position: absolute; }
+.fs-center {
+  left: 0;
+  right: 0;
+  width: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Shared type. */
+.fs-k {
+  font-weight: 600;
+  letter-spacing: -0.004em;
+  line-height: 1.1;
+  opacity: 0.92;
+  color: #fff;
+}
+.fs-v {
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.04;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.fs-wd {
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  color: #fff;
+  line-height: 1;
+}
+.fs-spine {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  display: inline-block;
+}
+
+.fs-lk { display: inline-flex; align-items: center; }
+
+.fs-brackets {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Optional scrim (off by default) — a soft dark wash behind the block for bright
+   photos. Kept minimal; the design ideal is no shadow, this is the escape hatch. */
+.fs-scrim { position: absolute; inset: 0; }
+.fs-scrim.d-A { background: radial-gradient(120% 90% at 0% 0%, rgba(0,0,0,0.42), transparent 58%); }
+.fs-scrim.d-E { background: radial-gradient(120% 70% at 0% 100%, rgba(0,0,0,0.42), transparent 58%); }
+.fs-scrim.d-C { background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, transparent 46%); }
+.fs-scrim.d-B { background: radial-gradient(80% 55% at 32% 62%, rgba(0,0,0,0.38), transparent 60%); }
+.fs-scrim.d-F { background: radial-gradient(70% 55% at 50% 50%, rgba(0,0,0,0.42), transparent 62%); }

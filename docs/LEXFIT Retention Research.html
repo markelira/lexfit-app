@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Retention Research · az első 14 nap</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:oklch(0.955 0.015 0);--surface:#fff;--surface-2:oklch(0.952 0.014 0);--line:oklch(0.91 0.018 0);
+--ink:oklch(0.245 0.022 350);--ink-2:oklch(0.49 0.030 355);--ink-3:oklch(0.63 0.030 355);
+--accent:oklch(0.66 0.155 0);--accent-2:oklch(0.58 0.165 358);--accent-soft:oklch(0.945 0.030 0);--accent-ink:oklch(0.50 0.155 358);
+--warn:oklch(0.55 0.12 45);--warn-ink:oklch(0.46 0.13 45);--warn-soft:oklch(0.96 0.03 60);--ok:oklch(0.63 0.130 152);--okd:oklch(0.45 0.13 152);--ok-soft:oklch(0.955 0.03 152);
+--font:"Poppins",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent-ink)}a:hover{color:var(--ink)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 36px 100px}
+.mono{font-family:var(--mono)}
+header.doc{padding:58px 0 30px;border-bottom:2px solid var(--ink)}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink)}
+header.doc h1{font-size:clamp(34px,4.8vw,56px);font-weight:800;letter-spacing:-.04em;line-height:1;margin:16px 0 0;max-width:22ch}
+header.doc .sub{max-width:80ch;color:var(--ink-2);font-size:16.5px;margin:22px 0 0}
+section{padding:62px 0 0}
+section>.head{display:flex;align-items:baseline;gap:18px;border-bottom:1px solid var(--line);padding-bottom:14px;flex-wrap:wrap}
+.sn{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--accent-ink);text-transform:uppercase;white-space:nowrap}
+section h2{font-size:27px;font-weight:700;letter-spacing:-.03em;margin:0}
+h3{font-size:18px;font-weight:700;letter-spacing:-.02em;margin:32px 0 0}
+h4{font-size:15px;font-weight:700;letter-spacing:-.01em;margin:22px 0 0}
+p{font-size:15px;color:var(--ink-2);max-width:88ch}
+p b,li b{color:var(--ink);font-weight:600}
+.lede{font-size:16px;margin:18px 0 0}
+ul{padding-left:20px;max-width:88ch}
+li{font-size:15px;color:var(--ink-2);margin:8px 0}
+.lbl{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+/* TLDR */
+.tldr{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;padding:28px 30px;margin-top:28px}
+.tldr h3{margin:0 0 14px;font-size:21px}
+.tldr p{font-size:15.5px;margin:0 0 12px}
+.tldr p:last-child{margin-bottom:0}
+/* stat strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:17px 18px}
+.stat .n{font-size:31px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+.stat .n.bad{color:var(--warn)}
+.stat .n.good{color:var(--okd)}
+.stat .k{font-size:12px;color:var(--ink-2);margin-top:8px;line-height:1.4}
+.stat .s{font-family:var(--mono);font-size:11px;letter-spacing:.07em;color:var(--ink-2);margin-top:7px;text-transform:uppercase}
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:0 1px 2px oklch(0.3 0.03 350/.04),0 6px 22px -12px oklch(0.45 0.08 0/.12)}
+.panel h4{margin-top:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:18px 22px;margin-top:24px}
+.callout .t{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.callout p{margin:9px 0 0;color:var(--ink);font-size:15px}
+.callout.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.callout.warn .t{color:var(--warn-ink)}
+.callout.ok{border-left-color:var(--ok);background:var(--ok-soft)}
+.callout.ok .t{color:var(--okd)}
+/* table */
+table{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px;background:var(--surface);border-radius:12px;overflow:hidden}
+th{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);border-bottom:1px solid var(--ink);padding:13px 15px;font-weight:500;background:var(--surface-2);vertical-align:bottom}
+td{padding:12px 15px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+td strong{color:var(--ink);font-weight:600}
+td.y{color:var(--okd);font-weight:600}
+td.n{color:var(--warn);font-weight:600}
+td.mono{font-family:var(--mono);font-size:12px;color:var(--ink)}
+/* 14 day grid */
+.wk{display:flex;align-items:center;gap:12px;margin-top:22px}
+.wk .n{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink);white-space:nowrap}
+.wk .r{flex:1;height:1px;background:var(--line)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin-top:10px}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 10px 12px;min-height:126px;display:flex;flex-direction:column;gap:5px}
+.day .d{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-2);text-transform:uppercase}
+.day .t{font-size:12.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25;color:var(--ink)}
+.day .w{font-size:11.5px;color:var(--ink-2);line-height:1.35;margin-top:auto}
+.day.work{background:var(--accent-soft);border-color:oklch(0.88 0.05 0)}
+.day.work .d{color:var(--accent-ink)}
+.day.rest{background:var(--surface-2)}
+.day.key{border:1.5px solid var(--ink)}
+.day .pin{font-family:var(--mono);font-size:11px;letter-spacing:.06em;background:var(--ink);color:#fff;padding:2px 6px;border-radius:4px;align-self:flex-start}
+/* ladder */
+.ladder{margin-top:24px;border-top:1px solid var(--ink)}
+.ladder>div{display:grid;grid-template-columns:52px 1fr 1.1fr;gap:22px;padding:18px 0;border-bottom:1px solid var(--line);align-items:start}
+.ladder .num{font-family:var(--mono);font-size:11px;color:var(--accent-ink);letter-spacing:.08em;padding-top:3px}
+.ladder h4{margin:0;font-size:16px}
+.ladder p{margin:6px 0 0;font-size:14px}
+.ladder .ev{font-size:13.5px;color:var(--ink-2)}
+.ladder .ev b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-bottom:5px}
+/* dont */
+.don{display:grid;grid-template-columns:1fr 1fr;gap:0 34px;margin-top:24px;border-top:1px solid var(--ink)}
+.don>div{padding:15px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:14px;color:var(--ink-2)}
+.don .x{font-family:var(--mono);font-size:13px;color:var(--warn);font-weight:600}
+.don b{color:var(--ink);font-weight:600}
+/* sources */
+.src{margin-top:24px;border-top:1px solid var(--ink)}
+.src>div{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--ink-2)}
+.src .n{font-family:var(--mono);font-size:11px;color:var(--accent-ink)}
+.src b{color:var(--ink);font-weight:600;display:block;margin-bottom:3px}
+.src span.u{font-family:var(--mono);font-size:11px;color:var(--ink-2);word-break:break-all}
+footer{margin-top:74px;padding-top:24px;border-top:2px solid var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+@media(max-width:1100px){.stats{grid-template-columns:1fr 1fr}.two,.three{grid-template-columns:1fr}.ladder>div{grid-template-columns:1fr}.don{grid-template-columns:1fr}
+.days{gap:7px}.day{padding:9px 8px 10px;min-height:118px}.day .t{font-size:11.5px}.day .w{font-size:11px}.day .pin{font-size:11px;padding:2px 5px}}
+@media(max-width:720px){.days{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Deep research · Retention · az előfizetés első 14 napja</div>
+<h1>Don't fake a daily habit. Build a weekly one and defend it.</h1>
+<p class="sub">LEXFIT's programme prescribes 3–5 workouts a week. Nobody trains twice a day. So the honest version of the retention question is not <em>"how do we make this a daily app"</em> — it is <b>"what happens on day 4, when there is nothing scheduled, and the user has to decide whether this is still part of their life."</b> That decision is made roughly nine times in the first fourteen days. This document is about those nine moments.</p>
+</header>
+
+<!-- ═══ TLDR ═══ -->
+<section style="padding-top:34px">
+<div class="tldr">
+<h3>TL;DR</h3>
+<p><b>The 14-day window is not a marketing period, it is the entire product.</b> Users who complete fewer than three workouts in their first fourteen days churn at <b>3–4× the rate</b> of those who establish a weekly rhythm. Sessions completed in week one are the single strongest predictor of long-term subscription. Everything else — renewal, LTV, referral — is downstream of that one number.</p>
+<p><b>Copy the weekly commitment, not the daily streak.</b> Down Dog switched from daily participation to flexible <em>weekly</em> goals and gained <b>20% in 90-day retention</b>. LEXFIT's structural disadvantage (no daily workout) becomes an advantage the moment the unit of commitment matches the programme instead of fighting it.</p>
+<p><b>Alexa is the moat, and she is currently underused.</b> Pure tracking apps without human touchpoints see D90 retention <b>below 10%</b>; products with real human accountability reach <b>20–35%</b>. LEXFIT has one named, real trainer and a 17,000-person Facebook group. That is a structural advantage Peloton cannot buy and Keep could not build.</p>
+<p><b>Be careful with rewards.</b> The Deci–Koestner–Ryan meta-analysis found that <em>all</em> expected tangible rewards contingent on performance reliably undermine intrinsic motivation — and a 2025 study of Keep found excessive gamification produces stress and emotional exhaustion. Points, badges and coins are the wrong instrument for a 35+ audience returning to movement.</p>
+<p><b>Hungary-specific headwind:</b> fewer than 30% of Hungarian consumers want subscription models at all — the lowest in CEE alongside Slovakia, versus 41% in Poland. The retention system must earn renewal <em>behaviourally</em>, because the cultural default is to resist recurring payment.</p>
+</div>
+
+<div class="stats">
+<div class="stat"><div class="n bad">12%</div><div class="k">average Day-14 retention for health &amp; fitness apps</div><div class="s">Airship / Apptopia</div></div>
+<div class="stat"><div class="n bad">3–4×</div><div class="k">churn rate for users with fewer than 3 workouts in 14 days</div><div class="s">RetentionCheck 2026</div></div>
+<div class="stat"><div class="n good">+20%</div><div class="k">D90 retention from switching daily goals to flexible weekly goals</div><div class="s">Down Dog</div></div>
+<div class="stat"><div class="n good">&lt;10% → 35%</div><div class="k">D90 without human touchpoints vs with real human accountability</div><div class="s">Health app retention 2026</div></div>
+</div>
+</section>
+
+<!-- ═══ R1 ═══ -->
+<section>
+<div class="head"><span class="sn">R1</span><h2>The structural problem, stated honestly</h2></div>
+<p class="lede">Most retention advice assumes a daily-use product. LEXFIT is not one, and pretending otherwise produces the worst possible outcome: a user who feels they are failing an app that told them to rest.</p>
+
+<div class="two">
+<div class="panel">
+<div class="lbl" style="color:var(--warn)">A hamis kérdés</div>
+<h4>„Hogyan legyen ez napi használatú app?"</h4>
+<p>This leads directly to filler: step counters nobody asked for, calorie logs that get abandoned in week two, badges for opening the app. Users spend an average of <b>2.5 minutes a day</b> in fitness apps — there is no room for invented daily busywork, and manufactured daily obligation on a rest day actively contradicts the coaching.</p>
+</div>
+<div class="panel">
+<div class="lbl" style="color:var(--okd)">A valódi kérdés</div>
+<h4>„Miért nyitja meg a 4. napon, amikor nincs edzés?"</h4>
+<p>Because something is <em>there</em> — a plan that acknowledges the rest day, a word from Alexa, a visible weekly shape she is 3/5 through, a group that trained today. The rest day is not a gap to be filled with a game. It is a <b>touchpoint to be honoured</b>.</p>
+</div>
+</div>
+
+<h3>Why 14 days and not 30</h3>
+<p>Fitness apps have a novelty window of roughly <b>3–7 days</b> where users open the app because it is new, not because a habit exists. Once the novelty ends, if the app has not given a concrete reason to return by day 10, it does not get one. The subscription's first billing cycle is therefore decided long before the renewal date — <b>renewal is a lagging indicator of week one.</b></p>
+
+<div class="callout warn">
+<div class="t">The counter-intuitive frequency finding</div>
+<p><b>3–4 workouts per week is optimal for retention. More is better for results but worse for retention</b> — it produces burnout. LEXFIT's onboarding asks how many days fit, and offers 3/4/5/6. The research says the app should gently steer a returning-to-movement beginner toward <b>3</b>, not 5, and raise it later. An ambitious answer on day one is a churn risk on day nine.</p>
+</div>
+</section>
+
+<!-- ═══ R2 ═══ -->
+<section>
+<div class="head"><span class="sn">R2</span><h2>The Eastern model — and why Keep is a warning, not a template</h2></div>
+<p class="lede">China's approach is the most aggressive in the world: fitness as social media, commerce and content in one surface. It is instructive precisely because the market leader executed it fully and <em>still lost retention</em>.</p>
+
+<h3>What Keep built</h3>
+<p>Keep (2015, 36M MAU at peak) is barely recognisable as a workout app — the exercise-recording buttons are small and easy to overlook at the top of a landing page dominated by classes, feeds and products. It is closer to a fitness-focused Xiaohongshu: social networking, KOL-led series, equipment e-commerce, nutrition, its own gyms, and a WeChat mini-programme for frictionless entry. Its largest revenue line is e-commerce, not subscription.</p>
+
+<h3>What happened</h3>
+<div class="callout warn">
+<div class="t">The outcome</div>
+<p>Keep's monthly retention <b>peaked in 2020 and has since fallen below pre-pandemic levels.</b> Only about 1 in 100 users buys anything in a given month. And the number that matters most for LEXFIT: <b>the average Keep user exercises with the app once a week.</b> Chinese media's diagnosis was blunt — with thousands of fitness KOLs giving away workouts on Douyin, "Keep is replaceable."</p>
+</div>
+
+<p>The lesson is not that social features don't work. It is that <b>social features layered onto replaceable content do not create retention.</b> Keep's competition was never other fitness apps — it was every free creator on Douyin, one of whom (Liu Genghong) drew larger audiences than Keep's entire MAU. Home-fitness video on Douyin grew 134% year-on-year in 2021; Kuaishou had 600,000+ fitness livestreamers.</p>
+
+<h3>What is genuinely worth stealing from the East</h3>
+<div class="three">
+<div class="panel"><h4>Livestream co-presence</h4><p>The one mechanic that outperformed gamification: live comments and reactions create a sense of community that recorded content cannot. <b>Not that LEXFIT needs livestream</b> — but "other people are doing this right now" is a real, cheap retention primitive.</p></div>
+<div class="panel"><h4>The person, not the platform</h4><p>China's home-fitness winners were <em>individuals</em> with audiences, not apps with libraries. Alexa is the asset. A product that foregrounds the library over the trainer is competing on replaceability.</p></div>
+<div class="panel"><h4>Where it broke</h4><p>A 2025 study of Keep's gamification found fun and achievement raise persistence short-term, but <b>excessive gamification causes stress and emotional exhaustion.</b> The Chinese model's ceiling is a design warning.</p></div>
+</div>
+</section>
+
+<!-- ═══ R3 ═══ -->
+<section>
+<div class="head"><span class="sn">R3</span><h2>The Western model — what actually creates pull</h2></div>
+<p class="lede">Duolingo is the most instructive case in consumer software, and the popular reading of it is wrong. The streak is not a notification strategy. It is an architecture decision.</p>
+
+<h3>The three findings that matter</h3>
+<div class="ladder">
+<div><div class="num">W-01</div><div><h4>The streak sits <em>inside</em> the core loop, not on top of it.</h4><p>Duolingo treats the streak as one of the rewards that fires when the core action completes — action → reward → progress. It is not a retention layer bolted on afterwards, which is why it never competes with the reason users opened the app.</p></div><div class="ev"><b>Why it matters for LEXFIT</b>A streak that only exists in the header is decoration. It has to be part of what completing a workout <em>gives</em> you.</div></div>
+<div><div class="num">W-02</div><div><h4>Identity attachment outperforms behavioural habit.</h4><p>Users who identify as streak-maintainers are more resilient to a break than users who are merely afraid of losing progress. Identity formation is described as the highest-durability retention state — users don't just use Duolingo, they <em>are</em> Duolingo users.</p></div><div class="ev"><b>Numbers</b>Users reaching a 7-day streak are <b>3.6×</b> more likely to complete their course and <b>2.4×</b> more likely to return the next day.</div></div>
+<div><div class="num">W-03</div><div><h4>A break is a recoverable state, not a failure.</h4><p>Someone who built a habit and lost it circumstantially is a demonstrably high-value user who can rebuild it. Duolingo's comeback mechanics target exactly that segment, and streak freezes function as a safety net rather than a licence to skip.</p></div><div class="ev"><b>Discipline</b>Duolingo has run <b>600+ experiments on the streak alone</b> — roughly one every other day for four years — with an explicit rule that any monetisation change hurting Day-7 retention gets rolled back.</div></div>
+</div>
+
+<div class="callout">
+<div class="t">The insight the user asked about — pull without push</div>
+<p>Duolingo's Friend Streaks give it a notification stream that is <b>structurally harder to mute than its own algorithmic pushes</b>: "It's not an owl asking you to come back — it's your friend asking where you've been." The app could send the identical message. The <em>sender</em> changes the meaning. This is the entire answer to "how do TikTok and Instagram retain without notifying": the pull comes from other people, not from the product.</p>
+</div>
+
+<h3>The two numbers from fitness specifically</h3>
+<table>
+<thead><tr><th style="width:20%">App</th><th style="width:26%">Change</th><th style="width:16%">Result</th><th>Why it worked</th></tr></thead>
+<tbody>
+<tr><td><strong>Down Dog</strong></td><td>Replaced daily participation with <strong>flexible weekly goals</strong></td><td class="y">+20% D90</td><td><b>The single most relevant finding in this document.</b> Giving users control over the goal — and matching the goal to how exercise actually works — beat demanding daily presence.</td></tr>
+<tr><td><strong>Strava</strong></td><td>Launched <strong>Challenges</strong> (2022)</td><td class="y">D90 18% → 32%</td><td>+28% DAU and +15% premium conversion. Event-based, time-bounded, socially visible — and it gave non-training days a reason to check standing.</td></tr>
+<tr><td><strong>Cult.fit / HealthifyMe</strong></td><td>Streak freeze, once per month</td><td class="y">—</td><td>Removes the punishment feeling while keeping the habit. Loss aversion without the guilt cliff.</td></tr>
+<tr><td><strong>Generic vs personalised plans</strong></td><td>Adaptive difficulty and exercise swap</td><td class="y">+40% D7</td><td>Users who always skip an exercise get it replaced. The plan visibly learns, which reads as attention.</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ═══ R4 ═══ -->
+<section>
+<div class="head"><span class="sn">R4</span><h2>The science — and the trap most fitness apps walk into</h2></div>
+<p class="lede">Self-Determination Theory is the best-evidenced framework for exercise adherence, and it contains a direct warning about the gamification playbook.</p>
+
+<div class="three">
+<div class="panel"><div class="lbl" style="color:var(--accent-ink)">Autonómia</div><h4>Choice with minimal pressure</h4><p>Supported by helping someone decide for <em>personal</em> reasons. Critically: <b>competence does not produce intrinsic motivation in the absence of autonomy.</b> A user who feels the app is instructing rather than offering gets no motivational benefit from getting better.</p></div>
+<div class="panel"><div class="lbl" style="color:var(--accent-ink)">Kompetencia</div><h4>Structure, feedback, realistic goals</h4><p>The 8-week Foundation programme and the visszamérés are textbook competence support — provided the goals are achievable. This is the argument for steering a beginner to 3 days rather than 5.</p></div>
+<div class="panel"><div class="lbl" style="color:var(--accent-ink)">Kapcsolódás</div><h4>Connectedness to others</h4><p>Feeling socially included and supported facilitates intrinsic motivation. This is the Facebook group's real job — and the reason removing all social presence from the app was a risk worth naming.</p></div>
+</div>
+
+<div class="callout warn">
+<div class="t">The trap</div>
+<p>A comprehensive meta-analysis (Deci, Koestner &amp; Ryan) confirmed that <b>all expected tangible rewards made contingent on task performance reliably undermine intrinsic motivation.</b> And it is not only rewards: <b>threats, deadlines, directives, pressured evaluations and imposed goals</b> diminish it the same way, because they shift the perceived locus of causality outward. Extrinsic motivation can change behaviour short-term but fails to maintain it over time.</p>
+</div>
+
+<h3>The finding that should shape LEXFIT's copy</h3>
+<p>Exercise motives are not equal. <b>Body-related motives — weight, appearance — are experienced as extrinsic and internally controlling.</b> Affiliation and skill development are experienced as autonomous. And the temporal split matters enormously: <b>well-internalised extrinsic motives drive initial adoption</b> (they are why someone subscribes), while <b>a predominance of intrinsic motivation drives longer-term participation.</b></p>
+
+<div class="callout ok">
+<div class="t">What this means concretely</div>
+<p>The first fourteen days are <b>the handover</b> — from "I want to lose weight" (why she paid) to "I like how this feels and it is mine" (why she stays). A retention system that keeps hammering the weight goal is optimising for the motive that predicts <em>churn</em>. This is the strongest possible evidence for the non-scale-wins block and the „Miért kezdted" sentence already in the design — and for why <b>„Megcsináltad" beats „−0,4 kg".</b></p>
+</div>
+</section>
+
+<!-- ═══ R5 ═══ -->
+<section>
+<div class="head"><span class="sn">R5</span><h2>Localising to Hungary and CEE</h2></div>
+
+<div class="two">
+<div class="panel">
+<div class="lbl" style="color:var(--warn)">A fő akadály</div>
+<h4>Fewer than 30% of Hungarians want subscriptions</h4>
+<p>PwC's CEE Voice of the Consumer found Hungary and Slovakia at <b>under 30%</b> willingness to move to subscription models — against 41% in Poland and 47% in Ukraine, and a 35% regional average. Poland leads the region on subscription attitude; Hungary trails it. Cultural, economic and payment-infrastructure maturity all contribute.</p>
+</div>
+<div class="panel">
+<div class="lbl" style="color:var(--okd)">A kedvező adat</div>
+<h4>Digital fitness converts unusually well</h4>
+<p>Trial-to-paid conversion for digital fitness is <b>63.7%</b> — about 12 points above other digital subscription categories. And fitness churn improved from 8.9% (2023) to 7.2% (2025), with the B2C improvement attributed substantially to <b>flexible pause features</b>.</p>
+</div>
+</div>
+
+<h3>Four consequences for the Hungarian market</h3>
+<ul>
+<li><b>Pause must exist, and be easy to find.</b> In a market that resists recurring payment, a visible „szüneteltetés" is a retention feature, not a leak. Cancel-or-continue is a binary Hungarian users will resolve toward cancel; pause-or-continue is not.</li>
+<li><b>The annual plan carries disproportionate weight.</b> With 39 900 Ft/year at −44%, the annual plan removes eleven monthly renewal decisions in a market predisposed to say no to each one. Sunk-cost commitment cuts both ways ethically — but the honest version is real value plus real savings, which is what is on the pricing page.</li>
+<li><b>The Facebook group is a local advantage, not a legacy channel.</b> CEE consumers engage heavily through social media, and a 17,000-member Hungarian-language group around a named trainer is not something a global competitor can replicate. Apple Fitness+ has no Hungarian Alexa.</li>
+<li><b>Price sensitivity is elevated.</b> CEE consumers in 2024 were carefully weighing finances in retail choices. Per-week framing (767 Ft/hét) is doing real work — keep it.</li>
+</ul>
+
+<div class="callout warn">
+<div class="t">GDPR note, briefly</div>
+<p>Several mechanics in the American playbook — visible friend activity, leaderboards, social streaks — involve processing that needs a clear lawful basis and genuine opt-in under GDPR. Progress photos are special-category-adjacent. The design decision already taken (photos private by construction, no follower counts) is defensible both as UX and as compliance posture. <b>Do not add social visibility without a privacy review.</b></p>
+</div>
+</section>
+
+<!-- ═══ R6 ═══ -->
+<section>
+<div class="head"><span class="sn">R6</span><h2>The recommendation — a 14-day system for LEXFIT</h2></div>
+<p class="lede">Six mechanics, ordered by evidence strength per unit of build effort. None of them is a points system. All of them are things a real coach would do.</p>
+
+<div class="ladder">
+<div><div class="num">01</div><div><h4>The unit of commitment is the week, not the day.</h4><p>The ring reads <b>3/5 ezen a héten</b>, never a daily obligation. A rest day is drawn as part of the plan and explicitly does not break anything. The user chooses the weekly number and can change it — autonomy support, not an imposed goal.</p></div><div class="ev"><b>Evidence</b>Down Dog: +20% D90 from flexible weekly goals. SDT: imposed goals diminish intrinsic motivation the same way rewards do.</div></div>
+
+<div><div class="num">02</div><div><h4>Three workouts in the first seven days is the only activation metric that matters.</h4><p>Instrument it, alert on it, and design the first week backwards from it. If a user is at 1 by day 5, that is the moment for intervention — not day 25. The first week's plan should be <b>the three shortest, easiest sessions in the programme</b>, regardless of the level they selected.</p></div><div class="ev"><b>Evidence</b>&lt;3 workouts in 14 days → 3–4× churn. First-week sessions are the strongest single predictor of long-term subscription.</div></div>
+
+<div><div class="num">03</div><div><h4>Alexa appears personally in the first fourteen days — at least twice, as a human.</h4><p>Not an automated „Hajrá!". A short video or voice note addressed to the cohort that started this week, and a genuine response to the „Miért kezdted" sentence. This is the highest-leverage unbuilt feature in the product.</p></div><div class="ev"><b>Evidence</b>Pure-app D90 &lt;10% vs 20–35% with human accountability. The hybrid model (automated daily, human weekly) is what Noom and others converged on.</div></div>
+
+<div><div class="num">04</div><div><h4>The rest day gets content, not a game.</h4><p>A 60-second action at most: one line from Alexa, a non-scale-win prompt, tomorrow's session previewed, or a 3-minute mobility option that is explicitly optional. <b>Under a minute, and never framed as an obligation.</b> The rest day's job is to keep the app in her life without contradicting the coaching.</p></div><div class="ev"><b>Evidence</b>Tiny Habits: design the minimum daily action for &lt;60s completion. Apps that <em>educate</em> about recovery see 20% higher adherence because users feel validated rather than guilty.</div></div>
+
+<div><div class="num">05</div><div><h4>Streak with forgiveness, framed as consistency — and a one-tap comeback.</h4><p>Rest days protect it. One free „freeze" per month. When it does break, the copy is <b>„Új sorozat indul"</b> with one-tap restart, never a red zero. Someone who broke a 12-day streak is a high-value user, not a failure.</p></div><div class="ev"><b>Evidence</b>7-day streak → 3.6× course completion, 2.4× next-day return. Streak freezes remove punishment while keeping the habit; breaks are a recoverable state.</div></div>
+
+<div><div class="num">06</div><div><h4>Co-presence, borrowed rather than built.</h4><p>„<b>312-en csinálták végig ezt a hetet</b>" and „ma 47 valaki edzett veled együtt" — facts about other people, no leaderboard, no follower counts. Plus the challenge archive as a Strava-style time-bounded event. The Facebook group stays the live room; the app carries the evidence that she is not alone.</p></div><div class="ev"><b>Evidence</b>Friend-sender effect: social weight the app cannot manufacture. Strava Challenges: D90 18%→32%. SDT relatedness. Social features raise retention ~30%.</div></div>
+</div>
+
+<h3>What the first fourteen days look like</h3>
+<div class="wk"><span class="n">1. hét · aktiválás</span><span class="r"></span><span class="n">3 edzés</span></div>
+<div class="days">
+<div class="day work key"><span class="d">1. nap</span><span class="pin">AKTIVÁLÁS</span><span class="t">Az első edzés</span><span class="w">A legrövidebb a programban. Alexa videós köszöntése a végén.</span></div>
+<div class="day rest"><span class="d">2. nap</span><span class="t">Pihenő</span><span class="w">„Ez is a terv része." Holnap előnézet. 30 másodperc.</span></div>
+<div class="day work"><span class="d">3. nap</span><span class="t">2. edzés</span><span class="w">Ugyanaz a hossz. Semmi új.</span></div>
+<div class="day rest"><span class="d">4. nap</span><span class="t">Pihenő</span><span class="w">Első nem-mérleg kérdés: „Mit vettél észre?"</span></div>
+<div class="day work key"><span class="d">5. nap</span><span class="pin">A KÜLÖNBSÉG</span><span class="t">3. edzés</span><span class="w">Az aktivációs küszöb. Itt dől el a hónap.</span></div>
+<div class="day rest"><span class="d">6. nap</span><span class="t">Pihenő</span><span class="w">„312-en csinálták végig ezt a hetet."</span></div>
+<div class="day work"><span class="d">7. nap</span><span class="t">A hét zárása</span><span class="w">3/3 kész. Heti összegzés, nem napi.</span></div>
+</div>
+<div class="wk" style="margin-top:20px"><span class="n">2. hét · megtartás</span><span class="r"></span><span class="n">3 edzés</span></div>
+<div class="days">
+<div class="day work"><span class="d">8. nap</span><span class="t">2. hét indul</span><span class="w">Alexa: a válaszára reagál. Személyesen.</span></div>
+<div class="day rest"><span class="d">9. nap</span><span class="t">Pihenő</span><span class="w">Opcionális 3 perc mobilitás.</span></div>
+<div class="day work"><span class="d">10. nap</span><span class="t">5. edzés</span><span class="w">Először picit hosszabb — ha az 1. hét megvolt.</span></div>
+<div class="day rest"><span class="d">11. nap</span><span class="t">Pihenő</span><span class="w">Kihívás-archívum: van kedve egy héthez?</span></div>
+<div class="day work"><span class="d">12. nap</span><span class="t">6. edzés</span><span class="w">Sorozat: 12 nap az appban.</span></div>
+<div class="day rest"><span class="d">13. nap</span><span class="t">Pihenő</span><span class="w">„Két hét. Ez már nem lelkesedés, ez rutin."</span></div>
+<div class="day work key"><span class="d">14. nap</span><span class="pin">MEGTARTÁS</span><span class="t">Az első visszamérés</span><span class="w">Nem az 5. héten. Egy kis mérés <b>most</b>, hogy legyen bizonyíték.</span></div>
+</div>
+
+<div class="callout ok">
+<div class="t">One design change this research suggests</div>
+<p>The Haladásom design places the first visszamérés at week 3 and the big one at week 8. <b>Consider a small, honest measurement at day 14.</b> The evidence says the retention decision is made inside the first two weeks — so the proof has to arrive inside the first two weeks too. Not the full re-test; something small and real that says „ez működik".</p>
+</div>
+</section>
+
+<!-- ═══ R7 ═══ -->
+<section>
+<div class="head"><span class="sn">R7</span><h2>What we should deliberately not do</h2></div>
+<div class="don">
+<div><span class="x">✕</span><span><b>Points, coins or badges for opening the app.</b> Expected tangible rewards contingent on behaviour reliably undermine intrinsic motivation. This is the single best-evidenced "don't" in the document.</span></div>
+<div><span class="x">✕</span><span><b>Leaderboards ranking users against each other.</b> The slowest members leave first, and they are the audience. Facts about the group, yes; rankings, no.</span></div>
+<div><span class="x">✕</span><span><b>A daily obligation on rest days.</b> It contradicts the coaching, and apps that validate rest see 20% higher adherence.</span></div>
+<div><span class="x">✕</span><span><b>Manufactured logging (calories, weight, steps).</b> Abandoned in week two, and body-related metrics are the motive class that predicts churn.</span></div>
+<div><span class="x">✕</span><span><b>Guilt-based notifications.</b> Duolingo <em>earned</em> the right to be persistent because users bought into the streak first. Escalating urgency before buy-in reads as harassment.</span></div>
+<div><span class="x">✕</span><span><b>Steering beginners to 5–6 days a week.</b> More frequency is better for results and worse for retention. Let her succeed at 3 first.</span></div>
+<div><span class="x">✕</span><span><b>Hiding cancellation.</b> In a market already sceptical of subscriptions, a dark-pattern cancel flow poisons word-of-mouth in a 17,000-person group. Offer pause prominently instead.</span></div>
+<div><span class="x">✕</span><span><b>Building a social feed in the app.</b> Keep did all of it and still lost retention. The group already exists; the app should carry evidence of it, not compete with it.</span></div>
+</div>
+</section>
+
+<!-- ═══ R8 ═══ -->
+<section>
+<div class="head"><span class="sn">R8</span><h2>How to know if it is working</h2></div>
+<table>
+<thead><tr><th style="width:26%">Metrika</th><th style="width:17%">Cél</th><th>Miért ez</th></tr></thead>
+<tbody>
+<tr><td><strong>Edzések az első 7 napban</strong></td><td class="mono">≥ 3</td><td><b>The one activation metric.</b> Everything else is downstream. Alert when a user is below 2 by day 5.</td></tr>
+<tr><td><strong>D14 retention</strong></td><td class="mono">&gt; 25%</td><td>Category average is 12%. Doubling it is a realistic target for a programme-led product with a real trainer.</td></tr>
+<tr><td><strong>Heti cél teljesítése</strong></td><td class="mono">&gt; 60%</td><td>The right unit. Measure the week, not the day — the product promises a week.</td></tr>
+<tr><td><strong>Edzés-befejezési arány</strong></td><td class="mono">&gt; 70%</td><td>Above 70% is associated with a 43% lift in user lifetime value. Also the cleanest signal that a session is well-designed.</td></tr>
+<tr><td><strong>D90 retention</strong></td><td class="mono">15–20%</td><td>What top fitness apps with human touchpoints achieve. Below 10% would mean the Alexa layer is not landing.</td></tr>
+<tr><td><strong>Szüneteltetés vs lemondás</strong></td><td class="mono">arány</td><td>The Hungarian-market metric. A healthy pause-to-cancel ratio is the local retention signal that matters most.</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<div class="t">A process recommendation, not a feature</div>
+<p>Duolingo ran <b>600+ experiments on the streak alone</b>, with a named person empowered to veto anything that cheapened it, and a standing rule that any change hurting Day-7 retention is rolled back. LEXFIT does not need that volume — but it needs the <b>rule</b>: one metric (3 workouts in 7 days), one owner, and permission to reject features that trade it for short-term engagement.</p>
+</div>
+</section>
+
+<!-- ═══ SOURCES ═══ -->
+<section>
+<div class="head"><span class="sn">S</span><h2>Sources</h2></div>
+<div class="src">
+<div><span class="n">01</span><span><b>Airship — Building a Habit for Health &amp; Fitness Apps</b>Day-14 retention of 12%; 2.5 minutes average daily session time (Apptopia data).<span class="u">airship.com/blog/building-a-habit-for-health-fitness-apps</span></span></div>
+<div><span class="n">02</span><span><b>RetentionCheck — Fitness App Retention &amp; Churn 2026</b>Session frequency in the first two weeks as the most predictive churn signal; &lt;3 workouts in 14 days → 3–4× churn.<span class="u">retentioncheck.com/churn-benchmarks/fitness-apps</span></span></div>
+<div><span class="n">03</span><span><b>Lucid — Retention Metrics for Fitness Apps</b>Down Dog's flexible weekly "Practice Frequency" → +20% D90; Strava Challenges → D90 18%→32%, +28% DAU, +15% premium.<span class="u">lucid.now/blog/retention-metrics-for-fitness-apps-industry-insights</span></span></div>
+<div><span class="n">04</span><span><b>Product Growth — Fitness App Retention: What Top Apps Do Differently</b>3–4 workouts/week optimal, more causes burnout; streak freezes; rest-day education → 20% higher adherence; personalised vs generic → +40% D7.<span class="u">productgrowth.in/insights/healthtech/fitness-app-retention</span></span></div>
+<div><span class="n">05</span><span><b>Product Growth — Health App Engagement 2026</b>Human accountability vs pure-app retention: D90 below 10% without human touchpoints, 20–35% with professional support; Tiny Habits &lt;60s daily action.<span class="u">productgrowth.in/insights/healthtech/health-app-retention-guide</span></span></div>
+<div><span class="n">06</span><span><b>The China Project — Keep's pandemic bet</b>Retention peaked 2020 and fell below pre-pandemic levels; average user exercises once a week; ~1 in 100 users purchase monthly; "Keep is replaceable."<span class="u">thechinaproject.com/2023/08/11/keep-fitness-app-bet-big-during-the-pandemic-will-it-pay-off</span></span></div>
+<div><span class="n">07</span><span><b>PingWest — Keep dethroned on Douyin</b>Douyin fitness video +134% YoY (2021); 600,000+ Kuaishou fitness livestreamers; livestream co-presence outperforming gamification.<span class="u">en.pingwest.com/a/10195</span></span></div>
+<div><span class="n">08</span><span><b>Taylor &amp; Francis (2025) — Revisiting the Role of Gamification in Fitness Apps</b>Study of Keep: fun and achievement raise short-term persistence; excessive gamification causes stress and emotional exhaustion.<span class="u">tandfonline.com/doi/full/10.1080/10447318.2025.2539483</span></span></div>
+<div><span class="n">09</span><span><b>UX Magazine — The Psychology of Hot Streak Game Design</b>7-day streak → 3.6× course completion and 2.4× next-day return; streaks working without external notification pressure.<span class="u">uxmag.com/articles/the-psychology-of-hot-streak-game-design</span></span></div>
+<div><span class="n">10</span><span><b>Deconstructor of Duolingo — Streaks</b>The streak as a reward inside the core loop rather than a bolted-on layer; Friend Streaks and the sender effect.<span class="u">duolingo.deconstructoroffun.com/mechanics/streaks</span></span></div>
+<div><span class="n">11</span><span><b>Digia — Duolingo's Habit-Forming Reminders</b>Identity formation as the highest-durability retention state; breaks as a recoverable state; Streak Wager A/B → Day-7 retention +14%.<span class="u">digia.tech/post/duolingo-habit-forming-reminders-retention-architecture</span></span></div>
+<div><span class="n">12</span><span><b>Ryan &amp; Deci — Self-Determination Theory (2000)</b>The Deci, Koestner &amp; Ryan meta-analysis: expected tangible performance-contingent rewards reliably undermine intrinsic motivation; so do threats, deadlines, directives and imposed goals.<span class="u">selfdeterminationtheory.org/SDT/documents/2000_RyanDeci_SDT.pdf</span></span></div>
+<div><span class="n">13</span><span><b>IJBNPA — Exercise, physical activity and SDT: a systematic review</b>Internalised extrinsic motives drive adoption; intrinsic motivation drives long-term participation; body-related motives experienced as internally controlling.<span class="u">link.springer.com/article/10.1186/1479-5868-9-78</span></span></div>
+<div><span class="n">14</span><span><b>PwC CEE — Voice of the Consumer 2024</b>Hungary and Slovakia below 30% willingness to adopt subscription models vs 41% Poland, 47% Ukraine, 35% regional average.<span class="u">cee.pwc.com/voice-of-the-consumer-survey-2024.html</span></span></div>
+<div><span class="n">15</span><span><b>Focus Digital — Subscription churn benchmarks 2025</b>Fitness churn 8.9% (2023) → 7.2% (2025); B2C improvement attributed to flexible pause features and AI retention tooling.<span class="u">focus-digital.co/average-churn-rate-subscription-services</span></span></div>
+<div><span class="n">16</span><span><b>Member Solutions — Digital Fitness Trends</b>Digital fitness trial-to-paid conversion 63.7%, ~12 points above other digital subscription categories; hybrid participation +41% YoY.<span class="u">membersolutions.com/blog/digital-fitness-trends</span></span></div>
+<div><span class="n">17</span><span><b>Fitscope — Reducing Churn with Fresh Content Drops</b>First-week sessions as the strongest predictor of long-term subscription; structured 4–8 class programmes as the most powerful early-retention content type.<span class="u">fitscope.com/blog/how-fitness-apps-reduce-churn-with-fresh-content-drops</span></span></div>
+<div><span class="n">18</span><span><b>Mindster — Fitness App Gamification: the 14-Day Churn Problem</b>The 3–7 day novelty window; if no concrete reason to return exists by day 10, it does not arrive later.<span class="u">mindster.com/mindster-blogs/fitness-app-user-retention</span></span></div>
+</div>
+</section>
+
+<footer>LEXFIT · Retention research · Az előfizetés első 14 napja · 2026. július</footer>
+</div>
+</body>
+</html>
