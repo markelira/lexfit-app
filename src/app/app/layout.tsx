@@ -9,7 +9,12 @@ import { useAuth } from "@/lib/auth-context";
 import { AppTopBar } from "@/components/AppTopBar";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
-import { getProgress, syncMuxProgress } from "@/lib/progress";
+import { getProgress, syncMuxProgress, getPendingCompletions } from "@/lib/progress";
+import { getPrefs } from "@/lib/prefs";
+import { computeStreak } from "@/lib/streak";
+
+const pad = (n: number) => String(n).padStart(2, "0");
+const ymd = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
 // Four labelled destinations (RULE 02). Icon + permanently visible label on every
 // item, at every breakpoint (F-10). Order matches the shell wireframe.
@@ -30,11 +35,23 @@ function Shell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) return;
-    // Fold any freshly finished Mux views into the progress doc (throttled),
-    // then read the up-to-date streak for the top bar.
+    const uid = user.uid;
+    // Fold any freshly finished Mux views into the progress doc (throttled), then
+    // derive the streak FRESH the same way Haladásom does (computeStreak over the
+    // dated completions + the user's plan) — never the stored, drift-prone field.
     syncMuxProgress()
-      .then(() => getProgress(user.uid))
-      .then((p) => setStreak(p?.streak ?? 0))
+      .then(() => Promise.all([getProgress(uid), getPrefs(uid)]))
+      .then(([p, pr]) => {
+        const confirmed = p?.completed ?? [];
+        const pending = getPendingCompletions();
+        const merged = [
+          ...confirmed,
+          ...pending.filter((x) => !confirmed.some((c) => c.code === x.code && String(c.at) === String(x.at))),
+        ];
+        const dates = merged.map((c) => String(c.at));
+        const workoutIdx = new Set(pr.plan.weekdays.map((w) => w - 1));
+        setStreak(computeStreak(dates, workoutIdx, ymd(new Date()), pr.plan.restDayKeepsStreak));
+      })
       .catch(() => {});
   }, [user]);
 
