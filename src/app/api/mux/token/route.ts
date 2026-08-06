@@ -13,14 +13,17 @@ export async function GET(req: Request) {
   const token = await verifyRequest(req);
   if (!token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const code = new URL(req.url).searchParams.get("code");
+  const params = new URL(req.url).searchParams;
+  const code = params.get("code");
+  // Kihívások day videos live in challengeVideos/ — same signed-playback gating.
+  const collection = params.get("type") === "challenge" ? "challengeVideos" : "videos";
   if (!code) return NextResponse.json({ error: "missing code" }, { status: 400 });
 
   if (!(await hasAccess(token.uid))) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  const snap = await adminDb.collection("videos").doc(code).get();
+  const snap = await adminDb.collection(collection).doc(code).get();
   const playbackId = snap.data()?.muxPlaybackId as string | undefined;
   if (!playbackId) return NextResponse.json({ error: "no video attached" }, { status: 404 });
 

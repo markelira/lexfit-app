@@ -16,6 +16,8 @@ import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { levelWord } from "@/lib/categories";
 import { loadLibrary, type LibVideo } from "@/lib/library";
+import { loadChallenges, type ChallengeCardData } from "@/lib/challenges";
+import { ChallengeCard } from "@/components/ChallengeCard";
 import { GuideController, GUIDE_START_EVENT } from "@/components/GuidedTour";
 import { JoinCinematic } from "@/components/JoinCinematic";
 import { loadFoundation, dayState, type FoundationData, type WorkoutItem } from "@/lib/program";
@@ -37,6 +39,7 @@ export default function KezdolapPage() {
   const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [cineOpen, setCineOpen] = useState(false);
   const [libVideos, setLibVideos] = useState<LibVideo[]>([]);
+  const [challenges, setChallenges] = useState<ChallengeCardData[]>([]);
   const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
   const isMobile = useIsMobile();
 
@@ -70,6 +73,7 @@ export default function KezdolapPage() {
       getMyList(user.uid).then(setMyList).catch(() => {});
       getProgress(user.uid).then(setProgress).catch(() => {});
       getPrefs(user.uid).then(setPrefs).catch(() => {});
+      loadChallenges(user.uid).then((d) => setChallenges(d.challenges)).catch(() => {});
     }
   }, [reload, user]);
 
@@ -184,8 +188,11 @@ export default function KezdolapPage() {
   // 4 · Ha csak 15 perced van
   const rowShort = libVideos.filter((v) => v.mins <= 15 && v.kind === "workout");
 
-  // 5 · Szavazz Magadra · a heti kihívás
-  const rowChallenge = libVideos.filter((v) => v.kind === "bonus");
+  // 5 · Szavazz Magadra · kihívások — in-progress first (C-RULE 06: challenges
+  // live in the rows, never the hero), then the rest newest-first for discovery.
+  const chInProgress = challenges.filter((c) => c.state === "folyamatban");
+  const chSeen = new Set(chInProgress.map((c) => c.slug));
+  const rowChallenge = [...chInProgress, ...challenges.filter((c) => !chSeen.has(c.slug))].slice(0, 10);
 
   return (
     <div className="home fade-in">
@@ -221,7 +228,20 @@ export default function KezdolapPage() {
         <HomeRow title="Folytatod" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowResume.map(cardFor)} />
         <HomeRow title="Listám" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowList.map(cardFor)} />
         <HomeRow title="Ha csak 15 perced van" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowShort.map(cardFor)} />
-        <HomeRow title="Szavazz Magadra · a heti kihívás" allLabel="Kihívások" onAll={() => router.push("/app/challenges")} cards={rowChallenge.map(cardFor)} />
+        <HomeRow
+          title="Szavazz Magadra · kihívások"
+          allLabel="Kihívások"
+          onAll={() => router.push("/app/challenges")}
+          cards={rowChallenge.map((c) => (
+            <ChallengeCard
+              key={c.slug}
+              c={c}
+              saved={myList.has(c.slug)}
+              onOpen={(s) => router.push(`/app/challenges/${s}`)}
+              onToggleSave={toggleSave}
+            />
+          ))}
+        />
       </div>
 
       {modalVideo && (

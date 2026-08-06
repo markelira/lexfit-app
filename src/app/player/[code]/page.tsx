@@ -21,6 +21,8 @@ import type { Video, VideoBlock } from "@/lib/types";
 import { secToClock } from "@/lib/time";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
+import { FinishShareEntry } from "@/components/finish/FinishShareEntry";
+import { buildFinishData } from "@/lib/finish-data";
 
 const CAT: Record<string, { c: string; word: string }> = {
   "Alsótest": { c: "var(--cat-also)", word: "ALSÓ" },
@@ -70,6 +72,7 @@ function PlayerScreen({ code }: { code: string }) {
   const [speed, setSpeed] = useState(1);
   const [fs, setFs] = useState(false);
   const [result, setResult] = useState<{ streak: number } | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const lastSavedRef = useRef(0);
   // Watch time + completions come from Mux Data server-side (/api/progress/sync).
   // The player only tags views with viewer_user_id and drops an optimistic local
@@ -200,6 +203,16 @@ function PlayerScreen({ code }: { code: string }) {
   // ── overlay copy ──────────────────────────────────────────────────────────
   const blockName = blocks[active]?.name ?? "";
   const totalEx = useMemo(() => blocks.reduce((n, b) => n + (b.items?.length ?? 0), 0), [blocks]);
+  // Memoized so the share sheet / desktop handoff gets a STABLE `data` object —
+  // an inline rebuild each render tears down the handoff's onSnapshot listener.
+  const finishData = useMemo(
+    () => (video ? buildFinishData({
+      title: video.title, mins: video.mins, theme: video.theme,
+      streak: result?.streak ?? 1, exercises: totalEx,
+      workoutNo: (progRef.current?.doneCount ?? 0) + 1,
+    }) : null),
+    [video, result?.streak, totalEx],
+  );
   const exBefore = useMemo(() => blocks.slice(0, active).reduce((n, b) => n + (b.items?.length ?? 0), 0), [blocks, active]);
   const curExNum = exBefore + Math.max(0, activeEx) + 1;
   const repText = totalEx > 0 ? `${curExNum} / ${totalEx} · ${blockName.toUpperCase()}` : `${active + 1} / ${blocks.length} · ${blockName.toUpperCase()}`;
@@ -651,6 +664,9 @@ function PlayerScreen({ code }: { code: string }) {
                 <span className="pf-end-ic"><Check size={30} /></span>
                 <div className="h">Megcsináltad.</div>
                 <div className="s">{video.title} · {video.mins} perc · a sorozatod <b>{result?.streak ?? 1} napos</b> lett</div>
+                <button className="pf-share" onClick={() => setShareOpen(true)}>
+                  <LxIcon d={lxPaths.play} size={15} /> Oszd meg egy szelfivel
+                </button>
                 <div className="q">Hogy ment ma?</div>
                 <div className="pf-rate">
                   {["Könnyű volt", "Jó volt", "Kemény volt"].map((f) => (<button key={f} onClick={exit}>{f}</button>))}
@@ -664,6 +680,11 @@ function PlayerScreen({ code }: { code: string }) {
                 )}
                 <button className="pf-skip" onClick={exit}>Most nem · kihagyom</button>
               </div>
+            )}
+
+            {/* Finish share — selfie + data overlay (mobile: inline camera; desktop: QR handoff) */}
+            {finishData && (
+              <FinishShareEntry open={shareOpen} onClose={() => setShareOpen(false)} data={finishData} />
             )}
 
             {/* keyboard help (?) */}

@@ -1,0 +1,102 @@
+/* Post-workout selfie + overlay share flow. Fullscreen, dark, on-device only. */
+.fsh {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  background: #0b0b0c;
+  color: #fff;
+  font-family: var(--font, "Poppins", sans-serif);
+}
+
+.fsh-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  flex: none;
+}
+.fsh-x {
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  background: none; border: none; color: rgba(255,255,255,.9); cursor: pointer;
+}
+.fsh-x svg { stroke: currentColor; }
+.fsh-ttl { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+
+.fsh-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 0 16px; }
+.fsh-frame {
+  position: relative;
+  height: 100%;
+  max-height: 100%;
+  aspect-ratio: 9 / 16;
+  max-width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+}
+.fsh-video, .fsh-still {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.fsh-video { transform: scaleX(-1); } /* selfie mirror (still is pre-mirrored on capture) */
+
+.fsh-camerr {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; text-align: center; padding: 28px; background: rgba(0,0,0,.6);
+}
+.fsh-camerr p { font-size: 14px; color: rgba(255,255,255,.85); margin: 0; }
+
+/* Camera controls — the shutter. */
+.fsh-controls { flex: none; display: flex; justify-content: center; padding: 22px 0 30px; }
+.fsh-shutter {
+  width: 74px; height: 74px; border-radius: 50%; border: 4px solid rgba(255,255,255,.9);
+  background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: transform .1s ease;
+}
+.fsh-shutter span { width: 58px; height: 58px; border-radius: 50%; background: #fff; display: block; }
+.fsh-shutter:active { transform: scale(.94); }
+.fsh-shutter:disabled { opacity: .4; cursor: default; }
+
+/* Review controls. */
+.fsh-review { flex: none; display: flex; flex-direction: column; gap: 14px; padding: 16px 16px 26px; }
+.fsh-carousel { display: flex; align-items: center; justify-content: center; gap: 18px; }
+.fsh-nav {
+  width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,.24);
+  background: rgba(255,255,255,.06); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.fsh-nav svg { stroke: currentColor; }
+.fsh-dots { display: flex; align-items: center; gap: 8px; }
+.fsh-dots button {
+  width: 8px; height: 8px; border-radius: 50%; border: none; background: rgba(255,255,255,.32); cursor: pointer; padding: 0;
+}
+.fsh-dots button.on { background: #fff; width: 22px; border-radius: 4px; }
+
+.fsh-frame.draggable { cursor: grab; touch-action: none; }
+.fsh-frame.draggable:active { cursor: grabbing; }
+
+.fsh-leads { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.fsh-leads .lbl { font-size: 12px; color: rgba(255,255,255,.5); margin-right: 2px; }
+.fsh-leads button {
+  height: 30px; padding: 0 13px; border-radius: 999px; cursor: pointer; font-family: inherit;
+  font-size: 12.5px; font-weight: 600; color: #fff;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
+}
+.fsh-leads button.on { background: #fff; color: #14100c; border-color: #fff; }
+
+.fsh-scrim-tog {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 12px; color: rgba(255,255,255,.6); text-align: center;
+}
+
+.fsh-actions { display: flex; gap: 10px; }
+.fsh-btn {
+  flex: 1; height: 46px; border-radius: 999px; border: 1px solid transparent; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  font-family: inherit; font-size: 14px; font-weight: 600;
+}
+.fsh-btn svg { stroke: currentColor; }
+.fsh-btn.sec { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: #fff; }
+.fsh-btn.pri { background: #fff; color: #14100c; flex: 1.4; }
+.fsh-btn:disabled { opacity: .55; cursor: default; }
+
+@media (prefers-reduced-motion: reduce) { .fsh-shutter { transition: none; } }

@@ -9,6 +9,7 @@ export const lxPaths: Record<string, string | string[]> = {
   arrowR: ["M5 12 H19", "M13 6 L19 12 L13 18"],
   ballot: ["M5 4 H19 V20 H5 Z", "M8 9 H16", "M8 13 H16", "M8 17 H12"],
   plus: ["M12 5 V19", "M5 12 H19"],
+  layers: ["M12 2 L2 7 L12 12 L22 7 Z", "M2 12 L12 17 L22 12", "M2 17 L12 22 L22 17"],
   play: "M7 4 L19 12 L7 20 Z",
   lock: ["M6 11 H18 V20 H6 Z", "M9 11 V8 a3 3 0 0 1 6 0 V11"],
   search: ["M11 18 a7 7 0 1 0 0-14 a7 7 0 0 0 0 14 Z", "M16 16 L21 21"],

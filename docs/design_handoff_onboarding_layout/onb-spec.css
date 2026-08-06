@@ -1,0 +1,96 @@
+/* LEXFIT onboarding layout spec — annotation + dimensioning vocabulary.
+   Extends wireframe-kit.css. Greyscale + one accent; measurements are the content. */
+
+/* ── dimension annotation ── */
+.dimwrap{position:relative}
+.dim{position:absolute;z-index:6;pointer-events:none;font-family:var(--mono);font-size:9px;letter-spacing:.05em;color:var(--dgr);white-space:nowrap}
+.dim.h{border-top:1px solid var(--dgr);height:0}
+.dim.h::before,.dim.h::after{content:"";position:absolute;top:-3px;width:1px;height:7px;background:var(--dgr)}
+.dim.h::before{left:0}.dim.h::after{right:0}
+.dim.h>span{position:absolute;left:50%;top:-16px;transform:translateX(-50%);background:#fff;padding:1px 5px;border:1px solid var(--dgr);border-radius:3px}
+.dim.v{border-left:1px solid var(--dgr);width:0}
+.dim.v::before,.dim.v::after{content:"";position:absolute;left:-3px;width:7px;height:1px;background:var(--dgr)}
+.dim.v::before{top:0}.dim.v::after{bottom:0}
+.dim.v>span{position:absolute;top:50%;left:7px;transform:translateY(-50%);background:#fff;padding:1px 5px;border:1px solid var(--dgr);border-radius:3px}
+.dim.v.lft>span{left:auto;right:7px}
+/* callout pin */
+.pin{position:absolute;z-index:7;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;letter-spacing:.05em;color:var(--acc);background:#fff;border:1px solid var(--accln);border-radius:3px;padding:2px 6px;white-space:nowrap}
+.pin b{color:var(--ink);font-weight:600}
+.pin.warnpin{color:var(--warn-ink);border-color:var(--warn)}
+/* axis guide — the single alignment line */
+.axis{position:absolute;top:0;bottom:0;border-left:1px dashed var(--dgr);opacity:.55;z-index:5;pointer-events:none}
+.axis span{position:absolute;top:6px;left:5px;font-family:var(--mono);font-size:8.5px;color:var(--dgr);background:#fff;padding:1px 4px;border:1px solid var(--dgr);border-radius:2px}
+.hzone{position:absolute;left:0;right:0;background:rgba(140,58,46,.07);border-top:1px dashed rgba(140,58,46,.5);border-bottom:1px dashed rgba(140,58,46,.5);z-index:4;pointer-events:none}
+.hzone span{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:8.5px;color:var(--dgr);background:#fff;padding:1px 5px;border:1px solid var(--dgr);border-radius:2px}
+
+/* ── the onboarding shell, drawn to scale ── */
+.shell{display:grid;grid-template-columns:1fr 1fr;height:492px;background:#fff}
+.shell.mob{grid-template-columns:1fr;width:320px;height:610px;margin:0 auto}
+/* left brand panel */
+.bp{background:linear-gradient(158deg,#edf5f1 0%,var(--accbg) 48%,#d6e9e0 100%);border-right:1.5px solid var(--ink);display:flex;flex-direction:column;padding:20px 22px 18px;position:relative;overflow:hidden}
+.bp .bpin{display:flex;flex-direction:column;flex:1;min-height:0;max-height:100%}
+.bp .brow{display:flex;align-items:center;gap:8px}
+.bp .brow b{font-size:12.5px;font-weight:800;letter-spacing:-.02em}
+.bp .hero{margin:auto 0}
+.bp .hero .h{font-size:23px;font-weight:300;letter-spacing:-.035em;line-height:1.05}
+.bp .hero .h b{display:block;font-weight:700}
+.bp .hero .l{font-size:11px;color:var(--ink2);line-height:1.45;margin-top:9px;max-width:30ch}
+.bp .st{display:flex;gap:18px;margin-top:14px}
+.bp .st .v{font-size:14px;font-weight:800;letter-spacing:-.025em;line-height:1}
+.bp .st .k{font-family:var(--mono);font-size:8px;letter-spacing:.07em;color:var(--ink2);text-transform:uppercase;margin-top:3px}
+.bp .fnd{display:flex;align-items:center;gap:9px;padding-top:12px;border-top:1px solid rgba(24,32,29,.14)}
+.bp .fnd .n{font-size:11.5px;font-weight:700}
+.bp .fnd .r{font-family:var(--mono);font-size:8px;letter-spacing:.07em;color:var(--ink2);text-transform:uppercase}
+/* right pane */
+.rp{background:#fff;display:flex;flex-direction:column;padding:20px 0 18px;position:relative;min-width:0}
+.rp .rpin{width:calc(100% - 56px);max-width:236px;margin:auto;display:flex;flex-direction:column;height:calc(100% - 8px);max-height:376px}
+.rp .rhead{display:flex;align-items:center;gap:9px;flex:none}
+.rp .rbody{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding-top:16px;overflow:hidden}
+.rp .rfoot{flex:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line2);display:flex;flex-direction:column;gap:7px}
+.rp .rfoot .meta{text-align:center;font-size:9.5px;color:var(--ink3)}
+/* question atoms (spec scale) */
+.qh{font-size:17px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+.qs{font-size:10.5px;color:var(--ink2);margin-top:6px;line-height:1.45}
+.sbar{display:flex;gap:3px;align-items:center;flex:1}
+.sbar i{height:4px;border-radius:2px;background:var(--fill);flex:1;border:1px solid var(--line)}
+.sbar i.on{background:var(--acc);border-color:var(--acc)}
+.orow{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);border-radius:9px;background:#fff;padding:8px 10px;min-height:44px}
+.orow .oi{width:28px;height:28px;border-radius:7px;background:var(--fill);border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.orow .oi svg{width:14px;height:14px;stroke:var(--ink2)}
+.orow .ot{flex:1;min-width:0}
+.orow .ob{font-size:11px;font-weight:700;letter-spacing:-.01em;display:block}
+.orow .os{font-size:9.5px;color:var(--ink3);margin-top:1px;display:block}
+.orow .ck{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center}
+.orow .ck svg{width:10px;height:10px;stroke:#fff}
+.orow.on{border-color:var(--acc);background:var(--accbg)}
+.orow.on .oi{background:var(--acc);border-color:var(--acc)}
+.orow.on .oi svg{stroke:#fff}
+.orow.on .ob{color:var(--acc)}
+.orow.on .ck{background:var(--acc);border-color:var(--acc)}
+.cta{height:38px;border-radius:9px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+.cta.ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink2)}
+/* mobile pane */
+.mhead{height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid var(--line2);flex:none;background:#fff}
+.mmain{flex:1;min-height:0;padding:16px 16px 0;display:flex;flex-direction:column;gap:8px;overflow:hidden;background:var(--paper)}
+.mact{flex:none;padding:10px 16px 14px;border-top:1px solid var(--line2);background:#fff;display:flex;flex-direction:column;gap:7px}
+.safe{position:absolute;left:0;right:0;background:repeating-linear-gradient(45deg,rgba(140,58,46,.1) 0 6px,transparent 6px 12px);border-top:1px dashed rgba(140,58,46,.45);z-index:3;pointer-events:none}
+
+/* ── spec tables ── */
+table.spec{width:100%;border-collapse:collapse;margin-top:20px;font-size:12.5px;background:#fff}
+table.spec th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--ink);padding:10px 12px;font-weight:500;background:var(--fill2);vertical-align:bottom}
+table.spec td{padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--ink2)}
+table.spec td strong{color:var(--ink);font-weight:600}
+table.spec td.n{font-family:var(--mono);font-size:11.5px;color:var(--ink);white-space:nowrap}
+table.spec td.bad{color:var(--dgr);font-weight:600}
+table.spec td.good{color:var(--acc);font-weight:600}
+table.spec tr.grp td{background:var(--fill2);font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);font-weight:600}
+code{font-family:var(--mono);font-size:11.5px;background:var(--fill2);border:1px solid var(--line2);border-radius:3px;padding:1px 5px;color:var(--ink)}
+pre.css{margin:18px 0 0;background:#fff;border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:4px;padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--ink2);overflow-x:auto}
+pre.css b{color:var(--ink);font-weight:600}
+pre.css i{color:var(--acc);font-style:normal}
+pre.css u{color:var(--dgr);text-decoration:none}
+.frames{display:flex;gap:26px;flex-wrap:wrap;margin-top:26px}
+.fcap{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+.fcap b{color:var(--ink)}
+.scaleno{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--dgr);margin-top:7px}
+@media(max-width:1180px){.shell{height:auto;min-height:430px}}

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Overlay alternatívák · új adatok</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+--brand:"Poppins",system-ui,sans-serif;
+--bg:#eceae6;--surface:#fff;--sep:#d7d3cd;--label:#14100c;--label2:#7a736a;
+--accent-ink:#355c4d;--soft:#e1f1ea;--warn:#8f4f20;--warn-soft:#fdf1e6;--ok:#3f7a5f;--ok-soft:#e6f3ec;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--label);font-family:var(--ui);line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+a{color:var(--accent-ink)}a:hover{color:var(--label)}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px 110px}
+header.doc{padding:60px 0 30px;border-bottom:1px solid var(--label)}
+.kick{font-size:13px;font-weight:600;color:var(--accent-ink);letter-spacing:.01em}
+header.doc h1{font-size:clamp(36px,5vw,60px);font-weight:700;letter-spacing:-.035em;line-height:.98;margin:16px 0 0;max-width:20ch;font-family:var(--brand)}
+header.doc .sub{max-width:78ch;color:var(--label2);font-size:17px;margin:22px 0 0;letter-spacing:-.019em}
+section{padding:62px 0 0}
+section>.head{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--sep);padding-bottom:13px;flex-wrap:wrap}
+.sn{font-size:13px;font-weight:600;color:var(--accent-ink);white-space:nowrap}
+section h2{font-size:27px;font-weight:700;letter-spacing:-.028em;margin:0;font-family:var(--brand)}
+h3{font-size:19px;font-weight:600;letter-spacing:-.022em;margin:0}
+p{font-size:15.5px;color:var(--label2);max-width:86ch;letter-spacing:-.016em}
+p b{color:var(--label);font-weight:600}
+.lede{font-size:17px;margin:18px 0 0}
+.note{border-radius:14px;padding:18px 21px;margin-top:24px;background:var(--soft)}
+.note .t{font-size:13px;font-weight:600;color:var(--accent-ink)}
+.note p{margin:7px 0 0;color:var(--label);font-size:16px}
+.note.warn{background:var(--warn-soft)}.note.warn .t{color:var(--warn)}
+.note.ok{background:var(--ok-soft)}.note.ok .t{color:var(--ok)}
+table{width:100%;border-collapse:collapse;margin-top:22px;font-size:15px;background:var(--surface);border-radius:14px;overflow:hidden}
+th{text-align:left;font-size:13px;font-weight:600;color:var(--label2);border-bottom:1px solid var(--label);padding:13px 16px;vertical-align:bottom}
+td{padding:12px 16px;border-bottom:1px solid var(--sep);vertical-align:top;color:var(--label2);letter-spacing:-.014em}
+tr:last-child td{border-bottom:none}
+td strong{color:var(--label);font-weight:600}
+td.y{color:var(--ok);font-weight:600}td.n{color:var(--warn);font-weight:600}
+
+/* ══ shared overlay type ══ */
+.ol{font-family:var(--brand);color:#fff;pointer-events:none}
+.ol .k{font-weight:600;font-size:13px;letter-spacing:-.004em;line-height:1.1}
+.ol .v{font-weight:700;letter-spacing:-.028em;line-height:1.04;font-variant-numeric:tabular-nums}
+.lk{display:inline-flex;align-items:center;gap:9px;font-family:var(--brand)}
+.lk svg{display:block;flex:none}
+.lk .wd{font-weight:800;letter-spacing:.055em;color:#fff;line-height:1}
+.lk.sm svg{width:13px;height:12px}.lk.sm .wd{font-size:14px}
+.lk.md svg{width:18px;height:17px}.lk.md .wd{font-size:18px}
+
+/* frames */
+.fr{width:284px;aspect-ratio:9/16;border-radius:16px;overflow:hidden;position:relative;flex:none;background:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.1),0 16px 38px -16px rgba(0,0,0,.34)}
+.fr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fr.tpl{background:#22201d}
+.sl{border:1px dashed rgba(255,255,255,.5);border-radius:4px;padding:3px 6px;font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.03em;color:rgba(255,255,255,.9);display:inline-block;white-space:nowrap}
+.sl.big{font-size:11px;padding:8px 9px}
+.tplnote{background:var(--surface);border-radius:12px;padding:15px 17px;margin-top:12px;max-width:274px}
+.tplnote .tt{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--accent-ink);margin-bottom:6px}
+.tplnote p{font-size:13.5px;margin:0}
+.tplnote code{font-size:12px}
+.ov{position:absolute;inset:0;z-index:3}
+.grid{display:grid;grid-template-columns:284px 1fr;gap:30px;align-items:start;margin-top:26px}
+.grid+.grid{margin-top:46px;padding-top:46px;border-top:1px solid var(--sep)}
+.meta{display:flex;flex-direction:column;gap:14px}
+.meta .tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--accent-ink)}
+.meta h3{font-family:var(--brand);font-size:23px;letter-spacing:-.028em}
+.meta .dev{background:var(--surface);border-radius:12px;padding:15px 17px}
+.meta .dev .dt{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--label2);margin-bottom:5px}
+.meta .dev p{margin:0;font-size:14.5px}
+.pros{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+.pros>div{padding:9px 0;border-top:1px solid var(--sep);font-size:14px;color:var(--label2)}
+.pros b{display:block;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--label);margin-bottom:3px}
+.rank{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--label);color:#fff;font-size:13px;font-weight:700;font-family:var(--brand)}
+footer{margin-top:74px;padding-top:24px;border-top:1px solid var(--label);font-size:13px;color:var(--label2)}
+@media(max-width:1080px){.grid{grid-template-columns:1fr}.pros{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Overlay · öt irány · új adatokkal</div>
+<h1>Idő · Ismétlés · Sorozat.</h1>
+<p class="sub">Ugyanaz az öt irány, <b>csak az adatok változtak.</b> Egyetlen csere viszi a legtöbbet: a „Gyakorlat 12 / 12" helyére az <b>összes ismétlésszám</b> kerül. A 12/12 egy kipipált lista — jó az appban, de megosztva nem mond semmit arról, mit tettél. A „340 ismétlés" nagy, kiérdemelt szám, pontosan úgy, ahogy a Stravánál a kilométer. <b>Az idő és a sorozat marad.</b></p>
+<div class="note ok" style="margin-top:24px"><div class="t">A trió, és honnan jön</div><p><b>340 ismétlés</b> — a gyakorlatok rep-számainak összege · <b>28 perc</b> — <code style="font-size:13px">video.mins</code> · <b>13. nap</b> — <code style="font-size:13px">progress.streak</code>. Mennyiség, erőfeszítés, kitartás — mind a három automatikusan kinyerhető, mind a három önmagához mér, és egyikben sem lehet veszíteni. Kizárva: kalória, testsúly, centiméter, intenzitás, rangsor.</p></div>
+</header>
+
+<!-- ══ A ══ -->
+<section>
+<div class="head"><span class="sn">A</span><h2>Bal felső — a lockup a hasáb fölött</h2></div>
+
+<div class="grid">
+<div class="fr">
+  <img src="uploads/e2a72af773fa5af0a8470928534b77b6.jpg" alt="" style="object-position:50% 58%">
+  <div class="ov">
+    <div class="ol" style="position:absolute;left:20px;width:150px;top:54px">
+      <div class="lk sm" style="margin-bottom:16px"><svg viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg><span class="wd">LEXFIT</span></div>
+      <div><div class="k" style="opacity:.92">Ismétlés</div><div class="v" style="font-size:26px;margin-top:2px">340</div></div>
+      <div style="margin-top:13px"><div class="k" style="opacity:.92">Idő</div><div class="v" style="font-size:26px;margin-top:2px">28 perc</div></div>
+      <div style="margin-top:13px"><div class="k" style="opacity:.92">Sorozat</div><div class="v" style="font-size:26px;margin-top:2px">13. nap</div></div>
+    </div>
+  </div>
+</div>
+<div class="meta">
+  <div class="tag"><span class="rank">1</span> A legegyszerűbb</div>
+  <h3>Bal felső sarok, lockup a hasáb fölött.</h3>
+  <p>Az ív lekerült — a keretet átszelő vonal fotón mindig verseng a témával. Helyette a legegyszerűbb szerkezet: <b>a lockup a hasáb fölött, bal felső sarokban</b>, egy tengelyen. Ez a nyugati olvasási irány kezdőpontja, tehát ide néz először a szem.</p>
+  <div class="dev"><div class="dt">A felismerési eszköz</div><p>A lockup a hasáb fölött, egy tengelyen, <b>a bal felső sarokban</b> — egészen fent (y 54) — közvetlenül az Instagram Story avatár-sávja alatt, a biztonságos zóna legfelső pontján. <b>Ehhez a fotóhoz sötét bal felső sarkú kép kell</b>: itt a plafon kiégett, ezért a felső két elem kontrasztja alacsony. Ez a demo-fotó korlátja, nem a layouté.</p></div>
+  <div class="pros">
+    <div><b>Erősség</b>A legrobusztusabb: nem szel át semmit, nem kíván bizonyos kompozíciót, és bármilyen vágást kibír.</div>
+    <div><b>Kockázat</b>Nincs saját grafikai eszköze, tehát a felismerést teljesen a lockup és a tipográfia viszi.</div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ══ B ══ -->
+<section>
+<div class="head"><span class="sn">B</span><h2>Vágójelek — the viewfinder</h2></div>
+
+<div class="grid">
+<div class="fr">
+  <img src="uploads/e2a72af773fa5af0a8470928534b77b6.jpg" alt="" style="object-position:50% 68%">
+  <div class="ov">
+    <svg viewBox="0 0 284 505" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true">
+      <path d="M26 282 v-30 h30" fill="none" stroke="#fff" stroke-width="2"/>
+      <path d="M178 442 v30 h-30" fill="none" stroke="#fff" stroke-width="2"/>
+    </svg>
+    <div class="ol" style="position:absolute;left:46px;width:118px;top:270px">
+      <div><div class="k" style="opacity:.92">Ismétlés</div><div class="v" style="font-size:22px;margin-top:2px">340</div></div>
+      <div style="margin-top:11px"><div class="k" style="opacity:.92">Idő</div><div class="v" style="font-size:22px;margin-top:2px">28 perc</div></div>
+      <div style="margin-top:11px"><div class="k" style="opacity:.92">Sorozat</div><div class="v" style="font-size:22px;margin-top:2px">13. nap</div></div>
+      <div class="lk sm" style="margin-top:13px"><svg viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg><span class="wd">LEXFIT</span></div>
+    </div>
+  </div>
+</div>
+<div class="meta">
+  <div class="tag"><span class="rank">3</span> A legtisztább</div>
+  <h3>Two corner marks claim the frame without drawing a box.</h3>
+  <p>Egy L a bal felső, a tükörképe a jobb alsó sarokban — 30 pixeles szárak, 2 pixeles vonal. <b>A keret most tényleg körbefogja a hasábot</b>: korábban a szöveg felül kilógott belőle, mert a blokk magasabb volt, mint a jelek közti tér. <b>It borrows the language of photography</b>: crop marks, a viewfinder, a contact sheet. That reads as considered rather than decorated, and it flatters the photograph instead of competing with it.</p>
+  <div class="dev"><div class="dt">A felismerési eszköz</div><p>The diagonal pair of brackets. Two small marks in a fixed relationship are enough to be a system — the same trick Off-White and Aesop use, and it costs almost nothing visually.</p></div>
+  <div class="pros">
+    <div><b>Erősség</b>The cleanest of the five and the most forgiving of photo content. Works on any composition.</div>
+    <div><b>Kockázat</b>Quiet to the point of anonymity. At feed-thumbnail size the brackets may not register at all.</div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ══ C ══ -->
+<section>
+<div class="head"><span class="sn">C</span><h2>Egy szám — the poster</h2></div>
+
+<div class="grid">
+<div class="fr">
+  <img src="uploads/e2a72af773fa5af0a8470928534b77b6.jpg" alt="" style="object-position:50% 74%">
+  <div class="ov">
+    <div class="ol" style="position:absolute;left:24px;width:152px;bottom:30px">
+      <div class="lk sm" style="margin-bottom:16px"><svg viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg><span class="wd">LEXFIT</span></div>
+      <div class="k" style="opacity:.92;margin-bottom:2px">Ma reggel</div>
+      <div class="v" style="font-size:78px;letter-spacing:-.055em;line-height:.84">340</div>
+      <div class="v" style="font-size:21px;margin-top:3px">ismétlés</div>
+      <div class="k" style="opacity:.92;margin-top:12px;line-height:1.35">28 perc · 13. nap<br>sorozatban</div>
+    </div>
+  </div>
+</div>
+<div class="meta">
+  <div class="tag"><span class="rank">4</span> A legnagyobb hatás</div>
+  <h3>Egy szám 78 pontban. A többi lábjegyzet.</h3>
+  <p><b>Itt derül ki, miért kell az ismétlés.</b> A „340" ekkora méretben erős poszt; a „12/12" ugyanígy nagyítva egy kipipált lista lenne. <b>A lockup felülre került</b> — így a blokk fentről indul és lefelé épül, nem a szám lóg a semmiben. Ez az egyetlen változat, ami óriásplakáton is működne, és az egyetlen, ami 60 pixelen is olvasható.</p>
+  <div class="dev"><div class="dt">A felismerési eszköz</div><p>The scale itself — a number that occupies a third of the frame. Recognition here comes from <em>proportion</em> rather than from a graphic, which means it survives any crop and any photo.</p></div>
+  <div class="pros">
+    <div><b>Erősség</b>Maximum feed impact. Also the easiest to localise, because there is almost no text.</div>
+    <div><b>Kockázat</b>A szám maga a design, tehát egy rövid edzés aláaknázza. „90 ismétlés" 104 pontban mást mond, mint „340".</div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ══ F ══ -->
+<section>
+<div class="head"><span class="sn">F</span><h2>Középre — a Strava-pozíció</h2></div>
+
+<div class="grid">
+<div class="fr">
+  <img src="uploads/e2a72af773fa5af0a8470928534b77b6.jpg" alt="" style="object-position:50% 88%">
+  <div class="ov">
+    <div class="ol" style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px">
+      <div><div class="k" style="opacity:.92">Ismétlés</div><div class="v" style="font-size:35px;margin-top:2px">340</div></div>
+      <div><div class="k" style="opacity:.92">Idő</div><div class="v" style="font-size:35px;margin-top:2px">28 perc</div></div>
+      <div><div class="k" style="opacity:.92">Sorozat</div><div class="v" style="font-size:35px;margin-top:2px">13. nap</div></div>
+      <div class="lk sm" style="flex-direction:column;gap:11px;margin-top:8px"><svg viewBox="0 0 680 616" style="width:19px;height:18px"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg><span class="wd" style="font-size:17px">LEXFIT</span></div>
+    </div>
+  </div>
+</div>
+<div class="meta">
+  <div class="tag"><span class="rank">2</span> A legismerősebb</div>
+  <h3>Pontosan a Strava szerkezete, a mi tipográfiánkkal.</h3>
+  <p>Címke fölött, érték alatta, három csoport egymás alatt, a lockup legalul — <b>ez betűre a Strava Stats Sticker felépítése</b>, ezért nulla magyarázatot kíván. Amit mi hozunk hozzá: a Poppins geometrikus számai, a mértékegység a szövegen belül („28 perc" egy string, nem „28" + kis „perc"), és <b>a lockup alatta állva</b>, ikon a szóvédjegy fölött.</p>
+  <div class="dev"><div class="dt">A felismerési eszköz</div><p>A szimmetria maga. Egy középre zárt hasáb a képen <b>azonnal „sport-app" olvasatot ad</b> — ez a pozíció annyira bejáratott, hogy önmagában jelentést hordoz.</p></div>
+  <div class="pros">
+    <div><b>Erősség</b>A legkevesebb tanulást kívánja a nézőtől, és bármilyen arányban működik — 9:16, 4:5, 1:1.</div>
+    <div><b>Kockázat</b>Nyugodt, sötét képközépet kíván. Itt a padlóra esik, de egy világos háttér előtt álló alakra nem lehet ráadni.</div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ══ E ══ -->
+<section>
+<div class="head"><span class="sn">E</span><h2>Gerinc — the vertical wordmark</h2></div>
+
+<div class="grid">
+<div class="fr">
+  <img src="uploads/e2a72af773fa5af0a8470928534b77b6.jpg" alt="" style="object-position:56% 62%">
+  <div class="ov">
+    <div class="ol" style="position:absolute;left:26px;width:150px;bottom:34px">
+      <div style="margin-bottom:14px"><span style="font-family:var(--brand);font-weight:800;font-size:19px;letter-spacing:.34em;color:#fff;writing-mode:vertical-rl;text-orientation:mixed;display:inline-block">LEXFIT</span></div>
+      <div><div class="k" style="opacity:.92">Ismétlés</div><div class="v" style="font-size:25px;margin-top:2px">340</div></div>
+      <div style="margin-top:14px"><div class="k" style="opacity:.92">Idő</div><div class="v" style="font-size:25px;margin-top:2px">28 perc</div></div>
+      <div style="margin-top:14px"><div class="k" style="opacity:.92">Sorozat</div><div class="v" style="font-size:25px;margin-top:2px">13. nap</div></div>
+    </div>
+  </div>
+</div>
+<div class="meta">
+  <div class="tag"><span class="rank">5</span> A legmárkásabb</div>
+  <h3>The wordmark runs the full height of the left edge.</h3>
+  <p>LEXFIT set vertically at 0.34em tracking down the left margin, mark above it. <b>A függőleges szóvédjegy a hasáb első eleme</b>, ugyanazzal a 14 pixeles réssel, ami a 340 és az Idő között van — így a köz strukturálisan azonos, nem szemre igazított. Ikon nélkül, tiszta fehérben — mint minden más elem. A színes accent fotón nem megy: <b>#7a9b8d L=0,295, mid-tónus</b>, ami se sötét, se világos képen nem éri el a 3:1-et, árnyékot pedig nem használunk. <b>Pure fashion-campaign asymmetry</b> — the tension between the vertical spine and the right-aligned column is what makes it feel designed rather than assembled.</p>
+  <div class="dev"><div class="dt">A felismerési eszköz</div><p>The vertical spine. A full-height letterspaced wordmark is a silhouette before it is a word — you know whose it is before you read it, which is the definition of what we are after.</p></div>
+  <div class="pros">
+    <div><b>Erősség</b>The most brand-forward and the most editorial. Excellent for paid placements where the brand must be unmissable.</div>
+    <div><b>Kockázat</b>It claims the whole left edge, so it needs a subject positioned right of centre. Least flexible of the five.</div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ══ compare ══ -->
+<section>
+<div class="head"><span class="sn">↔</span><h2>Comparison</h2></div>
+
+<table>
+<thead><tr><th style="width:16%">Irány</th><th style="width:19%">Felismerési eszköz</th><th style="width:12%">Feed-olvashatóság</th><th style="width:13%">Fotó-tolerancia</th><th>Mire a legjobb</th></tr></thead>
+<tbody>
+<tr><td><strong>A · Az Ív</strong></td><td>A teljes képen átfutó ív</td><td class="y">Erős</td><td>Közepes</td><td><b>Az alap.</b> The only one that is unmistakably ours rather than borrowed.</td></tr>
+<tr><td><strong>F · Középre</strong></td><td>A szimmetria · Strava-pozíció</td><td class="y">Erős</td><td class="n">Alacsony</td><td>A legismerősebb — de nyugodt, sötét képközepet kíván.</td></tr>
+  <tr><td><strong>B · Vágójelek</strong></td><td>Két átlós sarokjel</td><td class="n">Gyenge</td><td class="y">Kiváló</td><td>Editorial posts and anything where the photograph must lead.</td></tr>
+<tr><td><strong>C · Egy szám</strong></td><td>A méret-arány</td><td class="y">Kiváló</td><td class="y">Kiváló</td><td>Paid ads, grid previews, anything seen small.</td></tr>
+<tr><td><strong>E · Gerinc</strong></td><td>Függőleges szóvédjegy</td><td>Közepes</td><td class="n">Alacsony</td><td>Hero campaign shots, art-directed placements.</td></tr>
+</tbody>
+</table>
+
+<div class="note ok">
+<div class="t">Amit javaslok</div>
+<p><b>A mint alap, F mint a legismerősebb, C mint fizetett hirdetés.</b> A bal felső lockup viszi az identitást, az egy nagy szám pedig mindent, amit kicsiben látnak. <b>B és E inkább art direction, mint rendszer</b> — szépek, hero képekre jók, de nem ezeket adnám egy idegen kezébe felügyelet nélkül.</p>
+</div>
+
+<div class="note warn">
+<div class="t">Egy megjegyzés mind az ötről</div>
+<p>All five still depend on the placement guardrail. <b>Pure white with no shadow means the export tool has to refuse a bright region</b> — and direction A is the most exposed, because the arc crosses the whole frame and can pass through a blown-out window like the one on the right of this photo. If A is chosen, the luminance test needs to sample <em>along the arc's path</em>, not just under the text block.</p>
+</div>
+</section>
+
+<!-- ══ SABLONOK ══ -->
+<section>
+<div class="head"><span class="sn">T</span><h2>Sablonok — mi cserélhető</h2></div>
+<p class="lede">Ugyanaz az öt szerkezet, adat helyett <b>megnevezett helyekkel</b>. Minden hely bármelyik adattípust felveheti a leltárból — a stílus, a pozíció és a méret nem változik, csak a tartalom. A karakterhatárok azért vannak, hogy egy hosszabb címke ne borítsa fel a kompozíciót.</p>
+
+<div class="deck">
+
+<div class="spec">
+<div class="sl" style="border:none;padding:0;color:var(--label);font-family:var(--ui);font-size:13px;font-weight:600">A · Bal felső</div>
+<div class="fr tpl">
+  <div class="ov">
+    <div class="ol" style="position:absolute;left:20px;width:150px;top:54px">
+      <div class="lk sm" style="margin-bottom:16px"><svg viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg><span class="wd">LEXFIT</span></div>
+      <div><span class="sl">CÍMKE 1</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 1</span></div></div>
+      <div style="margin-top:11px"><span class="sl">CÍMKE 2</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 2</span></div></div><div style="margin-top:11px"><span class="sl">CÍMKE 3</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 3</span></div></div>
+    </div>
+  </div>
+</div>
+<div class="tplnote"><div class="tt">3 hely + lockup</div><p>Címke ≤ 12 karakter, érték ≤ 11. A lockup fix. <b>Bármelyik hely elhagyható</b> — kettővel is működik.</p></div>
+</div>
+
+<div class="spec">
+<div class="sl" style="border:none;padding:0;color:var(--label);font-family:var(--ui);font-size:13px;font-weight:600">F · Középre</div>
+<div class="fr tpl">
+  <div class="ov">
+    <div class="ol" style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:16px">
+      <div style="text-align:center"><span class="sl">CÍMKE 1</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 1</span></div></div>
+      <div style="text-align:center"><span class="sl">CÍMKE 2</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 2</span></div></div>
+      <div style="text-align:center"><span class="sl">CÍMKE 3</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 3</span></div></div>
+      <div class="lk sm" style="flex-direction:column;gap:11px;margin-top:6px"><svg viewBox="0 0 680 616" style="width:19px;height:18px"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg><span class="wd" style="font-size:17px">LEXFIT</span></div>
+    </div>
+  </div>
+</div>
+<div class="tplnote"><div class="tt">3 hely · szimmetrikus</div><p><b>Érték ≤ 9 karakter</b> — középre zártan ez a legszűkebb. „28 perc" jó, „1000 perc mozgás" nem.</p></div>
+</div>
+
+<div class="spec">
+<div class="sl" style="border:none;padding:0;color:var(--label);font-family:var(--ui);font-size:13px;font-weight:600">C · Egy szám</div>
+<div class="fr tpl">
+  <div class="ov">
+    <div class="ol" style="position:absolute;left:24px;width:152px;bottom:30px">
+      <div class="lk sm" style="margin-bottom:16px"><svg viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg><span class="wd">LEXFIT</span></div>
+      <span class="sl">FELCÍM</span>
+      <div style="margin-top:6px"><span class="sl big" style="font-size:15px;padding:14px 11px">KIEMELT&nbsp;SZÁM</span></div>
+      <div style="margin-top:6px"><span class="sl">MÉRTÉKEGYSÉG</span></div>
+      <div style="margin-top:12px"><span class="sl">LÁBJEGYZET · 2 SOR</span></div>
+    </div>
+  </div>
+</div>
+<div class="tplnote"><div class="tt">1 kiemelt + 3 kísérő</div><p><b>Kiemelt szám ≤ 4 karakter</b> (78 pontban ennyi fér). A lábjegyzetbe a másik két adat kerül, vesszővel.</p></div>
+</div>
+
+<div class="spec">
+<div class="sl" style="border:none;padding:0;color:var(--label);font-family:var(--ui);font-size:13px;font-weight:600">B · Vágójelek</div>
+<div class="fr tpl">
+  <div class="ov">
+    <svg viewBox="0 0 284 505" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true">
+      <path d="M26 282 v-30 h30" fill="none" stroke="#fff" stroke-width="2"/>
+      <path d="M178 442 v30 h-30" fill="none" stroke="#fff" stroke-width="2"/>
+    </svg>
+    <div class="ol" style="position:absolute;left:46px;width:118px;top:270px">
+      <div><span class="sl">CÍMKE 1</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 1</span></div></div>
+      <div style="margin-top:11px"><span class="sl">CÍMKE 2</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 2</span></div></div><div style="margin-top:11px"><span class="sl">CÍMKE 3</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 3</span></div></div>
+      <div class="lk sm" style="margin-top:13px"><svg viewBox="0 0 680 616"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#fff"/></g></svg><span class="wd">LEXFIT</span></div>
+    </div>
+  </div>
+</div>
+<div class="tplnote"><div class="tt">3 hely a kereten belül</div><p><b>Érték ≤ 8 karakter</b>, a keret szélessége 118px. A sarokjelek pozíciója fix — a blokk nem nőhet ki belőlük.</p></div>
+</div>
+
+<div class="spec">
+<div class="sl" style="border:none;padding:0;color:var(--label);font-family:var(--ui);font-size:13px;font-weight:600">E · Gerinc</div>
+<div class="fr tpl">
+  <div class="ov">
+    <div class="ol" style="position:absolute;left:26px;width:150px;bottom:34px">
+      <div style="margin-bottom:14px"><span style="font-family:var(--brand);font-weight:800;font-size:19px;letter-spacing:.34em;color:#fff;writing-mode:vertical-rl;text-orientation:mixed;display:inline-block">LEXFIT</span></div>
+      <div><span class="sl">CÍMKE 1</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 1</span></div></div>
+      <div style="margin-top:11px"><span class="sl">CÍMKE 2</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 2</span></div></div><div style="margin-top:11px"><span class="sl">CÍMKE 3</span><div style="margin-top:4px"><span class="sl big">ÉRTÉK 3</span></div></div>
+    </div>
+  </div>
+</div>
+<div class="tplnote"><div class="tt">Függőleges lockup + 3 hely</div><p>Címke ≤ 12, érték ≤ 11 karakter. A szóvédjegy a hasáb első eleme, ugyanazzal a 14px-es réssel.</p></div>
+</div>
+
+</div>
+
+<h3 style="margin-top:40px">Adatleltár — mi kerülhet bármelyik helyre</h3>
+<table>
+<thead><tr><th style="width:20%">Adattípus</th><th style="width:20%">Példa-formátum</th><th style="width:12%">Karakter</th><th>Melyik helyre</th></tr></thead>
+<tbody>
+<tr><td><strong>Ismétlésszám</strong></td><td><code>Ismétlés</code> / <code>NNN</code></td><td>3–4</td><td>Bármelyik. <b>C kiemeltjeként a legerősebb.</b></td></tr>
+<tr><td><strong>Körök</strong></td><td><code>Kör</code> / <code>N kör</code></td><td>5–6</td><td>Bármelyik. Tartalék az ismétlés helyett.</td></tr>
+<tr><td><strong>Idő</strong></td><td><code>Idő</code> / <code>NN perc</code></td><td>7</td><td>Bármelyik.</td></tr>
+<tr><td><strong>Sorozat</strong></td><td><code>Sorozat</code> / <code>NN. nap</code></td><td>7</td><td>Bármelyik.</td></tr>
+<tr><td><strong>Edzés-szám</strong></td><td><code>Edzésem</code> / <code>NN.</code></td><td>3</td><td>Bármelyik. Mérföldkőnél a sorozat helyére.</td></tr>
+<tr><td><strong>Összes perc</strong></td><td><code>Összesen</code> / <code>NNNN perc</code></td><td>9</td><td>A, B, E. <b>F-be szűken fér.</b></td></tr>
+<tr><td><strong>Edzés neve</strong></td><td><code>Ma</code> / <code>Fenék &amp; comb</code></td><td>12+</td><td>Csak A vagy E felcímként — <b>F-be és B-be nem fér.</b></td></tr>
+<tr><td><strong>Gyakorlat</strong></td><td><code>Gyakorlat</code> / <code>NN</code></td><td>2</td><td>Bármelyik. Flow-videóknál az ismétlés helyett.</td></tr>
+<tr><td><strong>Testrész</strong></td><td><code>Fókusz</code> / <code>Alsótest</code></td><td>8</td><td>Bármelyik — de <b>leíró adat, nem eredmény.</b></td></tr>
+<tr><td><strong>Program-hét</strong></td><td><code>Foundation</code> / <code>N. hét</code></td><td>6</td><td>Bármelyik. Felcímként A és C-ben a legjobb.</td></tr>
+<tr><td><strong>Mérföldkő</strong></td><td><code>—</code> / <code>30 napos sorozat</code></td><td>16</td><td>Csak a lockup mellé vagy C lábjegyzetébe.</td></tr>
+</tbody>
+</table>
+
+<div class="note warn">
+<div class="t">Két szabály, ami a sablont megvédi</div>
+<p><b>1 · A karakterhatár kötelező.</b> Nem esztétikai kérés — F-ben egy 12 karakteres érték szétfeszíti a szimmetriát, B-ben kilóg a keretből. Ha egy adat nem fér, másik helyre kell, nem kisebb betűre. <b>2 · Legfeljebb három hely.</b> A negyedik táblázatot csinál a képből, és a hírfolyamban minden plusz szám elveszi a figyelmet az elsőtől.</p>
+</div>
+</section>
+
+<footer>LEXFIT · Overlay alternatívák · Öt felismerési eszköz · Tiszta fehér, árnyék nélkül</footer>
+</div>
+</body>
+</html>

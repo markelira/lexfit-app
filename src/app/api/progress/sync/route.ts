@@ -139,9 +139,14 @@ export async function POST(req: Request) {
     if (s.week === 1) { const i = DAY_IDX[(s.day ?? "").toLowerCase()]; if (i != null) workoutIdx.add(i); }
   });
 
-  // 4 · Fold views into watch seconds and completions.
+  // 4 · Fold views into watch seconds and completions. Kihívások membership is
+  // detected lazily (a code missing from videos/ but present in challengeVideos/)
+  // so the global collectionGroup("days") slug scan below is paid ONLY by syncs
+  // that actually complete a challenge day, not by every Foundation-only sync.
   const watchAdd: Record<string, number> = {};
   const completions: Completion[] = [];
+  const challengeCodes = new Set<string>();
+  const rawChallengeCompletions: { code: string; at: string }[] = [];
   const durationCache: Record<string, number> = {};
   for (const d of usable) {
     const code = d.video_id!;
@@ -150,15 +155,39 @@ export async function POST(req: Request) {
     if (playedMs > 0) watchAdd[day] = (watchAdd[day] ?? 0) + Math.round(playedMs / 1000);
 
     if (!(code in durationCache)) {
-      const vs = await adminDb.doc(`videos/${code}`).get();
+      let vs = await adminDb.doc(`videos/${code}`).get();
+      if (!vs.exists) {
+        const cvs = await adminDb.doc(`challengeVideos/${code}`).get();
+        if (cvs.exists) { challengeCodes.add(code); vs = cvs; }
+      }
       durationCache[code] = Number(vs.data()?.muxDuration ?? 0);
     }
     const durSec = durationCache[code];
     const playheadMs = Number(d.view_max_playhead_position ?? 0);
     if (durSec > 0 && playheadMs / 1000 >= durSec * COMPLETE_FRACTION && playedMs >= minPlayMs(durSec)) {
-      completions.push({ code, at: day, atTime: time });
+      if (challengeCodes.has(code)) rawChallengeCompletions.push({ code, at: day });
+      else completions.push({ code, at: day, atTime: time });
     }
     seen[d.id] = Math.floor(new Date(d.view_end).getTime() / 1000);
+  }
+
+  // Resolve challenge slug + per-challenge day count only when a day completed.
+  const challengeCompletions: { slug: string; code: string; at: string }[] = [];
+  const challengeDaysCount: Record<string, number> = {};
+  if (rawChallengeCompletions.length) {
+    const slugByCode: Record<string, string> = {};
+    try {
+      const daysSnap = await adminDb.collectionGroup("days").get();
+      daysSnap.forEach((d) => {
+        const slug = d.ref.parent.parent?.id;
+        const code = (d.data() as { videoCode?: string }).videoCode;
+        if (slug && code) { slugByCode[code] = slug; challengeDaysCount[slug] = (challengeDaysCount[slug] ?? 0) + 1; }
+      });
+    } catch { /* ignore — completions just won't be attributed this sync */ }
+    for (const c of rawChallengeCompletions) {
+      const slug = slugByCode[c.code];
+      if (slug) challengeCompletions.push({ slug, code: c.code, at: c.at });
+    }
   }
   // Views we listed but didn't (or couldn't) detail-fetch stay un-seen and are
   // retried inside the overlap window next sync.
@@ -177,6 +206,43 @@ export async function POST(req: Request) {
   }
   for (const [day, s] of Object.entries(watchAdd)) baseWatch[day] = (baseWatch[day] ?? 0) + s;
 
+  // 5b · Kihívások completions → the separate store, and their dates → the flame.
+  // Read every challengeProgress doc so the streak sees ALL past challenge days
+  // (prior syncs stored them here, not in Foundation completed[]).
+  const challengeDates: string[] = [];
+  const cpBySlug: Record<string, { doneDays: Set<string>; dayDates: Record<string, string>; completedAt: boolean }> = {};
+  try {
+    const cpSnap = await adminDb.collection(`users/${uid}/challengeProgress`).get();
+    cpSnap.forEach((d) => {
+      const data = d.data() as { doneDays?: string[]; dayDates?: Record<string, string>; completedAt?: unknown };
+      cpBySlug[d.id] = { doneDays: new Set(data.doneDays ?? []), dayDates: { ...(data.dayDates ?? {}) }, completedAt: !!data.completedAt };
+      for (const dd of Object.values(data.dayDates ?? {})) challengeDates.push(dd);
+    });
+  } catch { /* none yet */ }
+  const touchedSlugs = new Set<string>();
+  for (const c of challengeCompletions) {
+    const cur = cpBySlug[c.slug] ?? (cpBySlug[c.slug] = { doneDays: new Set(), dayDates: {}, completedAt: false });
+    if (!cur.dayDates[c.code]) { cur.dayDates[c.code] = c.at; challengeDates.push(c.at); }
+    cur.doneDays.add(c.code);
+    touchedSlugs.add(c.slug);
+  }
+  await Promise.all([...touchedSlugs].map((slug) => {
+    const cur = cpBySlug[slug];
+    const total = challengeDaysCount[slug] ?? 0;
+    const nowComplete = total > 0 && cur.doneDays.size >= total;
+    // arrayUnion (not a full-array write) so a completion the client marks
+    // mid-sync composes instead of being clobbered by our stale snapshot.
+    // dayDates is a map → merge:true deep-unions its keys, also non-destructive.
+    const newCodes = challengeCompletions.filter((c) => c.slug === slug).map((c) => c.code);
+    return adminDb.doc(`users/${uid}/challengeProgress/${slug}`).set({
+      slug,
+      doneDays: FieldValue.arrayUnion(...newCodes),
+      dayDates: cur.dayDates,
+      ...(nowComplete && !cur.completedAt ? { completedAt: FieldValue.serverTimestamp() } : {}),
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+  }));
+
   // The streak honors the user's rest-day-forgiveness pref (settings/prefs).
   const prefsSnap = await adminDb.doc(`users/${uid}/settings/prefs`).get();
   const restDayKeepsStreak = (prefsSnap.data()?.plan?.restDayKeepsStreak ?? true) as boolean;
@@ -186,7 +252,8 @@ export async function POST(req: Request) {
   const todayStr = budapest(new Date().toISOString()).day;
   const doneCount = distinct.size;
   const lastCompletedDate = dates.length ? [...dates].sort().at(-1)! : null;
-  const streak = computeStreak(dates, workoutIdx, todayStr, restDayKeepsStreak);
+  // Foundation doneCount/completed[] stay challenge-free; the flame counts both.
+  const streak = computeStreak([...dates, ...challengeDates], workoutIdx, todayStr, restDayKeepsStreak);
   let currentIndex = firstSync ? 0 : Number(cur.currentIndex ?? 0);
   for (const code of distinct) {
     const order = orderByCode[code];

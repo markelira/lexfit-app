@@ -127,6 +127,88 @@ export interface ProgramSession {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Kihívások — the "Szavazz Magadra" archive (a SECOND library,
+// parallel to videos/programs; see docs/kihivasok-plan.md)
+//
+// Topology:
+//   challengeVideos/{code}          — separate 9:16 video pool; NEVER surfaces
+//                                     in Videótár (that reads videos/{code}).
+//   challenges/{slug}               — a challenge = an ordered 5–14 day series.
+//   challenges/{slug}/days/{id}     — the playlist: ordered refs to challengeVideos.
+//   challengeFilters/{key}          — editable taxonomy (HOSSZ buckets, TESTRÉSZ).
+//   settings/challenges             — { fbGroupUrl } global link-out.
+//   users/{uid}/challengeProgress/{slug} — per-user completion store.
+// ─────────────────────────────────────────────────────────────
+
+/** challengeVideos/{code} — a 9:16 challenge day video (own pool, Mux signed). */
+export interface ChallengeVideo {
+  code: string;                 // "SZM24-1" (doc id)
+  title: string;
+  bodyPart: string;             // matches a challengeFilters/theme option
+  mins: number;
+  level: number;                // 1–3
+  blocks: VideoBlock[];         // exercise breakdown (reuses the workout block shape)
+  orientation: "portrait";      // 9:16 reels — distinguishes the player mode
+  // Video source — Mux (signed playback), mirrors Video's fields.
+  muxAssetId: string | null;
+  muxPlaybackId: string | null;
+  muxUploadId?: string | null;
+  muxStatus: MuxStatus;
+  muxDuration: number | null;   // seconds, from Mux webhook
+  thumb: string | null;
+  published: boolean;
+  status: ContentStatus;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface Challenge {
+  slug: string;                 // "7-napos-has-kihivas" (doc id)
+  title: string;                // "7 napos has-kihívás"
+  series: string;               // eyebrow, e.g. "Szavazz Magadra"
+  monthLabel: string;           // human label, "2024. november"
+  sortDate: string;             // sortable "YYYY-MM" (or ISO) — archive reads newest-first
+  synopsis: string;
+  bodyPart: string;             // → challengeFilters/theme (TESTRÉSZ)
+  equipment: string | null;     // "eszköz nélkül"
+  durationDays: number;         // 5–14; the card's "N NAP" badge (also = day count)
+  perDayMinsLabel: string | null; // "napi 10–14 perc"
+  participantCount: number | null; // static, admin-entered ("312-en csinálták")
+  fbPostUrl: string | null;     // optional per-challenge Facebook post link
+  featured: boolean;            // "A csoport választása" / ribbon
+  featuredLabel: string | null; // "A CSOPORT VÁLASZTÁSA" | "ÚJ"
+  cover: string | null;
+  totalDays: number;            // maintained by the days route (like totalSessions)
+  access: "members" | "free";
+  status: ContentStatus;
+  order: number;                // catalog ordering (secondary to sortDate)
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+/** challenges/{slug}/days/{id} — a flat, ordered day pointing at a challengeVideo. */
+export interface ChallengeDay {
+  id: string;                   // day doc id (zero-padded order, e.g. "00")
+  videoCode: string;            // → challengeVideos/{code}
+  order: number;                // 0-based position (day N = order + 1)
+  dayTitle: string | null;      // "Alapozás", "Kitartás" — the "6. nap · Kitartás" suffix
+}
+
+/** users/{uid}/challengeProgress/{slug} — per-user completion (separate store). */
+export interface ChallengeProgress {
+  slug: string;
+  doneDays: string[];           // videoCodes completed (order-agnostic)
+  dayDates?: Record<string, string>; // videoCode → YYYY-MM-DD completed ("Megcsináltad · márc. 2.")
+  resume: Record<string, number>; // videoCode → seconds
+  resumeAt?: Record<string, number>; // videoCode → epoch ms (recency)
+  startedAt?: unknown;
+  completedAt?: unknown;        // set when doneDays covers all days
+}
+
+/** Computed per-user challenge state (not stored) — the ÁLLAPOT filter. */
+export type ChallengeState = "elkezdetlen" | "folyamatban" | "kesz";
+
+// ─────────────────────────────────────────────────────────────
 // filters/{key} — editable taxonomy (one doc per dimension)
 // ─────────────────────────────────────────────────────────────
 
