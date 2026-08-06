@@ -56,6 +56,8 @@ export function BrandPanel({ step }: { step: string }) {
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
           priority={k === "welcome"}
+          unoptimized /* hero photos are pre-sized (1200×1600); skip the optimizer
+            so a replaced file shows immediately, no dev image-cache staleness */
         />
         <div className="bp-scrim" aria-hidden="true" />
         <div className="bp-cap">
