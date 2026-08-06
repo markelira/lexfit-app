@@ -1,62 +1,66 @@
-/* Redesigned workout-completion moment. Fills the whole screen; the celebration,
-   the full grid of member finish-cards, and the CTA are ALL visible at once — no
-   scroll. A flex column with the grid as the growing element guarantees the fit. */
+/* Redesigned workout-completion moment. Takes over the WHOLE screen (fixed), the
+   celebration + an infinite rolling row of member finish-cards + the CTA, all
+   centered. Apple-design: restraint, materials, a quiet materialize-in. */
 
 .fc {
-  position: absolute; inset: 0; z-index: 5; overflow: hidden; display: flex; justify-content: center; align-items: stretch;
-  background: radial-gradient(125% 75% at 50% -6%, #191b1d 0%, #0b0b0c 64%);
+  position: fixed; inset: 0; z-index: 200; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(125% 75% at 50% 8%, #191b1d 0%, #0b0b0c 68%);
   color: #fff; font-family: var(--font, "Poppins", sans-serif);
 }
 .fc-inner {
-  flex: none; min-width: 0; box-sizing: border-box; width: min(560px, 100%);
+  flex: none; min-width: 0; box-sizing: border-box; width: min(860px, 100%); max-height: 100%; overflow-y: auto;
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  gap: clamp(7px, 1.4vh, 14px);
-  padding: clamp(16px, 2.6vh, 30px) 16px clamp(14px, 2.4vh, 26px);
+  gap: clamp(9px, 1.6vh, 16px);
+  padding: clamp(20px, 3vh, 40px) 0 clamp(18px, 3vh, 34px);
 }
 
-/* Achievement (compact) */
+/* Achievement */
 .fc-badge {
-  flex: none; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  flex: none; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
   background: rgba(122,155,141,.14); border: 1.5px solid rgba(169,197,184,.5); color: #bfe0d0;
 }
 .fc-badge svg { stroke: currentColor; }
-.fc-title { flex: none; font-size: clamp(24px, 6.6vw, 36px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.0; margin: 2px 0 0; max-width: 100%; }
-.fc-stat { flex: none; font-size: clamp(12px, 3.4vw, 14px); line-height: 1.4; color: rgba(255,255,255,.66); margin: 0; max-width: 36ch; }
+.fc-title { flex: none; font-size: clamp(28px, 7.5vw, 40px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.0; margin: 4px 0 0; max-width: 100%; padding: 0 16px; }
+.fc-stat { flex: none; font-size: clamp(12.5px, 3.6vw, 14.5px); line-height: 1.4; color: rgba(255,255,255,.66); margin: 0; max-width: 40ch; padding: 0 16px; }
 .fc-stat b { color: #bfe0d0; font-weight: 600; }
-.fc-eyebrow { flex: none; font-family: var(--mono, monospace); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-top: 2px; }
+.fc-eyebrow { flex: none; font-family: var(--mono, monospace); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-top: 2px; padding: 0 16px; }
 
-/* The full grid of examples — all six at once. minmax(0,1fr) stops the aspect-
-   ratio frames from growing the columns past the viewport. */
-.fex-grid {
-  width: 100%; margin: 4px 0 2px;
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px;
+/* Infinite rolling carousel of examples */
+.fex-marquee {
+  flex: none; width: 100%; overflow: hidden; padding: 6px 0;
+  -webkit-mask: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  mask: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
 }
+.fex-track { display: flex; width: max-content; animation: fex-scroll 46s linear infinite; will-change: transform; }
+@media (hover: hover) { .fex-marquee:hover .fex-track { animation-play-state: paused; } }
 .fex-card {
-  min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  flex: none; width: clamp(150px, 44vw, 196px); margin-right: 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
   background: none; border: none; padding: 0; cursor: pointer;
 }
 .fex-frame {
-  width: 100%; aspect-ratio: 9 / 16;
-  position: relative; border-radius: 12px; overflow: hidden; background: #000;
-  box-shadow: 0 10px 24px -14px rgba(0,0,0,.7);
+  width: 100%; aspect-ratio: 9 / 16; position: relative; border-radius: 14px; overflow: hidden; background: #000;
+  box-shadow: 0 12px 30px -14px rgba(0,0,0,.7);
   transition: transform .16s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease;
 }
 .fex-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.fex-card:active .fex-frame { transform: scale(.955); transition-duration: .09s; }
+.fex-card:active .fex-frame { transform: scale(.965); transition-duration: .09s; }
 @media (hover: hover) { .fex-card:hover .fex-frame { transform: translateY(-3px); box-shadow: 0 18px 40px -16px rgba(0,0,0,.78); } }
 .fex-card:focus-visible .fex-frame { outline: 2px solid #bfe0d0; outline-offset: 2px; }
-.fex-name { flex: none; font-family: var(--mono, monospace); font-size: 9px; letter-spacing: 0.05em; color: rgba(255,255,255,.5); }
+.fex-name { flex: none; font-family: var(--mono, monospace); font-size: 9.5px; letter-spacing: 0.05em; color: rgba(255,255,255,.5); }
+@keyframes fex-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 .fc-cta {
-  flex: none; display: inline-flex; align-items: center; gap: 9px; height: 48px; padding: 0 24px; border-radius: 999px;
+  flex: none; display: inline-flex; align-items: center; gap: 9px; height: 50px; padding: 0 26px; border-radius: 999px;
   border: none; background: #fff; color: #14100c; font-family: inherit; font-weight: 600; font-size: 15px; cursor: pointer;
-  box-shadow: 0 10px 28px -12px rgba(255,255,255,.34); transition: transform .12s cubic-bezier(.2,.7,.3,1); margin-top: 2px;
+  box-shadow: 0 10px 28px -12px rgba(255,255,255,.34); transition: transform .12s cubic-bezier(.2,.7,.3,1); margin-top: 4px;
 }
 .fc-cta svg { stroke: currentColor; }
 .fc-cta:active { transform: scale(.97); }
 
 /* Footer — slim up-next + skip */
-.fc-foot { flex: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.fc-foot { flex: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 0 16px; box-sizing: border-box; }
 .fc-next {
   display: flex; align-items: center; gap: 11px; width: 100%; max-width: 360px; padding: 9px 12px; border-radius: 14px; cursor: pointer; text-align: left;
   background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
@@ -80,13 +84,14 @@
 .fc-title { animation-delay: .04s; }
 .fc-stat { animation-delay: .08s; }
 .fc-eyebrow { animation-delay: .12s; }
-.fex-grid { animation-delay: .16s; }
+.fex-marquee { animation-delay: .16s; }
 .fc-cta { animation-delay: .24s; }
 .fc-foot { animation-delay: .3s; }
 .fc-badge { animation: fc-badge-in .55s cubic-bezier(.2,.8,.25,1) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .fc-inner > *, .fc-badge { animation: fc-fade .3s ease both; }
+  .fex-track { animation: none; }
   .fex-frame, .fc-cta { transition: none; }
   .fex-card:active .fex-frame, .fc-cta:active { transform: none; }
   @media (hover: hover) { .fex-card:hover .fex-frame { transform: none; } }
@@ -94,6 +99,3 @@
 @media (prefers-reduced-transparency: reduce) {
   .fc-next { background: #1a1c1e; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
-/* Shorter viewports (small/older phones, landscape): allow scroll so nothing is
-   ever cut off. Tall modern phones show the whole thing at once, no scroll. */
-@media (max-height: 780px) { .fc { overflow-y: auto; } .fc-inner { justify-content: flex-start; } }

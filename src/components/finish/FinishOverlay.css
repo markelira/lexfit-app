@@ -13,6 +13,9 @@
   top: 0;
   left: 0;
   transform-origin: top left;
+  /* Immune to an inherited text-align (e.g. a <button> host centers inline
+     content) — every block anchors left unless it opts into .fs-center. */
+  text-align: left;
   font-family: var(--font, "Poppins", sans-serif);
   color: #fff;
 }
