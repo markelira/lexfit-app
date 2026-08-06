@@ -857,14 +857,14 @@ function PlanStep({
       </div>
       <div className="fnl-scroll pw-scroll">
         <div className="pw-head">
-          <LexMark />
+          <LexMark size={46} />
           <h1 className="pw-title" ref={headRef} tabIndex={-1}>A teljes LEXFIT</h1>
-          <p className="pw-sub">Egy előfizetés, minden funkció. Bármikor lemondhatod.</p>
+          <p className="pw-sub">Egy előfizetés, minden funkció.</p>
         </div>
         <div className="pw-feats">
           {PAYWALL_FEATURES.map((f) => (
             <div className="pw-feat" key={f.title}>
-              <span className="pw-fic"><LxIcon d={f.icon} size={20} /></span>
+              <span className="pw-fic"><LxIcon d={f.icon} size={18} /></span>
               <span className="pw-ftx"><b>{f.title}</b><span>{f.sub}</span></span>
             </div>
           ))}
