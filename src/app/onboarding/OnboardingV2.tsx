@@ -14,7 +14,6 @@ import { formatHuf, perWeekHuf, annualSavingsPct } from "@/lib/pricing/display";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { StepFrame } from "@/components/onboarding/StepFrame";
-import { PlanCard } from "@/components/onboarding/PlanCard";
 import { EmbeddedPay } from "@/components/onboarding/EmbeddedPay";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { BrandPanel } from "@/components/onboarding/BrandPanel";
@@ -54,31 +53,45 @@ const HEADINGS: Partial<Record<StepId, string>> = {
   goal: MOCK.goal.heading, focus: MOCK.focus.heading, level: MOCK.level.heading,
   days: MOCK.days.heading, time: MOCK.time.heading, env: MOCK.env.heading,
   obstacle: MOCK.obstacle.heading, why: MOCK.why.heading, reveal: "A terved kész",
-  plan: "Válaszd ki, hogyan kezded", account: "Készítsd el a fiókod", pay: "Már csak egy lépés",
+  plan: "A teljes LEXFIT", account: "Készítsd el a fiókod", pay: "Már csak egy lépés",
 };
 
-// ── The plan-picker offers (E1). Every figure from PRICES. Default is the
-// low-friction weekly intro (deep-research wf_8fdc08c7-f57 — 490 Ft entry, not a
-// bare full charge); annual keeps "best value" for high-intent buyers. ──
-const FUNNEL_PLANS: {
-  role: string; label: string; price: string; unit: string; terms: string; badge?: string;
+// ── The subscription offer ("A teljes LEXFIT"), styled to the iOS-paywall
+// reference (docs/LEXFIT Elofizetes iOS.html). Features + selectable plan rows +
+// a tucked CTA showing the selected price. Our real figures; NO fixed-length
+// claims (owner rule — no "8 hetes / 40 edzés / 5.–8. hét"). ──
+const PAYWALL_FEATURES: { icon: string | string[]; title: string; sub: string }[] = [
+  { icon: lxPaths.calendarCheck, title: "Vezetett programok", sub: "Foundation és több — végigvezetve, a te tempódban" },
+  { icon: lxPaths.layoutGrid, title: "Teljes videótár", sub: "200+ edzés, bármikor — szűrhetően" },
+  { icon: lxPaths.users, title: "Heti közösségi kihívások", sub: "Szavazz Magadra — együtt, minden héten" },
+  { icon: lxPaths.chartColumn, title: "Haladásod, végig követve", sub: "Lásd a fejlődésed, hétről hétre" },
+  { icon: lxPaths.house, title: "Otthon, eszköz nélkül", sub: "Napi 30 perc, csak egy matrac" },
+];
+// Reference-format plan rows (name · sub · big price · unit). Heti is the
+// highlighted default — low-friction 490 Ft entry (deep-research: lead with the
+// weekly intro). Annual keeps its "best value" in its subline. `cta` = the full
+// billing summary for the button. One-offs excluded — subscriptions only.
+const PAYWALL_PLANS: {
+  role: string; name: string; sub: string; price: string; unit: string; badge?: string; cta: string;
 }[] = [
   {
-    role: "week_intro", label: "HETI", price: formatHuf(PRICES.week_intro.amountHuf), unit: "/ első 7 nap",
-    terms: `Utána ${formatHuf(PRICES.week_std.amountHuf)} / hét · bármikor lemondható`,
-    badge: "AJÁNLOTT INDULÁS",
+    role: "week_intro", name: "Heti",
+    sub: `Első hét ${formatHuf(PRICES.week_intro.amountHuf)} · utána ${formatHuf(PRICES.week_std.amountHuf)} / hét`,
+    price: formatHuf(PRICES.week_intro.amountHuf), unit: "első hét",
+    badge: "Ajánlott indulás", cta: `${formatHuf(PRICES.week_intro.amountHuf)} · első hét`,
   },
   {
-    role: "month_std", label: "HAVI", price: formatHuf(PRICES.month_std.amountHuf), unit: "/ hó",
-    terms: "Havonta automatikusan megújul",
+    role: "month_std", name: "Havi", sub: "Havonta megújul",
+    price: formatHuf(PRICES.month_std.amountHuf), unit: "/ hó",
+    cta: `${formatHuf(PRICES.month_std.amountHuf)} / hó`,
   },
   {
-    role: "annual_std", label: "ÉVES", price: formatHuf(perWeekHuf(PRICES.annual_std.amountHuf)), unit: "/ hét",
-    terms: `${formatHuf(PRICES.annual_std.amountHuf)} / év · SPÓROLJ ${annualSavingsPct()}%`,
-    badge: "LEGNÉPSZERŰBB",
+    role: "annual_std", name: "Éves",
+    sub: `${formatHuf(PRICES.annual_std.amountHuf)} / év · −${annualSavingsPct()}% · a legjobb ár`,
+    price: formatHuf(perWeekHuf(PRICES.annual_std.amountHuf)), unit: "/ hét",
+    cta: `${formatHuf(PRICES.annual_std.amountHuf)} / év`,
   },
 ];
-// One-off products removed from the funnel (user, 2026-08-03) — subscriptions only.
 
 interface FunnelAnswers {
   goal: string | null;
@@ -95,7 +108,7 @@ interface FunnelAnswers {
 const INITIAL: FunnelAnswers = {
   goal: null, focus: null, level: null, days: MOCK.days.recommended,
   weekdays: [...MOCK.days.defaults[MOCK.days.recommended]], time: null, env: [],
-  obstacle: null, why: "", plan: "week_intro",
+  obstacle: null, why: "", plan: "week_intro", // highlighted default = Heti (low-friction 490)
 };
 
 // FunnelAnswers ↔ the persisted draft (OnboardingAnswers-shaped, so it attaches
@@ -762,8 +775,55 @@ function Reveal({
   );
 }
 
-// ── Step 09 — plan picker (E1). Reuses PlanCard; default = weekly intro. One
-// fixed CTA → account. Radiogroup semantics + arrow-key nav (a11y). ──
+// The LEXFIT mark as a filled green tile (paywall header + reference LexMark).
+function LexMark({ size = 56 }: { size?: number }) {
+  return (
+    <span className="pw-mark" style={{ width: size, height: size, borderRadius: size * 0.24 }}>
+      <svg viewBox="0 0 680 616" width={size * 0.52} height={size * 0.47} aria-hidden="true">
+        <g transform="translate(-192,-152)">
+          <path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" strokeWidth="112" strokeLinecap="round" />
+          <circle cx="800" cy="224" r="72" fill="#fff" />
+        </g>
+      </svg>
+    </span>
+  );
+}
+
+// A selectable plan row (reference PlanRow): radio/check · name+sub · price+unit.
+function PlanRow({
+  p, selected, onSelect, tabIndex, onKeyDown,
+}: {
+  p: (typeof PAYWALL_PLANS)[number];
+  selected: boolean;
+  onSelect: () => void;
+  tabIndex: number;
+  onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
+}) {
+  return (
+    <button
+      type="button" role="radio" aria-checked={selected}
+      className={`pw-plan${selected ? " on" : ""}`}
+      onClick={onSelect} tabIndex={tabIndex} onKeyDown={onKeyDown}
+    >
+      {p.badge && <span className="pw-badge">{p.badge}</span>}
+      <span className="pw-radio" aria-hidden="true">
+        {selected && <LxIcon d={lxPaths.check} size={12} sw={2.6} />}
+      </span>
+      <span className="pw-pinfo">
+        <span className="pw-pname">{p.name}</span>
+        <span className="pw-psub">{p.sub}</span>
+      </span>
+      <span className="pw-pprice">
+        <span className="pw-pnum tabular">{p.price}</span>
+        <span className="pw-punit">{p.unit}</span>
+      </span>
+    </button>
+  );
+}
+
+// ── Step 09 — the subscription offer ("A teljes LEXFIT"), redesigned to the
+// iOS-paywall reference. Features + selectable plan rows + a tucked CTA with the
+// selected price. CTA → account → embedded Stripe pay. ──
 function PlanStep({
   value, onChange, onBack, onNext, headRef,
 }: {
@@ -774,9 +834,9 @@ function PlanStep({
   headRef: React.Ref<HTMLHeadingElement>;
 }) {
   const groupRef = useRef<HTMLDivElement>(null);
-  const rovingIdx = Math.max(0, FUNNEL_PLANS.findIndex((p) => p.role === value));
+  const rovingIdx = Math.max(0, PAYWALL_PLANS.findIndex((p) => p.role === value));
   const onKeyDown = (i: number) => (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    const n = FUNNEL_PLANS.length;
+    const n = PAYWALL_PLANS.length;
     let next = -1;
     if (e.key === "ArrowDown" || e.key === "ArrowRight") next = (i + 1) % n;
     else if (e.key === "ArrowUp" || e.key === "ArrowLeft") next = (i - 1 + n) % n;
@@ -784,28 +844,35 @@ function PlanStep({
     else if (e.key === "End") next = n - 1;
     if (next < 0) return;
     e.preventDefault();
-    onChange(FUNNEL_PLANS[next].role);
+    onChange(PAYWALL_PLANS[next].role);
     groupRef.current?.querySelectorAll<HTMLButtonElement>("[role=radio]")[next]?.focus();
   };
+  const sel = PAYWALL_PLANS.find((p) => p.role === value) ?? PAYWALL_PLANS[0];
   return (
-    <div className="fnl-main fnl">
+    <div className="fnl-main fnl pw">
       <div className="fnl-top">
         <button className="fnl-back" onClick={onBack} aria-label="Vissza">
           <LxIcon d={lxPaths.chevronLeft} size={18} />
         </button>
       </div>
-      <div className="fnl-scroll">
-        <h1 className="fnl-q" ref={headRef} tabIndex={-1}>Válaszd ki, hogyan kezded</h1>
-        <p className="fnl-sub">Bármelyikkel ugyanaz a teljes hozzáférés. Bármikor lemondhatod.</p>
-        <div className="fnl-plans" role="radiogroup" aria-label="Csomag" ref={groupRef}>
-          {FUNNEL_PLANS.map((p, i) => (
-            <PlanCard
-              key={p.role}
-              label={p.label}
-              price={p.price}
-              unit={p.unit}
-              terms={p.terms}
-              badge={p.badge}
+      <div className="fnl-scroll pw-scroll">
+        <div className="pw-head">
+          <LexMark />
+          <h1 className="pw-title" ref={headRef} tabIndex={-1}>A teljes LEXFIT</h1>
+          <p className="pw-sub">Egy előfizetés, minden funkció. Bármikor lemondhatod.</p>
+        </div>
+        <div className="pw-feats">
+          {PAYWALL_FEATURES.map((f) => (
+            <div className="pw-feat" key={f.title}>
+              <span className="pw-fic"><LxIcon d={f.icon} size={20} /></span>
+              <span className="pw-ftx"><b>{f.title}</b><span>{f.sub}</span></span>
+            </div>
+          ))}
+        </div>
+        <div className="pw-plans" role="radiogroup" aria-label="Csomag" ref={groupRef}>
+          {PAYWALL_PLANS.map((p, i) => (
+            <PlanRow
+              key={p.role} p={p}
               selected={value === p.role}
               onSelect={() => onChange(p.role)}
               tabIndex={i === rovingIdx ? 0 : -1}
@@ -815,8 +882,14 @@ function PlanStep({
         </div>
       </div>
       <div className="fnl-foot">
-        <button className="fnl-cta" onClick={onNext}>Tovább</button>
-        <p className="fnl-alt">Bármikor lemondható · 14 napos pénzvisszafizetési garancia</p>
+        <button className="fnl-cta" onClick={onNext}>Előfizetek — {sel.cta}</button>
+        <p className="pw-fine">
+          Az előfizetés automatikusan megújul, amíg le nem mondod. Bármikor lemondható · 14 napos pénzvisszafizetési garancia.
+        </p>
+        <div className="pw-links">
+          <a href="/terms">Feltételek</a>
+          <a href="/privacy">Adatvédelem</a>
+        </div>
       </div>
     </div>
   );
@@ -856,7 +929,7 @@ function PayStep({
   onBack: () => void;
   headRef: React.Ref<HTMLHeadingElement>;
 }) {
-  const chosen = FUNNEL_PLANS.find((p) => p.role === plan) ?? FUNNEL_PLANS[0];
+  const chosen = PAYWALL_PLANS.find((p) => p.role === plan) ?? PAYWALL_PLANS[0];
   const outcome = MOCK.reveal.outcomes[goal ?? "ero"]?.headline;
   return (
     <div className="fnl-main fnl">
@@ -875,9 +948,9 @@ function PayStep({
         )}
         <EmbeddedPay
           role={chosen.role}
-          planLabel={chosen.label}
+          planLabel={chosen.name}
           planPrice={`${chosen.price} ${chosen.unit}`}
-          planTerms={chosen.terms}
+          planTerms={chosen.sub}
         />
       </div>
     </div>

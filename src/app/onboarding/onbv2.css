@@ -944,3 +944,65 @@
 @media (prefers-reduced-motion: reduce) {
   .lx .bp-stage { animation: none; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Subscription offer ("A teljes LEXFIT") — iOS-paywall reference
+   (docs/LEXFIT Elofizetes iOS.html). Features + selectable plan rows + a green
+   pay CTA with the selected price. Tint = --accent-2.
+   ════════════════════════════════════════════════════════════════════════ */
+.lx .pw-scroll { text-align: center; }
+
+/* Header — mark + title + sub, centred. */
+.lx .pw-head { display: flex; flex-direction: column; align-items: center; }
+.lx .pw-mark { display: inline-flex; align-items: center; justify-content: center; background: var(--accent-2); box-shadow: 0 8px 20px -8px rgba(24, 32, 29, 0.5); }
+.lx .pw-title { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); margin-top: 11px; }
+.lx .pw-title:focus { outline: none; }
+.lx .pw-sub { font-size: 14.5px; color: var(--ink-2); letter-spacing: -0.01em; margin-top: 4px; max-width: 300px; }
+
+/* Feature rows — tinted icon box + title + sub. */
+.lx .pw-feats { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; padding: 0 4px; }
+.lx .pw-feat { display: flex; align-items: center; gap: 14px; text-align: left; }
+.lx .pw-fic { width: 38px; height: 38px; flex-shrink: 0; border-radius: 10px; background: var(--accent-soft); color: var(--accent-2); display: flex; align-items: center; justify-content: center; }
+.lx .pw-ftx { display: flex; flex-direction: column; }
+.lx .pw-ftx b { font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); line-height: 1.3; }
+.lx .pw-ftx span { font-size: 13px; color: var(--ink-2); line-height: 1.32; margin-top: 1px; }
+
+/* Plan rows — selectable cards with radio + optional badge. */
+.lx .pw-plans { display: flex; flex-direction: column; gap: 9px; margin-top: 18px; }
+.lx .pw-plan {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  width: 100%; text-align: left; padding: 12px 14px; background: var(--surface);
+  border: 2px solid rgba(60, 60, 67, 0.14); border-radius: 14px; cursor: pointer;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+.lx .pw-plan:hover { border-color: var(--accent); }
+.lx .pw-plan:active { transform: scale(0.995); }
+.lx .pw-plan:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lx .pw-plan.on { border-color: var(--accent-2); box-shadow: 0 4px 14px -6px rgba(74, 108, 94, 0.35); }
+.lx .pw-badge {
+  position: absolute; top: -9px; right: 14px; background: var(--accent-2); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+  padding: 2.5px 9px; border-radius: 999px;
+}
+.lx .pw-radio {
+  width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
+  border: 1.8px solid rgba(60, 60, 67, 0.3); background: transparent;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+}
+.lx .pw-plan.on .pw-radio { border-color: var(--accent-2); background: var(--accent-2); }
+.lx .pw-pinfo { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.lx .pw-pname { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+.lx .pw-psub { font-size: 12.5px; color: var(--ink-2); letter-spacing: -0.01em; margin-top: 1px; }
+.lx .pw-pprice { flex-shrink: 0; text-align: right; }
+.lx .pw-pnum { display: block; font-size: 16.5px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+.lx .pw-punit { display: block; font-size: 12px; color: var(--ink-2); }
+
+/* The pay CTA is green (the money button), per the reference. */
+.lx .pw .fnl-cta { background: var(--accent-2); border-color: var(--accent-2); box-shadow: 0 6px 18px -6px rgba(74, 108, 94, 0.5); }
+.lx .pw .fnl-cta:hover { background: oklch(from var(--accent-2) calc(l - 0.04) c h); }
+
+/* Fine print + footer links. */
+.lx .pw-fine { font-size: 11.5px; color: var(--ink-3); line-height: 1.35; text-align: center; }
+.lx .pw-links { display: flex; justify-content: center; gap: 18px; }
+.lx .pw-links a { font-size: 12px; color: var(--accent-2); font-weight: 500; text-decoration: none; }
+.lx .pw-links a:hover { text-decoration: underline; text-underline-offset: 3px; }

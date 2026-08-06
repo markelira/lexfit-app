@@ -40,7 +40,7 @@ const CAP: Record<PanelKey, { eyebrow?: string; line: React.ReactNode; slogan?: 
   alone: { eyebrow: "Nem vagy egyedül", line: <>Egyedül nehéz. <b>Együtt muszáj.</b></>, slogan: true },
   story: { eyebrow: "Az alapító", line: <>„Egyedül nem megy.” <span className="bp-by">— Alexa</span></>, slogan: true },
   promise: { eyebrow: "A terved kész", line: "Innentől együtt csináljuk." },
-  reassure: { eyebrow: "Nyugodt szívvel", line: "A közösség ingyenes marad — ez a programot nyitja." },
+  reassure: { eyebrow: "Itt a helyed", line: <>A terved kész — <b>már csak te hiányzol.</b></>, slogan: true },
 };
 
 export function BrandPanel({ step }: { step: string }) {
