@@ -13,14 +13,13 @@ import {
   type ProgressState, type PendingCompletion,
 } from "@/lib/progress";
 import { computeStreak } from "@/lib/streak";
+import { computeWeekProgress } from "@/lib/week-progress";
 import { getPrefs } from "@/lib/prefs";
 import { getPhotos, uploadMilestonePhoto, MILESTONES, type Milestone } from "@/lib/photos";
 import { loadFoundation, type FoundationData } from "@/lib/program";
 
 const CAM = ["M4 8 h3 l1.5 -2 h7 l1.5 2 h3 v11 h-19 Z", "M12 16.5 a3 3 0 1 0 0-6 a3 3 0 0 0 0 6 Z"];
 const DAY_LABELS = ["H", "K", "SZE", "CS", "P", "SZO", "V"]; // Monday-first (HU)
-// program day codes → Monday-first weekday index
-const DAY_IDX: Record<string, number> = { h: 0, k: 1, sze: 2, cs: 3, p: 4, szo: 5, v: 6 };
 
 // ── date helpers (completions store `at` as YYYY-MM-DD strings) ──
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -57,6 +56,7 @@ export default function HaladasomPage() {
   const [fnd, setFnd] = useState<FoundationData | null>(null);
   const [pending, setPending] = useState<PendingCompletion[]>([]);
   const [restDayKeepsStreak, setRestDayKeepsStreak] = useState(true);
+  const [plan, setPlan] = useState<{ weekdays: number[]; daysPerWeek: number }>({ weekdays: [], daysPerWeek: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -69,14 +69,15 @@ export default function HaladasomPage() {
         clearConfirmedPending(p?.completed ?? []);
         setPending(getPendingCompletions());
         setProgress(p); setOnb(o); setPhotos(ph); setFnd(f); setRestDayKeepsStreak(pr.plan.restDayKeepsStreak);
+        setPlan({ weekdays: pr.plan.weekdays, daysPerWeek: pr.plan.daysPerWeek });
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [user]);
 
   const model = useMemo(
-    () => derive(progress, onb, fnd, pending, restDayKeepsStreak),
-    [progress, onb, fnd, pending, restDayKeepsStreak],
+    () => derive(progress, onb, fnd, pending, restDayKeepsStreak, plan),
+    [progress, onb, fnd, pending, restDayKeepsStreak, plan],
   );
 
   async function upload(m: Milestone, file: File) {
@@ -185,10 +186,16 @@ export default function HaladasomPage() {
 }
 
 // ── derivation ─────────────────────────────────────────────────────────────
-function derive(p: ProgressState | null, onb: Record<string, unknown> | null, fnd: FoundationData | null, pending: PendingCompletion[] = [], restDayKeepsStreak = true) {
+function derive(
+  p: ProgressState | null,
+  onb: Record<string, unknown> | null,
+  fnd: FoundationData | null,
+  pending: PendingCompletion[] = [],
+  restDayKeepsStreak = true,
+  plan: { weekdays: number[]; daysPerWeek: number } = { weekdays: [], daysPerWeek: 0 },
+) {
   const program = fnd?.program ?? null;
   const perWeek = program?.perWeek ?? 5;
-  const weekTarget = (typeof onb?.days === "number" ? (onb.days as number) : undefined) ?? perWeek;
 
   const confirmed = p?.completed ?? [];
   // Optimistic bridge: workouts the player saw finish that the Mux sync hasn't
@@ -207,20 +214,25 @@ function derive(p: ProgressState | null, onb: Record<string, unknown> | null, fn
     ? Math.max(1, Math.floor(daysBetween(start, today) / 7) + 1)
     : Math.max(1, Math.floor((p?.currentIndex ?? 0) / perWeek) + 1);
 
-  // fixed weekly workout-day set (same every week) → the rest are rest days
-  const workoutIdx = new Set<number>(p?.workoutDays ?? []);
-  const firstWeek = fnd?.weeks[0];
-  if (firstWeek) for (const w of firstWeek.workouts) { const i = DAY_IDX[(w.day || "").toLowerCase()]; if (i != null) workoutIdx.add(i); }
+  // THIS week's status comes from the SHARED collector (lib/week-progress) so
+  // this card is identical to the home (/app) strip — same plan training days,
+  // same completions (confirmed + pending), same calendar week and target.
+  const wk = computeWeekProgress({
+    weekdays: plan.weekdays,
+    daysPerWeek: plan.daysPerWeek || perWeek,
+    completed: confirmed,
+    pending,
+    now: today,
+  });
+  const weekTarget = wk.target;
+  const days = wk.days.map((d, i) => ({ label: DAY_LABELS[i], done: d.done, today: d.today, rest: d.rest }));
+  const thisWeek = wk.doneThisWeek;
+  // Rest-day-aware streak uses the same training days, 0-based Mon..Sun.
+  const workoutIdx = new Set<number>(plan.weekdays.map((w) => w - 1));
 
   const inRange = (from: Date, to: Date) => dates.filter((s) => { const d = parseYmd(s); return d >= from && d < to; }).length;
 
-  // THIS calendar week — the unit of commitment (R6-01). Program-agnostic.
   const mon = mondayOf(today);
-  const days = DAY_LABELS.map((label, i) => {
-    const key = ymd(addDays(mon, i));
-    return { label, done: dates.includes(key), today: key === ymd(today), rest: workoutIdx.size > 0 && !workoutIdx.has(i) };
-  });
-  const thisWeek = inRange(mon, addDays(mon, 7));
   const lastWeek = inRange(addDays(mon, -7), mon);
 
   // Rolling last-8 CALENDAR weeks (oldest → this week) — the weekly rhythm across

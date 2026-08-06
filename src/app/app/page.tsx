@@ -5,7 +5,8 @@ import "./home.css";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { ensureProgress, getProgress, type ProgressState } from "@/lib/progress";
+import { ensureProgress, getProgress, getPendingCompletions, type ProgressState } from "@/lib/progress";
+import { computeWeekProgress, type WeekProgress } from "@/lib/week-progress";
 import { getMyList, setSaved } from "@/lib/mylist";
 import { NcardModal } from "@/components/NcardModal";
 import { WorkoutCard } from "@/components/WorkoutCard";
@@ -215,9 +216,12 @@ export default function KezdolapPage() {
       />
 
       <WeekStrip
-        weekdays={prefs?.plan.weekdays ?? []}
-        daysPerWeek={prefs?.plan.daysPerWeek ?? perWeek}
-        completedDates={(progress?.completed ?? []).map((c) => (typeof c.at === "string" ? c.at : "")).filter(Boolean)}
+        week={computeWeekProgress({
+          weekdays: prefs?.plan.weekdays ?? [],
+          daysPerWeek: prefs?.plan.daysPerWeek ?? perWeek,
+          completed: progress?.completed ?? [],
+          pending: getPendingCompletions(),
+        })}
       />
 
       <div className="home-rows">
@@ -349,53 +353,22 @@ const WEEK_DAYS: [string, string][] = [
   ["P", "Péntek"], ["SZO", "Szombat"], ["V", "Vasárnap"],
 ];
 
-// Local Monday-first date helpers for the plan strip.
-const pad2 = (n: number) => String(n).padStart(2, "0");
-const ymdLocal = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-const addDaysLocal = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
-
 /**
- * The weekly plan strip: the user's OWN training days (prefs.plan.weekdays,
- * 1=Mon…7=Sun), this real calendar week, and which of those days are already
- * done — never the program cursor. Today is the real weekday, "done" comes from
- * dated completions, and any non-training day is a rest day. The ring targets
- * the user's chosen days/week.
+ * The weekly plan strip. Renders straight from the shared weekly collector
+ * (lib/week-progress) so it is identical to the Haladásom week card — same
+ * training days (the user's plan), same "done" (dated completions incl. the
+ * optimistic bridge), same real calendar week and target.
  */
-function WeekStrip({
-  weekdays, daysPerWeek, completedDates,
-}: {
-  weekdays: number[];        // 1=Mon … 7=Sun — the user's chosen training days
-  daysPerWeek: number;
-  completedDates: string[];  // YYYY-MM-DD completion days
-}) {
-  // Resolve "now" after mount so the strip follows the viewer's own clock and
-  // never mismatches server markup (todayIdx = -1 → no highlight until mounted).
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => setNow(new Date()), []);
-  if (!weekdays.length) return null;
-
-  const ref = now ?? new Date();
-  const todayIdx = now ? (now.getDay() + 6) % 7 : -1;      // 0=Mon … 6=Sun
-  const monday = addDaysLocal(ref, -((ref.getDay() + 6) % 7));
-  const done = new Set(completedDates);
-  const training = new Set(weekdays);                       // 1..7
-
-  const cells = WEEK_DAYS.map(([abbr, full], i) => {
-    const key = ymdLocal(addDaysLocal(monday, i));
-    return { abbr, full, done: done.has(key), isToday: i === todayIdx, rest: !training.has(i + 1) };
-  });
-
-  const target = Math.max(1, daysPerWeek || training.size);
-  const doneThisWeek = cells.filter((c) => c.done).length;
+function WeekStrip({ week }: { week: WeekProgress }) {
+  if (!week.weekdays.length) return null;
+  const { days, target, doneThisWeek } = week;
   const ringPct = Math.round((Math.min(doneThisWeek, target) / target) * 100);
 
-  // A finished day always reads as done; otherwise the real today is highlighted;
-  // otherwise it's an upcoming training day (todo) or a rest day.
-  const clsOf = (c: (typeof cells)[number]) =>
-    c.done ? "done" : c.isToday ? "today" : c.rest ? "rest" : "todo";
-  const labelOf = (c: (typeof cells)[number]) => {
-    const base = c.done ? "kész" : c.rest ? "pihenőnap" : "nincs kész";
-    return c.isToday ? `ma · ${base}` : base;
+  const clsOf = (d: WeekProgress["days"][number]) =>
+    d.done ? "done" : d.today ? "today" : d.rest ? "rest" : "todo";
+  const labelOf = (d: WeekProgress["days"][number]) => {
+    const base = d.done ? "kész" : d.rest ? "pihenőnap" : d.missed ? "kihagyva" : "nincs kész";
+    return d.today ? `ma · ${base}` : base;
   };
 
   return (
@@ -412,12 +385,12 @@ function WeekStrip({
         >
           <b>{doneThisWeek}/{target}</b>
         </div>
-        {cells.map((c) => {
-          const k = clsOf(c);
+        {days.map((d, i) => {
+          const k = clsOf(d);
           return (
-            <div key={c.abbr} className={`wstrip-day ${k}`}>
-              <div className="d">{c.abbr}</div>
-              <div className="dot" role="img" aria-label={`${c.full} · ${labelOf(c)}`}>
+            <div key={d.weekday} className={`wstrip-day ${k}`}>
+              <div className="d">{WEEK_DAYS[i][0]}</div>
+              <div className="dot" role="img" aria-label={`${WEEK_DAYS[i][1]} · ${labelOf(d)}`}>
                 {k === "done" ? <LxIcon d={lxPaths.check} size={15} sw={2.6} /> : k === "rest" ? "☾" : ""}
               </div>
             </div>
