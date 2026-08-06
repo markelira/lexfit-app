@@ -6,6 +6,7 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe
 import { fetchEmbeddedClientSecret, type Consents } from "@/lib/billing";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
+import { type PayPlan } from "./paywall";
 
 // Stripe.js is loaded lazily, once, at module scope (publishable key is public).
 const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -15,15 +16,6 @@ const stripePromise = pk ? loadStripe(pk) : null;
 // start); the single compact checkbox below covers both, and the server records
 // the consent before the session is created.
 const CONSENTS: Consents = { autoRenew: true, immediateStart: true };
-
-export interface PayPlan {
-  role: string;
-  name: string;
-  price: string;
-  unit: string;
-  sub: string;
-  badge?: string;
-}
 
 // Embedded Stripe Checkout mounted on the pay step (E2). The user can still
 // change the plan here (no need to go back) — the selection is controlled by the

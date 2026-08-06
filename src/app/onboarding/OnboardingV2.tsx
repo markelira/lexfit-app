@@ -9,12 +9,11 @@ import { hasOnboarded } from "@/lib/user";
 import { paidDestination } from "@/lib/billing";
 import { readDraft, writeDraft, clearDraft, type DraftAnswers } from "@/lib/onboarding-draft";
 import { FIRST_WORKOUT } from "@/lib/foundation-preview";
-import { PRICES } from "@/lib/pricing/config";
-import { formatHuf, perWeekHuf, annualSavingsPct } from "@/lib/pricing/display";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { StepFrame } from "@/components/onboarding/StepFrame";
 import { EmbeddedPay } from "@/components/onboarding/EmbeddedPay";
+import { PAYWALL_PLANS, PaywallOffer } from "@/components/onboarding/paywall";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { BrandPanel } from "@/components/onboarding/BrandPanel";
 import { OptionList } from "@/components/onboarding/OptionList";
@@ -60,40 +59,8 @@ const HEADINGS: Partial<Record<StepId, string>> = {
 // reference (docs/LEXFIT Elofizetes iOS.html). Features + selectable plan rows +
 // a tucked CTA showing the selected price. Our real figures; NO fixed-length
 // claims (owner rule — no "8 hetes / 40 edzés / 5.–8. hét"). ──
-// [0] is the hero USP (full-width, emphasised); [1..] are the 2-col chip grid.
-// Grid subs are short so nothing wraps at half width (apple-design: hierarchy).
-const PAYWALL_FEATURES: { icon: string | string[]; title: string; sub: string }[] = [
-  { icon: lxPaths.calendarCheck, title: "Vezetett programok", sub: "Foundation és több — végigvezetve, a te tempódban" },
-  { icon: lxPaths.layoutGrid, title: "Teljes videótár", sub: "200+ edzés" },
-  { icon: lxPaths.users, title: "Heti kihívások", sub: "Szavazz Magadra" },
-  { icon: lxPaths.chartColumn, title: "Haladáskövetés", sub: "hétről hétre" },
-  { icon: lxPaths.house, title: "Otthon, bárhol", sub: "eszköz nélkül" },
-];
-// Reference-format plan rows (name · sub · big price · unit). Heti is the
-// highlighted default — low-friction 490 Ft entry (deep-research: lead with the
-// weekly intro). Annual keeps its "best value" in its subline. `cta` = the full
-// billing summary for the button. One-offs excluded — subscriptions only.
-const PAYWALL_PLANS: {
-  role: string; name: string; sub: string; price: string; unit: string; badge?: string; cta: string;
-}[] = [
-  {
-    role: "week_intro", name: "Heti",
-    sub: `Első hét ${formatHuf(PRICES.week_intro.amountHuf)} · utána ${formatHuf(PRICES.week_std.amountHuf)} / hét`,
-    price: formatHuf(PRICES.week_intro.amountHuf), unit: "első hét",
-    badge: "Ajánlott indulás", cta: `${formatHuf(PRICES.week_intro.amountHuf)} · első hét`,
-  },
-  {
-    role: "month_std", name: "Havi", sub: "Havonta megújul",
-    price: formatHuf(PRICES.month_std.amountHuf), unit: "/ hó",
-    cta: `${formatHuf(PRICES.month_std.amountHuf)} / hó`,
-  },
-  {
-    role: "annual_std", name: "Éves",
-    sub: `${formatHuf(PRICES.annual_std.amountHuf)} / év · −${annualSavingsPct()}% · a legjobb ár`,
-    price: formatHuf(perWeekHuf(PRICES.annual_std.amountHuf)), unit: "/ hét",
-    cta: `${formatHuf(PRICES.annual_std.amountHuf)} / év`,
-  },
-];
+// The offer data + header/features live in the shared paywall module (also used
+// by /subscribe): PAYWALL_FEATURES/PAYWALL_PLANS, LexMark, PaywallOffer.
 
 interface FunnelAnswers {
   goal: string | null;
@@ -779,20 +746,6 @@ function Reveal({
   );
 }
 
-// The LEXFIT mark as a filled green tile (paywall header + reference LexMark).
-function LexMark({ size = 56 }: { size?: number }) {
-  return (
-    <span className="pw-mark" style={{ width: size, height: size, borderRadius: size * 0.24 }}>
-      <svg viewBox="0 0 680 616" width={size * 0.52} height={size * 0.47} aria-hidden="true">
-        <g transform="translate(-192,-152)">
-          <path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#fff" strokeWidth="112" strokeLinecap="round" />
-          <circle cx="800" cy="224" r="72" fill="#fff" />
-        </g>
-      </svg>
-    </span>
-  );
-}
-
 // A selectable plan row (reference PlanRow): radio/check · name+sub · price+unit.
 function PlanRow({
   p, selected, onSelect, tabIndex, onKeyDown,
@@ -860,25 +813,7 @@ function PlanStep({
         </button>
       </div>
       <div className="fnl-scroll pw-scroll">
-        <div className="pw-head">
-          <LexMark size={46} />
-          <h1 className="pw-title" ref={headRef} tabIndex={-1}>A teljes LEXFIT</h1>
-          <p className="pw-sub">Egy előfizetés, minden funkció.</p>
-        </div>
-        <div className="pw-feats">
-          <div className="pw-hero">
-            <span className="pw-fic"><LxIcon d={PAYWALL_FEATURES[0].icon} size={20} /></span>
-            <span className="pw-ftx"><b>{PAYWALL_FEATURES[0].title}</b><span>{PAYWALL_FEATURES[0].sub}</span></span>
-          </div>
-          <div className="pw-grid">
-            {PAYWALL_FEATURES.slice(1).map((f) => (
-              <div className="pw-tile" key={f.title}>
-                <span className="pw-fic"><LxIcon d={f.icon} size={17} /></span>
-                <span className="pw-ftx"><b>{f.title}</b><span>{f.sub}</span></span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <PaywallOffer headRef={headRef} />
         <div className="pw-plans" role="radiogroup" aria-label="Csomag" ref={groupRef}>
           {PAYWALL_PLANS.map((p, i) => (
             <PlanRow
