@@ -4,6 +4,8 @@ import { useCallback, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { fetchEmbeddedClientSecret, type Consents } from "@/lib/billing";
+import { LxIcon } from "@/components/LxIcon";
+import { lxPaths } from "@/lib/icons";
 
 // Stripe.js is loaded lazily, once, at module scope (publishable key is public).
 const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -14,44 +16,82 @@ const stripePromise = pk ? loadStripe(pk) : null;
 // the consent before the session is created.
 const CONSENTS: Consents = { autoRenew: true, immediateStart: true };
 
-// Embedded Stripe Checkout mounted on the pay step (E2). Consent gates it; once
-// given, we create the session (server-side consent record) and mount Stripe's
-// own secure checkout inline. On success Stripe returns to /app?sub=success,
-// where confirmCheckout grants access.
-export function EmbeddedPay({
-  role,
-  planLabel,
-  planPrice,
-  planTerms,
-}: {
+export interface PayPlan {
   role: string;
-  planLabel: string;
-  planPrice: string;
-  planTerms: string;
+  name: string;
+  price: string;
+  unit: string;
+  sub: string;
+  badge?: string;
+}
+
+// Embedded Stripe Checkout mounted on the pay step (E2). The user can still
+// change the plan here (no need to go back) — the selection is controlled by the
+// funnel (onRoleChange → answers.plan). Consent gates it; once "Tovább" is hit we
+// lock the plan, create the session (server-side consent record), and mount
+// Stripe's own secure checkout inline. Success returns to /app?sub=success.
+export function EmbeddedPay({
+  plans,
+  role,
+  onRoleChange,
+}: {
+  plans: PayPlan[];
+  role: string;
+  onRoleChange: (role: string) => void;
 }) {
   const [consented, setConsented] = useState(false);
   const [ready, setReady] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const selected = plans.find((p) => p.role === role) ?? plans[0];
 
   const fetchClientSecret = useCallback(
     () =>
-      fetchEmbeddedClientSecret(role, CONSENTS).catch((e) => {
+      fetchEmbeddedClientSecret(selected.role, CONSENTS).catch((e) => {
         setErr("A fizetést most nem tudtuk elindítani. Próbáld újra.");
         throw e;
       }),
-    [role],
+    [selected.role],
   );
+
+  // Roving-focus arrow-key nav across the plan radios (a11y).
+  const onKeyDown = (i: number) => (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const n = plans.length;
+    let next = -1;
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") next = (i + 1) % n;
+    else if (e.key === "ArrowUp" || e.key === "ArrowLeft") next = (i - 1 + n) % n;
+    if (next < 0) return;
+    e.preventDefault();
+    onRoleChange(plans[next].role);
+    (e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>("[role=radio]")[next])?.focus();
+  };
 
   return (
     <div className="fnl-pay">
-      <div className="fnl-paysum">
-        <span className="lbl mono">{planLabel}</span>
-        <span className="amt tabular">{planPrice}</span>
-        <span className="terms">{planTerms}</span>
-      </div>
-
-      {!ready && (
+      {!ready ? (
         <>
+          {/* Same summary-card style — but all three are selectable here, so the
+              user can switch plan without going back. */}
+          <div className="fnl-payopts" role="radiogroup" aria-label="Csomag">
+            {plans.map((p, i) => {
+              const on = p.role === selected.role;
+              return (
+                <button
+                  key={p.role} type="button" role="radio" aria-checked={on}
+                  className={`fnl-paysum fnl-payopt${on ? " on" : ""}`}
+                  tabIndex={on ? 0 : -1}
+                  onClick={() => onRoleChange(p.role)} onKeyDown={onKeyDown(i)}
+                >
+                  <span className="lbl mono">{p.name}</span>
+                  <span className="amt tabular">{p.price} {p.unit}</span>
+                  <span className="terms">{p.sub}</span>
+                  <span className="fnl-paydot" aria-hidden="true">
+                    {on && <LxIcon d={lxPaths.check} size={11} sw={2.6} />}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
           <label className="fnl-check">
             <input type="checkbox" checked={consented} onChange={(e) => setConsented(e.target.checked)} />
             <span>
@@ -65,26 +105,31 @@ export function EmbeddedPay({
           </button>
           <p className="fnl-alt">Bármikor lemondható · 14 napos pénzvisszafizetési garancia</p>
         </>
-      )}
+      ) : (
+        <>
+          {/* Locked to the chosen plan; one tap to change it again. */}
+          <div className="fnl-paysum">
+            <span className="lbl mono">{selected.name}</span>
+            <span className="amt tabular">{selected.price} {selected.unit}</span>
+            <span className="terms">{selected.sub}</span>
+            <button type="button" className="fnl-payedit" onClick={() => setReady(false)}>Módosítás</button>
+          </div>
 
-      {ready && stripePromise && !err && (
-        <div className="fnl-embed">
-          <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
-        </div>
-      )}
-
-      {ready && !stripePromise && (
-        <p className="fnl-formerr">A fizetés jelenleg nem elérhető.</p>
-      )}
-      {err && (
-        <div>
-          <p className="fnl-formerr">{err}</p>
-          <button className="fnl-cta" onClick={() => { setErr(null); setReady(false); }}>
-            Vissza
-          </button>
-        </div>
+          {stripePromise && !err && (
+            <div className="fnl-embed">
+              <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
+                <EmbeddedCheckout />
+              </EmbeddedCheckoutProvider>
+            </div>
+          )}
+          {!stripePromise && <p className="fnl-formerr">A fizetés jelenleg nem elérhető.</p>}
+          {err && (
+            <div>
+              <p className="fnl-formerr">{err}</p>
+              <button className="fnl-cta" onClick={() => { setErr(null); setReady(false); }}>Vissza</button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

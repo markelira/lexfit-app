@@ -328,6 +328,8 @@ export function OnboardingV2() {
                 plan={answers.plan}
                 goal={answers.goal}
                 onBack={() => go(-1)}
+                onPlanChange={(r) => set("plan", r)}
+                onExit={() => router.push("/")}
                 headRef={sectionHeadRef}
               />
             )}
@@ -930,14 +932,15 @@ function AccountStep({
 // ── Step 11 — pay: embedded Stripe Checkout. Repeats the user's goal outcome
 // above checkout (research — surfacing the goal at the paywall lifts pay). ──
 function PayStep({
-  plan, goal, onBack, headRef,
+  plan, goal, onBack, onPlanChange, onExit, headRef,
 }: {
   plan: string;
   goal: string | null;
   onBack: () => void;
+  onPlanChange: (role: string) => void;
+  onExit: () => void;
   headRef: React.Ref<HTMLHeadingElement>;
 }) {
-  const chosen = PAYWALL_PLANS.find((p) => p.role === plan) ?? PAYWALL_PLANS[0];
   const outcome = MOCK.reveal.outcomes[goal ?? "ero"]?.headline;
   return (
     <div className="fnl-main fnl">
@@ -945,6 +948,7 @@ function PayStep({
         <button className="fnl-back" onClick={onBack} aria-label="Vissza">
           <LxIcon d={lxPaths.chevronLeft} size={18} />
         </button>
+        <button className="fnl-later" onClick={onExit}>Később</button>
       </div>
       <div className="fnl-scroll">
         <h1 className="fnl-q" ref={headRef} tabIndex={-1}>Már csak egy lépés</h1>
@@ -954,12 +958,7 @@ function PayStep({
             <strong>{outcome}</strong>
           </p>
         )}
-        <EmbeddedPay
-          role={chosen.role}
-          planLabel={chosen.name}
-          planPrice={`${chosen.price} ${chosen.unit}`}
-          planTerms={chosen.sub}
-        />
+        <EmbeddedPay plans={PAYWALL_PLANS} role={plan} onRoleChange={onPlanChange} />
       </div>
     </div>
   );

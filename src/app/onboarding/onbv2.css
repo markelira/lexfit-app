@@ -191,6 +191,10 @@
 .lx .fnl-back:active { transform: scale(0.9); }
 .lx .fnl-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .lx .fnl-back-spacer { width: 34px; }
+/* "Később" — exit the funnel from the pay step (draft is kept). */
+.lx .fnl-later { margin-left: auto; background: none; border: none; padding: 6px 4px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--ink-3); }
+.lx .fnl-later:hover { color: var(--ink); }
+.lx .fnl-later:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
 
 .lx .fnl-prog { flex: 1; display: flex; gap: var(--sp-1); }
 .lx .fnl-prog .seg {
@@ -627,9 +631,31 @@
   display: flex; flex-direction: column; gap: 3px;
   padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2);
 }
+.lx .fnl-paysum { position: relative; }
 .lx .fnl-paysum .lbl { font-size: 10px; letter-spacing: 0.08em; color: var(--ink-3); }
 .lx .fnl-paysum .amt { font-size: 22px; font-weight: 800; letter-spacing: -0.035em; color: var(--ink); }
 .lx .fnl-paysum .terms { font-size: 11px; color: var(--ink-2); }
+.lx .fnl-payedit { position: absolute; top: 12px; right: 14px; background: none; border: none; padding: 0; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--accent-2); }
+.lx .fnl-payedit:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Pay-step plan selector — same summary-card style, now selectable so the user
+   can switch plan without going back. */
+.lx .fnl-payopts { display: flex; flex-direction: column; gap: var(--sp-2); }
+.lx .fnl-payopt {
+  width: 100%; text-align: left; cursor: pointer; font: inherit;
+  padding-right: 46px; background: var(--surface); border: 1.5px solid var(--line);
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.lx .fnl-payopt:hover { border-color: var(--accent); }
+.lx .fnl-payopt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lx .fnl-payopt.on { border-color: var(--accent-2); background: var(--accent-soft); }
+.lx .fnl-payopt .amt { font-size: 18px; }
+.lx .fnl-paydot {
+  position: absolute; top: 50%; right: 14px; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+  border: 1.8px solid rgba(60, 60, 67, 0.3); color: #fff;
+}
+.lx .fnl-payopt.on .fnl-paydot { border-color: var(--accent-2); background: var(--accent-2); }
 .lx .fnl-embed { border: 1px solid var(--line); border-radius: var(--r-md); padding: 6px; background: var(--surface); min-height: 200px; }
 
 /* register-or-login extras (account step) */
