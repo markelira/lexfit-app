@@ -60,12 +60,14 @@ const HEADINGS: Partial<Record<StepId, string>> = {
 // reference (docs/LEXFIT Elofizetes iOS.html). Features + selectable plan rows +
 // a tucked CTA showing the selected price. Our real figures; NO fixed-length
 // claims (owner rule — no "8 hetes / 40 edzés / 5.–8. hét"). ──
+// [0] is the hero USP (full-width, emphasised); [1..] are the 2-col chip grid.
+// Grid subs are short so nothing wraps at half width (apple-design: hierarchy).
 const PAYWALL_FEATURES: { icon: string | string[]; title: string; sub: string }[] = [
   { icon: lxPaths.calendarCheck, title: "Vezetett programok", sub: "Foundation és több — végigvezetve, a te tempódban" },
-  { icon: lxPaths.layoutGrid, title: "Teljes videótár", sub: "200+ edzés, bármikor — szűrhetően" },
-  { icon: lxPaths.users, title: "Heti közösségi kihívások", sub: "Szavazz Magadra — együtt, minden héten" },
-  { icon: lxPaths.chartColumn, title: "Haladásod, végig követve", sub: "Lásd a fejlődésed, hétről hétre" },
-  { icon: lxPaths.house, title: "Otthon, eszköz nélkül", sub: "Napi 30 perc, csak egy matrac" },
+  { icon: lxPaths.layoutGrid, title: "Teljes videótár", sub: "200+ edzés" },
+  { icon: lxPaths.users, title: "Heti kihívások", sub: "Szavazz Magadra" },
+  { icon: lxPaths.chartColumn, title: "Haladáskövetés", sub: "hétről hétre" },
+  { icon: lxPaths.house, title: "Otthon, bárhol", sub: "eszköz nélkül" },
 ];
 // Reference-format plan rows (name · sub · big price · unit). Heti is the
 // highlighted default — low-friction 490 Ft entry (deep-research: lead with the
@@ -862,12 +864,18 @@ function PlanStep({
           <p className="pw-sub">Egy előfizetés, minden funkció.</p>
         </div>
         <div className="pw-feats">
-          {PAYWALL_FEATURES.map((f) => (
-            <div className="pw-feat" key={f.title}>
-              <span className="pw-fic"><LxIcon d={f.icon} size={18} /></span>
-              <span className="pw-ftx"><b>{f.title}</b><span>{f.sub}</span></span>
-            </div>
-          ))}
+          <div className="pw-hero">
+            <span className="pw-fic"><LxIcon d={PAYWALL_FEATURES[0].icon} size={20} /></span>
+            <span className="pw-ftx"><b>{PAYWALL_FEATURES[0].title}</b><span>{PAYWALL_FEATURES[0].sub}</span></span>
+          </div>
+          <div className="pw-grid">
+            {PAYWALL_FEATURES.slice(1).map((f) => (
+              <div className="pw-tile" key={f.title}>
+                <span className="pw-fic"><LxIcon d={f.icon} size={17} /></span>
+                <span className="pw-ftx"><b>{f.title}</b><span>{f.sub}</span></span>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="pw-plans" role="radiogroup" aria-label="Csomag" ref={groupRef}>
           {PAYWALL_PLANS.map((p, i) => (

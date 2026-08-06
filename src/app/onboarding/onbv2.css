@@ -959,13 +959,19 @@
 .lx .pw-title:focus { outline: none; }
 .lx .pw-sub { font-size: 13.5px; color: var(--ink-2); letter-spacing: -0.01em; margin-top: 3px; max-width: 290px; }
 
-/* Feature rows — tinted icon box + title + sub. */
-.lx .pw-feats { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; padding: 0 4px; }
-.lx .pw-feat { display: flex; align-items: center; gap: 11px; text-align: left; }
-.lx .pw-fic { width: 32px; height: 32px; flex-shrink: 0; border-radius: 9px; background: var(--accent-soft); color: var(--accent-2); display: flex; align-items: center; justify-content: center; }
-.lx .pw-ftx { display: flex; flex-direction: column; }
-.lx .pw-ftx b { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); line-height: 1.25; }
-.lx .pw-ftx span { font-size: 12.5px; color: var(--ink-2); line-height: 1.25; margin-top: 1px; }
+/* Features — one emphasised hero row + a 2-column chip grid (apple-design:
+   hierarchy over a flat cramped list). Left-aligned. */
+.lx .pw-feats { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; text-align: left; }
+.lx .pw-hero { display: flex; align-items: center; gap: 13px; background: var(--accent-soft); border-radius: 14px; padding: 13px 15px; }
+.lx .pw-hero .pw-fic { width: 40px; height: 40px; border-radius: 11px; background: var(--accent-2); color: #fff; }
+.lx .pw-hero .pw-ftx b { font-size: 15.5px; }
+.lx .pw-hero .pw-ftx span { font-size: 12.5px; margin-top: 2px; white-space: normal; }
+.lx .pw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lx .pw-tile { display: flex; align-items: center; gap: 10px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; }
+.lx .pw-fic { width: 30px; height: 30px; flex-shrink: 0; border-radius: 8px; background: var(--accent-soft); color: var(--accent-2); display: grid; place-items: center; }
+.lx .pw-ftx { display: flex; flex-direction: column; min-width: 0; }
+.lx .pw-ftx b { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); line-height: 1.2; }
+.lx .pw-ftx span { font-size: 11.5px; color: var(--ink-2); line-height: 1.2; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Plan rows — selectable cards with radio + optional badge. */
 .lx .pw-plans { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
