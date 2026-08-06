@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Profil vázlat / skeleton</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="lexfit-icons.js"></script>
+<style>
+:root{
+--ink:#19211e;--ink2:#44544d;--ink3:#5c6e66;--line:#c9c9c9;--line2:#e2e2e2;
+--fill:#ececec;--fill2:#f5f5f5;--paper:#fbfbfa;
+--acc:#4a6c5e;--accent:#7a9b8d;--accbg:#e1f1ea;--accln:#bcd8cc;--warn:#b4652a;--warnbg:#fff3e6;--dgr:#8c3a2e;
+--mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"Inter Tight",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#efeeec;color:var(--ink);font-family:var(--sans);line-height:1.5}
+a{color:var(--acc)}a:hover{color:var(--ink)}
+.wrap{max-width:1480px;margin:0 auto;padding:0 36px 90px}
+.mono{font-family:var(--mono)}
+svg[data-lucide],.lucide{width:1em;height:1em;stroke-width:2;flex:none;vertical-align:-.14em}
+header.doc{padding:54px 0 26px;border-bottom:2px solid var(--ink)}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+header.doc h1{font-size:clamp(34px,4.6vw,56px);font-weight:800;letter-spacing:-.035em;line-height:1;margin:14px 0 0;max-width:20ch}
+header.doc p{max-width:76ch;color:var(--ink2);font-size:16px;margin:18px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.lg{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink2)}
+.lg b{color:var(--acc)}
+section{padding:60px 0 0}
+section>.head{display:flex;align-items:baseline;gap:18px;border-bottom:1px dashed var(--line);padding-bottom:14px;flex-wrap:wrap}
+.sn{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--acc);text-transform:uppercase;white-space:nowrap}
+section h2{font-size:26px;font-weight:700;letter-spacing:-.025em;margin:0}
+.lede{color:var(--ink2);font-size:15px;max-width:84ch;margin:14px 0 0}
+.layout{display:grid;grid-template-columns:1fr 272px;gap:30px;align-items:start;margin-top:26px}
+.notes{position:sticky;top:20px;display:flex;flex-direction:column;gap:13px}
+.note{background:#fff;border:1px solid var(--line2);border-left:3px solid var(--acc);border-radius:4px;padding:12px 14px}
+.note .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--acc)}
+.note p{margin:6px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.45}
+.note p b{color:var(--ink);font-weight:600}
+.note.warn{border-left-color:var(--warn)}.note.warn .t{color:var(--warn)}
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);display:inline-flex;align-items:center;gap:5px}
+.lbl svg{width:12px;height:12px;stroke:currentColor}
+
+/* Az Ív — the LEXFIT mark. Accent tile, white glyph (a logo is a graphic; the
+   ink-on-accent text rule does not apply to it). */
+.lexmark{width:22px;height:22px;border-radius:6px;background:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 3px 8px -4px rgba(24,32,29,.45)}
+.lexmark svg{width:13px;height:12px;display:block}
+.lexmark.lg{width:32px;height:32px;border-radius:9px}
+.lexmark.lg svg{width:18px;height:16px}
+.lexmark.xl{width:44px;height:44px;border-radius:12px}
+.lexmark.xl svg{width:24px;height:22px}
+.art{position:absolute;inset:0;background:repeating-linear-gradient(135deg,#e6e6e6 0 12px,#efefef 12px 24px)}
+.frame{background:#fff;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden;box-shadow:6px 6px 0 rgba(0,0,0,.06);position:relative}
+.app{display:grid;grid-template-columns:200px 1fr}
+.topbar{grid-column:1/-1;height:58px;border-bottom:1.5px solid var(--ink);display:grid;grid-template-columns:200px 1fr auto;align-items:center;background:var(--fill2)}
+.tb-logo{padding:0 18px;font-weight:800;letter-spacing:-.02em;font-size:15px;border-right:1px dashed var(--line);height:100%;display:flex;align-items:center}
+.tb-mid{padding:0 20px;display:flex;align-items:center}
+.tb-search{flex:1;max-width:420px;height:34px;border:1px solid var(--line);border-radius:999px;background:#fff;display:flex;align-items:center;gap:9px;padding:0 14px;color:var(--ink3);font-size:11px}
+.tb-search svg{width:14px;height:14px;stroke:var(--ink3)}
+.tb-right{display:flex;align-items:center;gap:12px;padding:0 18px;position:relative}
+.streak{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 11px;border-radius:999px;border:1px dashed var(--line);font-family:var(--mono);font-size:10px;color:var(--ink2);background:#fff}
+.streak svg{width:12px;height:12px;stroke:var(--warn)}
+.circ{width:32px;height:32px;border-radius:50%;background:var(--fill);border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.circ svg{width:16px;height:16px;stroke:var(--ink3)}
+.circ.on{border:2px solid var(--acc)}
+.rail{border-right:1.5px solid var(--ink);padding:14px 11px;display:flex;flex-direction:column;gap:5px;background:var(--fill2)}
+.rail .sec{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:6px 8px 3px}
+.nav{display:flex;align-items:center;gap:10px;padding:10px 9px;border-radius:6px}
+.nav .ic{width:20px;height:20px;border-radius:5px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.nav .ic svg{width:16px;height:16px;stroke:var(--ink2)}
+.nav .tx{font-size:13px;font-weight:500;color:var(--ink2)}
+.nav.on{background:var(--accbg)}.nav.on .tx{color:var(--acc);font-weight:700}
+.nav.on .ic{background:var(--acc);border-style:solid;border-color:var(--acc)}
+.nav.on .ic svg{stroke:#fff}
+.main{padding:22px 26px 32px;display:flex;flex-direction:column;gap:20px;background:var(--paper);min-width:0}
+.amenu{position:absolute;top:52px;right:14px;width:250px;background:#fff;border:1.5px solid var(--ink);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.16);z-index:9;overflow:hidden}
+.amhead{display:flex;gap:11px;align-items:center;padding:14px;border-bottom:1px solid var(--line2)}
+.amhead .nm{font-size:13.5px;font-weight:700}
+.amhead .sb{font-size:11px;color:var(--ink2)}
+.mrow{display:flex;align-items:center;gap:11px;padding:11px 14px;font-size:12.5px;color:var(--ink2);min-height:44px;border-bottom:1px solid var(--line2)}
+.mrow svg{width:16px;height:16px;stroke:var(--ink2)}
+.mrow:last-child{border-bottom:none}
+.mrow.dgr{color:var(--dgr)}.mrow.dgr svg{stroke:var(--dgr)}
+.idcard{display:flex;gap:20px;align-items:center;border:1px dashed var(--line);border-radius:10px;background:#fff;padding:20px 22px}
+.bigav{width:76px;height:76px;border-radius:50%;background:var(--fill);border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.bigav svg{width:32px;height:32px;stroke:var(--ink3)}
+.bigav .edit{position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.bigav .edit svg{width:12px;height:12px;stroke:var(--ink2)}
+.idcard h1{font-size:24px;font-weight:800;letter-spacing:-.03em;margin:0}
+.idcard .meta{font-size:12.5px;color:var(--ink2);margin-top:4px}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{border:1px dashed var(--line);border-radius:10px;background:#fff;padding:15px 17px}
+.stat .n{font-size:25px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.stat .k{font-size:11px;color:var(--ink3);margin-top:5px}
+.card{border:1px dashed var(--line);border-radius:10px;background:#fff;padding:17px 19px;display:flex;flex-direction:column;gap:12px}
+.card .ttl{font-size:14.5px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.card .ttl svg{width:16px;height:16px;stroke:var(--acc)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{text-align:center}
+.day .d{font-family:var(--mono);font-size:9px;color:var(--ink3)}
+.day .dot{height:26px;border-radius:5px;background:var(--fill);border:1px dashed var(--line);margin-top:4px;display:flex;align-items:center;justify-content:center}
+.day .dot svg{width:12px;height:12px;stroke:#fff}
+.day.done .dot{background:var(--acc);border-color:var(--acc)}
+.day.today .dot{border:2px solid var(--ink);background:#fff}
+.day.rest .dot svg{stroke:var(--ink3)}
+.btn{height:40px;padding:0 18px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:700}
+.btn.pri{background:var(--ink);color:#fff}
+.btn.sec{background:#fff;border:1px solid var(--line);color:var(--ink2);font-weight:600}
+.btn svg{width:15px;height:15px;stroke:currentColor}
+.setlayout{display:grid;grid-template-columns:196px 1fr;gap:22px;align-items:start}
+.subnav{display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--line2);padding-right:14px}
+.subnav .s{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:7px;font-size:12.5px;color:var(--ink2);min-height:44px}
+.subnav .s svg{width:16px;height:16px;stroke:var(--ink2)}
+.subnav .s.on{background:var(--accbg);color:var(--acc);font-weight:700}
+.subnav .s.on svg{stroke:var(--acc)}
+.group{display:flex;flex-direction:column;gap:0;border:1px dashed var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.glbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin:18px 0 8px}
+.row{display:flex;align-items:center;gap:13px;padding:13px 17px;border-bottom:1px solid var(--line2);min-height:52px}
+.row:last-child{border-bottom:none}
+.row .ri{width:20px;display:flex;justify-content:center;flex:none}
+.row .ri svg{width:17px;height:17px;stroke:var(--ink2)}
+.row .rl{flex:1;min-width:0}
+.row .rt{font-size:13px;font-weight:600}
+.row .rd{font-size:11.5px;color:var(--ink3);margin-top:2px}
+.row .rv{font-size:12px;color:var(--ink2)}
+.row .ch svg{width:16px;height:16px;stroke:var(--ink3)}
+.row.dgr .rt{color:var(--dgr)}.row.dgr .ri svg{stroke:var(--dgr)}
+.tog{width:44px;height:26px;border-radius:999px;background:var(--fill);border:1px solid var(--line);position:relative;flex:none}
+.tog i{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid var(--line)}
+.tog.on{background:var(--acc);border-color:var(--acc)}
+.tog.on i{left:auto;right:2px;border-color:var(--acc)}
+.pill{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:#fff;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;color:var(--ink2);white-space:nowrap}
+.pill.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.plan{border:1.5px solid var(--acc);border-radius:10px;background:var(--accbg);padding:17px 19px;display:flex;flex-direction:column;gap:9px}
+.plan .p1{font-size:16px;font-weight:800;letter-spacing:-.02em;color:var(--acc)}
+.plan .p2{font-size:12.5px;color:var(--acc)}
+.phone{width:320px;height:610px;border:1.5px solid var(--ink);border-radius:24px;background:#fff;overflow:hidden;box-shadow:6px 6px 0 rgba(0,0,0,.06);display:flex;flex-direction:column;position:relative}
+.status{height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;font-family:var(--mono);font-size:8px;color:var(--ink3);border-bottom:1px solid var(--line2)}
+.mtop{height:48px;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--fill2);border-bottom:1px solid var(--line)}
+.mtop .brand{font-weight:800;font-size:13.5px;letter-spacing:-.02em}
+.msearch{height:31px;border:1px solid var(--line);border-radius:999px;background:#fff;display:flex;align-items:center;gap:7px;padding:0 11px;color:var(--ink3);font-size:10px;flex:1}
+.msearch svg{width:12px;height:12px;stroke:var(--ink3)}
+.mbody{padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--paper);flex:1;min-height:0;overflow:hidden;position:relative}
+.mbody>*{flex:none}
+.mtabs{height:60px;border-top:1.5px solid var(--ink);display:grid;grid-template-columns:repeat(4,1fr);background:var(--fill2)}
+.mtab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--mono);font-size:8px;color:var(--ink3);text-transform:uppercase}
+.mtab .ic{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.mtab .ic svg{width:18px;height:18px;stroke:var(--ink3)}
+.mtab.on{color:var(--acc);font-weight:600}
+.mtab.on .ic{background:var(--acc)}.mtab.on .ic svg{stroke:#fff}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1.5px solid var(--ink);border-radius:16px 16px 0 0;padding:10px 13px 15px;display:flex;flex-direction:column;gap:8px;box-shadow:0 -8px 24px rgba(0,0,0,.1);z-index:5}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 3px}
+.scrim{position:absolute;inset:0;background:rgba(20,20,20,.34);z-index:4}
+.screens{display:flex;gap:26px;flex-wrap:wrap}
+.scr{display:flex;flex-direction:column;gap:9px}
+.scrlbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
+.scrlbl b{color:var(--ink)}
+.rules{margin-top:28px;border-top:1px solid var(--ink)}
+.rules>div{display:grid;grid-template-columns:66px 1fr 1fr;gap:24px;padding:20px 0;border-bottom:1px solid var(--line2);align-items:start}
+.rules .num{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:.08em;padding-top:3px}
+.rules h3{font-size:16px;margin:0;font-weight:700;letter-spacing:-.01em}
+.rules p{margin:6px 0 0;font-size:14px;color:var(--ink2)}
+.rules .ev{font-size:13px;color:var(--ink2)}
+.rules .ev b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.dont{display:grid;grid-template-columns:1fr 1fr;gap:0 34px;margin-top:26px;border-top:1px solid var(--ink)}
+.dont>div{padding:15px 0;border-bottom:1px solid var(--line2);display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:13.5px;color:var(--ink2)}
+.dont .x{font-family:var(--mono);font-size:12px;color:var(--warn);font-weight:600}
+.dont b{color:var(--ink);font-weight:600}
+footer{margin-top:70px;padding-top:22px;border-top:2px solid var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+@media(max-width:1180px){.layout{grid-template-columns:1fr}.notes{position:static;flex-direction:row;flex-wrap:wrap}.note{flex:1 1 250px}.rules>div{grid-template-columns:1fr}.dont{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Dashboard skeleton · Profil &amp; beállítások</div>
+<h1>Where the user goes to feel in control.</h1>
+<p>Profile is the least-visited and most-trusted screen in a product: people arrive here when something needs changing, and they arrive slightly anxious. So it is the one place where <b>convention matters more than character</b> — the settings grammar of iOS, Facebook and Google, in plain Hungarian, with nothing hidden and nothing clever.</p>
+<div class="legend">
+<span class="lg"><b>Entry</b> · avatar top-right → menu</span>
+<span class="lg"><b>Settings</b> · grouped rows — iOS / Facebook grammar</span>
+<span class="lg"><b>Mobile</b> · sheet, not a fifth tab</span>
+<span class="lg"><b>Icons</b> · Lucide (ISC)</span>
+</div>
+</header>
+
+<section>
+<div class="head"><span class="sn">P1</span><h2>The entry point — avatar, top-right, opens a menu</h2></div>
+<p class="lede">The audit found LEXFIT's profile at the foot of the left sidebar. The circular avatar in the top-right corner is one of the most consistently reinforced positions on the web — Google, Facebook, Netflix, Spotify — and Jakob's Law applies most strongly to <em>position</em>, not styling. Clicking it opens a menu, not a page: the user stays where they were.</p>
+
+<div class="layout">
+<div class="frame">
+<div class="app">
+  <div class="topbar">
+    <div class="tb-logo" style="gap:9px"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>LEXFIT</div>
+    <div class="tb-mid"><div class="tb-search"><i data-lucide="search"></i> Keresés edzés, kategória, hossz…</div></div>
+    <div class="tb-right"><span class="streak"><i data-lucide="flame"></i>12 NAP</span><span class="circ on"><i data-lucide="user-round"></i></span></div>
+  </div>
+  <div class="rail">
+    <div class="sec">Menü</div>
+    <div class="nav on"><span class="ic"><i data-lucide="house"></i></span><span class="tx">Kezdőlap</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="layout-grid"></i></span><span class="tx">Videótár</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="chart-column"></i></span><span class="tx">Haladásom</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="trophy"></i></span><span class="tx">Kihívások</span></div>
+  </div>
+  <div class="main" style="min-height:350px">
+    <div style="border:1px dashed var(--line);border-radius:8px;background:var(--fill);flex:1;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-family:var(--mono);font-size:10px">A KEZDŐLAP A HELYÉN MARAD</div>
+  </div>
+</div>
+<div class="amenu">
+  <div class="amhead">
+    <span class="circ" style="width:38px;height:38px"><i data-lucide="user-round" style="width:19px;height:19px"></i></span>
+    <div><div class="nm">Réka</div><div class="sb">Foundation · 4. hét</div></div>
+  </div>
+  <div class="mrow"><i data-lucide="user-round"></i> Profil</div>
+  <div class="mrow"><i data-lucide="calendar-check"></i> Az edzésterved</div>
+  <div class="mrow"><i data-lucide="bell"></i> Emlékeztetők</div>
+  <div class="mrow"><i data-lucide="sliders-horizontal"></i> Beállítások</div>
+  <div class="mrow"><i data-lucide="message-circle"></i> Segítség</div>
+  <div class="mrow dgr"><i data-lucide="log-out"></i> Kijelentkezés</div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">F-04</div><p><b>Avatar moves from bottom-left to top-right.</b> The most engraved position on the web; the audit flagged the sidebar placement as a P2 identity issue.</p></div>
+<div class="note"><div class="t">A menu, not a navigation</div><p>Profile is not a fifth destination. Opening a menu over the current page means <b>the user never loses their place</b> — and the four tabs stay four.</p></div>
+<div class="note"><div class="t">Six items, plain words</div><p>Icon plus a permanently visible Hungarian label on every row. NN/g: labels are particularly critical wherever an icon has to carry meaning.</p></div>
+<div class="note"><div class="t">Kijelentkezés last, and coloured</div><p>Destructive or session-ending actions sit at the bottom, visually separated. Universal convention — and it prevents mis-taps.</p></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="head"><span class="sn">P2</span><h2>Profil — who I am and how I'm doing</h2></div>
+<p class="lede">Not a settings page. This is the mirror: identity, the streak, the programme, the numbers. Everything editable lives one click away in Beállítások, so this screen can stay calm and readable — the layered-complexity principle from fitness-platform practice: beginner-friendly surface, depth on demand.</p>
+
+<div class="layout">
+<div class="frame">
+<div class="app">
+  <div class="topbar">
+    <div class="tb-logo" style="gap:9px"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>LEXFIT</div>
+    <div class="tb-mid"><div class="tb-search"><i data-lucide="search"></i> Keresés…</div></div>
+    <div class="tb-right"><span class="streak"><i data-lucide="flame"></i>12 NAP</span><span class="circ on"><i data-lucide="user-round"></i></span></div>
+  </div>
+  <div class="rail">
+    <div class="sec">Menü</div>
+    <div class="nav"><span class="ic"><i data-lucide="house"></i></span><span class="tx">Kezdőlap</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="layout-grid"></i></span><span class="tx">Videótár</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="chart-column"></i></span><span class="tx">Haladásom</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="trophy"></i></span><span class="tx">Kihívások</span></div>
+  </div>
+  <div class="main">
+    <div class="idcard">
+      <div class="bigav"><i data-lucide="user-round"></i><span class="edit"><i data-lucide="pencil"></i></span></div>
+      <div style="flex:1">
+        <h1>Réka</h1>
+        <div class="meta">Foundation · 4. hét · tag 2025 márciusa óta</div>
+      </div>
+      <span class="streak" style="height:36px;border-style:solid;border-color:var(--acc);color:var(--acc);font-size:11.5px"><i data-lucide="flame"></i>12 NAPOS SOROZAT</span>
+      <span class="btn sec"><i data-lucide="sliders-horizontal"></i> Beállítások</span>
+    </div>
+
+    <div class="stat3">
+      <div class="stat"><div class="n">21</div><div class="k">elvégzett edzés</div></div>
+      <div class="stat"><div class="n">412</div><div class="k">perc mozgás</div></div>
+      <div class="stat"><div class="n">12</div><div class="k">napos sorozat</div></div>
+    </div>
+
+    <div class="card">
+      <div class="ttl"><i data-lucide="calendar-check"></i> Az edzésterved</div>
+      <div class="week">
+        <div class="day done"><div class="d">H</div><div class="dot"><i data-lucide="check"></i></div></div>
+        <div class="day done"><div class="d">K</div><div class="dot"><i data-lucide="check"></i></div></div>
+        <div class="day rest"><div class="d">SZE</div><div class="dot"><i data-lucide="moon"></i></div></div>
+        <div class="day today"><div class="d">CS</div><div class="dot"></div></div>
+        <div class="day"><div class="d">P</div><div class="dot"></div></div>
+        <div class="day"><div class="d">SZO</div><div class="dot"></div></div>
+        <div class="day"><div class="d">V</div><div class="dot"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px">
+        <div style="font-size:12.5px;color:var(--ink2)">Heti 5 edzés · hétfő, kedd, csütörtök, péntek, vasárnap</div>
+        <span class="btn sec">Terv módosítása</span>
+      </div>
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <div class="ttl"><i data-lucide="message-circle"></i> Miért kezdted</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.5;font-style:italic">„Hogy a lépcsőn ne fulladjak ki, és bírjam a gyerekekkel."</div>
+        <div class="lbl">Az onboardingból · 2025. március</div>
+      </div>
+      <div class="card">
+        <div class="ttl"><i data-lucide="chart-column"></i> Következő mérföldkő</div>
+        <div style="font-size:13px;color:var(--ink2)">8. hét — visszamérés. Ugyanaz az edzés, mint az 1. héten.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between"><span class="lbl">4 hét múlva</span><span class="lbl">Haladásom <i data-lucide="chevron-right"></i></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Numbers, not charts</div><p>Three big tabular figures. The detailed view lives in Haladásom — <b>duplicating it here would create two answers to the same question.</b></p></div>
+<div class="note"><div class="t">"Miért kezdted"</div><p>The user's own sentence from onboarding, shown back to them. No reference app has this; it is the one place on the page where LEXFIT gets to be itself.</p></div>
+<div class="note"><div class="t">Streak beside the name</div><p>Identity and habit in the same row — the Duolingo model, where the streak is part of who you are rather than a statistic.</p></div>
+<div class="note warn"><div class="t">No vanity metrics</div><p>No calories, no badge wall, no ranking. Nothing that invites comparison with other people on a page about oneself.</p></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="head"><span class="sn">P3</span><h2>Beállítások — grouped rows, nothing hidden</h2></div>
+<p class="lede">The settings grammar everyone already knows: a labelled group, rows of icon + label, a value or a toggle on the right, a chevron when the row leads somewhere. Desktop gets a secondary sub-nav on the left — the Google / Facebook account pattern — so the page never becomes a single endless scroll.</p>
+
+<div class="layout">
+<div class="frame">
+<div class="app">
+  <div class="topbar">
+    <div class="tb-logo" style="gap:9px"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>LEXFIT</div>
+    <div class="tb-mid"><div class="tb-search"><i data-lucide="search"></i> Keresés…</div></div>
+    <div class="tb-right"><span class="streak"><i data-lucide="flame"></i>12 NAP</span><span class="circ on"><i data-lucide="user-round"></i></span></div>
+  </div>
+  <div class="rail">
+    <div class="sec">Menü</div>
+    <div class="nav"><span class="ic"><i data-lucide="house"></i></span><span class="tx">Kezdőlap</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="layout-grid"></i></span><span class="tx">Videótár</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="chart-column"></i></span><span class="tx">Haladásom</span></div>
+    <div class="nav"><span class="ic"><i data-lucide="trophy"></i></span><span class="tx">Kihívások</span></div>
+  </div>
+  <div class="main">
+    <div class="lbl"><i data-lucide="chevron-left"></i> Profil</div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:-.025em">Beállítások</div>
+    <div class="setlayout">
+      <div class="subnav">
+        <div class="s on"><i data-lucide="user-round"></i> Fiók</div>
+        <div class="s"><i data-lucide="bell"></i> Emlékeztetők</div>
+        <div class="s"><i data-lucide="users"></i> Adatvédelem</div>
+        <div class="s"><i data-lucide="calendar-check"></i> Előfizetés</div>
+        <div class="s"><i data-lucide="sliders-horizontal"></i> Lejátszás</div>
+        <div class="s"><i data-lucide="message-circle"></i> Súgó</div>
+      </div>
+      <div>
+        <div class="glbl" style="margin-top:0">Személyes adatok</div>
+        <div class="group">
+          <div class="row"><span class="ri"><i data-lucide="user-round"></i></span><span class="rl"><div class="rt">Név</div></span><span class="rv">Réka</span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+          <div class="row"><span class="ri"><i data-lucide="message-circle"></i></span><span class="rl"><div class="rt">E-mail</div></span><span class="rv">reka@…hu</span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+          <div class="row"><span class="ri"><i data-lucide="user-round"></i></span><span class="rl"><div class="rt">Profilkép</div></span><span class="rv">Nincs</span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+          <div class="row"><span class="ri"><i data-lucide="sliders-horizontal"></i></span><span class="rl"><div class="rt">Jelszó</div><div class="rd">Utoljára módosítva: 4 hónapja</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+        </div>
+
+        <div class="glbl">Az edzésterved</div>
+        <div class="group">
+          <div class="row"><span class="ri"><i data-lucide="calendar-check"></i></span><span class="rl"><div class="rt">Heti edzésnapok</div><div class="rd">Ez határozza meg, mi kerül a kezdőlapra</div></span><span class="rv">5 nap</span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+          <div class="row"><span class="ri"><i data-lucide="clock"></i></span><span class="rl"><div class="rt">Szokásos edzéshossz</div></span><span class="rv">20–30 perc</span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+          <div class="row"><span class="ri"><i data-lucide="dumbbell"></i></span><span class="rl"><div class="rt">Van otthon eszközöd?</div><div class="rd">Szőnyeg · súlyzó nélkül</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+          <div class="row"><span class="ri"><i data-lucide="moon"></i></span><span class="rl"><div class="rt">A pihenőnap megtartja a sorozatot</div><div class="rd">A tervezett pihenőnap nem töri meg a lángot</div></span><span class="tog on"><i></i></span></div>
+        </div>
+
+        <div class="glbl">Fiók</div>
+        <div class="group">
+          <div class="row"><span class="ri"><i data-lucide="log-out"></i></span><span class="rl"><div class="rt">Kijelentkezés</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+          <div class="row dgr"><span class="ri"><i data-lucide="trash-2"></i></span><span class="rl"><div class="rt">Fiók törlése</div><div class="rd">Végleges. Az adataid 30 napon belül törlődnek.</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">The iOS Settings grammar</div><p>Group label in small caps, rows with icon + label, current value on the right, chevron when it opens something. <b>Every phone in Hungary ships with this pattern.</b></p></div>
+<div class="note"><div class="t">Toggles on the right, always</div><p>Left-aligned label, right-aligned control. Mixed alignment is where settings pages start feeling unfamiliar.</p></div>
+<div class="note"><div class="t">Say what a setting does</div><p>"Ez határozza meg, mi kerül a kezdőlapra". NN/g heuristic 2 — speak the user's language and never assume a label carries its consequence.</p></div>
+<div class="note"><div class="t">Rest day toggle</div><p>The forgiveness mechanic made explicit and user-controlled. Freeze-equipped streaks reportedly run ~48% longer past day seven.</p></div>
+<div class="note warn"><div class="t">Deletion is findable</div><p><b>Account deletion is present, plainly worded, with its consequence stated.</b> Burying it is a documented dark pattern — and now illegal in some jurisdictions.</p></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="head"><span class="sn">P4</span><h2>Emlékeztetők, Adatvédelem, Előfizetés</h2></div>
+<p class="lede">Three panels that carry disproportionate weight: the habit lever, the trust contract, and the money. Each is drawn in the same grouped-row grammar so nothing feels like a different product.</p>
+
+<div class="layout">
+<div style="display:flex;flex-direction:column;gap:22px">
+
+<div class="frame" style="padding:22px">
+<div class="setlayout">
+  <div class="subnav">
+    <div class="s"><i data-lucide="user-round"></i> Fiók</div>
+    <div class="s on"><i data-lucide="bell"></i> Emlékeztetők</div>
+    <div class="s"><i data-lucide="users"></i> Adatvédelem</div>
+    <div class="s"><i data-lucide="calendar-check"></i> Előfizetés</div>
+  </div>
+  <div>
+    <div class="glbl" style="margin-top:0">Napi emlékeztető</div>
+    <div class="group">
+      <div class="row"><span class="ri"><i data-lucide="bell"></i></span><span class="rl"><div class="rt">Emlékeztess az edzésre</div><div class="rd">Csak az edzésnapjaidon, egyszer</div></span><span class="tog on"><i></i></span></div>
+      <div class="row"><span class="ri"><i data-lucide="clock"></i></span><span class="rl"><div class="rt">Időpont</div></span><span class="rv">07:15</span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+      <div class="row" style="flex-wrap:wrap;gap:8px"><span class="ri"><i data-lucide="calendar-check"></i></span><span class="rl"><div class="rt">Mely napokon</div></span>
+        <div style="display:flex;gap:5px"><span class="pill on">H</span><span class="pill on">K</span><span class="pill">SZE</span><span class="pill on">CS</span><span class="pill on">P</span><span class="pill">SZO</span><span class="pill on">V</span></div>
+      </div>
+    </div>
+    <div class="glbl">Egyéb értesítések</div>
+    <div class="group">
+      <div class="row"><span class="ri"><i data-lucide="flame"></i></span><span class="rl"><div class="rt">Sorozat veszélyben</div><div class="rd">Este 8-kor, ha aznap még nem mozogtál</div></span><span class="tog on"><i></i></span></div>
+      <div class="row"><span class="ri"><i data-lucide="users"></i></span><span class="rl"><div class="rt">Közösségi válaszok</div></span><span class="tog"><i></i></span></div>
+      <div class="row"><span class="ri"><i data-lucide="layout-grid"></i></span><span class="rl"><div class="rt">Új edzések a tárban</div><div class="rd">Legfeljebb hetente egyszer</div></span><span class="tog"><i></i></span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="two">
+<div class="frame" style="padding:20px">
+  <div class="glbl" style="margin-top:0">Adatvédelem</div>
+  <div class="group">
+    <div class="row"><span class="ri"><i data-lucide="users"></i></span><span class="rl"><div class="rt">A nevem látszik a közösségben</div><div class="rd">Kikapcsolva „R." néven jelensz meg</div></span><span class="tog on"><i></i></span></div>
+    <div class="row"><span class="ri"><i data-lucide="flame"></i></span><span class="rl"><div class="rt">A sorozatom látszik másoknak</div></span><span class="tog"><i></i></span></div>
+    <div class="row"><span class="ri"><i data-lucide="user-round"></i></span><span class="rl"><div class="rt">Haladásfotók</div><div class="rd">Csak te látod. Sosem kerülnek a közösségbe.</div></span><span class="rv">Privát</span></div>
+    <div class="row"><span class="ri"><i data-lucide="chart-column"></i></span><span class="rl"><div class="rt">Adataim letöltése</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+  </div>
+</div>
+
+<div class="frame" style="padding:20px">
+  <div class="glbl" style="margin-top:0">Előfizetés</div>
+  <div class="plan">
+    <div class="p1">LEXFIT — éves</div>
+    <div class="p2">Aktív · megújul 2026. március 4-én · 24 900 Ft / év</div>
+    <div style="display:flex;gap:9px;margin-top:3px"><span class="btn sec">Számlázás</span><span class="btn sec">Csomag váltása</span></div>
+  </div>
+  <div class="group" style="margin-top:14px">
+    <div class="row"><span class="ri"><i data-lucide="calendar-check"></i></span><span class="rl"><div class="rt">Fizetési előzmények</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+    <div class="row"><span class="ri"><i data-lucide="x"></i></span><span class="rl"><div class="rt">Előfizetés lemondása</div><div class="rd">A hozzáférésed a fizetett időszak végéig megmarad</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">One daily reminder, on your days</div><p>Duolingo's playbook without the pressure: a single trigger tied to the plan the user already set. <b>Not a stream of notifications.</b></p></div>
+<div class="note"><div class="t">"Sorozat veszélyben"</div><p>The one extra notification that earns its place — it protects something the user has already invested in, rather than advertising something new.</p></div>
+<div class="note"><div class="t">Privacy states the consequence</div><p>Each toggle says what happens when it is off. Fitness apps carry real privacy anxiety; <b>vague permission language is what breaks trust.</b></p></div>
+<div class="note"><div class="t">Progress photos are not a toggle</div><p>They are stated as private, permanently. A setting implies it could be otherwise — this one cannot.</p></div>
+<div class="note warn"><div class="t">Cancellation in plain sight</div><p>Renewal date, price and a cancel row that says what happens after. The existing sales-page audit already flagged price clarity as a P1.</p></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="head"><span class="sn">P5</span><h2>Mobile — sheet, profile, settings, reminder</h2></div>
+<p class="lede">Four tabs is the sweet spot, so profile stays off the tab bar. The avatar in the top bar opens a sheet in the thumb zone; from there it is full screens with a back chevron, exactly like the phone's own Settings app.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>P-01</b> · Avatar sheet</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch"><i data-lucide="search"></i> Keresés…</div><span class="circ on" style="width:28px;height:28px"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div style="border:1px dashed var(--line);border-radius:8px;background:var(--fill);height:130px;opacity:.5"></div>
+  <div class="scrim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div style="display:flex;gap:11px;align-items:center;padding-bottom:9px;border-bottom:1px solid var(--line2)">
+      <span class="circ" style="width:42px;height:42px"><i data-lucide="user-round" style="width:21px;height:21px"></i></span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700">Réka</div><div style="font-size:11px;color:var(--ink2)">Foundation · 4. hét</div></div>
+      <span class="streak"><i data-lucide="flame"></i>12</span>
+    </div>
+    <div class="mrow"><i data-lucide="user-round"></i> Profil</div>
+    <div class="mrow"><i data-lucide="calendar-check"></i> Az edzésterved</div>
+    <div class="mrow"><i data-lucide="bell"></i> Emlékeztetők</div>
+    <div class="mrow"><i data-lucide="sliders-horizontal"></i> Beállítások</div>
+    <div class="mrow"><i data-lucide="message-circle"></i> Segítség</div>
+    <div class="mrow dgr"><i data-lucide="log-out"></i> Kijelentkezés</div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>P-02</b> · Profil</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><span class="brand">Profil</span><div style="flex:1"></div><span class="circ" style="width:28px;height:28px"><i data-lucide="sliders-horizontal"></i></span></div>
+<div class="mbody">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0">
+    <div class="bigav" style="width:64px;height:64px"><i data-lucide="user-round" style="width:27px;height:27px"></i><span class="edit"><i data-lucide="pencil"></i></span></div>
+    <div style="font-size:18px;font-weight:800;letter-spacing:-.025em">Réka</div>
+    <div style="font-size:11px;color:var(--ink2)">Foundation · 4. hét · tag 2025 óta</div>
+    <span class="streak" style="border-style:solid;border-color:var(--acc);color:var(--acc)"><i data-lucide="flame"></i>12 NAPOS SOROZAT</span>
+  </div>
+  <div class="stat3" style="gap:8px">
+    <div class="stat" style="padding:11px;text-align:center"><div class="n" style="font-size:19px">21</div><div class="k" style="font-size:9px">edzés</div></div>
+    <div class="stat" style="padding:11px;text-align:center"><div class="n" style="font-size:19px">412</div><div class="k" style="font-size:9px">perc</div></div>
+    <div class="stat" style="padding:11px;text-align:center"><div class="n" style="font-size:19px">12</div><div class="k" style="font-size:9px">nap</div></div>
+  </div>
+  <div class="card" style="padding:13px;gap:9px">
+    <div class="ttl" style="font-size:12.5px"><i data-lucide="calendar-check"></i> Az edzésterved</div>
+    <div class="week" style="gap:4px">
+      <div class="day done"><div class="d">H</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day done"><div class="d">K</div><div class="dot" style="height:22px"><i data-lucide="check"></i></div></div>
+      <div class="day rest"><div class="d">SZE</div><div class="dot" style="height:22px"><i data-lucide="moon"></i></div></div>
+      <div class="day today"><div class="d">CS</div><div class="dot" style="height:22px"></div></div>
+      <div class="day"><div class="d">P</div><div class="dot" style="height:22px"></div></div>
+      <div class="day"><div class="d">SZO</div><div class="dot" style="height:22px"></div></div>
+      <div class="day"><div class="d">V</div><div class="dot" style="height:22px"></div></div>
+    </div>
+  </div>
+  <div class="card" style="padding:13px;gap:7px">
+    <div class="ttl" style="font-size:12.5px"><i data-lucide="message-circle"></i> Miért kezdted</div>
+    <div style="font-size:11.5px;color:var(--ink2);font-style:italic;line-height:1.45">„Hogy a lépcsőn ne fulladjak ki, és bírjam a gyerekekkel."</div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>P-03</b> · Beállítások</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><span class="brand">Beállítások</span></div>
+<div class="mbody" style="gap:0">
+  <div class="glbl" style="margin-top:2px">Személyes adatok</div>
+  <div class="group">
+    <div class="row" style="padding:11px 13px;min-height:48px"><span class="ri"><i data-lucide="user-round"></i></span><span class="rl"><div class="rt" style="font-size:12px">Név</div></span><span class="rv" style="font-size:11px">Réka</span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+    <div class="row" style="padding:11px 13px;min-height:48px"><span class="ri"><i data-lucide="message-circle"></i></span><span class="rl"><div class="rt" style="font-size:12px">E-mail</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+    <div class="row" style="padding:11px 13px;min-height:48px"><span class="ri"><i data-lucide="sliders-horizontal"></i></span><span class="rl"><div class="rt" style="font-size:12px">Jelszó</div></span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+  </div>
+  <div class="glbl">Emlékeztetők</div>
+  <div class="group">
+    <div class="row" style="padding:11px 13px;min-height:48px"><span class="ri"><i data-lucide="bell"></i></span><span class="rl"><div class="rt" style="font-size:12px">Napi emlékeztető</div><div class="rd" style="font-size:10px">07:15 · edzésnapokon</div></span><span class="tog on"><i></i></span></div>
+    <div class="row" style="padding:11px 13px;min-height:48px"><span class="ri"><i data-lucide="flame"></i></span><span class="rl"><div class="rt" style="font-size:12px">Sorozat veszélyben</div></span><span class="tog on"><i></i></span></div>
+  </div>
+  <div class="glbl">Fiók</div>
+  <div class="group">
+    <div class="row" style="padding:11px 13px;min-height:48px"><span class="ri"><i data-lucide="calendar-check"></i></span><span class="rl"><div class="rt" style="font-size:12px">Előfizetés</div></span><span class="rv" style="font-size:11px">Éves</span><span class="ch"><i data-lucide="chevron-right"></i></span></div>
+    <div class="row" style="padding:11px 13px;min-height:48px"><span class="ri"><i data-lucide="log-out"></i></span><span class="rl"><div class="rt" style="font-size:12px">Kijelentkezés</div></span></div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>P-04</b> · Emlékeztető beállítása</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="circ" style="width:28px;height:28px"><i data-lucide="chevron-left"></i></span><span class="brand">Emlékeztetők</span></div>
+<div class="mbody">
+  <div class="card" style="padding:14px;gap:11px">
+    <div style="display:flex;align-items:center;gap:11px"><i data-lucide="bell" style="width:17px;height:17px;stroke:var(--acc)"></i><div style="flex:1"><div style="font-size:12.5px;font-weight:700">Emlékeztess az edzésre</div><div style="font-size:10.5px;color:var(--ink3)">Csak az edzésnapjaidon, egyszer</div></div><span class="tog on"><i></i></span></div>
+  </div>
+  <div class="card" style="padding:14px;gap:10px">
+    <div class="lbl">Időpont</div>
+    <div style="font-size:34px;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;text-align:center;padding:6px 0">07:15</div>
+    <div style="display:flex;gap:6px;justify-content:center"><span class="pill">06:30</span><span class="pill on">07:15</span><span class="pill">18:00</span><span class="pill">20:00</span></div>
+  </div>
+  <div class="card" style="padding:14px;gap:10px">
+    <div class="lbl">Mely napokon</div>
+    <div style="display:flex;gap:5px;justify-content:space-between"><span class="pill on" style="padding:0 9px">H</span><span class="pill on" style="padding:0 9px">K</span><span class="pill" style="padding:0 8px">SZE</span><span class="pill on" style="padding:0 8px">CS</span><span class="pill on" style="padding:0 9px">P</span><span class="pill" style="padding:0 8px">SZO</span><span class="pill on" style="padding:0 9px">V</span></div>
+    <div style="font-size:10.5px;color:var(--ink3)">Megegyezik az edzésterveddel. Ha módosítod, a terv nem változik.</div>
+  </div>
+  <div class="btn pri" style="width:100%;height:44px">Mentés</div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Sheet first, screens after</div><p>The menu opens in the thumb zone; anything it leads to is a full screen with a back chevron top-left — the phone's own Settings behaviour.</p></div>
+<div class="note"><div class="t">Rows are 48px on mobile</div><p>Above the 44px floor even with two lines of text. Settings rows are where mis-taps are most expensive.</p></div>
+<div class="note"><div class="t">Time presets before a picker</div><p>Four suggested times cover most users in one tap; the full picker stays available. Typing and scroll wheels are expensive on a phone.</p></div>
+<div class="note"><div class="t">Tab bar stays visible</div><p>Even inside settings. The user can always leave without hunting for a way out — and the four destinations remain the map of the product.</p></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="head"><span class="sn">P6</span><h2>Profil rules</h2></div>
+<div class="rules">
+<div><div class="num">P-RULE 01</div><div><h3>Avatar top-right, opening a menu.</h3><p>Same position on desktop and mobile. Never a fifth tab, never a sidebar row.</p></div><div class="ev"><b>Evidence</b>Audit finding F-04; the most consistently reinforced position across Google, Facebook, Netflix, Spotify.</div></div>
+<div><div class="num">P-RULE 02</div><div><h3>Profil shows, Beállítások edits.</h3><p>One page to look at yourself, one to change things. Never mix the two.</p></div><div class="ev"><b>Evidence</b>Layered complexity — beginner-friendly surface, depth on demand.</div></div>
+<div><div class="num">P-RULE 03</div><div><h3>Grouped rows: label left, value or toggle right.</h3><p>Small-caps group heading, icon + label, chevron only when the row opens something.</p></div><div class="ev"><b>Evidence</b>The iOS Settings grammar — the pattern every phone in Hungary ships with.</div></div>
+<div><div class="num">P-RULE 04</div><div><h3>Every setting states its consequence.</h3><p>Not "Közösségi láthatóság" but "Kikapcsolva „R." néven jelensz meg".</p></div><div class="ev"><b>Evidence</b>NN/g heuristic 2 — speak the users' language; never assume a label carries its effect.</div></div>
+<div><div class="num">P-RULE 05</div><div><h3>Money and deletion are findable and plain.</h3><p>Renewal date, price, cancel row, delete account — all present, all worded honestly.</p></div><div class="ev"><b>Evidence</b>Dark-pattern avoidance; price clarity was already a P1 on the existing sales-page audit.</div></div>
+<div><div class="num">P-RULE 06</div><div><h3>One daily notification, tied to the user's own plan.</h3><p>Plus one streak-protection message. Nothing else is on by default.</p></div><div class="ev"><b>Evidence</b>Duolingo's habit loop paired with forgiveness; permission language must state why.</div></div>
+</div>
+
+<h3 style="margin-top:44px;font-size:19px;letter-spacing:-.02em">What we are deliberately not doing</h3>
+<div class="dont">
+<div><span class="x">✕</span><span><b>A badge wall or trophy cabinet.</b> Achievements that mean nothing outside the app dilute the one number that does: the streak.</span></div>
+<div><span class="x">✕</span><span><b>Public leaderboards on the profile.</b> A page about oneself should not invite comparison; solo experience first, social as an optional layer.</span></div>
+<div><span class="x">✕</span><span><b>Weight as a headline number.</b> Progress is measured against week 1, not against a scale — consistent with the programme's own framing.</span></div>
+<div><span class="x">✕</span><span><b>Hiding cancellation behind support chat.</b> A documented dark pattern, and a trust-destroying one for a subscription product.</span></div>
+<div><span class="x">✕</span><span><b>Notifications on by default beyond the daily reminder.</b> Every extra default is borrowed attention the product has not earned.</span></div>
+<div><span class="x">✕</span><span><b>A separate "account" area outside the app shell.</b> Settings live inside the same rail and tab bar as everything else.</span></div>
+</div>
+
+<div class="note warn" style="margin-top:26px"><div class="t">Still to settle with real users</div><p>Two questions: whether the profile should show the <b>"Miért kezdted"</b> sentence permanently or only around milestones — it may land as motivating or as nagging — and whether "Előfizetés" belongs directly in the avatar menu, since for many users it is the only reason they ever open this area.</p></div>
+</section>
+
+<footer>LEXFIT · Profil skeleton · Structure only — no visual design decisions made</footer>
+</div>
+<script>window.addEventListener("load",function(){window.lexfitIcons&&window.lexfitIcons()});</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 import "server-only";
 import { FieldValue } from "firebase-admin/firestore";
-import { mux } from "@/lib/mux";
+import { mux, passthroughTarget } from "@/lib/mux";
 import { adminDb } from "@/lib/firebase-admin";
 
 export const runtime = "nodejs";
@@ -23,14 +23,15 @@ export async function POST(req: Request) {
     return new Response(`bad signature: ${e instanceof Error ? e.message : ""}`, { status: 400 });
   }
 
-  const ref = (code: string) => adminDb.collection("videos").doc(code);
+  // The passthrough tells us which collection to write (videos/ or challengeVideos/).
+  const ref = (t: { collection: string; code: string }) => adminDb.collection(t.collection).doc(t.code);
 
   if (event.type === "video.asset.ready") {
     const asset = event.data;
-    const code = asset.passthrough;
+    const target = passthroughTarget(asset.passthrough);
     const playbackId = asset.playback_ids?.[0]?.id;
-    if (code && playbackId) {
-      await ref(code).set(
+    if (target && playbackId) {
+      await ref(target).set(
         {
           muxAssetId: asset.id,
           muxPlaybackId: playbackId,
@@ -43,9 +44,9 @@ export async function POST(req: Request) {
       );
     }
   } else if (event.type === "video.asset.errored") {
-    const code = event.data.passthrough;
-    if (code) {
-      await ref(code).set({ muxStatus: "error", updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    const target = passthroughTarget(event.data.passthrough);
+    if (target) {
+      await ref(target).set({ muxStatus: "error", updatedAt: FieldValue.serverTimestamp() }, { merge: true });
     }
   }
 

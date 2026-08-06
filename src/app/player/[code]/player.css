@@ -245,6 +245,9 @@
 .lx .pf-upnext .c { margin-left: auto; font-family: var(--mono); font-size: 11px; color: oklch(1 0 168 / 0.8); text-align: center; flex: none; }
 .lx .pf-upnext .c b { display: block; font-size: 19px; color: #fff; font-weight: 500; }
 .lx .pf-skip { background: none; border: none; color: oklch(1 0 168 / 0.7); font-size: 12px; margin-top: 10px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.lx .pf-share { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; height: 46px; padding: 0 22px; border-radius: 999px; border: none; background: #fff; color: #14100c; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; }
+.lx .pf-share svg { stroke: currentColor; }
+.lx .pf-share:hover { background: oklch(0.95 0 0); }
 
 /* keyboard help overlay (?) */
 .lx .pf-keys { position: absolute; inset: 0; z-index: 9; display: flex; align-items: center; justify-content: center; background: oklch(0.16 0 0 / 0.9); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }

@@ -241,31 +241,38 @@
   top: 44px;
   right: 0;
   z-index: 30;
-  min-width: 194px;
-  padding: 6px;
+  width: 250px;
   display: flex;
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--r-md);
+  overflow: hidden;
   box-shadow: 0 22px 54px -20px rgba(24, 32, 29, 0.36);
   animation: lxtbMenu 0.13s ease both;
 }
 @keyframes lxtbMenu { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-.lx .lxtb-menu button {
-  text-align: left;
-  padding: 10px 12px;
-  border: none;
-  background: none;
-  border-radius: 9px;
-  font-family: inherit;
-  font-size: 14px;
-  color: var(--ink);
-  cursor: pointer;
-}
-.lx .lxtb-menu button:hover { background: var(--surface-2); }
-.lx .lxtb-menu .danger { color: var(--accent-2); font-weight: 600; }
-.lx .lxtb-menu .sep { height: 1px; background: var(--line); margin: 5px 4px; }
+
+/* shared avatar-menu rows — desktop dropdown + mobile bottom sheet (30 §30.2) */
+.lx .lxam-head { display: flex; align-items: center; gap: 11px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.lx .lxam-ava { width: 38px; height: 38px; border-radius: 50%; flex: none; background: var(--accent-soft); color: var(--accent-ink); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; overflow: hidden; }
+.lx .lxam-ava img { width: 100%; height: 100%; object-fit: cover; }
+.lx .lxam-id { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+.lx .lxam-id .nm { font-size: 13.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lx .lxam-id .sb { font-size: 11px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lx .lxam-streak { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent-ink); flex: none; }
+.lx .lxam-streak svg { color: var(--accent-2); }
+
+.lx .lxam-item { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 44px; padding: 11px 14px; border: none; background: none; text-align: left; font-family: inherit; font-size: 12.5px; color: var(--ink); cursor: pointer; }
+.lx .lxam-item svg { color: var(--ink-3); flex: none; }
+.lx .lxam-item + .lxam-item { border-top: 1px solid var(--line); }
+.lx .lxam-item:hover { background: var(--surface-2); }
+.lx .lxam-item.danger { color: var(--danger); }
+.lx .lxam-item.danger svg { color: var(--danger); }
+
+/* mobile sheet: identity header + streak pill, rows a touch taller */
+.lx .lxam-sheet { display: flex; flex-direction: column; padding-bottom: 6px; }
+.lx .lxam-sheet .lxam-item { min-height: 48px; }
 
 /* ══════════════════ BODY + SIDEBAR ══════════════════ */
 .lx .lx-body { flex: 1; display: flex; align-items: flex-start; min-height: 0; }

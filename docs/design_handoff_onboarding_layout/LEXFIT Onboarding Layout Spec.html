@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Onboarding layout spec · desktop + mobil</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wireframe-kit.css">
+<link rel="stylesheet" href="onb-spec.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="lexfit-icons.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Onboarding · Layout &amp; sizing spec</div>
+<h1>The flow is right. The geometry is not.</h1>
+<p>The implemented onboarding uses the correct copy, the correct question order and the correct split-screen idea — but the shell has no fixed geometry, so every step lays itself out differently. The body column and the action bar sit on two different axes, content is top-aligned inside a full-height pane that leaves ~540px of dead space, and the type scale is roughly a third larger than drawn. This document is the missing half of <span class="mono">LEXFIT Onboarding Wireframe</span>: not what the screens say, but exactly how big everything is and where it sits — on desktop and on mobile.</p>
+<div class="legend">
+<span class="lg"><b>Normative</b> · the tables and the CSS contracts</span>
+<span class="lg"><b>Schematic</b> · the frames, ≈1:2 — labels are real px</span>
+<span class="lg"><b>Shell</b> · one split screen, steps 1–10</span>
+<span class="lg"><b>Axis</b> · 480px content column, one axis per pane</span>
+</div>
+</header>
+
+<!-- ═══ W1 ═══ -->
+<section>
+<div class="head"><span class="sn">W1</span><h2>What broke — measured against the wireframe</h2></div>
+<p class="lede">Eight defects, all of them geometry rather than content. Measurements are taken from the supplied build screenshots at a 2560×1440 viewport. Every one is fixed by a rule in W2–W5.</p>
+
+<div class="layout">
+<div>
+<table class="spec">
+<thead><tr><th style="width:4%">#</th><th style="width:26%">Defect</th><th style="width:24%">Measured in build</th><th style="width:22%">Spec</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td class="n">01</td><td><strong>Two alignment axes in the right pane</strong></td><td class="bad">body starts x≈1341, CTA starts x≈1615 — 274px apart</td><td class="good">one axis, both 480px wide</td><td>Header, body and action bar are children of a single <code>.pane__col</code>. Nothing sets its own width.</td></tr>
+<tr><td class="n">02</td><td><strong>Dead vertical space</strong></td><td class="bad">content ends y≈840, CTA at y≈1380 — 540px void</td><td class="good">max column height 760px, centred as one unit</td><td><code>max-height:760px;margin-block:auto</code> on the column — the pane grows, the column does not.</td></tr>
+<tr><td class="n">03</td><td><strong>Brand hero unanchored</strong></td><td class="bad">hero at y≈530–890, ~400px void above it</td><td class="good">three zones: mark top · hero centred · founder bottom</td><td><code>margin-block:auto</code> on the hero block only; founder is the last flex child.</td></tr>
+<tr><td class="n">04</td><td><strong>Panel seam and gutter</strong></td><td class="bad">panel ends x≈1293, content starts x≈1341 — 48px of unclaimed white</td><td class="good">panels meet at exactly 50%</td><td>Grid <code>1fr 1fr</code>, no margins between panes. Padding lives inside the pane.</td></tr>
+<tr><td class="n">05</td><td><strong>Step header detached</strong></td><td class="bad">stepbar ≈60px above the question, its own width</td><td class="good">32px below the header row, same axis</td><td>Header is row 1 of the column grid; gap is a token, not a margin.</td></tr>
+<tr><td class="n">06</td><td><strong>Type scale ≈130%</strong></td><td class="bad">brand h1 ≈64px · question h1 ≈40px</td><td class="good">48px · 30px</td><td>Fixed scale in W5. No <code>vw</code> units on the question column.</td></tr>
+<tr><td class="n">07</td><td><strong>Option rows over-wide</strong></td><td class="bad">≈600px wide, descriptions wrap to 3 lines</td><td class="good">480px, 2 lines maximum</td><td>Rows inherit the 480px axis; description clamped to 2 lines.</td></tr>
+<tr><td class="n">08</td><td><strong>No viewport lock</strong></td><td class="bad">shell height follows content; page scrolls</td><td class="good">100dvh, no page scroll</td><td><code>height:100dvh;overflow:hidden</code> on the shell; only the body row scrolls.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">One axis, not two</div><p>Defect 01 is the one that reads as "broken" at a glance. <b>A multi-step flow is judged on whether things stay still between steps</b> — two axes guarantee they do not.</p></div>
+<div class="note"><div class="t">Cap the column, not the pane</div><p>The pane must fill the viewport for the split to work. <b>The content column must not.</b> That single distinction removes defects 02 and 03.</p></div>
+<div class="note warn"><div class="t">The screenshots are a tall viewport</div><p>1440px tall exaggerates the voids — but they exist at 900px too, just smaller. <b>Do not treat this as a large-monitor-only bug.</b></p></div>
+<div class="note"><div class="t">Copy and order are correct</div><p>Nothing in this document changes a question, an option or the sequence. <b>The wireframe's flow survives unchanged.</b></p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ W2 ═══ -->
+<section>
+<div class="head"><span class="sn">W2</span><h2>Desktop shell — exact geometry</h2></div>
+<p class="lede">One shell for steps 1–10. Two panes, each exactly 50% of the viewport, each with its own internal content column and its own vertical rule. The left pane never changes between steps; the right pane's column swaps contents and nothing else moves.</p>
+
+<div class="layout">
+<div>
+
+<div class="fcap"><b>Desktop</b> · 1440 × 900 reference · drawn ≈1:2, labels are real px</div>
+<div class="frame dimwrap" style="width:720px;max-width:100%">
+  <div class="shell" style="height:450px">
+
+    <!-- LEFT: brand panel -->
+    <div class="bp" style="padding:22px 26px 20px">
+      <div class="bpin">
+        <div class="brow"><span class="lexmark lg"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><b>LEXFIT</b></div>
+        <div class="hero">
+          <div class="lbl" style="font-size:8px">Otthoni edzés</div>
+          <div class="h" style="margin-top:7px">Egyedül nehéz.<b>Együtt muszáj.</b></div>
+          <div class="l">Vezetett program otthonra, és egy közösség, ami megtart. Eszköz nélkül, napi 30 percben.</div>
+          <div class="st">
+            <div><div class="v">8 hét</div><div class="k">Foundation</div></div>
+            <div><div class="v">200+</div><div class="k">edzés</div></div>
+            <div><div class="v">17 000+</div><div class="k">a csoportban</div></div>
+          </div>
+        </div>
+        <div class="fnd"><span class="circ" style="width:26px;height:26px"><i data-lucide="user-round"></i></span><div><div class="n">Alexa</div><div class="r">Alapító · minden edzést ő vezet</div></div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: question pane -->
+    <div class="rp" style="padding:22px 0 20px">
+      <div class="rpin" style="width:calc(100% - 120px);max-width:240px;max-height:380px">
+        <div class="rhead"><span class="circ" style="width:24px;height:24px"><i data-lucide="chevron-left"></i></span><div class="sbar"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="lbl" style="font-size:8px">3 / 5</span></div>
+        <div class="rbody">
+          <div><div class="qh">Hány nap fér bele?</div><div class="qs">Ebből épül a heted. Bármikor változtathatod.</div></div>
+          <div class="seg" style="margin-top:4px"><span>3</span><span>4</span><span class="on">5</span><span>6</span></div>
+          <div class="week" style="gap:4px;margin-top:6px">
+            <div class="day done"><div class="d">H</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+            <div class="day done"><div class="d">K</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+            <div class="day rest"><div class="d">SZE</div><div class="dot" style="height:20px"><i data-lucide="moon"></i></div></div>
+            <div class="day done"><div class="d">CS</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+            <div class="day done"><div class="d">P</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+            <div class="day rest"><div class="d">SZO</div><div class="dot" style="height:20px"><i data-lucide="moon"></i></div></div>
+            <div class="day done"><div class="d">V</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+          </div>
+        </div>
+        <div class="rfoot"><span class="cta" style="height:28px">Tovább</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- annotations -->
+  <span class="axis" style="left:calc(50% + 60px)"><span>axis A</span></span>
+  <span class="axis" style="left:calc(100% - 60px)"></span>
+  <span class="dim h" style="left:0;width:50%;top:-26px"><span>720 — 50%</span></span>
+  <span class="dim h" style="left:50%;width:50%;top:-26px"><span>720 — 50%</span></span>
+  <span class="dim h" style="left:calc(50% + 60px);right:60px;top:-8px"><span>480 content axis</span></span>
+  <span class="dim v" style="left:-24px;top:0;height:100%"><span>900 · 100dvh</span></span>
+  <span class="dim v lft" style="left:calc(50% - 24px);top:35px;height:380px"><span>max 760</span></span>
+  <span class="pin" style="left:12px;top:6px">mark · <b>44px</b> tile, top-left</span>
+  <span class="pin" style="left:12px;bottom:78px">hero · <b>margin-block:auto</b></span>
+  <span class="pin" style="left:12px;bottom:10px">founder · <b>last child</b>, border-top</span>
+  <span class="pin" style="right:12px;top:6px">header row · <b>40px</b></span>
+  <span class="pin" style="right:12px;bottom:44px">action bar · <b>pinned</b>, border-top</span>
+</div>
+<div class="scaleno">Schematic ≈1:2. The tables below are normative.</div>
+
+<pre class="css"><b>/* Desktop ≥1024px — the shell contract */</b>
+.onb{<i>height</i>:100dvh;<i>display</i>:grid;<i>grid-template-columns</i>:1fr 1fr;<i>overflow</i>:hidden}
+
+<b>/* LEFT — brand panel, identical on every step */</b>
+.onb__brand{<i>padding</i>:44px 52px 40px;<i>display</i>:flex;<i>flex-direction</i>:column;<i>overflow</i>:hidden}
+.onb__brand .hero{<i>margin-block</i>:auto}          <u>/* fixes defect 03 */</u>
+.onb__brand .founder{<i>padding-top</i>:24px;<i>border-top</i>:1px solid rgba(24,32,29,.14)}
+
+<b>/* RIGHT — one column, three rows, one axis */</b>
+.onb__pane{<i>display</i>:flex;<i>flex-direction</i>:column;<i>padding</i>:44px 0 40px;<i>min-width</i>:0}
+.onb__col{
+  <i>width</i>:min(480px, 100% - 96px);          <u>/* the ONLY width — defect 01 */</u>
+  <i>margin-inline</i>:auto;
+  <i>max-height</i>:760px; <i>margin-block</i>:auto;   <u>/* defect 02 */</u>
+  <i>display</i>:flex;<i>flex-direction</i>:column;<i>height</i>:100%}
+.onb__head{<i>flex</i>:none;<i>height</i>:40px;<i>display</i>:flex;<i>align-items</i>:center;<i>gap</i>:16px}
+.onb__body{<i>flex</i>:1;<i>min-height</i>:0;<i>overflow-y</i>:auto;<i>padding-top</i>:32px;
+  <i>display</i>:flex;<i>flex-direction</i>:column;<i>gap</i>:12px}
+.onb__act{<i>flex</i>:none;<i>margin-top</i>:28px;<i>padding-top</i>:20px;<i>border-top</i>:1px solid #e2e2e2;
+  <i>display</i>:flex;<i>flex-direction</i>:column;<i>gap</i>:12px}</pre>
+
+<table class="spec">
+<thead><tr><th style="width:30%">Element</th><th style="width:22%">Size</th><th style="width:22%">Position / rule</th><th>Note</th></tr></thead>
+<tbody>
+<tr class="grp"><td colspan="4">Shell</td></tr>
+<tr><td><strong>Viewport lock</strong></td><td class="n">100dvh · overflow hidden</td><td>page never scrolls</td><td>Only <code>.onb__body</code> scrolls, and only when it must.</td></tr>
+<tr><td><strong>Column split</strong></td><td class="n">1fr / 1fr — 50% / 50%</td><td>grid, no gap</td><td>Panels meet on one line; no gutter, no margin.</td></tr>
+<tr><td><strong>Minimum for split</strong></td><td class="n">1024px</td><td>below → single column</td><td>See W6.</td></tr>
+<tr class="grp"><td colspan="4">Left · brand panel</td></tr>
+<tr><td>Padding</td><td class="n">44 52 40</td><td>—</td><td>Horizontal 52 both sides.</td></tr>
+<tr><td>Mark tile</td><td class="n">44 × 44 · r12</td><td>top-left, row 1</td><td>Wordmark 20px/800 beside it, gap 12.</td></tr>
+<tr><td>Hero block</td><td class="n">max-width 34ch</td><td><code>margin-block:auto</code></td><td>Vertically centred between mark and founder.</td></tr>
+<tr><td>Hero h1</td><td class="n">48 / 1.05 · −.035em</td><td>light 300 + bold 700 line</td><td>Fixed, not <code>vw</code>. 40px below 1280.</td></tr>
+<tr><td>Hero lede</td><td class="n">17 / 1.5</td><td>margin-top 16</td><td>max-width 34ch.</td></tr>
+<tr><td>Stat row</td><td class="n">value 22/800 · key 10 mono</td><td>margin-top 32 · gap 40</td><td>Three items, never wraps.</td></tr>
+<tr><td>Founder row</td><td class="n">avatar 44 · name 14 · role 10</td><td>last child · padding-top 24</td><td>border-top 1px on 14% ink.</td></tr>
+<tr class="grp"><td colspan="4">Right · question pane</td></tr>
+<tr><td><strong>Content axis</strong></td><td class="n">min(480, 100% − 96)</td><td><code>margin-inline:auto</code></td><td>Header, body and action bar all inherit it.</td></tr>
+<tr><td><strong>Column height</strong></td><td class="n">max 760</td><td><code>margin-block:auto</code></td><td>Centred as a unit; pane fills, column does not.</td></tr>
+<tr><td>Header row</td><td class="n">40 tall</td><td>row 1, flex none</td><td>Back 40×40 · bar 1fr · counter mono 11.</td></tr>
+<tr><td>Header → body</td><td class="n">32</td><td>padding-top on body</td><td>Same on every step.</td></tr>
+<tr><td>Body → action</td><td class="n">28 + 20 padding</td><td>margin-top + border-top</td><td>Action bar never floats away from the column.</td></tr>
+<tr><td>Step progress bar</td><td class="n">4 tall · r2 · gap 6</td><td>flex 1 in header</td><td>5 segments, filled = accent.</td></tr>
+</tbody>
+</table>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">The pane fills, the column doesn't</div><p><b>Two different jobs.</b> The pane owns the background and the 50% split; the column owns the reading measure and the rhythm. Conflating them is the whole bug.</p></div>
+<div class="note"><div class="t">480px is a reading measure</div><p>At 17px body copy that is ~62 characters — the standard comfortable line. <b>The 600px rows in the build push descriptions to three lines</b> and make the eye travel.</p></div>
+<div class="note"><div class="t">The header row is 40px on every step</div><p>Including the steps with no progress bar (8, 9, 10), where it holds only the back arrow. <b>The question title must land on the same y every time.</b></p></div>
+<div class="note warn"><div class="t">Left panel below 1280</div><p>Hero drops 48→40px and the lede to 16px. <b>Do not let the stat row wrap</b> — if it would, drop to two stats before you let it break.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ W3 ═══ -->
+<section>
+<div class="head"><span class="sn">W3</span><h2>Desktop — the same geometry across three step types</h2></div>
+<p class="lede">Proof that one column serves all ten steps. The option list, the reveal and the auth form differ only in what fills the body row; the axis, the header y and the action bar y are identical. The left pane is omitted here for space — it does not change.</p>
+
+<div class="layout">
+<div>
+<div class="frames">
+
+<div>
+<div class="fcap"><b>Step 2</b> · option list · 5 options</div>
+<div class="frame dimwrap" style="width:340px">
+  <div class="rp" style="padding:20px 0 18px;height:400px">
+    <div class="rpin" style="width:calc(100% - 60px);max-width:240px;max-height:340px">
+      <div class="rhead"><span class="circ" style="width:24px;height:24px"><i data-lucide="chevron-left"></i></span><div class="sbar"><i class="on"></i><i></i><i></i><i></i><i></i></div><span class="lbl" style="font-size:8px">1 / 5</span></div>
+      <div class="rbody">
+        <div><div class="qh">Mi hozott ide?</div><div class="qs">Egyet válassz — ez adja az edzéseid fókuszát.</div></div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">
+          <div class="orow on"><span class="oi"><i data-lucide="flame"></i></span><span class="ot"><span class="ob">Erősebb, energikusabb test</span><span class="os">Hogy bírjam a napot.</span></span><span class="ck"><i data-lucide="check"></i></span></div>
+          <div class="orow"><span class="oi"><i data-lucide="chart-column"></i></span><span class="ot"><span class="ob">Lefogyni, formálódni</span></span><span class="ck"></span></div>
+          <div class="orow"><span class="oi"><i data-lucide="moon"></i></span><span class="ot"><span class="ob">Visszatérni a mozgáshoz</span></span><span class="ck"></span></div>
+          <div class="orow"><span class="oi"><i data-lucide="user-round"></i></span><span class="ot"><span class="ob">Jobb tartás</span></span><span class="ck"></span></div>
+        </div>
+      </div>
+      <div class="rfoot"><span class="cta" style="height:28px">Tovább</span></div>
+    </div>
+  </div>
+  <span class="hzone" style="top:20px;height:24px"><span>head 40</span></span>
+  <span class="hzone" style="bottom:18px;height:44px"><span>action</span></span>
+</div>
+</div>
+
+<div>
+<div class="fcap"><b>Step 8</b> · a heted · reveal</div>
+<div class="frame dimwrap" style="width:340px">
+  <div class="rp" style="padding:20px 0 18px;height:400px">
+    <div class="rpin" style="width:calc(100% - 60px);max-width:240px;max-height:340px">
+      <div class="rhead"><span class="circ" style="width:24px;height:24px"><i data-lucide="chevron-left"></i></span><div class="sbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><span class="lbl" style="font-size:8px">Kész</span></div>
+      <div class="rbody">
+        <div class="lbl" style="font-size:8px">Kész is</div>
+        <div class="qh">Ez lesz az első heted.</div>
+        <div class="card" style="padding:10px;gap:7px;margin-top:4px">
+          <div class="week" style="gap:3px">
+            <div class="day today"><div class="d">H</div><div class="dot" style="height:18px"></div></div>
+            <div class="day done"><div class="d">K</div><div class="dot" style="height:18px"></div></div>
+            <div class="day rest"><div class="d">SZE</div><div class="dot" style="height:18px"><i data-lucide="moon"></i></div></div>
+            <div class="day done"><div class="d">CS</div><div class="dot" style="height:18px"></div></div>
+            <div class="day done"><div class="d">P</div><div class="dot" style="height:18px"></div></div>
+            <div class="day rest"><div class="d">SZO</div><div class="dot" style="height:18px"><i data-lucide="moon"></i></div></div>
+            <div class="day done"><div class="d">V</div><div class="dot" style="height:18px"></div></div>
+          </div>
+          <div style="font-size:9px;color:var(--ink3)">Heti 5 edzés · reggelente · csendes variációkkal</div>
+        </div>
+        <div style="position:relative;border:1px dashed var(--line);border-radius:6px;background:var(--fill);aspect-ratio:16/9;overflow:hidden;margin-top:4px"><div class="art"></div><span style="position:absolute;left:0;top:6px;background:var(--acc);color:#fff;font-family:var(--mono);font-size:7px;letter-spacing:.08em;padding:2px 6px;border-radius:0 3px 3px 0">1. NAP</span></div>
+      </div>
+      <div class="rfoot"><span class="cta" style="height:28px">Mentsük el a tervedet</span></div>
+    </div>
+  </div>
+  <span class="hzone" style="top:20px;height:24px"><span>head 40</span></span>
+  <span class="hzone" style="bottom:18px;height:44px"><span>action</span></span>
+</div>
+</div>
+
+<div>
+<div class="fcap"><b>Step 10</b> · előfizetés · 3 plans</div>
+<div class="frame dimwrap" style="width:340px">
+  <div class="rp" style="padding:20px 0 18px;height:400px">
+    <div class="rpin" style="width:calc(100% - 60px);max-width:240px;max-height:340px">
+      <div class="rhead"><span class="circ" style="width:24px;height:24px"><i data-lucide="chevron-left"></i></span><span class="lbl" style="font-size:8px;margin-left:auto">Előfizetés</span></div>
+      <div class="rbody">
+        <div><div class="qh">Válaszd ki, hogyan kezded</div><div class="qs">Bármelyikkel ugyanaz a teljes hozzáférés.</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+          <div class="orow on" style="min-height:40px;align-items:flex-start;flex-direction:column;gap:2px;padding:8px 10px"><span style="font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;color:var(--acc)">ÉVES · LEGNÉPSZERŰBB</span><span style="font-size:14px;font-weight:800;letter-spacing:-.03em;color:var(--acc)">767 Ft <span style="font-size:8px;font-weight:600">/ hét</span></span></div>
+          <div class="orow" style="min-height:40px;align-items:flex-start;flex-direction:column;gap:2px;padding:8px 10px"><span style="font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;color:var(--ink3)">HAVI</span><span style="font-size:14px;font-weight:800;letter-spacing:-.03em">5990 Ft <span style="font-size:8px;font-weight:600;color:var(--ink3)">/ hó</span></span></div>
+          <div class="orow" style="min-height:40px;align-items:flex-start;flex-direction:column;gap:2px;padding:8px 10px"><span style="font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;color:var(--ink3)">HETI</span><span style="font-size:14px;font-weight:800;letter-spacing:-.03em">490 Ft <span style="font-size:8px;font-weight:600;color:var(--ink3)">/ első 7 nap</span></span></div>
+        </div>
+      </div>
+      <div class="rfoot"><span class="cta" style="height:28px">Előfizetek — 39 900 Ft / év</span><div class="meta">Bármikor lemondható · 14 napos garancia</div></div>
+    </div>
+  </div>
+  <span class="hzone" style="top:20px;height:24px"><span>head 40</span></span>
+  <span class="hzone" style="bottom:18px;height:62px"><span>action + meta</span></span>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Three step types, one skeleton</div><p>Option list, reveal, plan picker. <b>The shaded bands are at identical y in all three.</b> That is the whole test — if a band moves, the geometry is wrong.</p></div>
+<div class="note"><div class="t">Body scrolls, chrome does not</div><p>Step 10b and the auth form exceed 760px. <b>They scroll inside the body row</b> while the header and action bar stay put.</p></div>
+<div class="note"><div class="t">The action bar may grow</div><p>Adding a meta line or a ghost button grows it downward from its border-top. <b>The body row absorbs the difference</b>, so the title still does not move.</p></div>
+<div class="note warn"><div class="t">Step 9 is the existing Auth pane</div><p>Its form is used as built — but it must adopt this column, not bring its own. <b>Same 480px axis, same header row, same action bar.</b></p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ W4 ═══ -->
+<section>
+<div class="head"><span class="sn">W4</span><h2>Mobile — exact geometry</h2></div>
+<p class="lede">Below 768px the brand panel is dropped entirely; only the mark survives, in the header. The screen becomes a three-row stack — fixed header, scrolling body, sticky action bar — with the action bar respecting the home-indicator inset. One question per screen, as drawn in the wireframe.</p>
+
+<div class="layout">
+<div>
+<div class="frames">
+
+<div>
+<div class="fcap"><b>Mobile</b> · 390 × 844 · drawn ≈0.82×, labels real px</div>
+<div class="dimwrap" style="width:320px">
+<div class="phone" style="width:320px;height:610px">
+  <div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+  <div class="mhead"><span class="circ" style="width:26px;height:26px"><i data-lucide="chevron-left"></i></span><div class="sbar"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="lbl" style="font-size:8px">3 / 5</span></div>
+  <div class="mmain">
+    <div><div class="qh" style="font-size:15px">Hány nap fér bele?</div><div class="qs">Ebből épül a heted. Bármikor változtathatod.</div></div>
+    <div class="seg" style="margin-top:4px"><span>3</span><span>4</span><span class="on">5</span><span>6</span></div>
+    <div class="card" style="padding:10px;gap:7px;margin-top:4px">
+      <div class="lbl" style="font-size:8px">Így néz majd ki a heted</div>
+      <div class="week" style="gap:3px">
+        <div class="day done"><div class="d">H</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+        <div class="day done"><div class="d">K</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+        <div class="day rest"><div class="d">SZE</div><div class="dot" style="height:20px"><i data-lucide="moon"></i></div></div>
+        <div class="day done"><div class="d">CS</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+        <div class="day done"><div class="d">P</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+        <div class="day rest"><div class="d">SZO</div><div class="dot" style="height:20px"><i data-lucide="moon"></i></div></div>
+        <div class="day done"><div class="d">V</div><div class="dot" style="height:20px"><i data-lucide="check"></i></div></div>
+      </div>
+      <div style="font-size:9px;color:var(--ink3)">A pihenőnap is a terv része.</div>
+    </div>
+  </div>
+  <div class="mact"><span class="cta" style="height:30px">Tovább</span></div>
+  <span class="safe" style="bottom:0;height:10px"></span>
+</div>
+<span class="dim v" style="left:-24px;top:24px;height:44px"><span>56 header</span></span>
+<span class="dim v" style="left:-24px;bottom:0;height:54px"><span>action + safe</span></span>
+<span class="dim h" style="left:0;right:0;top:-26px"><span>390 · 100vw</span></span>
+<span class="pin" style="left:6px;top:76px">body · <b>scrolls</b></span>
+<span class="pin warnpin" style="right:6px;bottom:14px">safe-area inset</span>
+</div>
+<div class="scaleno">Header and action bar are fixed; only the body scrolls.</div>
+</div>
+
+<div style="flex:1;min-width:330px">
+<pre class="css" style="margin-top:0"><b>/* Mobile &lt;768px */</b>
+.onb{<i>height</i>:100dvh;<i>grid-template-columns</i>:1fr;<i>overflow</i>:hidden}
+.onb__brand{<i>display</i>:none}                    <u>/* mark moves into header */</u>
+
+.onb__pane{<i>padding</i>:0;<i>display</i>:flex;<i>flex-direction</i>:column}
+.onb__col{<i>width</i>:100%;<i>max-width</i>:none;<i>max-height</i>:none;
+  <i>margin</i>:0;<i>flex</i>:1;<i>min-height</i>:0}
+
+.onb__head{<i>height</i>:56px;<i>padding</i>:0 20px;<i>flex</i>:none;
+  <i>border-bottom</i>:1px solid #e2e2e2;<i>background</i>:#fff}
+.onb__body{<i>flex</i>:1;<i>min-height</i>:0;<i>overflow-y</i>:auto;
+  <i>padding</i>:20px 20px 0;<i>gap</i>:10px;
+  <i>-webkit-overflow-scrolling</i>:touch;<i>overscroll-behavior</i>:contain}
+.onb__act{<i>flex</i>:none;<i>margin</i>:0;<i>border-top</i>:1px solid #e2e2e2;<i>background</i>:#fff;
+  <i>padding</i>:12px 20px calc(12px + <u>env(safe-area-inset-bottom)</u>);
+  <i>gap</i>:10px}
+
+<b>/* Tablet 768–1023 — single column, but centred and measured */</b>
+@media (min-width:768px) and (max-width:1023.98px){
+  .onb__body,.onb__head,.onb__act &gt; *{<i>max-width</i>:440px;<i>margin-inline</i>:auto;<i>width</i>:100%}
+  .onb__body{<i>padding-top</i>:28px}}</pre>
+
+<table class="spec">
+<thead><tr><th style="width:34%">Element</th><th style="width:26%">Size</th><th>Rule</th></tr></thead>
+<tbody>
+<tr class="grp"><td colspan="3">Mobile &lt;768</td></tr>
+<tr><td><strong>Header</strong></td><td class="n">56 tall · pad 0 20</td><td>Fixed. Back 40×40 · bar 1fr · counter. Mark replaces back on step 1.</td></tr>
+<tr><td><strong>Body</strong></td><td class="n">pad 20 20 0 · gap 10</td><td>The only scrolling region. Never <code>height:100%</code>.</td></tr>
+<tr><td><strong>Action bar</strong></td><td class="n">pad 12 20 (12+inset)</td><td>Sticky bottom, border-top, opaque background.</td></tr>
+<tr><td>CTA</td><td class="n">52 tall · r12 · full width</td><td>16/700. One per screen.</td></tr>
+<tr><td>Secondary link</td><td class="n">14 · centred</td><td>„Most kihagyom" — below the CTA, inside the bar.</td></tr>
+<tr><td>Question h1</td><td class="n">24 / 1.2 · −.03em</td><td>Never wraps past 3 lines at 390px.</td></tr>
+<tr><td>Question sub</td><td class="n">14 / 1.5</td><td>margin-top 6.</td></tr>
+<tr><td>Option row</td><td class="n">min-height 64 · pad 12 14 · r12</td><td>Icon 36 · tick 22 · gap 12.</td></tr>
+<tr><td>Option list gap</td><td class="n">8</td><td>—</td></tr>
+<tr><td>Side margins</td><td class="n">20</td><td>Plus <code>env(safe-area-inset-left/right)</code> in landscape.</td></tr>
+<tr class="grp"><td colspan="3">Tablet 768–1023</td></tr>
+<tr><td>Content measure</td><td class="n">max 440 · centred</td><td>Brand panel still hidden; header/body/action share the measure.</td></tr>
+<tr><td>Question h1</td><td class="n">27</td><td>Between mobile and desktop.</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Drop the brand panel, don't stack it</div><p>The auth handoff already warned that stacking pushes the form below the fold. <b>Under 1024 the panel is not shown at all</b> — the mark in the header carries the brand.</p></div>
+<div class="note"><div class="t">100dvh, not 100vh</div><p><code>dvh</code> accounts for the collapsing mobile URL bar. <b>With <code>vh</code> the sticky action bar sits under the browser chrome</b> on first paint.</p></div>
+<div class="note warn"><div class="t">The action bar is opaque</div><p>It overlaps scrolling content. A translucent bar over option rows reads as a rendering fault — <b>solid white, 1px border-top, no blur.</b></p></div>
+<div class="note"><div class="t">Tablet is not a small desktop</div><p>768–1023 keeps the mobile stack and only adds a 440px measure. <b>Two panes at 900px would give the form a 450px pane</b> — narrower than the mobile screen it replaced.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ W5 ═══ -->
+<section>
+<div class="head"><span class="sn">W5</span><h2>Shared atoms — one table, both devices</h2></div>
+<p class="lede">Every value the two shells share. Where they differ, both are given: desktop first, mobile second. Nothing on an onboarding screen should be sized outside this table.</p>
+
+<div class="layout">
+<div>
+<table class="spec">
+<thead><tr><th style="width:26%">Atom</th><th style="width:19%">Desktop ≥1024</th><th style="width:19%">Mobile &lt;768</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="grp"><td colspan="4">Type scale</td></tr>
+<tr><td><strong>Brand hero h1</strong></td><td class="n">48 / 1.05</td><td class="n">— (hidden)</td><td>300 weight line + 700 weight line. −.035em.</td></tr>
+<tr><td><strong>Question h1</strong></td><td class="n">30 / 1.15</td><td class="n">24 / 1.2</td><td>800, −.03em. Tablet 27.</td></tr>
+<tr><td>Question sub</td><td class="n">15 / 1.5</td><td class="n">14 / 1.5</td><td>ink2. max-width 40ch.</td></tr>
+<tr><td>Option title</td><td class="n">16 / 700</td><td class="n">15 / 700</td><td>−.01em.</td></tr>
+<tr><td>Option description</td><td class="n">13.5 / 1.4</td><td class="n">13 / 1.4</td><td>ink3. Clamp to 2 lines.</td></tr>
+<tr><td>Eyebrow / counter</td><td class="n">11 mono · .08em</td><td class="n">11 mono</td><td>Uppercase.</td></tr>
+<tr><td>Meta under CTA</td><td class="n">12.5</td><td class="n">12</td><td>ink3, centred.</td></tr>
+<tr class="grp"><td colspan="4">Controls</td></tr>
+<tr><td><strong>Primary CTA</strong></td><td class="n">56 · r12</td><td class="n">52 · r12</td><td>Full axis width. 16/700. One per screen.</td></tr>
+<tr><td>Secondary / ghost</td><td class="n">48 · r12</td><td class="n">46 · r12</td><td>1.5px border, no fill.</td></tr>
+<tr><td>Back button</td><td class="n">40 × 40 · r10</td><td class="n">40 × 40</td><td>Hit target 44 via padding. Always present from step 2.</td></tr>
+<tr><td><strong>Option row</strong></td><td class="n">min 68 · pad 14 16 · r14</td><td class="n">min 64 · pad 12 14 · r12</td><td>56/60 when single-line. Above the 44 floor either way.</td></tr>
+<tr><td>Option icon tile</td><td class="n">40 · r10</td><td class="n">36 · r9</td><td>Lucide 18 / 17 stroke 2.</td></tr>
+<tr><td>Option tick</td><td class="n">24</td><td class="n">22</td><td>Circle = single choice, rounded square = multi.</td></tr>
+<tr><td>Option list gap</td><td class="n">10</td><td class="n">8</td><td>—</td></tr>
+<tr><td>Segmented control</td><td class="n">52 · r999 · pad 4</td><td class="n">48 · r999</td><td>Days 3–6. Selected pill white + shadow.</td></tr>
+<tr><td>Text area</td><td class="n">min 104 · r12</td><td class="n">min 96</td><td>Step 7. Counter 0/160 below, right.</td></tr>
+<tr><td>Input field</td><td class="n">52 · r12</td><td class="n">50 · r12</td><td>Label mono 11 above, gap 6.</td></tr>
+<tr><td>OAuth button</td><td class="n">52 · r12</td><td class="n">50 · r12</td><td>Icon 18, gap 10, centred.</td></tr>
+<tr class="grp"><td colspan="4">Spacing rhythm</td></tr>
+<tr><td>Header → title</td><td class="n">32</td><td class="n">20</td><td>Fixed on every step.</td></tr>
+<tr><td>Title → first control</td><td class="n">24</td><td class="n">18</td><td>—</td></tr>
+<tr><td>Body block gap</td><td class="n">12</td><td class="n">10</td><td>Between sub-blocks inside the body.</td></tr>
+<tr><td>Body → action bar</td><td class="n">28 + 20</td><td class="n">0 + 12</td><td>Desktop margin + padding; mobile padding only.</td></tr>
+<tr><td>Radius scale</td><td class="n">10 / 12 / 14 / 999</td><td class="n">9 / 12 / 999</td><td>Icon tiles / buttons+fields / cards / pills.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Two type sizes per role, no more</div><p>One desktop value, one mobile value, tablet interpolated only for the h1. <b>Fluid <code>clamp()</code> on question text is what produced the 40px h1</b> in the build.</p></div>
+<div class="note"><div class="t">44px is a floor, not a target</div><p>Every row and button here clears it. <b>The audience is 35+ and often mid-movement</b> — 64–68px rows are the reason the flow feels easy.</p></div>
+<div class="note"><div class="t">Tick shape carries the semantics</div><p>Circle for single-choice, rounded square for multi-select. <b>Step 5 is the only multi-select</b> — it must not look like the others.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ W6 ═══ -->
+<section>
+<div class="head"><span class="sn">W6</span><h2>Breakpoints</h2></div>
+<p class="lede">Four, and only four. Each one changes structure, not just size — which is why there are so few.</p>
+
+<div class="layout">
+<div>
+<table class="spec">
+<thead><tr><th style="width:16%">Range</th><th style="width:16%">Structure</th><th style="width:20%">Content measure</th><th style="width:16%">Brand panel</th><th>Action bar</th></tr></thead>
+<tbody>
+<tr><td class="n">&lt; 768</td><td><strong>Single column</strong></td><td class="n">100% − 40</td><td class="bad">hidden</td><td>Sticky bottom, safe-area inset</td></tr>
+<tr><td class="n">768 – 1023</td><td><strong>Single column, centred</strong></td><td class="n">max 440</td><td class="bad">hidden</td><td>Sticky bottom</td></tr>
+<tr><td class="n">1024 – 1599</td><td><strong>Split 50 / 50</strong></td><td class="n">min(480, 100% − 96)</td><td class="good">visible · hero 40–48</td><td>In-column, border-top</td></tr>
+<tr><td class="n">≥ 1600</td><td><strong>Split 50 / 50</strong></td><td class="n">480 fixed</td><td class="good">visible · hero 48</td><td>In-column, border-top</td></tr>
+</tbody>
+</table>
+
+<pre class="css">@media (max-width:767.98px){ <i>/* single column, safe areas */</i> }
+@media (min-width:768px) and (max-width:1023.98px){ <i>/* centred 440 measure */</i> }
+@media (min-width:1024px){ <i>/* split shell, 480 axis, 760 column cap */</i> }
+<u>/* no breakpoint above 1600 — the axis is already fixed at 480 */</u></pre>
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">The split needs 1024</div><p>At 1024 each pane is 512 — just enough for the 480 axis minus padding. <b>Below that the form gets narrower than a phone</b>, which is the failure the auth README predicted.</p></div>
+<div class="note"><div class="t">Nothing grows past 1600</div><p>The axis is capped, the column is capped. <b>A 4K monitor shows more background, not bigger text</b> — which is what the build's <code>vw</code> sizing got wrong.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ W7 ═══ -->
+<section>
+<div class="head"><span class="sn">W7</span><h2>Layout rules</h2></div>
+<div class="rules">
+<div><div class="num">L-RULE 01</div><div><h3>One axis per pane.</h3><p>Header, body and action bar are children of the same measured column. No descendant sets its own width or margin-inline.</p></div><div class="ev"><b>Fixes</b>Defect 01 — the 274px offset between body and CTA.</div></div>
+<div><div class="num">L-RULE 02</div><div><h3>The pane fills the viewport; the column does not.</h3><p>Panes are 100dvh. The content column is capped at 760px and centred with <code>margin-block:auto</code>.</p></div><div class="ev"><b>Fixes</b>Defect 02 — the 540px void above the CTA.</div></div>
+<div><div class="num">L-RULE 03</div><div><h3>The title lands on the same y on every step.</h3><p>Header row is 40px whether or not it holds a progress bar; body padding-top is always 32.</p></div><div class="ev"><b>Evidence</b>Stability between steps is what makes a sequence feel like one screen changing rather than ten screens loading.</div></div>
+<div><div class="num">L-RULE 04</div><div><h3>Only the body scrolls.</h3><p>The shell has <code>overflow:hidden</code>. Header and action bar are never scrolled off.</p></div><div class="ev"><b>Fixes</b>Defect 08 — the page-level scroll.</div></div>
+<div><div class="num">L-RULE 05</div><div><h3>Fixed type scale. No viewport units on text.</h3><p>Two values per role — desktop and mobile — with the h1 interpolated once for tablet.</p></div><div class="ev"><b>Fixes</b>Defect 06 — the 64px brand h1 and 40px question h1.</div></div>
+<div><div class="num">L-RULE 06</div><div><h3>Below 1024 the brand panel is dropped, not stacked.</h3><p>The mark moves into the 56px header. Nothing else from the panel survives.</p></div><div class="ev"><b>Evidence</b>The auth handoff's own warning about stacking pushing the form below the fold.</div></div>
+<div><div class="num">L-RULE 07</div><div><h3>The action bar owns the bottom inset.</h3><p><code>padding-bottom:calc(12px + env(safe-area-inset-bottom))</code>, opaque background, 1px border-top.</p></div><div class="ev"><b>Evidence</b>Home-indicator overlap is the most common iOS onboarding defect.</div></div>
+</div>
+
+<h3 style="margin-top:44px;font-size:19px;letter-spacing:-.02em">What not to do</h3>
+<div class="dont">
+<div><span class="x">✕</span><span><b>Centring the CTA in the pane while the body is left-aligned.</b> The single most visible defect in the current build.</span></div>
+<div><span class="x">✕</span><span><b>Letting the content column stretch to 100dvh.</b> It produces the dead space; cap it at 760 and centre it.</span></div>
+<div><span class="x">✕</span><span><b><code>clamp()</code> or <code>vw</code> on question type.</b> Two fixed values are correct; fluid text made the h1 40px.</span></div>
+<div><span class="x">✕</span><span><b>Stacking the brand panel above the form under 1024px.</b> Drop it.</span></div>
+<div><span class="x">✕</span><span><b>A translucent or blurred mobile action bar.</b> It sits over scrolling rows — keep it solid.</span></div>
+<div><span class="x">✕</span><span><b>Option rows wider than 480px.</b> Descriptions wrap to three lines and the eye has to travel.</span></div>
+<div><span class="x">✕</span><span><b><code>100vh</code> on mobile.</b> Use <code>100dvh</code> or the action bar hides under the URL bar.</span></div>
+<div><span class="x">✕</span><span><b>A second loud button in the action bar.</b> One primary; „Most kihagyom" is a text link.</span></div>
+</div>
+
+<div class="note warn" style="margin-top:26px"><div class="t">Two things this spec does not decide</div><p>Whether the desktop action bar should instead sit immediately below the content (rather than pinned to the column's bottom edge) on the three short steps — <b>pinned is specified here for step-to-step stability</b>, but it leaves a visible gap on step 4. And whether the left panel's hero copy changes per step or stays fixed; <b>fixed is drawn</b>, because a changing panel breaks the "one screen" illusion the split exists to create.</p></div>
+</section>
+
+<footer>LEXFIT · Onboarding layout &amp; sizing spec · Geometry only — flow and copy per the Onboarding Wireframe</footer>
+</div>
+<script>window.addEventListener("load",function(){window.lexfitIcons&&window.lexfitIcons()});</script>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEXFIT — Mobil vázlat / skeleton</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="lexfit-icons.js"></script>
+<style>
+:root{
+--ink:#19211e;--ink2:#44544d;--ink3:#5c6e66;--line:#c9c9c9;--line2:#e2e2e2;
+--fill:#ececec;--fill2:#f5f5f5;--paper:#fbfbfa;
+--acc:#4a6c5e;--accent:#7a9b8d;--accbg:#e1f1ea;--accln:#bcd8cc;--warn:#b4652a;--warnbg:#fff3e6;
+--mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"Inter Tight",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#efeeec;color:var(--ink);font-family:var(--sans);line-height:1.5}
+a{color:var(--acc)}a:hover{color:var(--ink)}
+.wrap{max-width:1460px;margin:0 auto;padding:0 36px 90px}
+.mono{font-family:var(--mono)}
+svg[data-lucide],.lucide{width:1em;height:1em;stroke-width:2;flex:none;vertical-align:-.14em}
+header.doc{padding:54px 0 26px;border-bottom:2px solid var(--ink)}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+header.doc h1{font-size:clamp(34px,4.6vw,56px);font-weight:800;letter-spacing:-.035em;line-height:1;margin:14px 0 0;max-width:20ch}
+header.doc p{max-width:74ch;color:var(--ink2);font-size:16px;margin:18px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.lg{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink2)}
+.lg b{color:var(--acc)}
+section{padding:60px 0 0}
+section>.head{display:flex;align-items:baseline;gap:18px;border-bottom:1px dashed var(--line);padding-bottom:14px;flex-wrap:wrap}
+.sn{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--acc);text-transform:uppercase;white-space:nowrap}
+section h2{font-size:26px;font-weight:700;letter-spacing:-.025em;margin:0}
+.lede{color:var(--ink2);font-size:15px;max-width:82ch;margin:14px 0 0}
+.layout{display:grid;grid-template-columns:1fr 272px;gap:30px;align-items:start;margin-top:26px}
+.screens{display:flex;gap:30px;flex-wrap:wrap}
+.scr{display:flex;flex-direction:column;gap:9px}
+.scrlbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
+.scrlbl b{color:var(--ink)}
+.notes{position:sticky;top:20px;display:flex;flex-direction:column;gap:13px}
+.note{background:#fff;border:1px solid var(--line2);border-left:3px solid var(--acc);border-radius:4px;padding:12px 14px}
+.note .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--acc)}
+.note p{margin:6px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.45}
+.note p b{color:var(--ink);font-weight:600}
+.note.warn{border-left-color:var(--warn)}.note.warn .t{color:var(--warn)}
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);display:inline-flex;align-items:center;gap:5px}
+.lbl svg{width:12px;height:12px;stroke:currentColor}
+
+/* ── phone ── */
+.phone{width:330px;height:648px;border:1.5px solid var(--ink);border-radius:26px;background:#fff;overflow:hidden;box-shadow:6px 6px 0 rgba(0,0,0,.06);display:flex;flex-direction:column;position:relative}
+.status{height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-family:var(--mono);font-size:8.5px;color:var(--ink3);border-bottom:1px solid var(--line2);background:#fff}
+.mtop{height:50px;display:flex;align-items:center;gap:9px;padding:0 13px;background:var(--fill2);border-bottom:1px solid var(--line)}
+.mtop .brand{font-weight:800;font-size:14px;letter-spacing:-.02em}
+.msearch{flex:none;height:32px;border:1px solid var(--line);border-radius:999px;background:#fff;display:flex;align-items:center;gap:7px;padding:0 12px;color:var(--ink3);font-size:10.5px}
+.msearch svg{width:13px;height:13px;stroke:var(--ink3)}
+.streak{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 9px;border-radius:999px;border:1px dashed var(--line);font-family:var(--mono);font-size:9.5px;color:var(--ink2);background:#fff}
+.streak svg{width:12px;height:12px;stroke:var(--warn)}
+.ava{width:30px;height:30px;border-radius:50%;background:var(--fill);border:1px dashed var(--line);flex:none;display:flex;align-items:center;justify-content:center}
+.ava svg{width:15px;height:15px;stroke:var(--ink3)}
+.ava.on{border-style:solid;border-color:var(--acc)}.ava.on svg{stroke:var(--acc)}
+.mbody{padding:13px;display:flex;flex-direction:column;gap:15px;background:var(--paper);flex:1;min-height:0;overflow:hidden;position:relative}
+.mtabs{height:64px;border-top:1.5px solid var(--ink);display:grid;grid-template-columns:repeat(4,1fr);background:var(--fill2)}
+.mtab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--mono);font-size:8.5px;letter-spacing:.03em;color:var(--ink3);text-transform:uppercase;min-height:44px}
+.mtab .ic{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.mtab .ic svg{width:20px;height:20px;stroke:var(--ink3)}
+.mtab.on{color:var(--acc);font-weight:600}
+.mtab.on .ic{background:var(--acc)}
+.mtab.on .ic svg{stroke:#fff}
+.mtab .dot{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--warn);margin:-16px 0 0 15px}
+
+/* ── content bits ── */
+
+/* Az Ív — the LEXFIT mark. Accent tile, white glyph (a logo is a graphic; the
+   ink-on-accent text rule does not apply to it). */
+.lexmark{width:22px;height:22px;border-radius:6px;background:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 3px 8px -4px rgba(24,32,29,.45)}
+.lexmark svg{width:13px;height:12px;display:block}
+.lexmark.lg{width:32px;height:32px;border-radius:9px}
+.lexmark.lg svg{width:18px;height:16px}
+.lexmark.xl{width:44px;height:44px;border-radius:12px}
+.lexmark.xl svg{width:24px;height:22px}
+.art{position:absolute;inset:0;background:repeating-linear-gradient(135deg,#e6e6e6 0 12px,#efefef 12px 24px)}
+.hero{position:relative;border:1px dashed var(--line);border-radius:8px;background:var(--fill);overflow:hidden;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;min-height:190px}
+.hero>*{position:relative}
+.hero .h1{font-size:19px;font-weight:800;letter-spacing:-.025em;line-height:1.08}
+.chip{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:3px;padding:2px 5px;color:var(--ink2);white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.chip svg{width:10px;height:10px;stroke:var(--ink2)}
+.btn{height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13.5px;font-weight:700}
+.btn.pri{background:var(--ink);color:#fff}
+.btn.pri svg{width:15px;height:15px;fill:#fff;stroke:#fff}
+.btn.sec{background:#fff;border:1px solid var(--line);color:var(--ink2);font-weight:600}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;border:1px dashed var(--line);border-radius:8px;padding:10px 9px;background:#fff}
+.day{text-align:center}
+.day .d{font-family:var(--mono);font-size:8.5px;color:var(--ink3);letter-spacing:.06em}
+.day .dot{height:24px;border-radius:5px;background:var(--fill);border:1px dashed var(--line);margin-top:4px;display:flex;align-items:center;justify-content:center}
+.day .dot svg{width:12px;height:12px;stroke:#fff}
+.day.done .dot{background:var(--acc);border-color:var(--acc)}
+.day.today .dot{border:2px solid var(--ink);background:#fff}
+.day.rest .dot svg{stroke:var(--ink3)}
+.rh{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.rt{font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+/* horizontal peek row */
+.hrow{display:grid;grid-auto-flow:column;grid-auto-columns:72%;gap:10px;overflow:hidden}
+.cb{display:flex;flex-direction:column;gap:7px}
+.cb .thumb{position:relative;border:1px dashed var(--line);border-radius:6px;background:var(--fill);aspect-ratio:16/9;overflow:hidden}
+.cb .dur{position:absolute;right:5px;bottom:6px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:8.5px;padding:2px 5px;border-radius:3px}
+.cb .ribbon{position:absolute;left:0;top:8px;background:var(--acc);color:#fff;font-family:var(--mono);font-size:8px;letter-spacing:.08em;padding:3px 7px;border-radius:0 3px 3px 0}
+.cb .body{display:flex;gap:8px;align-items:flex-start}
+.cb .txt{flex:1;min-width:0}
+.cb .name{font-size:11.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+.cb .state{font-size:10px;color:var(--ink2);margin-top:2px}
+.cb .state.done{color:var(--acc);font-weight:600}
+.cb .save{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.cb .save svg{width:14px;height:14px;stroke:var(--ink2)}
+.cb .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;border:1.5px solid var(--ink);background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center}
+.cb .play svg{width:15px;height:15px;fill:var(--ink);stroke:var(--ink)}
+.prog{position:absolute;left:0;right:0;bottom:0;height:4px;background:#dadada}
+.prog i{display:block;height:100%;background:var(--acc)}
+.whisper{font-size:10px;line-height:1.35;color:var(--acc);background:var(--accbg);border:1px solid var(--accln);border-radius:5px;padding:6px 8px;display:flex;gap:6px;align-items:flex-start}
+.whisper svg{width:12px;height:12px;stroke:var(--acc);margin-top:1px}
+/* list item (search results) */
+.li{display:flex;gap:10px;align-items:flex-start}
+.li .th{position:relative;width:112px;flex:none;border:1px dashed var(--line);border-radius:5px;background:var(--fill);aspect-ratio:16/9;overflow:hidden}
+.li .th .dur{position:absolute;right:4px;bottom:4px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:8px;padding:1px 4px;border-radius:2px}
+.li .name{font-size:11.5px;font-weight:700;line-height:1.25}
+.li .sub{font-size:10px;color:var(--ink3);margin-top:3px}
+/* bottom sheet */
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1.5px solid var(--ink);border-radius:16px 16px 0 0;padding:10px 14px 16px;display:flex;flex-direction:column;gap:11px;box-shadow:0 -8px 24px rgba(0,0,0,.10);z-index:5}
+.grab{width:38px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 4px}
+.scrim{position:absolute;inset:0;background:rgba(20,20,20,.34);z-index:4}
+.srow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line2);font-size:12.5px;color:var(--ink2);min-height:44px}
+.srow svg{width:17px;height:17px;stroke:var(--ink2)}
+.srow:last-child{border-bottom:none}
+/* thumb map */
+.reach{position:absolute;inset:0;z-index:6;pointer-events:none}
+.reach .zone{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.z1{bottom:0;height:38%;background:rgba(53,92,77,.16);border-top:1px dashed var(--acc);color:var(--acc)}
+.z2{bottom:38%;height:28%;background:rgba(180,101,42,.10);border-top:1px dashed var(--warn);color:var(--warn)}
+.z3{top:0;height:34%;background:rgba(20,20,20,.06);border-bottom:1px dashed var(--ink3);color:var(--ink3)}
+/* player */
+.player{background:var(--ink);color:#fff;flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:14px}
+.player .top{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.7);font-family:var(--mono);font-size:9px}
+.player .top svg{width:16px;height:16px;stroke:rgba(255,255,255,.8)}
+.player .mid{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+.player .ex{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.player .cd{font-family:var(--mono);font-size:44px;font-weight:600;letter-spacing:-.03em}
+.player .nx{font-size:10.5px;color:rgba(255,255,255,.6)}
+.player .ctl{display:flex;align-items:center;justify-content:center;gap:16px}
+.player .cbtn{width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center}
+.player .cbtn.main{width:66px;height:66px;background:#fff}
+.player .cbtn svg{width:20px;height:20px;stroke:#fff}
+.player .cbtn.main svg{width:26px;height:26px;stroke:var(--ink);fill:var(--ink)}
+.pbar{height:5px;border-radius:3px;background:rgba(255,255,255,.22)}
+.pbar i{display:block;height:100%;border-radius:3px;background:#fff;width:38%}
+/* ── YouTube-grammar watch player ── */
+.ytp{position:relative;background:var(--ink);aspect-ratio:16/9;flex:none;overflow:hidden}
+.ytp .vart{position:absolute;inset:0;background:repeating-linear-gradient(135deg,#2a2a2a 0 12px,#333 12px 24px)}
+.ytp .ov{position:absolute;inset:0;background:rgba(0,0,0,.42);display:flex;flex-direction:column;justify-content:space-between;padding:9px 11px}
+.ytp .ovtop{display:flex;justify-content:space-between;align-items:center}
+.ytp .ovtop svg{width:17px;height:17px;stroke:#fff}
+.ytp .ovmid{display:flex;align-items:center;justify-content:center;gap:26px}
+.ytp .tb{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mono);font-size:8px;position:relative}
+.ytp .tb svg{width:20px;height:20px;stroke:#fff}
+.ytp .tb.main{width:54px;height:54px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4)}
+.ytp .tb.main svg{width:24px;height:24px;fill:#fff;stroke:#fff}
+.ytp .ovbot{display:flex;align-items:center;gap:9px;color:#fff;font-family:var(--mono);font-size:8.5px}
+.ytp .ovbot svg{width:15px;height:15px;stroke:#fff}
+.chapbar{display:flex;gap:3px;flex:1}
+.chapbar span{height:4px;border-radius:2px;background:rgba(255,255,255,.32);position:relative;overflow:hidden}
+.chapbar span i{position:absolute;left:0;top:0;bottom:0;background:#fff;display:block}
+.ytp .restbar{position:absolute;left:0;right:0;bottom:0;padding:0 9px 7px;display:flex;gap:3px}
+.ytp .restbar span{height:4px;border-radius:2px;background:rgba(255,255,255,.3);position:relative;overflow:hidden}
+.ytp .restbar span i{position:absolute;inset:0 auto 0 0;background:#fff}
+.ytbody{flex:1;min-height:0;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.ytbody>*{flex:none}
+.yttitle{padding:11px 13px 9px;border-bottom:1px solid var(--line2)}
+.yttitle .tt{font-size:14.5px;font-weight:800;letter-spacing:-.02em;line-height:1.2;display:flex;gap:8px;align-items:flex-start}
+.yttitle .tt svg{width:16px;height:16px;stroke:var(--ink3);flex:none;margin-top:2px}
+.yttitle .mt{font-size:10.5px;color:var(--ink2);margin-top:4px}
+.nowstrip{margin:11px 13px 0;border:1px solid var(--accln);background:var(--accbg);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:12px}
+.nowstrip .cd{font-family:var(--mono);font-size:30px;font-weight:600;letter-spacing:-.03em;color:var(--acc);line-height:1;font-variant-numeric:tabular-nums}
+.nowstrip .ex{font-size:13px;font-weight:800;letter-spacing:-.015em;color:var(--acc)}
+.nowstrip .nx{font-size:10px;color:var(--acc);opacity:.8;margin-top:2px}
+.nowstrip .stp{font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;color:var(--acc);opacity:.75}
+.pills{display:flex;gap:7px;padding:11px 13px;overflow:hidden}
+.pill{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--fill2);display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:var(--ink2);white-space:nowrap;flex:none}
+.pill svg{width:13px;height:13px;stroke:var(--ink2)}
+.pill.on{background:var(--acc);border-color:var(--acc);color:#fff}.pill.on svg{stroke:#fff}
+.chrow{display:flex;align-items:center;gap:10px;padding:10px 13px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+.chrow .nm{font-size:12px;font-weight:700}
+.chrow .sb{font-size:10px;color:var(--ink3)}
+.menulist{padding:9px 13px 0;display:flex;flex-direction:column;gap:0}
+.mi{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line2);min-height:44px}
+.mi .ix{width:20px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);text-align:center;flex:none}
+.mi .ix svg{width:13px;height:13px;stroke:var(--acc)}
+.mi .nm{font-size:11.5px;color:var(--ink2);flex:1}
+.mi .tm{font-family:var(--mono);font-size:9.5px;color:var(--ink3)}
+.mi.on{background:var(--accbg);margin:0 -13px;padding:8px 13px;border-bottom-color:var(--accln)}
+.mi.on .nm{color:var(--acc);font-weight:700}
+.mi.on .tm{color:var(--acc)}
+.mi.done .nm{color:var(--ink3)}
+/* rules */
+.rules{margin-top:28px;border-top:1px solid var(--ink)}
+.rules>div{display:grid;grid-template-columns:66px 1fr 1fr;gap:24px;padding:20px 0;border-bottom:1px solid var(--line2);align-items:start}
+.rules .num{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:.08em;padding-top:3px}
+.rules h3{font-size:16px;margin:0;font-weight:700;letter-spacing:-.01em}
+.rules p{margin:6px 0 0;font-size:14px;color:var(--ink2)}
+.rules .ev{font-size:13px;color:var(--ink2)}
+.rules .ev b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.dont{display:grid;grid-template-columns:1fr 1fr;gap:0 34px;margin-top:26px;border-top:1px solid var(--ink)}
+.dont>div{padding:15px 0;border-bottom:1px solid var(--line2);display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:13.5px;color:var(--ink2)}
+.dont .x{font-family:var(--mono);font-size:12px;color:var(--warn);font-weight:600}
+.dont b{color:var(--ink);font-weight:600}
+footer{margin-top:70px;padding-top:22px;border-top:2px solid var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+@media(max-width:1180px){.layout{grid-template-columns:1fr}.notes{position:static;flex-direction:row;flex-wrap:wrap}.note{flex:1 1 250px}.rules>div{grid-template-columns:1fr}.dont{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+<div class="kick">LEXFIT · Dashboard skeleton · Mobile expansion</div>
+<h1>The phone is the product.</h1>
+<p>Desktop was drawn first because it is easier to reason about; mobile is where the sessions actually happen — often propped against a wall with a mat already down. This document expands the mobile side of the skeleton: thirteen screens, the thumb-reach model behind them, and the rules that keep them familiar. Structure only, Variant B cards, Lucide icons.</p>
+<div class="legend">
+<span class="lg"><b>Nav</b> · fixed bottom tab bar, 4 destinations</span>
+<span class="lg"><b>Targets</b> · 44×44px minimum, everywhere</span>
+<span class="lg"><b>Card</b> · Variant B, one per row-width with peek</span>
+<span class="lg"><b>Icons</b> · Lucide (ISC)</span>
+</div>
+</header>
+
+<!-- ═══ M1 · CHASSIS ═══ -->
+<section>
+<div class="head"><span class="sn">M1</span><h2>The mobile chassis and the thumb</h2></div>
+<p class="lede">Three fixed layers: a slim top bar for identity and search, a scrolling content area, and a bottom tab bar that never moves. The reason the tabs are at the bottom is not fashion — it is Fitts's law: the time to hit a target is a function of its distance and size, and the bottom third of the screen is the only region the thumb reaches without regripping.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>01</b> · Chassis</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch" style="flex:1"><i data-lucide="search"></i> Keresés…</div><span class="streak"><i data-lucide="flame"></i>12</span><span class="ava"><i data-lucide="user-round"></i></span></div>
+<div class="mbody"><div style="border:1px dashed var(--line);border-radius:8px;background:var(--fill);flex:1;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-family:var(--mono);font-size:10px;text-align:center;padding:20px">GÖRGETHETŐ<br>TARTALOM</div></div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>02</b> · Thumb-reach model</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch" style="flex:1"><i data-lucide="search"></i> Keresés…</div><span class="ava"><i data-lucide="user-round"></i></span></div>
+<div class="mbody"></div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+<div class="reach">
+<div class="zone z3">Nehezen elérhető · csak információ</div>
+<div class="zone z2">Nyújtás · másodlagos</div>
+<div class="zone z1">Hüvelykujj-zóna · minden fő művelet</div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">RULE 06 · F-07</div><p><b>Fixed bottom tabs, four destinations, icon + permanent label.</b> Apple HIG has long recommended the tab bar; Material moved to bottom nav for primary destinations in 2016.</p></div>
+<div class="note"><div class="t">Fitts's law</div><p>The bottom band is the cheapest real estate on the device. <b>Primary actions live there; the top bar holds only identity and search.</b></p></div>
+<div class="note"><div class="t">Hidden-nav penalty</div><p>NN/g measured mobile users on hidden navigation at 57% usage vs 86% for partly-visible, and 15% slower on task. Visible tabs are the whole point.</p></div>
+<div class="note"><div class="t">Search stays reachable</div><p>The field is in the top bar of every screen — <b>it does not retreat into Videótár on small screens.</b> Top-right placement is the engraved convention even when the strip is narrow.</p></div>
+<div class="note warn"><div class="t">Target floor</div><p><b>44×44px minimum on every tab, save control and play button.</b> Tabs are 64px tall for this reason, not for visual weight.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ M2 · KEZDŐLAP ═══ -->
+<section>
+<div class="head"><span class="sn">M2</span><h2>Kezdőlap — above the fold, then the rows</h2></div>
+<p class="lede">The first screenful must answer one question: <em>what am I doing today, and can I start it now?</em> Hero, one loud button, then the week. Rows begin below the fold — that is correct, because a user with a plan never needs to scroll, and a user browsing always will.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>03</b> · Kezdőlap · első képernyő</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch" style="flex:1"><i data-lucide="search"></i> Keresés…</div><span class="streak"><i data-lucide="flame"></i>12</span><span class="ava"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div class="hero">
+    <div class="art"></div>
+    <div class="lbl">Foundation · 4. hét · csütörtök</div>
+    <div class="h1">Teljes test — EMOM</div>
+    <div style="display:flex;gap:5px"><span class="chip"><i data-lucide="clock"></i>28 PERC</span><span class="chip"><i data-lucide="flame"></i>KÖZEPES</span><span class="chip">ESZKÖZ NÉLKÜL</span></div>
+    <div class="btn pri" style="margin-top:4px"><i data-lucide="play"></i> Edzés indítása</div>
+  </div>
+  <div class="week">
+    <div class="day done"><div class="d">H</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day done"><div class="d">K</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day rest"><div class="d">SZE</div><div class="dot"><i data-lucide="moon"></i></div></div>
+    <div class="day today"><div class="d">CS</div><div class="dot"></div></div>
+    <div class="day"><div class="d">P</div><div class="dot"></div></div>
+    <div class="day"><div class="d">SZO</div><div class="dot"></div></div>
+    <div class="day"><div class="d">V</div><div class="dot"></div></div>
+  </div>
+  <div>
+    <div class="rh"><span class="rt">Folytatod</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div class="hrow">
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">18 PERC</span><span class="prog"><i style="width:70%"></i></span></div><div class="body"><div class="txt"><div class="name">Reggeli cardio flow</div><div class="state">5 perc van hátra</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">30 PERC</span></div><div class="body"><div class="txt"><div class="name">Teljes test</div></div></div></div>
+    </div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>04</b> · Kezdőlap · görgetve</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch" style="flex:1"><i data-lucide="search"></i> Keresés…</div><span class="streak"><i data-lucide="flame"></i>12</span><span class="ava"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div>
+    <div class="rh"><span class="rt">A Foundation heted</span><span class="lbl">Program <i data-lucide="chevron-right"></i></span></div>
+    <div class="hrow">
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="ribbon">MAI</span><span class="dur">28 PERC</span></div><div class="body"><div class="txt"><div class="name">Csütörtök · teljes test</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">28 PERC</span></div><div class="body"><div class="txt"><div class="name">Péntek · cardio</div></div></div></div>
+    </div>
+  </div>
+  <div>
+    <div class="rh"><span class="rt">Listám</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div class="hrow">
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">15 PERC</span></div><div class="body"><div class="txt"><div class="name">Hát &amp; tartás</div></div><span class="save"><i data-lucide="check"></i></span></div></div>
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">35 PERC</span></div><div class="body"><div class="txt"><div class="name">Tánc-cardio</div></div></div></div>
+    </div>
+  </div>
+  <div>
+    <div class="rh"><span class="rt">Ha csak 15 perced van</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div class="hrow">
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">10 PERC</span></div><div class="body"><div class="txt"><div class="name">Nyak &amp; váll oldás</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">8 PERC</span></div><div class="body"><div class="txt"><div class="name">Reggeli ébresztő</div></div></div></div>
+    </div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>05</b> · Pihenőnap</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch" style="flex:1"><i data-lucide="search"></i> Keresés…</div><span class="streak"><i data-lucide="flame"></i>12</span><span class="ava"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div class="hero" style="min-height:170px">
+    <div class="art"></div>
+    <div class="lbl"><i data-lucide="moon"></i> Foundation · 4. hét · szerda</div>
+    <div class="h1">Ma pihenőnap.</div>
+    <div class="whisper" style="background:rgba(255,255,255,.9)"><i data-lucide="message-circle"></i><span>„A pihenőnap is a terv része — a sorozatod megmarad."</span></div>
+    <div class="btn sec" style="margin-top:4px">Holnapi edzés megnézése</div>
+  </div>
+  <div class="week">
+    <div class="day done"><div class="d">H</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day done"><div class="d">K</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day today rest"><div class="d">SZE</div><div class="dot"><i data-lucide="moon"></i></div></div>
+    <div class="day"><div class="d">CS</div><div class="dot"></div></div>
+    <div class="day"><div class="d">P</div><div class="dot"></div></div>
+    <div class="day"><div class="d">SZO</div><div class="dot"></div></div>
+    <div class="day"><div class="d">V</div><div class="dot"></div></div>
+  </div>
+  <div>
+    <div class="rh"><span class="rt">Ha mégis mozognál</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div class="hrow">
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">10 PERC</span></div><div class="body"><div class="txt"><div class="name">Esti nyújtás</div></div><span class="save"><i data-lucide="plus"></i></span></div></div>
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">12 PERC</span></div><div class="body"><div class="txt"><div class="name">Légzés</div></div></div></div>
+    </div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">One loud action</div><p><b>"Edzés indítása" is the only filled button on the screen</b>, full width, 44px tall, sitting in the thumb zone. Nielsen: a quiet primary CTA gets overlooked because every other app shouts.</p></div>
+<div class="note"><div class="t">Rows: one card + peek</div><p>Cards are 72% of the row width so <b>the next one always peeks</b>. Users judge a row by its first thumbnails and swipe only when committed — the peek is what tells them swiping is possible.</p></div>
+<div class="note"><div class="t">Week strip above the rows</div><p>Ring-and-strip is the Apple Fitness / banking model for "am I on track". It stays above the fold; the rows do not.</p></div>
+<div class="note"><div class="t">Rest day protects the streak</div><p>The humane version of Duolingo's freeze: the flame does not break, and Alexa says so explicitly. Freeze-equipped streaks reportedly run ~48% longer past day seven.</p></div>
+<div class="note warn"><div class="t">Deliberate omission</div><p>No notification bell, no badge counts, no "new" dots on the home screen. Every additional signal competes with the one button that matters.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ M3 · SEARCH & LIBRARY ═══ -->
+<section>
+<div class="head"><span class="sn">M3</span><h2>Keresés and Videótár — browse, then results</h2></div>
+<p class="lede">Two modes, the YouTube split: rows while browsing, a vertical result list the moment intent is expressed. Results are one column, full width — legibility beats density once the user has already told us what they want.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>06</b> · Keresés · üres állapot</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="ava" style="border-style:solid"><i data-lucide="chevron-left"></i></span><div class="msearch" style="flex:1;height:36px;border-color:var(--ink)"><i data-lucide="search"></i> Keresés edzés, kategória…</div></div>
+<div class="mbody">
+  <div class="lbl">Gyors szűrők</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip" style="padding:8px 11px"><i data-lucide="clock"></i>10 PERC ALATT</span><span class="chip" style="padding:8px 11px">ALSÓTEST</span><span class="chip" style="padding:8px 11px">CARDIO</span><span class="chip" style="padding:8px 11px">KEZDŐ</span><span class="chip" style="padding:8px 11px">ESZKÖZ NÉLKÜL</span></div>
+  <div class="lbl" style="margin-top:4px">Legutóbbi keresések</div>
+  <div class="srow"><i data-lucide="clock"></i> has 15 perc</div>
+  <div class="srow"><i data-lucide="clock"></i> tánc-cardio</div>
+  <div class="srow"><i data-lucide="clock"></i> nyújtás este</div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab on"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>07</b> · Találatok · 1 oszlop</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="ava" style="border-style:solid"><i data-lucide="chevron-left"></i></span><div class="msearch" style="flex:1;height:36px"><i data-lucide="search"></i> has 15 perc</div><span class="ava" style="border-style:solid"><i data-lucide="x"></i></span></div>
+<div class="mbody" style="gap:11px">
+  <div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl">24 találat</span><span class="chip" style="padding:7px 10px"><i data-lucide="sliders-horizontal"></i>SZŰRŐK · 2</span></div>
+  <div class="li"><div class="th"><div class="art"></div><span class="dur">12 PERC</span></div><div><div class="name">Has &amp; core alapok</div><div class="sub">Alexa</div></div></div>
+  <div class="li"><div class="th"><div class="art"></div><span class="dur">15 PERC</span></div><div><div class="name">Mély has — haladó</div><div class="sub">Alexa</div></div></div>
+  <div class="li"><div class="th"><div class="art"></div><span class="dur">14 PERC</span><span class="prog"><i style="width:40%"></i></span></div><div><div class="name">Plank sorozat</div><div class="sub">9 perc van hátra</div></div></div>
+  <div class="li"><div class="th"><div class="art"></div><span class="dur">15 PERC</span></div><div><div class="name">Has &amp; hát egyensúly</div><div class="sub">Alexa</div></div></div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab on"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>08</b> · Szűrők · bottom sheet</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="ava" style="border-style:solid"><i data-lucide="chevron-left"></i></span><div class="msearch" style="flex:1;height:36px"><i data-lucide="search"></i> has 15 perc</div></div>
+<div class="mbody">
+  <div class="li" style="opacity:.5"><div class="th"><div class="art"></div></div><div><div class="name">Has &amp; core alapok</div></div></div>
+  <div class="li" style="opacity:.5"><div class="th"><div class="art"></div></div><div><div class="name">Mély has — haladó</div></div></div>
+  <div class="scrim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><span class="rt">Szűrők</span><span class="lbl">Törlés mind</span></div>
+    <div class="lbl">Hossz</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip" style="padding:8px 11px;background:var(--acc);color:#fff;border-color:var(--acc)">10 PERC ALATT</span><span class="chip" style="padding:8px 11px">10–20</span><span class="chip" style="padding:8px 11px">20–30</span><span class="chip" style="padding:8px 11px">30+</span></div>
+    <div class="lbl">Testrész</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip" style="padding:8px 11px;background:var(--acc);color:#fff;border-color:var(--acc)">HAS</span><span class="chip" style="padding:8px 11px">ALSÓTEST</span><span class="chip" style="padding:8px 11px">HÁT</span><span class="chip" style="padding:8px 11px">TELJES</span></div>
+    <div class="btn pri">24 találat megnézése</div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab on"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Browse vs. results</div><p>Rows while exploring; <b>a one-column list the moment a query or filter exists.</b> The same switch YouTube makes, and users already expect it.</p></div>
+<div class="note"><div class="t">Bottom sheet for filters</div><p>Filters open from the bottom, in the thumb zone, with a confirming button that <b>reports the result count before committing</b>. Sheets are the standard iOS and Material mobile disclosure.</p></div>
+<div class="note"><div class="t">Chips are 44px tall</div><p>Filter chips look small but their tap area is not. This is the most commonly failed target on the existing Apple TV page audit.</p></div>
+<div class="note warn"><div class="t">Recent searches, not suggestions</div><p>Recency beats cleverness on a small keyboard. NN/g: people are notoriously bad at formulating queries, and typing on mobile is expensive.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ M4 · WORKOUT FLOW ═══ -->
+<section>
+<div class="head"><span class="sn">M4</span><h2>The workout flow — detail sheet, player, done</h2></div>
+<p class="lede">The path from tapping a card to finishing a workout is the only flow the product truly needs to get right. Three moments, each borrowed: the detail sheet from Spotify/Apple Music, <b>the player from the YouTube watch page</b> — video pinned to the top, content scrolling beneath, tab bar intact — and the completion screen from Duolingo's lesson end.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>09</b> · Edzés részletei · sheet</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch" style="flex:1"><i data-lucide="search"></i> Keresés…</div><span class="ava"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div class="hero" style="min-height:150px;opacity:.45"><div class="art"></div></div>
+  <div class="scrim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="hero" style="min-height:112px;padding:11px"><div class="art"></div><div class="h1" style="font-size:16px">Teljes test — EMOM</div></div>
+    <div style="display:flex;gap:5px"><span class="chip"><i data-lucide="clock"></i>28 PERC</span><span class="chip"><i data-lucide="flame"></i>KÖZEPES</span><span class="chip"><i data-lucide="dumbbell"></i>ESZKÖZ NÉLKÜL</span></div>
+    <div class="whisper"><i data-lucide="message-circle"></i><span>„Ha egy perc túl sok, hagyd ki a felét — a lényeg, hogy itt vagy."</span></div>
+    <div class="lbl">Mit fogsz csinálni</div>
+    <div style="display:flex;gap:4px"><div class="chip" style="flex:1;justify-content:center">BEMELEGÍTÉS 4′</div><div class="chip" style="flex:2;justify-content:center;background:var(--accbg);border-color:var(--accln)">FŐ BLOKK 20′</div><div class="chip" style="flex:1;justify-content:center">LEVEZETÉS 4′</div></div>
+    <div style="display:flex;gap:9px"><div class="btn pri" style="flex:1"><i data-lucide="play"></i> Indítás</div><div class="btn sec" style="width:52px"><i data-lucide="plus"></i></div></div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>10</b> · Lejátszó → külön dokumentum</div>
+<div class="phone" style="align-items:center;justify-content:center;padding:26px;text-align:center;gap:12px">
+  <i data-lucide="play" style="width:30px;height:30px;stroke:var(--acc);fill:var(--acc)"></i>
+  <div style="font-size:15px;font-weight:800;letter-spacing:-.02em">A lejátszó saját vázlatot kapott</div>
+  <div style="font-size:12px;color:var(--ink2);line-height:1.5">A mobil lejátszó (YouTube-nyelvtan) és a vezérlő-állapotok átkerültek a <b>LEXFIT Player Wireframe</b> dokumentumba, a desktop változat mellé — hogy egy helyen legyen a két platform.</div>
+  <div class="lbl">L5 · Mobile</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>11</b> · Kész · lezárás</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mbody" style="justify-content:center;align-items:center;text-align:center;gap:18px;padding:26px">
+  <div style="width:88px;height:88px;border-radius:50%;background:var(--accbg);border:2px solid var(--acc);display:flex;align-items:center;justify-content:center"><i data-lucide="check" style="width:40px;height:40px;stroke:var(--acc);stroke-width:2.5"></i></div>
+  <div><div style="font-size:22px;font-weight:800;letter-spacing:-.025em">Megcsináltad.</div><div style="font-size:13px;color:var(--ink2);margin-top:6px">Teljes test — EMOM · 28 perc</div></div>
+  <div class="streak" style="height:38px;padding:0 16px;font-size:12px;border-style:solid;border-color:var(--acc);color:var(--acc)"><i data-lucide="flame"></i> 13 NAPOS SOROZAT</div>
+  <div class="week" style="width:100%">
+    <div class="day done"><div class="d">H</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day done"><div class="d">K</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day rest"><div class="d">SZE</div><div class="dot"><i data-lucide="moon"></i></div></div>
+    <div class="day done"><div class="d">CS</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day"><div class="d">P</div><div class="dot"></div></div>
+    <div class="day"><div class="d">SZO</div><div class="dot"></div></div>
+    <div class="day"><div class="d">V</div><div class="dot"></div></div>
+  </div>
+  <div class="whisper" style="text-align:left"><i data-lucide="message-circle"></i><span>„Ma ennyi volt a titok. Holnap cardio jön — ott leszek."</span></div>
+  <div style="width:100%;display:flex;flex-direction:column;gap:8px"><div class="btn pri">Kész</div><div class="btn sec">Megosztás</div></div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Detail sheet, not a page</div><p>Tapping a card opens a <b>bottom sheet over the current screen</b>, so dismissing returns you exactly where you were. Spotify and Apple Music both work this way; a full page navigation loses the user's place.</p></div>
+<div class="note"><div class="t">Player = the YouTube watch page</div><p><b>Video pinned at the top, everything else scrolling beneath it, tab bar still visible.</b> Controls appear on tap and fade — exactly the sequence the audience performs dozens of times a week.</p></div>
+<div class="note"><div class="t">Chapters → blocks</div><p>YouTube's segmented chapter scrubber maps onto <b>bemelegítés · fő blokk · levezetés</b> without inventing anything. Skip ±10s becomes the natural exercise-repeat control.</p></div>
+<div class="note"><div class="t">Where the slots are re-aimed</div><p>Title and meta stay put. YouTube's like/share pill row becomes <b>Mentés · TV-re</b> — only the two actions a workout actually needs; the channel row becomes Alexa ("4 hete együtt"); the description becomes the <b>live countdown strip</b>; up-next becomes "Mai menü".</p></div>
+<div class="note"><div class="t">The countdown is below the video, not over it</div><p>Overlaying a timer would obscure the demonstration and break the tap-to-reveal convention. It sits where YouTube's title block sits — always visible, never in the way.</p></div>
+<div class="note warn"><div class="t">Open question</div><p>Whether "Mai menü" should auto-scroll to keep the current exercise centred, or stay put so the user can look ahead. Both behaviours exist in the market.</p></div>
+<div class="note"><div class="t">The completion screen is the reward</div><p><b>Check, what you did, the streak, the week, one line from Alexa.</b> A finished workout is an achievement — never dimmed, never silent.</p></div>
+<div class="note"><div class="t">Sharing is optional and second</div><p>A great solo experience first; social as a secondary layer for those who want it.</p></div>
+<div class="note warn"><div class="t">Open question</div><p>Whether the player should keep the video visible during rest intervals or switch to a full-screen countdown. Both patterns exist in the market — worth testing.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ M5 · PROGRESS, COMMUNITY, PROFILE ═══ -->
+<section>
+<div class="head"><span class="sn">M5</span><h2>Haladásom, Kihívások, Profil</h2></div>
+<p class="lede">The remaining destinations. Each borrows one reference app wholesale so the four tabs feel like one product rather than four projects.</p>
+
+<div class="layout">
+<div class="screens">
+
+<div class="scr"><div class="scrlbl"><b>12</b> · Haladásom · Apple Fitness modell</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="brand">Haladásom</span><div style="flex:1"></div><span class="streak"><i data-lucide="flame"></i>13</span><span class="ava"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div style="display:flex;gap:14px;align-items:center;border:1px dashed var(--line);border-radius:8px;padding:14px;background:#fff">
+    <div style="width:74px;height:74px;border-radius:50%;border:9px solid var(--fill);border-top-color:var(--acc);border-right-color:var(--acc);flex:none"></div>
+    <div><div style="font-size:24px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums">4 / 5</div><div style="font-size:11px;color:var(--ink2)">edzés ezen a héten</div><div style="font-size:10px;color:var(--acc);margin-top:4px;font-weight:600">+1 a múlt héthez képest</div></div>
+  </div>
+  <div class="week">
+    <div class="day done"><div class="d">H</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day done"><div class="d">K</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day rest"><div class="d">SZE</div><div class="dot"><i data-lucide="moon"></i></div></div>
+    <div class="day done"><div class="d">CS</div><div class="dot"><i data-lucide="check"></i></div></div>
+    <div class="day"><div class="d">P</div><div class="dot"></div></div>
+    <div class="day"><div class="d">SZO</div><div class="dot"></div></div>
+    <div class="day"><div class="d">V</div><div class="dot"></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+    <div style="border:1px dashed var(--line);border-radius:8px;padding:11px;background:#fff;text-align:center"><div style="font-size:19px;font-weight:800;font-variant-numeric:tabular-nums">13</div><div style="font-size:9.5px;color:var(--ink3)">nap sorozat</div></div>
+    <div style="border:1px dashed var(--line);border-radius:8px;padding:11px;background:#fff;text-align:center"><div style="font-size:19px;font-weight:800;font-variant-numeric:tabular-nums">412</div><div style="font-size:9.5px;color:var(--ink3)">perc</div></div>
+    <div style="border:1px dashed var(--line);border-radius:8px;padding:11px;background:#fff;text-align:center"><div style="font-size:19px;font-weight:800;font-variant-numeric:tabular-nums">21</div><div style="font-size:9.5px;color:var(--ink3)">edzés</div></div>
+  </div>
+  <div style="border:1px dashed var(--line);border-radius:8px;padding:14px;background:#fff;display:flex;gap:11px;align-items:center"><i data-lucide="calendar-check" style="width:20px;height:20px;stroke:var(--acc)"></i><div><div style="font-size:12px;font-weight:700">8. hét — visszamérés</div><div style="font-size:10.5px;color:var(--ink2)">4 hét múlva · ugyanaz az edzés, mint az 1. héten</div></div></div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab on"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>13</b> · Kihívások · archívum</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="brand">Kihívások</span><div style="flex:1"></div><span class="ava"><i data-lucide="user-round"></i></span></div>
+<div class="mbody" style="gap:11px">
+  <div style="display:flex;gap:6px;overflow:hidden"><span class="chip"><i data-lucide="clock"></i>HOSSZ</span><span class="chip">TESTRÉSZ</span><span class="chip"><i data-lucide="check"></i>ÁLLAPOT</span></div>
+  <div>
+    <div class="rh" style="margin-bottom:7px"><span class="rt" style="font-size:12.5px">Folytatod</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div class="hrow">
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">14 NAP</span><span class="prog"><i style="width:36%"></i></span></div><div class="body"><div class="txt"><div class="name">14 napos reggeli flow</div><div class="meta2">5 / 14 nap kész</div></div></div></div>
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">7 NAP</span><span class="prog"><i style="width:72%"></i></span></div><div class="body"><div class="txt"><div class="name">7 napos has</div></div></div></div>
+    </div>
+  </div>
+  <div>
+    <div class="rh" style="margin-bottom:7px"><span class="rt" style="font-size:12.5px">A legutóbbi hetek</span><span class="lbl">Összes <i data-lucide="chevron-right"></i></span></div>
+    <div class="hrow">
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="ribbon">ÚJ</span><span class="dur">10 NAP</span></div><div class="body"><div class="txt"><div class="name">10 napos alsótest</div><div class="meta2">2025. március</div></div></div></div>
+      <div class="cb"><div class="thumb"><div class="art"></div><span class="dur">7 NAP</span></div><div class="body"><div class="txt"><div class="name">7 napos hát</div></div></div></div>
+    </div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab on"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+<div class="scr"><div class="scrlbl"><b>14</b> · Profil · avatar sheet</div>
+<div class="phone">
+<div class="status"><span>9:41</span><span>LTE ▪ 84%</span></div>
+<div class="mtop"><span class="lexmark"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span><span class="brand">LEXFIT</span><div class="msearch" style="flex:1"><i data-lucide="search"></i> Keresés…</div><span class="ava on"><i data-lucide="user-round"></i></span></div>
+<div class="mbody">
+  <div class="hero" style="min-height:150px;opacity:.4"><div class="art"></div></div>
+  <div class="scrim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div style="display:flex;gap:11px;align-items:center;padding-bottom:9px;border-bottom:1px solid var(--line2)">
+      <span class="ava" style="width:44px;height:44px"><i data-lucide="user-round" style="width:22px;height:22px"></i></span>
+      <div><div style="font-size:14px;font-weight:700">Réka</div><div style="font-size:11px;color:var(--ink2)">Foundation · 4. hét</div></div>
+    </div>
+    <div class="srow"><i data-lucide="user-round"></i> Profil</div>
+    <div class="srow"><i data-lucide="calendar-check"></i> Az edzésterved</div>
+    <div class="srow"><i data-lucide="bell"></i> Emlékeztetők</div>
+    <div class="srow"><i data-lucide="sliders-horizontal"></i> Beállítások</div>
+    <div class="srow"><i data-lucide="message-circle"></i> Segítség</div>
+  </div>
+</div>
+<div class="mtabs">
+<div class="mtab on"><span class="ic"><i data-lucide="house"></i></span>Kezdőlap</div>
+<div class="mtab"><span class="ic"><i data-lucide="layout-grid"></i></span>Videótár</div>
+<div class="mtab"><span class="ic"><i data-lucide="chart-column"></i></span>Haladásom</div>
+<div class="mtab"><span class="ic"><i data-lucide="trophy"></i></span>Kihívások</div>
+</div>
+</div></div>
+
+</div>
+
+<div class="notes">
+<div class="note"><div class="t">Profile is a sheet, not a tab</div><p>Four tabs is the sweet spot; a fifth for profile would crowd the bar. <b>The avatar stays top-right</b> — the most engraved position — and opens a sheet in the thumb zone.</p></div>
+<div class="note"><div class="t">Haladásom · ring first</div><p>Ring, big tabular numbers, week strip, "vs. last week". No bespoke charts — the model is already installed by Apple Fitness and banking apps.</p></div>
+<div class="note"><div class="t">Kihívások · an archive, not a feed</div><p>The Szavazz Magadra weeks, kept and re-playable. <b>The voting stays in the Facebook group;</b> the app is the shelf. See the Kihívások skeleton.</p></div>
+<div class="note warn"><div class="t">Label</div><p>Drawn as <b>Kihívások</b> — the plain word for what the destination contains. "Szavazz Magadra" remains the name of the series inside it.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ M6 · RULES ═══ -->
+<section>
+<div class="head"><span class="sn">M6</span><h2>Mobile rules</h2></div>
+<div class="rules">
+<div><div class="num">M-RULE 01</div><div><h3>Four tabs, fixed, labelled, forever.</h3><p>Icon above a permanently visible word. The active tab is filled. No fifth tab, no hiding on scroll.</p></div><div class="ev"><b>Evidence</b>Apple HIG tab-bar preference; Material's 2016 shift; NN/g hidden-nav penalty of 15% slower tasks on mobile.</div></div>
+<div><div class="num">M-RULE 02</div><div><h3>Everything you tap lives in the bottom third.</h3><p>Primary buttons full-width above the tab bar; sheets rise from the bottom; destructive or rare actions may sit high.</p></div><div class="ev"><b>Evidence</b>Fitts's law — time to acquire a target is a function of distance and size.</div></div>
+<div><div class="num">M-RULE 03</div><div><h3>44×44px, no exceptions.</h3><p>Chips, save buttons, tabs, transport controls. Visual size may be smaller than tap size.</p></div><div class="ev"><b>Evidence</b>WCAG 2.5.8 / Apple HIG 44pt; already flagged as a failure on the existing Apple TV page.</div></div>
+<div><div class="num">M-RULE 04</div><div><h3>One card wide, with the next one peeking.</h3><p>72% of the row width. The peek is the only thing that tells a user the row scrolls.</p></div><div class="ev"><b>Evidence</b>SIGIR '26 — users judge a row by its first thumbnails and swipe only when committed.</div></div>
+<div><div class="num">M-RULE 05</div><div><h3>Sheets, not new pages, for anything you dismiss.</h3><p>Detail, filters, profile. The user's place in the scroll is never lost.</p></div><div class="ev"><b>Evidence</b>Standard iOS/Material disclosure; Spotify and Apple Music both use it for track detail.</div></div>
+<div><div class="num">M-RULE 06</div><div><h3>Search never retreats.</h3><p>Present in the top bar of every screen, even when the strip is tight.</p></div><div class="ev"><b>Evidence</b>Nielsen lists the open search box, top and right, as a canonical Jakob's Law pattern.</div></div>
+</div>
+
+<h3 style="margin-top:44px;font-size:19px;letter-spacing:-.02em">What we are deliberately not doing on mobile</h3>
+<div class="dont">
+<div><span class="x">✕</span><span><b>A hamburger menu anywhere.</b> Mobile hidden nav measured 57% usage vs 86% for partly-visible, and 15% slower on task.</span></div>
+<div><span class="x">✕</span><span><b>Hiding the tab bar on scroll.</b> Saves 64px, costs the user's map of the product.</span></div>
+<div><span class="x">✕</span><span><b>A floating action button.</b> There is already one loud action per screen; an FAB would compete with it and obscure content.</span></div>
+<div><span class="x">✕</span><span><b>Gesture-only navigation</b> with no visible control. Swipe may be an accelerator, never the only route.</span></div>
+<div><span class="x">✕</span><span><b>Icon-only tabs</b> once users "learn" the app. Labels are permanent — the audience skews 35+, and 65+ users are 43% slower on the web.</span></div>
+<div><span class="x">✕</span><span><b>Two-column card grids on the home screen.</b> Halves the artwork at exactly the moment the artwork is doing the work.</span></div>
+</div>
+</section>
+
+<footer>LEXFIT · Mobile skeleton · Structure only — no visual design decisions made</footer>
+</div>
+<script>window.addEventListener("load",function(){window.lexfitIcons&&window.lexfitIcons()});</script>
+</body>
+</html>

@@ -10,13 +10,19 @@ import { useAuth } from "@/lib/auth-context";
 import { Protected, Loader } from "@/components/Protected";
 import { Check } from "@/components/OnbAside";
 import { getPlaybackTokens, type PlaybackResponse } from "@/lib/playback";
-import { ensureProgress, getProgress, markComplete, saveResume } from "@/lib/progress";
+import {
+  ensureProgress, getProgress, saveResume, clearResume,
+  notePendingCompletion, getPendingCompletions, syncMuxProgress, type ProgressState,
+} from "@/lib/progress";
+import { computeStreak, ymd } from "@/lib/streak";
 import { getMyList, setSaved as setSavedRemote } from "@/lib/mylist";
 import { normalizeExercise } from "@/lib/blocks";
 import type { Video, VideoBlock } from "@/lib/types";
 import { secToClock } from "@/lib/time";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
+import { FinishShareEntry } from "@/components/finish/FinishShareEntry";
+import { buildFinishData } from "@/lib/finish-data";
 
 const CAT: Record<string, { c: string; word: string }> = {
   "Alsótest": { c: "var(--cat-also)", word: "ALSÓ" },
@@ -66,10 +72,18 @@ function PlayerScreen({ code }: { code: string }) {
   const [speed, setSpeed] = useState(1);
   const [fs, setFs] = useState(false);
   const [result, setResult] = useState<{ streak: number } | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const lastSavedRef = useRef(0);
+  // Watch time + completions come from Mux Data server-side (/api/progress/sync).
+  // The player only tags views with viewer_user_id and drops an optimistic local
+  // marker when a workout visibly completes, bridging Mux's finalization delay.
+  const progRef = useRef<ProgressState | null>(null);
+  const posRef = useRef(0);
+  const durRef = useRef(0);
   // L4 controls: volume, mute, gear menu, elapsed⇄remaining, keyboard help, idle-fade.
   const [vol, setVol] = useState(1);
   const [muted, setMuted] = useState(false);
+  const [castAvail, setCastAvail] = useState(false); // a real cast target exists
   const [gearOpen, setGearOpen] = useState(false);
   const [showRemain, setShowRemain] = useState(false);
   const [keysOpen, setKeysOpen] = useState(false);
@@ -96,6 +110,7 @@ function PlayerScreen({ code }: { code: string }) {
       const sess = await getDocs(query(collection(db, "programs", "foundation", "sessions"), where("videoCode", "==", code)));
       if (active && !sess.empty) setSessionOrder(sess.docs[0].data().order ?? 0);
       const prog = await getProgress(user.uid);
+      progRef.current = prog;
       if (active && prog?.resume?.[code]) setResumeAt(prog.resume[code]);
     })();
     return () => { active = false; };
@@ -104,7 +119,7 @@ function PlayerScreen({ code }: { code: string }) {
   // Seed duration from the stored Mux duration so stamped block math is correct
   // before the player's own `loadedmetadata` fires (which then sets the exact value).
   useEffect(() => {
-    if (video?.muxDuration) setDur(video.muxDuration);
+    if (video?.muxDuration) { setDur(video.muxDuration); durRef.current = video.muxDuration; }
   }, [video]);
 
   // Skip the player's own preview stage when arrived via an explicit "play" action
@@ -188,6 +203,16 @@ function PlayerScreen({ code }: { code: string }) {
   // ── overlay copy ──────────────────────────────────────────────────────────
   const blockName = blocks[active]?.name ?? "";
   const totalEx = useMemo(() => blocks.reduce((n, b) => n + (b.items?.length ?? 0), 0), [blocks]);
+  // Memoized so the share sheet / desktop handoff gets a STABLE `data` object —
+  // an inline rebuild each render tears down the handoff's onSnapshot listener.
+  const finishData = useMemo(
+    () => (video ? buildFinishData({
+      title: video.title, mins: video.mins, theme: video.theme,
+      streak: result?.streak ?? 1, exercises: totalEx,
+      workoutNo: (progRef.current?.doneCount ?? 0) + 1,
+    }) : null),
+    [video, result?.streak, totalEx],
+  );
   const exBefore = useMemo(() => blocks.slice(0, active).reduce((n, b) => n + (b.items?.length ?? 0), 0), [blocks, active]);
   const curExNum = exBefore + Math.max(0, activeEx) + 1;
   const repText = totalEx > 0 ? `${curExNum} / ${totalEx} · ${blockName.toUpperCase()}` : `${active + 1} / ${blocks.length} · ${blockName.toUpperCase()}`;
@@ -229,11 +254,24 @@ function PlayerScreen({ code }: { code: string }) {
     }
   }
 
-  async function finish() {
+  // The workout visibly completed. No Firestore write — the authoritative
+  // completion arrives via the Mux sync once the view finalizes. Locally: drop
+  // the pending marker, clear the resume position, and compute the streak
+  // optimistically for the finish screen (identical math to the server's).
+  function finish() {
     setStage("finished");
     if (user) {
-      const r = await markComplete(user.uid, code, sessionOrder);
-      setResult({ streak: r.streak });
+      notePendingCompletion(code);
+      void clearResume(user.uid, code);
+      const p = progRef.current;
+      const dates = new Set([
+        ...((p?.completed ?? []).map((c) => String(c.at))),
+        ...getPendingCompletions().map((c) => c.at),
+        ymd(new Date()),
+      ]);
+      setResult({ streak: computeStreak(dates, new Set(p?.workoutDays ?? []), ymd(new Date())) });
+      // Nudge the sync once Mux has likely finalized the view.
+      setTimeout(() => void syncMuxProgress({ force: true }), 20_000);
     }
   }
 
@@ -242,16 +280,17 @@ function PlayerScreen({ code }: { code: string }) {
     if (!el || !pb) return;
     const onTime = () => {
       const t = el.currentTime ?? 0;
+      posRef.current = t;
       setCur(t);
       if (user && t - lastSavedRef.current >= 5) {
         lastSavedRef.current = t;
         saveResume(user.uid, code, t);
       }
     };
-    const onMeta = () => setDur(el.duration ?? 0);
+    const onMeta = () => { setDur(el.duration ?? 0); durRef.current = el.duration ?? 0; };
     const onPlay = () => setPaused(false);
     const onPause = () => setPaused(true);
-    const onEnd = () => void finish();
+    const onEnd = () => finish();
     el.addEventListener("timeupdate", onTime);
     el.addEventListener("loadedmetadata", onMeta);
     el.addEventListener("play", onPlay);
@@ -263,6 +302,10 @@ function PlayerScreen({ code }: { code: string }) {
       el.removeEventListener("play", onPlay);
       el.removeEventListener("pause", onPause);
       el.removeEventListener("ended", onEnd);
+      // Leaving inside the last 10% still counts — mark it so Haladásom can
+      // show the workout before the Mux view lands.
+      const d = durRef.current;
+      if (d > 0 && posRef.current / d >= 0.9) notePendingCompletion(code);
     };
     // `stage` is required: the token is now prefetched during preview, so `pb` is
     // already set before the player mounts. We must re-run when we enter "playing"
@@ -300,6 +343,50 @@ function PlayerScreen({ code }: { code: string }) {
     setMuted(next);
     if (el) el.muted = next;
   };
+  // Cast to TV. mux-player proxies the media API; the underlying <video> carries
+  // AirPlay (Safari) + the Remote Playback API (Chromecast-capable Chrome). We
+  // gate the cast UI on real device availability so we never show a dead button.
+  const getVideo = () => {
+    const p = playerRef.current; // mux-player element (useRef<any>)
+    return p?.media?.nativeEl ?? p?.media ?? p ?? null;
+  };
+  const castToTv = () => {
+    const v = getVideo();
+    if (!v) return;
+    try {
+      if (typeof v.webkitShowPlaybackTargetPicker === "function") { v.webkitShowPlaybackTargetPicker(); return; }
+      if (v.remote?.prompt) v.remote.prompt().catch(() => {});
+    } catch { /* no cast target — button is only shown when available anyway */ }
+  };
+  // Watch for cast targets once the media element exists (it mounts after "playing").
+  useEffect(() => {
+    if (stage !== "playing") return;
+    let disposed = false;
+    let cleanup = () => {};
+    const attach = (): boolean => {
+      const v = getVideo();
+      if (!v) return false;
+      if (typeof v.webkitShowPlaybackTargetPicker === "function") {
+        const onAvail = (e: { availability?: string }) => setCastAvail(e.availability === "available");
+        v.addEventListener("webkitplaybacktargetavailabilitychanged", onAvail);
+        cleanup = () => v.removeEventListener("webkitplaybacktargetavailabilitychanged", onAvail);
+        return true;
+      }
+      if (v.remote?.watchAvailability) {
+        v.remote.watchAvailability((a: boolean) => setCastAvail(a))
+          .then((id: number) => { if (disposed) v.remote.cancelWatchAvailability(id).catch(() => {}); else cleanup = () => v.remote.cancelWatchAvailability(id).catch(() => {}); })
+          .catch(() => {});
+        return true;
+      }
+      return false;
+    };
+    if (!attach()) {
+      const iv = setInterval(() => { if (attach()) clearInterval(iv); }, 400);
+      const stop = setTimeout(() => clearInterval(iv), 4000);
+      cleanup = () => { clearInterval(iv); clearTimeout(stop); };
+    }
+    return () => { disposed = true; cleanup(); setCastAvail(false); };
+  }, [stage]);
   const toggleFs = () => {
     const el = frameRef.current;
     if (!document.fullscreenElement && el?.requestFullscreen) el.requestFullscreen().catch(() => {});
@@ -488,7 +575,7 @@ function PlayerScreen({ code }: { code: string }) {
         <button className="pf-ex" onClick={exit}><LxIcon d={lxPaths.chevronLeft} size={16} /> Kilépés</button>
         <div className="pf-ttl"><span className="nm">{video.title}</span><span className="c">{video.code} · FOUNDATION · {video.theme.toUpperCase()}</span></div>
         <div className="pf-toprt">
-          <button className="pf-ico" aria-label="Lejátszás TV-n"><LxIcon d={lxPaths.cast} size={16} /></button>
+          {castAvail && <button className="pf-ico" onClick={castToTv} aria-label="Lejátszás TV-n"><LxIcon d={lxPaths.cast} size={16} /></button>}
           <button className={`pf-ico${muted ? " on" : ""}`} onClick={toggleMute} aria-label={muted ? "Hang be" : "Némítás"}><LxIcon d={muted ? lxPaths.volumeX : lxPaths.volume2} size={16} /></button>
           <button className="pf-ico" onClick={() => setKeysOpen((v) => !v)} aria-label="Gyorsbillentyűk"><LxIcon d={lxPaths.ellipsis} size={16} /></button>
         </div>
@@ -501,7 +588,14 @@ function PlayerScreen({ code }: { code: string }) {
               <MuxPlayer ref={playerRef} className="pf-video" playbackId={pb.playbackId} tokens={pb.tokens}
                 startTime={resumeAt} streamType="on-demand" accentColor="#7a9b8d" autoPlay preload="auto"
                 initialBandwidthEstimateKbps={3000} initialEstimateSegments={2}
-                metadata={{ video_title: video.title, video_id: video.code }} />
+                metadata={{
+                  video_title: video.title,
+                  video_id: video.code,
+                  // Attribute the view to the user — the /api/progress/sync
+                  // route queries Mux Data by this id (watch time + completions).
+                  viewer_user_id: user?.uid,
+                  video_duration: video.muxDuration ? Math.round(video.muxDuration * 1000) : undefined,
+                }} />
             )}
 
             {/* over-video: two numbers dominate (L2 · L-RULE 01/02) */}
@@ -533,7 +627,7 @@ function PlayerScreen({ code }: { code: string }) {
                   <button onClick={exit} aria-label="Kilépés"><LxIcon d={lxPaths.chevronDown} size={18} /></button>
                   <div className="rt">
                     <button onClick={() => setHud((v) => !v)} aria-label={hud ? "Adatok elrejtése" : "Adatok mutatása"}><LxIcon d={hud ? lxPaths.eye : lxPaths.eyeOff} size={17} /></button>
-                    <button aria-label="TV-re"><LxIcon d={lxPaths.cast} size={17} /></button>
+                    {castAvail && <button onClick={castToTv} aria-label="TV-re"><LxIcon d={lxPaths.cast} size={17} /></button>}
                     <button onClick={() => setKeysOpen((v) => !v)} aria-label="Továbbiak"><LxIcon d={lxPaths.ellipsisV} size={17} /></button>
                   </div>
                 </div>
@@ -570,6 +664,9 @@ function PlayerScreen({ code }: { code: string }) {
                 <span className="pf-end-ic"><Check size={30} /></span>
                 <div className="h">Megcsináltad.</div>
                 <div className="s">{video.title} · {video.mins} perc · a sorozatod <b>{result?.streak ?? 1} napos</b> lett</div>
+                <button className="pf-share" onClick={() => setShareOpen(true)}>
+                  <LxIcon d={lxPaths.play} size={15} /> Oszd meg egy szelfivel
+                </button>
                 <div className="q">Hogy ment ma?</div>
                 <div className="pf-rate">
                   {["Könnyű volt", "Jó volt", "Kemény volt"].map((f) => (<button key={f} onClick={exit}>{f}</button>))}
@@ -583,6 +680,11 @@ function PlayerScreen({ code }: { code: string }) {
                 )}
                 <button className="pf-skip" onClick={exit}>Most nem · kihagyom</button>
               </div>
+            )}
+
+            {/* Finish share — selfie + data overlay (mobile: inline camera; desktop: QR handoff) */}
+            {finishData && (
+              <FinishShareEntry open={shareOpen} onClose={() => setShareOpen(false)} data={finishData} />
             )}
 
             {/* keyboard help (?) */}
@@ -634,7 +736,7 @@ function PlayerScreen({ code }: { code: string }) {
                 <button className="r" onClick={cycleSpeed}><LxIcon d={lxPaths.gauge} size={15} /> Sebesség <span className="v">{speed}×</span></button>
                 <div className="r"><LxIcon d={lxPaths.captions} size={15} /> Felirat <span className="v">MAGYAR</span></div>
                 <div className="r"><LxIcon d={lxPaths.settings} size={15} /> Minőség <span className="v">AUTO · 1080p</span></div>
-                <div className="r"><LxIcon d={lxPaths.cast} size={15} /> Lejátszás TV-n <span className="v">AIRPLAY</span></div>
+                {castAvail && <button className="r" onClick={castToTv}><LxIcon d={lxPaths.cast} size={15} /> Lejátszás TV-n <span className="v">AIRPLAY</span></button>}
               </div>
             )}
           </div>
@@ -685,7 +787,7 @@ function PlayerScreen({ code }: { code: string }) {
           </div>
           <div className="pf-pills">
             <button className={`pf-pill${saved ? " on" : ""}`} onClick={toggleSave}><LxIcon d={saved ? lxPaths.check : lxPaths.plus} size={13} /> {saved ? "Mentve" : "Mentés"}</button>
-            <button className="pf-pill"><LxIcon d={lxPaths.cast} size={13} /> TV-re</button>
+            {castAvail && <button className="pf-pill" onClick={castToTv}><LxIcon d={lxPaths.cast} size={13} /> TV-re</button>}
           </div>
           <div className="pf-chrow">
             <span className="ava"><img src="/alexa-av.jpg" alt="" /></span>

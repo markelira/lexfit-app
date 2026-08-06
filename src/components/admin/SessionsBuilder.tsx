@@ -21,7 +21,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { adminJson } from "@/lib/admin-fetch";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
-import type { ProgramSession } from "@/lib/types";
 
 /** A video as shown in the session picker (a link target from the library). */
 export interface PickVideo {
@@ -29,6 +28,13 @@ export interface PickVideo {
   title: string;
   theme: string;
   muxStatus: string;
+}
+
+/** Ordered-video builder is shared by Programok (sessions) and Kihívások (days) —
+ *  both are "link existing videos + drag to order", differing only in endpoint,
+ *  the source video pool, and copy. Only `videoCode` is read from initial items. */
+interface OrderedItem {
+  videoCode: string;
 }
 
 interface Row {
@@ -43,11 +49,25 @@ export function SessionsBuilder({
   slug,
   initialSessions,
   videos,
+  endpoint,
+  title = "Lejátszási lista",
+  hint = "Kapcsolj be videókat a videótárból, és húzd a ⠿ fogantyúval a kívánt sorrendbe — mint egy lejátszási lista. A hét/nap-beosztást a program a sorrendből számolja.",
+  saveLabel = "Lejátszási lista mentése",
+  pickLabel = "Videó bekapcsolása a videótárból",
+  pickPlaceholder = "Keresés a videótárban (kód, cím, téma)…",
 }: {
   slug: string;
-  initialSessions: ProgramSession[];
+  initialSessions: OrderedItem[];
   videos: PickVideo[];
+  /** POST target (full-replace). Defaults to the program sessions endpoint. */
+  endpoint?: string;
+  title?: string;
+  hint?: string;
+  saveLabel?: string;
+  pickLabel?: string;
+  pickPlaceholder?: string;
 }) {
+  const saveUrl = endpoint ?? `/api/admin/programs/${encodeURIComponent(slug)}/sessions`;
   const [rows, setRows] = useState<Row[]>(() => initialSessions.map((s) => ({ uid: newUid(), videoCode: s.videoCode })));
   const [pickQ, setPickQ] = useState("");
   const [saving, setSaving] = useState(false);
@@ -89,7 +109,7 @@ export function SessionsBuilder({
     setSaving(true);
     setErr("");
     try {
-      await adminJson(`/api/admin/programs/${encodeURIComponent(slug)}/sessions`, {
+      await adminJson(saveUrl, {
         method: "PUT",
         body: JSON.stringify({ sessions: rows.map((r) => ({ videoCode: r.videoCode })) }),
       });
@@ -104,13 +124,10 @@ export function SessionsBuilder({
   return (
     <div className="adm-card">
       <div className="adm-fil-hd">
-        <h3>Lejátszási lista</h3>
+        <h3>{title}</h3>
         <span className="cnt">{rows.length} videó</span>
       </div>
-      <div className="adm-fhint" style={{ marginBottom: 12 }}>
-        Kapcsolj be videókat a videótárból, és húzd a ⠿ fogantyúval a kívánt sorrendbe — mint egy lejátszási lista. A
-        hét/nap-beosztást a program a sorrendből számolja.
-      </div>
+      <div className="adm-fhint" style={{ marginBottom: 12 }}>{hint}</div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={rows.map((r) => r.uid)} strategy={verticalListSortingStrategy}>
@@ -126,10 +143,10 @@ export function SessionsBuilder({
 
       {/* Link an existing library video */}
       <div style={{ marginTop: 18 }}>
-        <label className="adm-flabel" style={{ display: "block", marginBottom: 8 }}>Videó bekapcsolása a videótárból</label>
+        <label className="adm-flabel" style={{ display: "block", marginBottom: 8 }}>{pickLabel}</label>
         <div className="adm-searchbox" style={{ maxWidth: "none", marginBottom: 8 }}>
           <LxIcon d={lxPaths.search} size={15} />
-          <input value={pickQ} onChange={(e) => setPickQ(e.target.value)} placeholder="Keresés a videótárban (kód, cím, téma)…" />
+          <input value={pickQ} onChange={(e) => setPickQ(e.target.value)} placeholder={pickPlaceholder} />
         </div>
         <div className="adm-vpick">
           {videos.length === 0 ? (
@@ -152,7 +169,7 @@ export function SessionsBuilder({
 
       <div className="adm-savebar">
         <button className="adm-btn primary" onClick={save} disabled={saving}>
-          {saving ? "Mentés…" : "Lejátszási lista mentése"}
+          {saving ? "Mentés…" : saveLabel}
         </button>
         {saved && <span className="status saved">Mentve ✓</span>}
         {err && <span className="status error">{err}</span>}

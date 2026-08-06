@@ -16,10 +16,15 @@ import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { levelWord } from "@/lib/categories";
 import { loadLibrary, type LibVideo } from "@/lib/library";
+import { loadChallenges, type ChallengeCardData } from "@/lib/challenges";
+import { ChallengeCard } from "@/components/ChallengeCard";
 import { GuideController, GUIDE_START_EVENT } from "@/components/GuidedTour";
 import { JoinCinematic } from "@/components/JoinCinematic";
 import { loadFoundation, dayState, type FoundationData, type WorkoutItem } from "@/lib/program";
 import { confirmCheckout } from "@/lib/billing";
+import { getPrefs, updatePrefs } from "@/lib/prefs";
+import type { Prefs } from "@/lib/profile";
+import { FirstEntry } from "@/components/FirstEntry";
 
 type AnyVideo = WorkoutItem | LibVideo;
 
@@ -31,8 +36,10 @@ export default function KezdolapPage() {
   const [modalVideo, setModalVideo] = useState<WorkoutItem | null>(null);
   const [myList, setMyList] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState<ProgressState | null>(null);
+  const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [cineOpen, setCineOpen] = useState(false);
   const [libVideos, setLibVideos] = useState<LibVideo[]>([]);
+  const [challenges, setChallenges] = useState<ChallengeCardData[]>([]);
   const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
   const isMobile = useIsMobile();
 
@@ -65,8 +72,24 @@ export default function KezdolapPage() {
     if (user) {
       getMyList(user.uid).then(setMyList).catch(() => {});
       getProgress(user.uid).then(setProgress).catch(() => {});
+      getPrefs(user.uid).then(setPrefs).catch(() => {});
+      loadChallenges(user.uid).then((d) => setChallenges(d.challenges)).catch(() => {});
     }
   }, [reload, user]);
+
+  // First-entry reminder card (40 §40.9 / P7.2). P0.6 = email channel, so
+  // "Beállítom" only writes the pref — no OS permission prompt. Both answers set
+  // `prompted` so the card never returns; the toggle stays in Beállítások.
+  const answerReminder = useCallback(
+    async (enabled: boolean) => {
+      if (!user) return;
+      setPrefs((p) =>
+        p ? { ...p, reminders: { ...p.reminders, workout: { ...p.reminders.workout, enabled, prompted: true } } } : p,
+      );
+      await updatePrefs(user.uid, { reminders: { workout: { enabled, prompted: true } } }).catch(() => {});
+    },
+    [user],
+  );
 
   async function toggleSave(code: string) {
     if (!user) return;
@@ -165,11 +188,21 @@ export default function KezdolapPage() {
   // 4 · Ha csak 15 perced van
   const rowShort = libVideos.filter((v) => v.mins <= 15 && v.kind === "workout");
 
-  // 5 · Szavazz Magadra · a heti kihívás
-  const rowChallenge = libVideos.filter((v) => v.kind === "bonus");
+  // 5 · Szavazz Magadra · kihívások — in-progress first (C-RULE 06: challenges
+  // live in the rows, never the hero), then the rest newest-first for discovery.
+  const chInProgress = challenges.filter((c) => c.state === "folyamatban");
+  const chSeen = new Set(chInProgress.map((c) => c.slug));
+  const rowChallenge = [...chInProgress, ...challenges.filter((c) => !chSeen.has(c.slug))].slice(0, 10);
 
   return (
     <div className="home fade-in">
+      <FirstEntry
+        doneCount={doneCount}
+        prefs={prefs}
+        onSetReminder={() => answerReminder(true)}
+        onDismissReminder={() => answerReminder(false)}
+      />
+
       <Billboard
         program={program}
         joined={joined}
@@ -195,7 +228,20 @@ export default function KezdolapPage() {
         <HomeRow title="Folytatod" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowResume.map(cardFor)} />
         <HomeRow title="Listám" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowList.map(cardFor)} />
         <HomeRow title="Ha csak 15 perced van" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowShort.map(cardFor)} />
-        <HomeRow title="Szavazz Magadra · a heti kihívás" allLabel="Kihívások" onAll={() => router.push("/app/challenges")} cards={rowChallenge.map(cardFor)} />
+        <HomeRow
+          title="Szavazz Magadra · kihívások"
+          allLabel="Kihívások"
+          onAll={() => router.push("/app/challenges")}
+          cards={rowChallenge.map((c) => (
+            <ChallengeCard
+              key={c.slug}
+              c={c}
+              saved={myList.has(c.slug)}
+              onOpen={(s) => router.push(`/app/challenges/${s}`)}
+              onToggleSave={toggleSave}
+            />
+          ))}
+        />
       </div>
 
       {modalVideo && (
@@ -243,7 +289,7 @@ function Billboard({
   const equip = !program.equipment || /nincs/i.test(program.equipment) ? "ESZKÖZ NÉLKÜL" : program.equipment.toUpperCase();
   const eyebrow = joined
     ? `${program.title.toUpperCase()} · ${curWeek}. HÉT · MAI EDZÉS`
-    : "LEXFIT · 8 HETES PROGRAM";
+    : "LEXFIT · OTTHONI EDZÉS"; // no hardcoded program length (it's data-driven)
 
   return (
     <section className="hb">

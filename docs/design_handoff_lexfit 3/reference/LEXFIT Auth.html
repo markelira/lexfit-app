@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEXFIT — Belépés</title>
+<script src="image-slot.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box}
+:root{
+ --accent:#7a9b8d;--accent-2:#496c5e;--accent-ink:#355c4d;--soft:#e1f1ea;
+ --ink:#18201d;--ink-2:#44544d;--ink-3:#5c6e66;
+ --bg:#f1f6f4;--surface:#fff;--surface-2:#e8efec;--line:#d8e0dd;--line-2:#c5cfca;
+ --d-bg:#18201d;--d-surface:#232d29;--d-ink:#f0f4f3;--d-ink-2:#9baca5;--d-accent:#80b19d;
+ --danger:#b13a38;
+ --font:"Poppins",sans-serif;--mono:"IBM Plex Mono",monospace}
+html,body{height:100%}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+a{color:var(--accent-ink);text-decoration:none}
+a:hover{color:var(--ink);text-decoration:underline}
+button{font-family:inherit;cursor:pointer}
+
+.shell{display:grid;grid-template-columns:1.02fr .98fr;min-height:100vh}
+
+/* ---------- LEFT · brand panel ---------- */
+.brand{position:relative;background:linear-gradient(160deg,#eaf4ef 0%,var(--soft) 46%,#d3e8de 100%);color:var(--ink);padding:44px 56px;display:flex;flex-direction:column;overflow:hidden}
+.brand::before{content:"";position:absolute;width:820px;height:820px;left:-18%;bottom:-34%;border-radius:50%;
+ background:radial-gradient(circle,rgba(122,155,141,.34),transparent 62%);filter:blur(30px);pointer-events:none}
+.brand::after{content:"";position:absolute;inset:0;pointer-events:none;
+ background:repeating-linear-gradient(115deg,transparent 0 118px,rgba(24,32,29,.028) 118px 119px)}
+.bmark{position:relative;z-index:2;display:flex;align-items:center;gap:12px}
+.bmark-ico{width:44px;height:44px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 16px -8px rgba(24,32,29,.45)}
+.bmark-ico svg{width:24px;height:22px;display:block}
+.bmark .wm{font-weight:800;font-size:20px;letter-spacing:.02em}
+.bbody{position:relative;z-index:2;margin-top:auto;margin-bottom:auto;padding:48px 0;max-width:460px}
+.bquote{font-weight:300;font-size:clamp(30px,3.2vw,46px);line-height:1.08;letter-spacing:-.03em;text-wrap:balance}
+.bquote b{font-weight:700}
+.bsub{font-size:15.5px;line-height:1.6;color:var(--ink-2);margin-top:20px;max-width:400px}
+.bstats{display:flex;gap:34px;margin-top:36px;flex-wrap:wrap}
+.bstats .s .v{font-weight:700;font-size:24px;letter-spacing:-.02em;line-height:1}
+.bstats .s .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin-top:7px}
+.bfoot{position:relative;z-index:2;display:flex;align-items:center;gap:14px;padding-top:22px;border-top:1px solid rgba(24,32,29,.14)}
+.bav{width:44px;height:44px;border-radius:50%;overflow:hidden;flex:none;border:1.5px solid rgba(24,32,29,.16);position:relative;background:#fff}
+.bav image-slot{position:absolute;inset:0}
+.bfoot .t{font-size:13.5px;line-height:1.45}
+.bfoot .t b{font-weight:600}
+.bfoot .t span{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-top:3px}
+
+/* ---------- RIGHT · auth ---------- */
+.auth{display:flex;align-items:center;justify-content:center;padding:44px 40px;background:var(--surface)}
+.card{width:100%;max-width:432px}
+.topline{display:flex;justify-content:flex-end;font-size:13.5px;color:var(--ink-2);margin-bottom:34px}
+.topline a{font-weight:600;margin-left:7px}
+
+/* segmented toggle */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:28px}
+.seg button{border:none;background:transparent;border-radius:999px;padding:11px 0;font-size:13.5px;font-weight:600;color:var(--ink-3);transition:.18s}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(24,32,29,.12)}
+
+h1{font-weight:600;font-size:29px;letter-spacing:-.032em;margin:0;line-height:1.14}
+.lede{font-size:14.5px;color:var(--ink-2);line-height:1.55;margin:9px 0 26px}
+
+.oauth{display:flex;flex-direction:column;gap:10px}
+.ob{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;height:50px;border:1.5px solid var(--line);
+ background:var(--surface);border-radius:12px;font-size:14.5px;font-weight:600;color:var(--ink);transition:.18s}
+.ob:hover{border-color:var(--line-2);background:#fbfdfc}
+.ob svg{width:19px;height:19px;flex:none}
+
+.div{display:flex;align-items:center;gap:14px;margin:22px 0;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.div::before,.div::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+.inp{position:relative;display:flex;align-items:center}
+.inp input{width:100%;height:50px;border:1.5px solid var(--line);border-radius:12px;padding:0 15px;font-family:inherit;font-size:15px;color:var(--ink);background:var(--surface);transition:.18s}
+.inp input::placeholder{color:var(--ink-3)}
+.inp input:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(73,108,94,.16)}
+.inp.has-btn input{padding-right:52px}
+.eye{position:absolute;right:6px;width:40px;height:40px;border:none;background:none;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ink-3)}
+.eye:hover{background:var(--bg);color:var(--ink)}
+.lab-row{display:flex;justify-content:space-between;align-items:baseline}
+.lab-row a{font-size:12.5px;font-weight:500}
+.hint{font-size:12.5px;color:var(--ink-3);margin-top:7px;line-height:1.5}
+.err{display:none;font-size:12.5px;color:var(--danger);margin-top:7px;font-weight:500}
+.field.bad input{border-color:var(--danger)}
+.field.bad .err{display:block}
+
+.check{display:flex;gap:10px;align-items:flex-start;margin:4px 0 20px;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.check input{width:17px;height:17px;margin:1px 0 0;accent-color:var(--accent-2);flex:none}
+
+.submit{width:100%;height:52px;border:none;border-radius:12px;background:var(--ink);color:#fff;
+ font-size:14px;font-weight:600;letter-spacing:.02em;transition:.18s;display:flex;align-items:center;justify-content:center;gap:9px}
+.submit:hover{background:#0f1512;transform:translateY(-1px);box-shadow:0 10px 22px -12px rgba(24,32,29,.6)}
+.submit .sp{width:15px;height:15px;border:2px solid rgba(255,255,255,.32);border-top-color:#fff;border-radius:50%;display:none;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.submit.loading .sp{display:block}
+.submit.loading .tx{opacity:.75}
+
+.legal{font-size:12px;color:var(--ink-3);line-height:1.6;margin-top:18px;text-align:center}
+.trust{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:26px;
+ font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.trust svg{width:13px;height:13px}
+
+.pane{display:none}
+.pane.on{display:block;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+@media(max-width:940px){
+ .shell{grid-template-columns:1fr}
+ .brand{padding:32px 30px;min-height:auto}
+ .bbody{padding:28px 0;margin:0}
+ .bquote{font-size:28px}
+ .bstats{gap:26px;margin-top:24px}
+ .auth{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- LEFT -->
+  <aside class="brand">
+    <div class="bmark">
+      <span class="bmark-ico"><svg viewBox="0 0 680 616" aria-hidden="true"><g transform="translate(-192,-152)"><path d="M248 712A400 400 0 0 1 648 312" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="round"/><circle cx="800" cy="224" r="72" fill="#ffffff"/></g></svg></span>
+      <span class="wm">LEXFIT</span>
+    </div>
+
+    <div class="bbody">
+      <div class="bquote">Egyedül nehéz.<br><b>Együtt muszáj.</b></div>
+      <p class="bsub">4 hetes vezetett program, 100+ edzés és egy közösség, ami megtart. Otthon, eszköz nélkül, napi 30 percben.</p>
+      <div class="bstats">
+        <div class="s"><div class="v">4 hét</div><div class="k">Foundation</div></div>
+        <div class="s"><div class="v">100+</div><div class="k">edzés</div></div>
+        <div class="s"><div class="v">17 000+</div><div class="k">a közösségben</div></div>
+      </div>
+    </div>
+
+    <div class="bfoot">
+      <div class="bav"><image-slot id="auth-alexa" shape="circle" placeholder="Alexa portré"></image-slot></div>
+      <div class="t"><b>Alexa</b><span>Alapító · minden edzést ő vezet</span></div>
+    </div>
+  </aside>
+
+  <!-- RIGHT -->
+  <main class="auth">
+    <div class="card">
+
+      <div class="topline" id="topline"><span>Még nincs fiókod?</span><a href="#" data-go="reg">Regisztrálj</a></div>
+
+      <div class="seg" role="tablist">
+        <button role="tab" class="on" data-tab="login" aria-selected="true">Belépés</button>
+        <button role="tab" data-tab="reg" aria-selected="false">Regisztráció</button>
+      </div>
+
+      <!-- LOGIN -->
+      <section class="pane on" id="pane-login">
+        <h1>Üdv újra itt.</h1>
+        <p class="lede">Lépj be, és folytasd ott, ahol abbahagytad.</p>
+
+        <div class="oauth">
+          <button class="ob" type="button">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.5 7l7.6 5.9c4.4-4.1 6.6-10.1 6.6-17.4z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C1 16.4 0 20.1 0 24s1 7.6 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.7-3.7-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+            Folytatás Google-lel
+          </button>
+          <button class="ob" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#18201d" d="M16.4 12.8c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.6.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.5.8 1.2 1.8 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.9.8 3.1.7c1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.6-3.8zM14 4.9c.7-.8 1.1-1.9 1-3-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.4z"/></svg>
+            Folytatás Apple-lel
+          </button>
+        </div>
+
+        <div class="div">vagy</div>
+
+        <div class="field">
+          <label for="l-email">E-mail cím</label>
+          <div class="inp"><input id="l-email" type="email" placeholder="nev@example.com" autocomplete="email"></div>
+          <div class="err">Adj meg egy érvényes e-mail címet.</div>
+        </div>
+
+        <div class="field">
+          <div class="lab-row"><label for="l-pw">Jelszó</label><a href="#">Elfelejtetted?</a></div>
+          <div class="inp has-btn">
+            <input id="l-pw" type="password" placeholder="••••••••" autocomplete="current-password">
+            <button class="eye" type="button" aria-label="Jelszó megjelenítése"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <div class="err">Add meg a jelszavad.</div>
+        </div>
+
+        <label class="check"><input type="checkbox" checked><span>Maradjak bejelentkezve ezen az eszközön</span></label>
+
+        <button class="submit" type="button" data-submit><span class="sp"></span><span class="tx">Belépés</span></button>
+
+        <div class="trust">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          Titkosított kapcsolat
+        </div>
+      </section>
+
+      <!-- REGISTER -->
+      <section class="pane" id="pane-reg">
+        <h1>Kezdjük el.</h1>
+        <p class="lede">Hozz létre egy fiókot — a csomagot a következő lépésben választod ki.</p>
+
+        <div class="oauth">
+          <button class="ob" type="button">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.5 7l7.6 5.9c4.4-4.1 6.6-10.1 6.6-17.4z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C1 16.4 0 20.1 0 24s1 7.6 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.7-3.7-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+            Regisztráció Google-lel
+          </button>
+          <button class="ob" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#18201d" d="M16.4 12.8c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.6.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.5.8 1.2 1.8 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.9.8 3.1.7c1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.6-3.8zM14 4.9c.7-.8 1.1-1.9 1-3-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.4z"/></svg>
+            Regisztráció Apple-lel
+          </button>
+        </div>
+
+        <div class="div">vagy</div>
+
+        <div class="field">
+          <label for="r-name">Keresztneved</label>
+          <div class="inp"><input id="r-name" type="text" placeholder="Anna" autocomplete="given-name"></div>
+          <div class="err">Add meg a keresztneved.</div>
+        </div>
+
+        <div class="field">
+          <label for="r-email">E-mail cím</label>
+          <div class="inp"><input id="r-email" type="email" placeholder="nev@example.com" autocomplete="email"></div>
+          <div class="err">Adj meg egy érvényes e-mail címet.</div>
+        </div>
+
+        <div class="field">
+          <label for="r-pw">Jelszó</label>
+          <div class="inp has-btn">
+            <input id="r-pw" type="password" placeholder="Legalább 8 karakter" autocomplete="new-password">
+            <button class="eye" type="button" aria-label="Jelszó megjelenítése"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <div class="hint">Legalább 8 karakter, egy számmal.</div>
+          <div class="err">A jelszó legyen legalább 8 karakter, és tartalmazzon számot.</div>
+        </div>
+
+        <label class="check"><input type="checkbox"><span>Kérek heti emlékeztetőt és új edzés-értesítőt. Bármikor leiratkozhatsz.</span></label>
+
+        <button class="submit" type="button" data-submit><span class="sp"></span><span class="tx">Fiók létrehozása</span></button>
+
+        <p class="legal">A folytatással elfogadod az <a href="#">ÁSZF</a>-et és az <a href="#">Adatkezelési tájékoztatót</a>.</p>
+
+        <div class="trust">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3v6c0 5-3.4 8.3-8 9-4.6-.7-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+          14 napos pénzvisszafizetési garancia
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+const panes={login:document.getElementById('pane-login'),reg:document.getElementById('pane-reg')};
+const segs=[...document.querySelectorAll('.seg button')];
+const topline=document.getElementById('topline');
+const TOP={login:['Még nincs fiókod?','Regisztrálj','reg'],reg:['Van már fiókod?','Lépj be','login']};
+
+function show(tab){
+  segs.forEach(b=>{const on=b.dataset.tab===tab;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+  for(const k in panes) panes[k].classList.toggle('on',k===tab);
+  const [t,a,go]=TOP[tab];
+  topline.innerHTML='<span>'+t+'</span><a href="#" data-go="'+go+'">'+a+'</a>';
+  const f=panes[tab].querySelector('input[type=email],input[type=text]');
+  if(f) setTimeout(()=>f.focus(),60);
+}
+segs.forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+document.addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(a){e.preventDefault();show(a.dataset.go);}});
+
+// password reveal
+document.querySelectorAll('.eye').forEach(btn=>btn.addEventListener('click',()=>{
+  const i=btn.parentElement.querySelector('input');
+  const show=i.type==='password';
+  i.type=show?'text':'password';
+  btn.setAttribute('aria-label',show?'Jelszó elrejtése':'Jelszó megjelenítése');
+  btn.style.color=show?'var(--accent-ink)':'';
+}));
+
+// inline validation + loading state
+function validate(pane){
+  let ok=true;
+  pane.querySelectorAll('.field').forEach(f=>{
+    const i=f.querySelector('input'); if(!i) return;
+    let bad=false;
+    if(i.type==='email') bad=!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(i.value.trim());
+    else if(i.type==='password'||i.id==='r-pw') bad=i.id==='r-pw' ? !(i.value.length>=8&&/\d/.test(i.value)) : i.value.length<1;
+    else bad=i.value.trim().length<1;
+    f.classList.toggle('bad',bad); if(bad)ok=false;
+  });
+  return ok;
+}
+document.querySelectorAll('[data-submit]').forEach(btn=>btn.addEventListener('click',()=>{
+  const pane=btn.closest('.pane');
+  if(!validate(pane)){pane.querySelector('.field.bad input')?.focus();return;}
+  btn.classList.add('loading');
+  setTimeout(()=>btn.classList.remove('loading'),1400);
+}));
+document.querySelectorAll('.field input').forEach(i=>i.addEventListener('input',()=>i.closest('.field').classList.remove('bad')));
+</script>
+</body>
+</html>

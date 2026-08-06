@@ -21,6 +21,9 @@ interface AuthState {
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signOutUser: () => Promise<void>;
+  /** Re-read the current user after a profile edit (updateProfile mutates in place,
+   *  and onAuthStateChanged doesn't fire) so the top bar reflects it without reload. */
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -36,6 +39,7 @@ appleProvider.addScope("name");
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [, forceTick] = useState(0);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
@@ -64,9 +68,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut(auth);
   }
 
+  async function refreshUser() {
+    if (!auth.currentUser) return;
+    await auth.currentUser.reload();
+    // updateProfile mutated the User in place; keep the real reference (so getIdToken
+    // etc. stay intact) and force a re-render so consumers re-read displayName/photoURL.
+    setUser(auth.currentUser);
+    forceTick((t) => t + 1);
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail, signOutUser }}
+      value={{ user, loading, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail, signOutUser, refreshUser }}
     >
       {children}
     </AuthContext.Provider>

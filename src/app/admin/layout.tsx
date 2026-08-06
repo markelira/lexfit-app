@@ -14,6 +14,8 @@ const NAV: [string, keyof typeof lxPaths, string][] = [
   ["/admin", "grid", "Vezérlőpult"],
   ["/admin/videos", "play", "Videók"],
   ["/admin/programs", "flame", "Programok"],
+  ["/admin/challenge-videos", "trophy", "Kihívás-videók"],
+  ["/admin/challenges", "trophy", "Kihívások"],
   ["/admin/filters", "filter", "Szűrők"],
   ["/admin/members", "chart", "Tagok"],
 ];
