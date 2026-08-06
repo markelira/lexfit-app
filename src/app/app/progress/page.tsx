@@ -230,7 +230,11 @@ function derive(
   // Rest-day-aware streak uses the same training days, 0-based Mon..Sun.
   const workoutIdx = new Set<number>(plan.weekdays.map((w) => w - 1));
 
-  const inRange = (from: Date, to: Date) => dates.filter((s) => { const d = parseYmd(s); return d >= from && d < to; }).length;
+  // Distinct DONE DAYS in a range (not raw completions) — a day you trained
+  // counts once, matching the ring/checkmarks. Keeps the delta + Heti ritmus
+  // bars on the same metric as `thisWeek`.
+  const inRange = (from: Date, to: Date) =>
+    new Set(dates.filter((s) => { const d = parseYmd(s); return d >= from && d < to; })).size;
 
   const mon = mondayOf(today);
   const lastWeek = inRange(addDays(mon, -7), mon);

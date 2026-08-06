@@ -57,8 +57,6 @@ export function computeWeekProgress(opts: {
 
   const mon = mondayOf(now);
   const todayKey = ymd(now);
-  const monKey = ymd(mon);
-  const endKey = ymd(addDays(mon, 7));
 
   const days: WeekDay[] = Array.from({ length: 7 }, (_, i) => {
     const date = ymd(addDays(mon, i));
@@ -75,10 +73,15 @@ export function computeWeekProgress(opts: {
     };
   });
 
-  const doneThisWeek = dates.filter((s) => s >= monKey && s < endKey).length;
+  // The ring numerator is the number of DONE DAYS this week — one per calendar
+  // day you trained, exactly the strip's checkmarks. NOT the raw completion
+  // count (two workouts on one day is still one done day) and never rest days
+  // that had no workout (they only keep the streak). So it always agrees with
+  // the checkmarks, the streak, and "elvégzett edzés".
+  const doneThisWeek = days.filter((d) => d.done).length;
   // The weekly target is the number of TRAINING days — the workouts you'll do
-  // that week. Rest days are never counted here (they only keep the streak); the
-  // denominator always equals the count of non-rest cells.
+  // that week. Rest days are never counted here; the denominator always equals
+  // the count of non-rest cells.
   const target = Math.max(1, training.size || opts.daysPerWeek || 1);
   return { days, target, doneThisWeek, weekdays: [...training].sort((a, b) => a - b) };
 }
