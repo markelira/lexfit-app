@@ -786,7 +786,7 @@ function PlayerScreen({ code }: { code: string }) {
           <div className="pf-chrow">
             <span className="ava"><img src="/alexa-av.jpg" alt="" /></span>
             <div style={{ flex: 1 }}><div className="nm">Alexa</div><div className="sb">A te edződ</div></div>
-            {result?.streak != null && <span className="pf-streak"><LxIcon d={lxPaths.flame} size={12} fill />{result.streak}</span>}
+            {result?.streak != null && <span className="pf-streak"><span className="fire" aria-hidden="true">🔥</span>{result.streak}</span>}
           </div>
           <div className="pf-menulist">
             <div className="lbl">Mai menü</div>

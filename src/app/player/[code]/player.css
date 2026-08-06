@@ -329,6 +329,7 @@
   .lx .pf-chrow .sb { font-size: 10.5px; color: var(--ink-3); }
   .lx .pf-streak { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); font-family: var(--mono); font-size: 11px; color: var(--ink-2); background: var(--surface); }
   .lx .pf-streak svg { color: var(--ink-3); }
+  .lx .pf-streak .fire { font-size: 11px; line-height: 1; }
 
   .lx .pf-menulist { padding: 11px 14px 18px; display: flex; flex-direction: column; }
   .lx .pf-menulist .lbl { font-size: 11px; font-weight: 700; color: var(--ink-2); padding-bottom: 6px; }

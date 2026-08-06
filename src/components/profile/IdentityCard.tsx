@@ -42,7 +42,7 @@ export function IdentityCard({
           <div className="id-actions">
             {streak > 0 && (
               <span className="id-streak">
-                <LxIcon d={lxPaths.flame} size={12} fill /> {streak} NAPOS SOROZAT
+                <span className="fire" aria-hidden="true">🔥</span> {streak} NAPOS SOROZAT
               </span>
             )}
             <button type="button" className="lxbtn s secondary id-set" onClick={onSettings}>

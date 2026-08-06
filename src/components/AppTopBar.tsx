@@ -232,7 +232,7 @@ export function AppTopBar({ streak }: { streak: number }) {
         {menuSub && <span className="sb">{menuSub}</span>}
       </span>
       {streak > 0 && (
-        <span className="lxam-streak"><LxIcon d={lxPaths.flame} size={13} fill /> {streak}</span>
+        <span className="lxam-streak"><span className="fire" aria-hidden="true">🔥</span> {streak}</span>
       )}
     </div>
   );
@@ -337,25 +337,28 @@ export function AppTopBar({ streak }: { streak: number }) {
         </span>
       </Link>
 
-      <div className="lxtb-searchwrap" ref={searchRef}>
-        <form className={`lxtb-search${searchOpen ? " open" : ""}`} role="search" onSubmit={submitSearch}>
-          <LxIcon d={lxPaths.search} size={16} />
-          <input
-            type="search"
-            value={q}
-            readOnly={isMobile}
-            onChange={(e) => setQ(e.target.value)}
-            onFocus={() => setSearchOpen(true)}
-            onClick={() => setSearchOpen(true)}
-            placeholder="Keresés edzés, kategória, hossz…"
-            aria-label="Keresés edzés, kategória, hossz"
-          />
-        </form>
+      {/* Desktop: a full inline search field. Mobile: it collapses to an icon in
+          the right cluster (below) so the bar never overflows a narrow phone. */}
+      {!isMobile && (
+        <div className="lxtb-searchwrap" ref={searchRef}>
+          <form className={`lxtb-search${searchOpen ? " open" : ""}`} role="search" onSubmit={submitSearch}>
+            <LxIcon d={lxPaths.search} size={16} />
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onFocus={() => setSearchOpen(true)}
+              onClick={() => setSearchOpen(true)}
+              placeholder="Keresés edzés, kategória, hossz…"
+              aria-label="Keresés edzés, kategória, hossz"
+            />
+          </form>
 
-        {searchOpen && !isMobile && (
-          <div className="lxtb-spanel" role="dialog" aria-label="Keresés">{searchBody}</div>
-        )}
-      </div>
+          {searchOpen && (
+            <div className="lxtb-spanel" role="dialog" aria-label="Keresés">{searchBody}</div>
+          )}
+        </div>
+      )}
 
       {searchOpen && isMobile &&
         createPortal(
@@ -386,8 +389,14 @@ export function AppTopBar({ streak }: { streak: number }) {
         )}
 
       <div className="lxtb-right">
+        {isMobile && (
+          <button className="lxtb-iconbtn" onClick={() => setSearchOpen(true)} aria-label="Keresés">
+            <LxIcon d={lxPaths.search} size={18} />
+          </button>
+        )}
+
         <span className="lxtb-streak" aria-label={`Sorozat: ${streak} nap`}>
-          <LxIcon d={lxPaths.flame} size={14} fill />
+          <span className="fire" aria-hidden="true">🔥</span>
           <b>{streak}<span className="u"> NAP</span></b>
         </span>
 
