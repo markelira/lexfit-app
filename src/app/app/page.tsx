@@ -20,7 +20,7 @@ import { loadChallenges, type ChallengeCardData } from "@/lib/challenges";
 import { ChallengeCard } from "@/components/ChallengeCard";
 import { GuideController, GUIDE_START_EVENT } from "@/components/GuidedTour";
 import { JoinCinematic } from "@/components/JoinCinematic";
-import { loadFoundation, dayState, type FoundationData, type WorkoutItem } from "@/lib/program";
+import { loadFoundation, type FoundationData, type WorkoutItem } from "@/lib/program";
 import { confirmCheckout } from "@/lib/billing";
 import { getPrefs, updatePrefs } from "@/lib/prefs";
 import type { Prefs } from "@/lib/profile";
@@ -215,12 +215,9 @@ export default function KezdolapPage() {
       />
 
       <WeekStrip
-        workouts={weeks.find((w) => w.num === curWeek)?.workouts ?? weeks[0]?.workouts ?? []}
-        joined={joined}
-        doneCount={doneCount}
-        currentIndex={currentIndex}
-        perWeek={perWeek}
-        curWeek={curWeek}
+        weekdays={prefs?.plan.weekdays ?? []}
+        daysPerWeek={prefs?.plan.daysPerWeek ?? perWeek}
+        completedDates={(progress?.completed ?? []).map((c) => (typeof c.at === "string" ? c.at : "")).filter(Boolean)}
       />
 
       <div className="home-rows">
@@ -352,55 +349,76 @@ const WEEK_DAYS: [string, string][] = [
   ["P", "Péntek"], ["SZO", "Szombat"], ["V", "Vasárnap"],
 ];
 
-function WeekStrip({
-  workouts, joined, doneCount, currentIndex, perWeek, curWeek,
-}: {
-  workouts: WorkoutItem[];
-  joined: boolean;
-  doneCount: number;
-  currentIndex: number;
-  perWeek: number;
-  curWeek: number;
-}) {
-  if (!workouts.length) return null;
+// Local Monday-first date helpers for the plan strip.
+const pad2 = (n: number) => String(n).padStart(2, "0");
+const ymdLocal = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const addDaysLocal = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 
-  // map each scheduled session onto its weekday column
-  const byCol: Record<string, "done" | "today" | "todo" | "preview"> = {};
-  workouts.forEach((w) => {
-    const key = (w.day || "").toUpperCase();
-    if (key) byCol[key] = dayState(w.order, joined, doneCount, currentIndex);
+/**
+ * The weekly plan strip: the user's OWN training days (prefs.plan.weekdays,
+ * 1=Mon…7=Sun), this real calendar week, and which of those days are already
+ * done — never the program cursor. Today is the real weekday, "done" comes from
+ * dated completions, and any non-training day is a rest day. The ring targets
+ * the user's chosen days/week.
+ */
+function WeekStrip({
+  weekdays, daysPerWeek, completedDates,
+}: {
+  weekdays: number[];        // 1=Mon … 7=Sun — the user's chosen training days
+  daysPerWeek: number;
+  completedDates: string[];  // YYYY-MM-DD completion days
+}) {
+  // Resolve "now" after mount so the strip follows the viewer's own clock and
+  // never mismatches server markup (todayIdx = -1 → no highlight until mounted).
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => setNow(new Date()), []);
+  if (!weekdays.length) return null;
+
+  const ref = now ?? new Date();
+  const todayIdx = now ? (now.getDay() + 6) % 7 : -1;      // 0=Mon … 6=Sun
+  const monday = addDaysLocal(ref, -((ref.getDay() + 6) % 7));
+  const done = new Set(completedDates);
+  const training = new Set(weekdays);                       // 1..7
+
+  const cells = WEEK_DAYS.map(([abbr, full], i) => {
+    const key = ymdLocal(addDaysLocal(monday, i));
+    return { abbr, full, done: done.has(key), isToday: i === todayIdx, rest: !training.has(i + 1) };
   });
 
-  const doneThisWeek = Math.min(perWeek, Math.max(0, doneCount - (curWeek - 1) * perWeek));
-  const ringPct = perWeek ? Math.round((doneThisWeek / perWeek) * 100) : 0;
+  const target = Math.max(1, daysPerWeek || training.size);
+  const doneThisWeek = cells.filter((c) => c.done).length;
+  const ringPct = Math.round((Math.min(doneThisWeek, target) / target) * 100);
 
-  const cls = (s?: string) =>
-    s === "done" ? "done" : s === "today" ? "today" : s == null ? "rest" : "todo";
-  const label = (s?: string) =>
-    s === "done" ? "kész" : s === "today" ? "mai nap · nincs kész" : s == null ? "pihenőnap" : "nincs kész";
+  // A finished day always reads as done; otherwise the real today is highlighted;
+  // otherwise it's an upcoming training day (todo) or a rest day.
+  const clsOf = (c: (typeof cells)[number]) =>
+    c.done ? "done" : c.isToday ? "today" : c.rest ? "rest" : "todo";
+  const labelOf = (c: (typeof cells)[number]) => {
+    const base = c.done ? "kész" : c.rest ? "pihenőnap" : "nincs kész";
+    return c.isToday ? `ma · ${base}` : base;
+  };
 
   return (
     <div>
-      <div className="wstrip" role="group" aria-label={`A hét: ${doneThisWeek} / ${perWeek} kész`}>
+      <div className="wstrip" role="group" aria-label={`A hét: ${doneThisWeek} / ${target} kész`}>
         <div
           className="wstrip-ring"
           style={{ "--p": ringPct } as React.CSSProperties}
           role="progressbar"
           aria-valuenow={doneThisWeek}
           aria-valuemin={0}
-          aria-valuemax={perWeek}
-          aria-label={`Heti haladás: ${doneThisWeek} / ${perWeek} kész`}
+          aria-valuemax={target}
+          aria-label={`Heti haladás: ${doneThisWeek} / ${target} kész`}
         >
-          <b>{doneThisWeek}/{perWeek}</b>
+          <b>{doneThisWeek}/{target}</b>
         </div>
-        {WEEK_DAYS.map(([abbr, full]) => {
-          const s = byCol[abbr];
-          const c = cls(s);
+        {cells.map((c) => {
+          const k = clsOf(c);
           return (
-            <div key={abbr} className={`wstrip-day ${c}`}>
-              <div className="d">{abbr}</div>
-              <div className="dot" role="img" aria-label={`${full} · ${label(s)}`}>
-                {c === "done" ? <LxIcon d={lxPaths.check} size={15} sw={2.6} /> : c === "rest" ? "☾" : ""}
+            <div key={c.abbr} className={`wstrip-day ${k}`}>
+              <div className="d">{c.abbr}</div>
+              <div className="dot" role="img" aria-label={`${c.full} · ${labelOf(c)}`}>
+                {k === "done" ? <LxIcon d={lxPaths.check} size={15} sw={2.6} /> : k === "rest" ? "☾" : ""}
               </div>
             </div>
           );
