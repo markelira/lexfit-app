@@ -1,8 +1,14 @@
 "use client";
 
+import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
+
 // Root error boundary — anything below the root layout that throws at render
 // lands here instead of Next's unstyled default screen.
-export default function RootError({ reset }: { error: Error; reset: () => void }) {
+export default function RootError({ error, reset }: { error: Error; reset: () => void }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
   return (
     <div style={{
       minHeight: "100dvh", display: "flex", flexDirection: "column",

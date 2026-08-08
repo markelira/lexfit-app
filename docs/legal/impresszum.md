@@ -12,10 +12,10 @@ A jelen impresszum az elektronikus kereskedelmi szolgáltatásokról szóló 200
 
 | # | Mező | Megjegyzés |
 |---|------|-----------|
-| 1 | `[WEBOLDAL CÍME — KITÖLTENDŐ]` | a szolgáltatás végleges domainje |
-| 2 | `[TELEFONSZÁM — KITÖLTENDŐ]` | opcionális — az Ekertv. 4. § b) pontja szerint az elektronikus levelezési cím (e-mail) megadása elegendő a kapcsolattartáshoz |
-| 3 | `[KAMARAI TAGSÁG — KITÖLTENDŐ]` | a területileg illetékes kereskedelmi és iparkamara (várhatóan: Borsod-Abaúj-Zemplén Vármegyei Kereskedelmi és Iparkamara) — ellenőrizendő |
-| 4 | Hatálybalépés / közzététel dátuma: 2026. [hónap] [nap] | fejléc |
+| 1 | Közzététel dátuma: 2026. [hónap] [nap] — az éles indulás napján töltendő ki | fejléc |
+| 2 | Kamarai nyilvántartás ellenőrzése (Borsod-Abaúj-Zemplén Vármegyei Kereskedelmi és Iparkamara) | 1. pont |
+
+*Kitöltve 2026-08-08: weboldal (https://lexfit.hu). Telefonszám szándékosan nincs — az Ekertv. 4. § b) szerint az e-mail elegendő.*
 
 ---
 
@@ -27,9 +27,8 @@ A jelen impresszum az elektronikus kereskedelmi szolgáltatásokról szóló 200
 - **Nyilvántartásba vevő cégbíróság:** Miskolci Törvényszék Cégbírósága
 - **Adószám:** 33004312-1-05 (a szolgáltató alanyi adómentes — az Áfa tv. XIII. fejezete szerint; a kiállított számlák ÁFA-t nem tartalmaznak, AAM)
 - **E-mail:** info@amstudios.hu
-- **Telefon:** `[TELEFONSZÁM — KITÖLTENDŐ]`
-- **Weboldal:** `[WEBOLDAL CÍME — KITÖLTENDŐ]`
-- **Kamarai tagság:** `[KAMARAI TAGSÁG — KITÖLTENDŐ]`
+- **Weboldal:** https://lexfit.hu
+- **Kamarai tagság:** Borsod-Abaúj-Zemplén Vármegyei Kereskedelmi és Iparkamara (kamarai nyilvántartásba vétel a 1999. évi CXXI. tv. alapján — ellenőrizendő)
 
 ## 2. Tárhelyszolgáltató
 

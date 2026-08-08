@@ -10,12 +10,10 @@ Hatályos: 2026. [hónap] [nap] napjától visszavonásig, illetve módosítási
 
 | # | Mező | Helye a dokumentumban |
 |---|------|----------------------|
-| 1 | `[KÉPVISELŐ NEVE — KITÖLTENDŐ]` | 1. pont |
-| 2 | `[TELEFONSZÁM — KITÖLTENDŐ]` (opcionális; az Ekertv. szerint az e-mail elegendő) | 1. pont |
-| 3 | `[WEBOLDAL CÍME — KITÖLTENDŐ]` (a szolgáltatás végleges domainje) | 1., 3. pont |
-| 4 | Hatálybalépés dátuma: 2026. [hónap] [nap] | fejléc, 16. pont |
-| 5 | Árváltoztatási / ÁSZF-módosítási értesítési idő ([30] nap — üzleti döntés) | 6.5., 16.1. pont |
-| 6 | Rendelkezésre állási vállalás ([99%] — üzleti döntés) | 11.6. pont |
+| 1 | Hatálybalépés dátuma: 2026. [hónap] [nap] — az éles indulás napján töltendő ki | fejléc, 16. pont |
+| 2 | Ügyvédi ellenőrzés (a dokumentum végén lévő megjegyzések szerint) | teljes dokumentum |
+
+*Kitöltve 2026-08-08: képviselő (Kecskeméti Ádám), weboldal (https://lexfit.hu), értesítési idő (30 nap), rendelkezésre állás (konkrét vállalás nélkül). Telefonszám szándékosan nincs — az Ekertv. szerint az e-mail elegendő.*
 
 ---
 
@@ -26,10 +24,9 @@ Hatályos: 2026. [hónap] [nap] napjától visszavonásig, illetve módosítási
 - **Cégjegyzékszám:** 05 09 039717
 - **Nyilvántartó cégbíróság:** Miskolci Törvényszék Cégbírósága
 - **Adószám:** 33004312-1-05
-- **Képviselő:** `[KÉPVISELŐ NEVE — KITÖLTENDŐ]`
+- **Képviselő:** Kecskeméti Ádám
 - **E-mail:** info@amstudios.hu
-- **Telefon:** `[TELEFONSZÁM — KITÖLTENDŐ]`
-- **Weboldal:** `[WEBOLDAL CÍME — KITÖLTENDŐ]` (a továbbiakban: **Weboldal**)
+- **Weboldal:** https://lexfit.hu (a továbbiakban: **Weboldal**)
 - **Tárhelyszolgáltató:** Vercel Inc. (340 S Lemon Ave #4133, Walnut, CA 91789, Amerikai Egyesült Államok; e-mail: privacy@vercel.com) — további részletek az Impresszumban.
 
 ## 2. Fogalmak
@@ -104,7 +101,7 @@ f) **e-mailes emlékeztetők és értesítések** (opcionális, lásd Adatkezel�
 
 A kedvezményes ajánlatok érvényességi ideje (pl. a 72 órás határidő) valós és végleges; a Szolgáltató nem alkalmaz megtévesztő sürgetést. A kedvezmény igénybevételének elmaradása a standard árakon való előfizetést nem érinti.
 
-6.5. **Árváltoztatás.** A Szolgáltató jogosult árait módosítani. Meglévő, megújuló előfizetés díja csak a soron következő megújulástól változhat, feltéve, hogy a Szolgáltató a módosításról a megújulást megelőzően legalább **[30] nappal** e-mailben értesítette az Előfizetőt. Az Előfizető az áremelés hatálybalépése előtt bármikor, következmény nélkül lemondhatja előfizetését (9. pont).
+6.5. **Árváltoztatás.** A Szolgáltató jogosult árait módosítani. Meglévő, megújuló előfizetés díja csak a soron következő megújulástól változhat, feltéve, hogy a Szolgáltató a módosításról a megújulást megelőzően legalább **30 nappal** e-mailben értesítette az Előfizetőt. Az Előfizető az áremelés hatálybalépése előtt bármikor, következmény nélkül lemondhatja előfizetését (9. pont).
 
 ## 7. Fizetés
 
@@ -159,7 +156,7 @@ A határidő megtartottnak minősül, ha a Fogyasztó nyilatkozatát a határid�
 
 11.5. A Szolgáltató a szerződésszegésével okozott károkért a Ptk. szerint felel. Fogyasztóval szemben a felelősség nem zárható ki és nem korlátozható a szándékosan okozott, továbbá az emberi életet, testi épséget vagy egészséget megkárosító szerződésszegésért való felelősség tekintetében.
 
-11.6. A Szolgáltató éves szinten legalább **[99%-os]** rendelkezésre állásra törekszik; a karbantartási és a Szolgáltató érdekkörén kívüli (pl. internetszolgáltatói, tárhely-, videószolgáltatói) kiesésekért való felelősség — a fogyasztói jogok sérelme nélkül — kizárt. A digitális szolgáltatás hibás teljesítése esetén a Fogyasztót a 373/2021. (VI. 30.) Korm. rendelet szerinti kellékszavatossági jogok illetik meg.
+11.6. A Szolgáltató a Szolgáltatás folyamatos elérhetőségére törekszik, de meghatározott rendelkezésre állási szintet nem vállal; a karbantartási és a Szolgáltató érdekkörén kívüli (pl. internetszolgáltatói, tárhely-, videószolgáltatói) kiesésekért való felelősség — a fogyasztói jogok sérelme nélkül — kizárt. A digitális szolgáltatás hibás teljesítése esetén a Fogyasztót a 373/2021. (VI. 30.) Korm. rendelet szerinti kellékszavatossági jogok illetik meg.
 
 ## 12. Szellemi tulajdon
 
@@ -193,7 +190,7 @@ A személyes adatok kezelésének részletes szabályait a Weboldalon elérhető
 
 ## 16. Vegyes rendelkezések
 
-16.1. A Szolgáltató jogosult a jelen ÁSZF-et egyoldalúan módosítani. A Felhasználókat hátrányosan érintő módosításról a Szolgáltató a hatálybalépés előtt legalább **[30] nappal** e-mailben tájékoztatást ad; a módosítás el nem fogadása esetén a Felhasználó az előfizetését a hatálybalépésig következmény nélkül lemondhatja. A módosítás a hatálybalépése előtt megfizetett időszakokra nem alkalmazandó a Fogyasztó hátrányára.
+16.1. A Szolgáltató jogosult a jelen ÁSZF-et egyoldalúan módosítani. A Felhasználókat hátrányosan érintő módosításról a Szolgáltató a hatálybalépés előtt legalább **30 nappal** e-mailben tájékoztatást ad; a módosítás el nem fogadása esetén a Felhasználó az előfizetését a hatálybalépésig következmény nélkül lemondhatja. A módosítás a hatálybalépése előtt megfizetett időszakokra nem alkalmazandó a Fogyasztó hátrányára.
 
 16.2. A jelen ÁSZF-ben nem szabályozott kérdésekre a magyar jog — különösen a Ptk., az Ekertv., a 45/2014. (II. 26.) Korm. rendelet, a 373/2021. (VI. 30.) Korm. rendelet és a fogyasztóvédelemről szóló 1997. évi CLV. törvény — irányadó. A szerződés nyelve a magyar.
 
@@ -223,7 +220,7 @@ LAWYER REVIEW NOTES (nem publikálandó — a magyar jogász figyelmébe):
 
 1. Elállási jog digitális szolgáltatásnál (10. pont): a szöveg a 45/2014. Korm. r. 13. §, 20. §, 26. § és 29. § (1) m) pontjának összjátékára épül — folyamatos digitális SZOLGÁLTATÁSKÉNT kezeljük (arányos elszámolással), nem egyszeri digitális tartalomként (teljes jogvesztéssel). Kérjük megerősíteni, hogy a streaming-előfizetés minősítése (szolgáltatás vs. digitális tartalom) és a kifejezett kérés + tudomásulvétel checkout-szövegezése megfelel a CJEU gyakorlatnak.
 2. „Kiérdemelt Ár" (6.4): aktivitásfüggő kedvezmények + 72 órás ajánlati határidő UCPD/Fttv. szempontból (megtévesztő sürgetés tilalma). Az implementáció valós, végleges határidőt kényszerít ki — kérjük ennek fogyasztóvédelmi megfelelőségét ellenőrizni, ideértve a „bevezető ár egyszer vehető igénybe" korlátozás közlési módját.
-3. Árváltoztatási értesítési idő (6.5, 16.1): a [30] nap javaslat — kérjük a megfelelő minimum megerősítését, és hogy kell-e külön hozzájárulás (opt-in) az emelt áron való megújuláshoz, vagy elegendő az értesítés + lemondási lehetőség.
+3. Árváltoztatási értesítési idő (6.5, 16.1): a 30 nap javaslat — kérjük a megfelelő minimum megerősítését, és hogy kell-e külön hozzájárulás (opt-in) az emelt áron való megújuláshoz, vagy elegendő az értesítés + lemondási lehetőség.
 4. ODR (14.4): az EU ODR-platform 2025. júliusi megszűnése miatti szövegezés ellenőrzendő a hatályos magyar/EU szabályokkal (fennmaradó hivatkozási kötelezettség van-e).
 5. Lemondógomb / (EU) 2023/2673 irányelv (9.2): a magyar átültetés pontos követelményeinek (elnevezés, elhelyezés) megfeleltetés.
 6. Sikertelen fizetés utáni 7 napos hozzáférés (7.3) és a szüneteltetés (9.3) díjmentessége — szerződéses minősítésük ellenőrzendő.

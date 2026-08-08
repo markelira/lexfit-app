@@ -12,10 +12,10 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 
 | # | Mező | Helye a dokumentumban |
 |---|------|----------------------|
-| 1 | `[KÉPVISELŐ NEVE — KITÖLTENDŐ]` | 1. pont |
-| 2 | `[WEBOLDAL CÍME — KITÖLTENDŐ]` (a szolgáltatás végleges domainje) | 1. pont |
-| 3 | Adatvédelmi tisztviselő: `[VAN / NINCS — KITÖLTENDŐ]` (kis B2C szolgáltatónál jellemzően nem kötelező) | 1. pont |
-| 4 | Hatálybalépés dátuma: 2026. [hónap] [nap] | fejléc |
+| 1 | Hatálybalépés dátuma: 2026. [hónap] [nap] — az éles indulás napján töltendő ki | fejléc |
+| 2 | Ügyvédi ellenőrzés (a dokumentum végén lévő megjegyzések szerint) | teljes dokumentum |
+
+*Kitöltve 2026-08-08: adatkezelő képviselője (Kecskeméti Ádám), weboldal (https://lexfit.hu), adatvédelmi tisztviselő: nincs (a GDPR 37. cikk szerinti kijelölési kötelezettség nem áll fenn — ügyvédi ellenőrzés alatt).*
 
 ---
 
@@ -24,10 +24,10 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 - **Név:** AM Studios Group Korlátolt Felelősségű Társaság (AM Studios Group Kft.) (a továbbiakban: **Adatkezelő**)
 - **Székhely:** 3532 Miskolc, Miklós utca 17. 2. em. 26. ajtó
 - **Cégjegyzékszám:** 05 09 039717 (Miskolci Törvényszék Cégbírósága) · **Adószám:** 33004312-1-05
-- **Képviselő:** `[KÉPVISELŐ NEVE — KITÖLTENDŐ]`
+- **Képviselő:** Kecskeméti Ádám
 - **E-mail (adatvédelmi megkeresések):** info@amstudios.hu
-- **Weboldal:** `[WEBOLDAL CÍME — KITÖLTENDŐ]`
-- **Adatvédelmi tisztviselő:** `[VAN / NINCS — KITÖLTENDŐ]`
+- **Weboldal:** https://lexfit.hu
+- **Adatvédelmi tisztviselő:** nincs (a GDPR 37. cikk szerinti kijelölési kötelezettség nem áll fenn — ügyvédi ellenőrzés alatt)
 
 ## 2. Alapelvek, az adatkezelés környezete
 
