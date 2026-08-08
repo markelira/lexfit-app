@@ -44,6 +44,7 @@ for (const slug of SLUGS) {
           muxStatus: "ready",
           muxDuration: 24,
           published: true,
+          status: "published",
           updatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true },

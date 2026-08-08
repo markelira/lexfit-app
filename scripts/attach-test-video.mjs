@@ -66,6 +66,7 @@ async function main() {
       muxStatus: "ready",
       muxDuration: ready.duration ?? null,
       published: true,
+      status: "published",
       updatedAt: FieldValue.serverTimestamp(),
     },
     { merge: true },
