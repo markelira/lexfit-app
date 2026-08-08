@@ -55,6 +55,13 @@ export async function POST(req: Request) {
 
   try {
     if (sub.stripeSubscriptionId) {
+      // Release the managing schedule FIRST — before any money moves. Weekly-
+      // intro subs are schedule-managed (490→1990 step-up) and Stripe rejects a
+      // direct cancel while that's true. Doing it up front means the operation
+      // most likely to fail happens before refunds, so a failure can't orphan a
+      // refund with the subscription still active.
+      await releaseScheduleIfManaged(sub.stripeSubscriptionId);
+
       // Recurring: refund each paid invoice's unused portion from REAL invoices.
       const invoices = await stripe.invoices.list({
         subscription: sub.stripeSubscriptionId,
@@ -74,9 +81,6 @@ export async function POST(req: Request) {
           refundedMinor += amount;
         }
       }
-      // Weekly-intro subs are schedule-managed (490→1990 step-up); Stripe
-      // rejects a direct cancel while a schedule manages them. Release it first.
-      await releaseScheduleIfManaged(sub.stripeSubscriptionId);
       await stripe.subscriptions.cancel(sub.stripeSubscriptionId);
     } else {
       // One-off: single "period" = startedAt..accessUntil, paid via stored PI.
