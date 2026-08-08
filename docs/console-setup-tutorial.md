@@ -1,3 +1,40 @@
+# Console setup — STATUS (updated 2026-08-08 evening)
+
+## ✅ DONE (Claude, this session)
+- **SendGrid**: lexfit.hu domain authenticated (validated via API); `EMAIL_FROM`
+  → `hi@lexfit.hu` in Vercel. ⚠️ ensure the `hi@lexfit.hu` mailbox exists at your
+  mail provider so replies land somewhere.
+- **Mux**: webhook confirmed on `https://www.lexfit.hu/api/mux/webhook`, secret matches Vercel.
+- **Firebase**: e-mail language = Hungarian; **you set the action URL** to
+  https://www.lexfit.hu/auth/action (the earlier save error was because
+  www.lexfit.hu wasn't an authorized domain — Claude added it via API, then it saved).
+- **Sentry**: DSN + full SDK (replay, nav spans, global-error, source-map-ready
+  config) in the repo; `SENTRY_DSN`/`NEXT_PUBLIC_SENTRY_DSN`/`SENTRY_ORG`/
+  `SENTRY_PROJECT` in Vercel; **test error confirmed arriving** in the dashboard;
+  **GitHub repo integration + code mapping wired** (markelira/lexfit-app @ main,
+  stack-trace root `app:///`) → suspect commits, stack-trace links, Seer/Autofix.
+
+## ⏳ REMAINING — 3 small things
+
+### a) `hi@lexfit.hu` mailbox — confirm it exists (1 min)
+Domain sending is authenticated, but make sure the address itself receives mail
+(alias/forward at your mail host). Otherwise outgoing works but replies bounce.
+
+### b) Apple sign-in — decide (see §1b below)
+Still the only product decision open. Tell Claude **"hide Apple"** (15-min change)
+or enroll in Apple Developer (99 USD/yr).
+
+### c) Sentry source-map upload token — optional but nice (2 min)
+Without it, prod stack traces show minified code. To fix:
+1. sentry.io → Settings → **Auth Tokens** (or Developer Settings → Auth Tokens) →
+   **Create** with scope `project:releases` (+ `org:read`).
+2. **Paste the token to Claude** → I add `SENTRY_AUTH_TOKEN` to Vercel; next deploy
+   uploads source maps automatically.
+
+---
+
+# (original tutorial below — most now done)
+
 # Console setup — what's actually left (updated 2026-08-08, after the API pass)
 
 Claude drove everything reachable by API/CLI. The list shrank — here's the state
