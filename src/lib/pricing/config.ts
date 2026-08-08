@@ -22,8 +22,10 @@ function envInt(name: string, fallback: number): number {
 
 // ── Currency / tax ─────────────────────────────────────────────────────────
 export const CURRENCY = "huf";
-/** HU ÁFA. Every amount below is GROSS (VAT already included) — see J5. */
-export const VAT_RATE = 0.27;
+// Every amount below is the FINAL price the consumer pays. The company is
+// alanyi adómentes (AAM) — invoices carry no VAT content (see lib/pricing/
+// invoice.ts). If VAT registration ever happens, prices stay gross and
+// BILLINGO_VAT_CODE switches the invoice split.
 
 /**
  * Stripe wants amounts in the currency's smallest unit. HUF is NOT a

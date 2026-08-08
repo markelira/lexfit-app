@@ -4,8 +4,10 @@ import { notifyAdmin } from "./events";
 
 // F0.6 — NAV-compliant invoicing via Billingo (v3 REST/JSON). Chosen over
 // Számlázz.hu for its modern JSON API. Every displayed price is GROSS HUF with
-// 27% ÁFA included (J5); Billingo derives the net/VAT split from `unit_price_type
-// = gross` + `vat = "27%"`.
+// VAT: AM Studios Group Kft. is ALANYI ADÓMENTES (confirmed by owner
+// 2026-08-08), so invoices carry the AAM code — no VAT content, gross = net.
+// If the company ever crosses the AAM threshold and becomes VAT-registered,
+// set BILLINGO_VAT_CODE=27% in the environment (no code change needed).
 //
 // Idempotent per Stripe ref (invoice id / payment-intent id): a marker doc in
 // `issuedInvoices/{ref}` guarantees one legal invoice per payment even across
@@ -116,10 +118,11 @@ export async function issueInvoice(ref: string, payload: InvoicePayload): Promis
         {
           name: payload.description,
           unit_price: payload.amountHuf,
-          unit_price_type: "gross", // 27% ÁFA already inside the gross price
+          unit_price_type: "gross",
           quantity: 1,
           unit: "db",
-          vat: "27%",
+          vat: process.env.BILLINGO_VAT_CODE ?? "AAM", // alanyi adómentes
+
         },
       ],
     });
