@@ -16,6 +16,7 @@
     "seed:challenges:local": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node --env-file=.env.local scripts/seed-challenges.mjs",
     "attach:challenge:local": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node --env-file=.env.local scripts/attach-emulator-challenge-video.mjs",
     "seed:stripe": "node --env-file=.env.local --import tsx scripts/seed-stripe.ts",
+    "audit:stripe": "node --env-file=.env.local --import tsx scripts/price-migration.ts",
     "test:pricing": "node --import tsx scripts/pricing-selftest.ts",
     "test:funnel": "node --import tsx scripts/funnel-selftest.ts",
     "test:onboarding-draft": "node --import tsx scripts/onboarding-draft-selftest.ts",

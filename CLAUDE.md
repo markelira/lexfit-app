@@ -9,10 +9,10 @@ Full spec: `docs/build-plan.md` (and the matching PDF). Read it before any phase
 ## Stack
 - **Next.js** (App Router, React + TypeScript), `src/` dir, import alias `@/*`. No Tailwind —
   brand comes from design tokens ported into global CSS.
-- **Firebase** — Firestore (NoSQL), Auth (Google now; Apple/Facebook in Phase 2), Storage
+- **Firebase** — Firestore (NoSQL), Auth (Google, Apple, email+password), Storage
   (progress photos). Project ID `lexfit-app`, region **`europe-west3` (Frankfurt, permanent)**.
 - **Mux** — video upload, encoding, signed playback for paid gating.
-- **Stripe** — subscriptions (Phase 6, not yet wired).
+- **Stripe** — subscriptions fully wired (embedded Checkout, webhook, Billingo AAM invoicing; see docs/pricing-implementation-status.md). Live cutover pending.
 - **Vercel** — hosting + auto-deploy from GitHub `markelira/lexfit-app`.
 - Language: **Hungarian only**; keep UI strings ready to centralize later.
 
@@ -63,7 +63,7 @@ A guarded `/admin` CMS is how real content gets authored (dev → emulator, prod
 - Research + plan: `docs/admin-migration-{research,plan}.md`.
 
 ## Build roadmap (do in order — see docs/build-plan.md)
-0. Foundations & design system  ← scaffold + services wired (current)
+0. Foundations & design system
 1. Database architecture & content seed
 2. Auth & onboarding
 3. Mux video pipeline & player
@@ -71,7 +71,7 @@ A guarded `/admin` CMS is how real content gets authored (dev → emulator, prod
 5. Haladásom (progress & photos)
 6. Stripe subscriptions & sales pages
 7. Admin dashboard  ← BUILT (content CMS; see "Admin dashboard" above)
-8. QA, polish & launch
+8. QA, polish & launch  ← current (see docs/launch-readiness-plan.md — the canonical launch tracker)
 
 ## Conventions
 - Build data model first, then screens that read it (back-to-front).

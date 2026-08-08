@@ -1,7 +1,7 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { verifyRequest } from "@/lib/auth-server";
 import { allowRequest, DAY_MS_RL } from "@/lib/rate-limit";
 import { adminDb } from "@/lib/firebase-admin";
@@ -49,6 +49,10 @@ export async function POST(req: Request) {
     status: "pending",
     createdAt: FieldValue.serverTimestamp(),
     expiresAt: Date.now() + TTL_MS,
+    // Firestore's TTL policy needs a Timestamp field (the numeric expiresAt
+    // above drives the read-time check; TTL ignores numbers). The policy on
+    // `purgeAt` is the durable backstop for abandoned sessions.
+    purgeAt: Timestamp.fromMillis(Date.now() + TTL_MS),
   });
 
   return NextResponse.json({ token: id });

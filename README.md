@@ -1,11 +1,11 @@
 # LEXFIT
 
-Hungarian, women-first fitness web app — a guided 8-week program (not a generic workout
+Hungarian fitness web app for women and men — a guided program (not a generic workout
 library). Production rebuild of a finished prototype. Full spec: [`docs/build-plan.md`](docs/build-plan.md).
 
 ## Stack
 - **Next.js 16** (App Router, TypeScript) · **Firebase** (Auth, Firestore `europe-west3`, Storage)
-- **Mux** (video, signed playback) · **Stripe** (subscriptions, Phase 6) · **Vercel** (hosting + auto-deploy)
+- **Mux** (video, signed playback) · **Stripe** (subscriptions, "Kiérdemelt Ár" pricing — test mode until cutover) · **Vercel** (hosting + auto-deploy)
 
 ## Local development (mock data in the emulator)
 Mock/preview content (program, videos, filters) lives **only** in the Firebase
