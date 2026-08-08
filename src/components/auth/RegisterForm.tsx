@@ -243,7 +243,7 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
       {isReg && (
         <p className="legal">
           A folytatással elfogadod az <a href="/aszf">ÁSZF</a>-et és az{" "}
-          <a href="/adatkezeles">Adatkezelési tájékoztatót</a>.
+          <a href="/adatvedelem">Adatkezelési tájékoztatót</a>.
         </p>
       )}
     </div>

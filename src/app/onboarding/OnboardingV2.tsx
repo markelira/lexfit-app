@@ -832,8 +832,8 @@ function PlanStep({
           Az előfizetés automatikusan megújul, amíg le nem mondod. Bármikor lemondható · 14 napos elállási jog.
         </p>
         <div className="pw-links">
-          <a href="/terms">Feltételek</a>
-          <a href="/privacy">Adatvédelem</a>
+          <a href="/aszf">Feltételek</a>
+          <a href="/adatvedelem">Adatvédelem</a>
         </div>
       </div>
     </div>

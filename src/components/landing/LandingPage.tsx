@@ -1040,7 +1040,8 @@ export default function LandingPage() {
             <span>Kérdésed van? Írj nekünk, és segítünk — <a href="mailto:team@lexfit.hu">team@lexfit.hu</a></span>
           </div>
           <div className="legal">
-            <a href="#">Felhasználási feltételek</a> | <a href="#">Adatvédelem</a>
+            <a href="/aszf">Felhasználási feltételek</a> | <a href="/adatvedelem">Adatvédelem</a> |{" "}
+            <a href="/impresszum">Impresszum</a>
           </div>
         </div>
       </div>

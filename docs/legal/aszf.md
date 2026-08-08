@@ -16,7 +16,6 @@ Hatályos: 2026. [hónap] [nap] napjától visszavonásig, illetve módosítási
 | 4 | Hatálybalépés dátuma: 2026. [hónap] [nap] | fejléc, 16. pont |
 | 5 | Árváltoztatási / ÁSZF-módosítási értesítési idő ([30] nap — üzleti döntés) | 6.5., 16.1. pont |
 | 6 | Rendelkezésre állási vállalás ([99%] — üzleti döntés) | 11.6. pont |
-| 7 | **ÁFA-státusz megerősítése a könyvelővel** (alanyi adómentesség vs. 27% ÁFA) — a számlázási beállítást és a szövegezést ehhez kell igazítani | 6.1., 8. pont + záró megjegyzések |
 
 ---
 
@@ -78,7 +77,7 @@ f) **e-mailes emlékeztetők és értesítések** (opcionális, lásd Adatkezel�
 
 ## 6. Előfizetési csomagok és árak
 
-6.1. Minden feltüntetett ár **a fogyasztó által fizetendő teljes (végleges) ár magyar forintban (HUF)**; a Felhasználót a feltüntetett áron felül semmilyen további díj vagy adó nem terheli.
+6.1. Minden feltüntetett ár **a fogyasztó által fizetendő teljes (végleges) ár magyar forintban (HUF)**; a Felhasználót a feltüntetett áron felül semmilyen további díj vagy adó nem terheli. A Szolgáltató **alanyi adómentes** (az általános forgalmi adóról szóló 2007. évi CXXVII. törvény XIII. fejezete szerint); a számla ÁFA-t nem tartalmaz (AAM).
 
 6.2. A megvásárolható csomagok a hatálybalépés napján:
 
@@ -117,7 +116,7 @@ A kedvezményes ajánlatok érvényességi ideje (pl. a 72 órás határidő) va
 
 ## 8. Számlázás
 
-8.1. A Szolgáltató minden teljesített fizetésről a mindenkor hatályos adó- és számviteli jogszabályoknak (különösen a számvitelről szóló 2000. évi C. törvénynek és az általános forgalmi adóról szóló 2007. évi CXXVII. törvénynek) megfelelő **elektronikus számlát** állít ki a **Billingo** (Billingo Technologies Zrt.) rendszerén keresztül, NAV-adatszolgáltatással. A számla a Felhasználó által megadott e-mail-címre kerül megküldésre.
+8.1. A Szolgáltató minden teljesített fizetésről a mindenkor hatályos adó- és számviteli jogszabályoknak (különösen a számvitelről szóló 2000. évi C. törvénynek és az általános forgalmi adóról szóló 2007. évi CXXVII. törvénynek) megfelelő **elektronikus számlát** állít ki a **Billingo** (Billingo Technologies Zrt.) rendszerén keresztül, NAV-adatszolgáltatással. A Szolgáltató alanyi adómentessége folytán a számla ÁFA-t nem tartalmaz (AAM jelöléssel kerül kiállításra). A számla a Felhasználó által megadott e-mail-címre kerül megküldésre.
 
 8.2. A Felhasználó az elektronikus számla alkalmazását a Szolgáltatás megrendelésével elfogadja.
 
@@ -220,7 +219,7 @@ A személyes adatok kezelésének részletes szabályait a Weboldalon elérhető
 <!--
 LAWYER REVIEW NOTES (nem publikálandó — a magyar jogász figyelmébe):
 
-0. KIEMELT — ÁFA-STÁTUSZ: a Szolgáltató adószámának középső kódja 1 (33004312-1-05), ami jellemzően ALANYI ADÓMENTES státuszra utal, miközben a számlázási rendszer (Billingo-integráció) jelenleg 27% ÁFA-tartalmú bruttó árral számláz. A kettő ellentmond egymásnak. A könyvelővel tisztázandó a tényleges ÁFA-státusz (alanyi adómentesség értékhatára és fenntarthatósága a várható árbevétel mellett!), és ahhoz kell igazítani: (a) a Billingo-számlák ÁFA-kulcsát (AAM vs. 27%), (b) az ÁSZF 6.1. és 8.1. pontját, (c) a felületen megjelenő ártájékoztatást. A jelen szöveg szándékosan semlegesen fogalmaz („a fogyasztó által fizetendő teljes ár").
+0. ÁFA — ALANYI ADÓMENTESSÉG: a Szolgáltató megerősítetten alanyi adómentes, a Billingo-integráció AAM-számlát állít ki; az ÁSZF ezt tényként rögzíti (6.1., 8.1.). Ellenőrizendő: az alanyi adómentesség értékhatár-figyelési kötelezettsége (az értékhatár átlépésekor követendő eljárás és az árak/ÁSZF ekkor szükséges módosítása), valamint az AAM-számlák kötelező záradékszövege.
 
 1. Elállási jog digitális szolgáltatásnál (10. pont): a szöveg a 45/2014. Korm. r. 13. §, 20. §, 26. § és 29. § (1) m) pontjának összjátékára épül — folyamatos digitális SZOLGÁLTATÁSKÉNT kezeljük (arányos elszámolással), nem egyszeri digitális tartalomként (teljes jogvesztéssel). Kérjük megerősíteni, hogy a streaming-előfizetés minősítése (szolgáltatás vs. digitális tartalom) és a kifejezett kérés + tudomásulvétel checkout-szövegezése megfelel a CJEU gyakorlatnak.
 2. „Kiérdemelt Ár" (6.4): aktivitásfüggő kedvezmények + 72 órás ajánlati határidő UCPD/Fttv. szempontból (megtévesztő sürgetés tilalma). Az implementáció valós, végleges határidőt kényszerít ki — kérjük ennek fogyasztóvédelmi megfelelőségét ellenőrizni, ideértve a „bevezető ár egyszer vehető igénybe" korlátozás közlési módját.
