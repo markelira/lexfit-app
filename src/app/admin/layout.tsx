@@ -65,6 +65,15 @@ function AdminGate({ children }: { children: React.ReactNode }) {
 function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(true);
+  // Which backend do admin writes hit? Renders a permanent badge — the
+  // "plain `npm run dev` writes to prod" footgun becomes visible at a glance.
+  const [emulator, setEmulator] = useState<boolean | null>(null);
+  useEffect(() => {
+    adminFetch("/api/admin/me")
+      .then((r) => r.json())
+      .then((d: { emulator?: boolean }) => setEmulator(!!d.emulator))
+      .catch(() => {});
+  }, []);
   const isActive = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
 
   return (
@@ -83,6 +92,19 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             LEX<span>FIT</span>
           </span>
           <span className="tag">Admin</span>
+          {emulator !== null && (
+            <span
+              title={emulator ? "A mentések a helyi emulátorba mennek" : "A mentések az ÉLES adatbázisba mennek"}
+              style={{
+                fontFamily: "var(--mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em",
+                padding: "2px 7px", borderRadius: 999,
+                background: emulator ? "oklch(0.55 0.15 150 / 0.18)" : "oklch(0.55 0.2 25 / 0.18)",
+                color: emulator ? "oklch(0.5 0.14 150)" : "oklch(0.52 0.19 25)",
+              }}
+            >
+              {emulator ? "EMULATOR" : "PROD"}
+            </span>
+          )}
           <button className="adm-navtoggle" onClick={() => setNavOpen(false)} title="Menü bezárása" aria-label="Menü bezárása">
             <LxIcon d={["M13 6 L7 12 L13 18", "M18 6 L12 12 L18 18"]} size={17} sw={2} />
           </button>

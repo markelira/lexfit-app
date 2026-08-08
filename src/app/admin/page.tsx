@@ -49,7 +49,7 @@ export default function AdminHome() {
         <div className="adm-titles">
           <div className="adm-eyebrow">LEXFIT ADMIN</div>
           <h1 className="adm-h1">Vezérlőpult</h1>
-          <p className="adm-sub">Áttekintés és tartalomkezelés. A produkciós adatbázis addig üres, amíg innen fel nem töltöd a valódi tartalmat.</p>
+          <p className="adm-sub">Áttekintés és tartalomkezelés. A fejlécben lévő jelvény mutatja, melyik adatbázisba mennek a mentések (PROD / EMULATOR).</p>
         </div>
       </div>
 

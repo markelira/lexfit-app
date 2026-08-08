@@ -2,14 +2,13 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { verifyRequest, isAdmin } from "@/lib/auth-server";
 import { upsertFilterDimension } from "@/lib/admin-taxonomy";
-import { DEFAULT_FILTERS } from "@/lib/filter-defaults";
+import { DEFAULT_CHALLENGE_FILTERS } from "@/lib/filter-defaults";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Admin-only: upsert a filter dimension's options (and optionally its label).
- *  Creates the doc when missing (empty prod bootstrap) using the canonical
- *  defaults for label/order. */
+/** Admin-only: upsert a Kihívások taxonomy dimension (challengeFilters/{key}).
+ *  Creates the doc when missing — previously unauthorable on empty prod. */
 export async function PUT(req: Request, { params }: { params: Promise<{ key: string }> }) {
   const token = await verifyRequest(req);
   if (!token || !isAdmin(token)) {
@@ -17,5 +16,5 @@ export async function PUT(req: Request, { params }: { params: Promise<{ key: str
   }
   const { key } = await params;
   const body = (await req.json().catch(() => ({}))) as { options?: unknown; label?: unknown };
-  return upsertFilterDimension("filters", DEFAULT_FILTERS, key, body);
+  return upsertFilterDimension("challengeFilters", DEFAULT_CHALLENGE_FILTERS, key, body);
 }

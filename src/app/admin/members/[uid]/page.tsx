@@ -13,6 +13,7 @@ interface Detail {
   onboarding: Record<string, unknown> | null;
   progress: Record<string, unknown> | null;
   subscription: Record<string, unknown> | null;
+  stripeLive?: boolean;
 }
 
 const label = (opts: readonly ChoiceOption[], v: unknown) =>
@@ -82,7 +83,12 @@ export default function MemberDetailPage() {
               <dt>Stripe</dt>
               <dd>
                 {stripeId ? (
-                  <a className="linkish" href={`https://dashboard.stripe.com/test/customers/${stripeId}`} target="_blank" rel="noreferrer">
+                  <a
+                    className="linkish"
+                    href={`https://dashboard.stripe.com/${d?.stripeLive ? "" : "test/"}customers/${stripeId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     {stripeId}
                   </a>
                 ) : "—"}

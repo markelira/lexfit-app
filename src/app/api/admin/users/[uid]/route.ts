@@ -28,5 +28,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ uid: str
     onboarding: onbSnap.exists ? serialize(onbSnap.data()) : null,
     progress: progSnap.exists ? serialize(progSnap.data()) : null,
     subscription: subSnap.exists ? serialize(subSnap.data()) : null,
+    // Whether this server runs on a LIVE Stripe key — the member page builds
+    // the correct dashboard deep-link from it (was hardcoded to /test/).
+    stripeLive: (process.env.STRIPE_SECRET_KEY ?? "").startsWith("sk_live"),
   });
 }

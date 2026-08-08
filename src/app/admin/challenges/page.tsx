@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { adminFetch } from "@/lib/admin-fetch";
+import { adminFetch, adminJson } from "@/lib/admin-fetch";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import type { Challenge } from "@/lib/types";
@@ -63,6 +63,8 @@ export default function AdminChallengesPage() {
         </div>
       </div>
 
+      <ChallengeSettingsCard />
+
       <div className="adm-toolbar">
         <div className="adm-searchbox">
           <LxIcon d={lxPaths.search} size={15} />
@@ -119,5 +121,68 @@ export default function AdminChallengesPage() {
         </table>
       )}
     </>
+  );
+}
+
+/** settings/challenges editor — the Kihívások community (FB-csoport) link.
+ *  Without this the doc was unauthorable on prod (only the emulator seed
+ *  ever wrote it). Empty value clears the link (the app hides the button). */
+function ChallengeSettingsCard() {
+  const [url, setUrl] = useState("");
+  const [baseline, setBaseline] = useState("");
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    getDoc(doc(db, "settings", "challenges"))
+      .then((s) => {
+        const v = s.exists() ? ((s.data() as { fbGroupUrl?: string | null }).fbGroupUrl ?? "") : "";
+        setUrl(v);
+        setBaseline(v);
+      })
+      .catch(() => {});
+  }, []);
+
+  async function save() {
+    setStatus("saving");
+    setErr("");
+    try {
+      await adminJson("/api/admin/settings/challenges", {
+        method: "PUT",
+        body: JSON.stringify({ fbGroupUrl: url.trim() }),
+      });
+      setBaseline(url.trim());
+      setStatus("saved");
+    } catch (e) {
+      setStatus("error");
+      setErr(e instanceof Error ? e.message : "Mentési hiba.");
+    }
+  }
+
+  const dirty = url.trim() !== baseline;
+  return (
+    <div className="adm-card" style={{ marginBottom: 16 }}>
+      <div className="adm-fil-hd">
+        <h3>Közösségi csoport</h3>
+        <span className="key">settings/challenges</span>
+      </div>
+      <p className="adm-sub" style={{ margin: "6px 0 10px" }}>
+        A kihívás-oldalak „Ugrás a csoportba” gombjának célja (https://…). Üresen hagyva a gomb nem jelenik meg.
+      </p>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <input
+          type="url"
+          value={url}
+          onChange={(e) => { setUrl(e.target.value); setStatus("idle"); }}
+          placeholder="https://www.facebook.com/groups/…"
+          style={{ flex: "1 1 320px", minWidth: 240 }}
+        />
+        <button className="adm-btn primary" disabled={!dirty || status === "saving"} onClick={save}>
+          {status === "saving" ? "Mentés…" : "Mentés"}
+        </button>
+        {status === "saved" && <span style={{ color: "var(--ink-3)", fontSize: 13 }}>Mentve ✓</span>}
+        {status === "error" && <span style={{ color: "oklch(0.5 0.19 25)", fontSize: 13 }}>{err}</span>}
+      </div>
+    </div>
   );
 }

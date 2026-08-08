@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { DEFAULT_CHALLENGE_FILTERS } from "@/lib/filter-defaults";
 import { adminJson } from "@/lib/admin-fetch";
 import { ChallengeVideoForm } from "@/components/admin/ChallengeVideoForm";
 import type { ChallengeVideo } from "@/lib/types";
@@ -21,8 +22,8 @@ export default function EditChallengeVideoPage() {
       .then((s) => setVideo(s.exists() ? ({ code: s.id, ...(s.data() as Omit<ChallengeVideo, "code">) }) : null))
       .catch(() => setVideo(null));
     getDoc(doc(db, "challengeFilters", "theme"))
-      .then((s) => setBodyParts((s.data()?.options as string[]) ?? []))
-      .catch(() => setBodyParts([]));
+      .then((s) => setBodyParts(((s.data()?.options as string[]) ?? []).length ? (s.data()?.options as string[]) : DEFAULT_CHALLENGE_FILTERS[0].options))
+      .catch(() => setBodyParts(DEFAULT_CHALLENGE_FILTERS[0].options));
   }, [code]);
 
   async function del() {

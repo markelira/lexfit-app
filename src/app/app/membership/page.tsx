@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Protected, Loader } from "@/components/Protected";
+import { PRICES } from "@/lib/pricing/config";
+import { formatHuf } from "@/lib/pricing/display";
 import {
   getSubscription,
   isSubscribed,
@@ -161,8 +163,8 @@ function Membership() {
         <p className={styles.eyebrow}>KISEBB CSOMAG</p>
         <h1 className={styles.title}>Váltás heti tagságra</h1>
         <p className={styles.sub}>
-          A mostani, már kifizetett hónapod végéig minden marad. Onnantól heti 1 990 Ft,
-          automatikusan megújul — bármikor lemondhatod.
+          A mostani, már kifizetett hónapod végéig minden marad. Onnantól heti{" "}
+          {formatHuf(PRICES.week_std.amountHuf)}, automatikusan megújul — bármikor lemondhatod.
         </p>
         <button
           className={styles.primary}

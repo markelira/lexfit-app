@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { DEFAULT_CHALLENGE_FILTERS } from "@/lib/filter-defaults";
 import { adminFetch } from "@/lib/admin-fetch";
 import { ChallengeForm } from "@/components/admin/ChallengeForm";
 import { SessionsBuilder, type PickVideo } from "@/components/admin/SessionsBuilder";
@@ -43,7 +44,8 @@ export default function EditChallengePage() {
           muxStatus: (d.data().muxStatus as string) ?? "none",
         }))
         .sort((a, b) => a.code.localeCompare(b.code));
-      const bodyParts = (tSnap.data()?.options as string[]) ?? [];
+      const stored = (tSnap.data()?.options as string[]) ?? [];
+      const bodyParts = stored.length ? stored : DEFAULT_CHALLENGE_FILTERS[0].options;
       setData({ challenge, days, videos, bodyParts });
     })().catch(() => {
       if (active) setData({ challenge: null, days: [], videos: [], bodyParts: [] });

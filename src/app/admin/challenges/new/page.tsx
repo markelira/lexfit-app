@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { DEFAULT_CHALLENGE_FILTERS } from "@/lib/filter-defaults";
 import { ChallengeForm } from "@/components/admin/ChallengeForm";
 
 export default function NewChallengePage() {
@@ -11,8 +12,8 @@ export default function NewChallengePage() {
 
   useEffect(() => {
     getDoc(doc(db, "challengeFilters", "theme"))
-      .then((s) => setBodyParts((s.data()?.options as string[]) ?? []))
-      .catch(() => setBodyParts([]));
+      .then((s) => setBodyParts(((s.data()?.options as string[]) ?? []).length ? (s.data()?.options as string[]) : DEFAULT_CHALLENGE_FILTERS[0].options))
+      .catch(() => setBodyParts(DEFAULT_CHALLENGE_FILTERS[0].options));
   }, []);
 
   return (

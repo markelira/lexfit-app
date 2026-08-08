@@ -186,6 +186,13 @@ export default function LibraryPage() {
   };
 
   const [spot, setSpot] = useState(0);
+  // Only spotlight cards whose "Lejátszás" target actually exists in the
+  // loaded library — the codes are curated, and on fresh prod content they
+  // may not have been uploaded (a dead play button would 404).
+  const spots = useMemo(
+    () => LIB_SPOTS.filter((s) => (data?.videos ?? []).some((v) => v.code === s.play)),
+    [data],
+  );
   const browseFrom = (f?: SpotFilter) => {
     if (!f) return;
     if (f.kind === "short") setActive((a) => ({ ...a, dur: new Set(["5–15 perc"]) }));
@@ -384,13 +391,16 @@ export default function LibraryPage() {
         </>
       ) : (
         <>
-          <LibSpotlight
-            spot={spot}
-            setSpot={setSpot}
-            count={(t) => byTheme(t).length}
-            onPlay={(c) => router.push(`/player/${c}?autostart=1`)}
-            onBrowse={browseFrom}
-          />
+          {spots.length > 0 && (
+            <LibSpotlight
+              spots={spots}
+              spot={Math.min(spot, spots.length - 1)}
+              setSpot={setSpot}
+              count={(t) => byTheme(t).length}
+              onPlay={(c) => router.push(`/player/${c}?autostart=1`)}
+              onBrowse={browseFrom}
+            />
+          )}
 
           {/* Kategóriák — the one browse element that navigates (applies a filter), not plays (§20.3) */}
           <section className="lib-cats">
@@ -472,12 +482,12 @@ export default function LibraryPage() {
 }
 
 function LibSpotlight({
-  spot, setSpot, count, onPlay, onBrowse,
+  spots, spot, setSpot, count, onPlay, onBrowse,
 }: {
-  spot: number; setSpot: (n: number | ((i: number) => number)) => void;
+  spots: typeof LIB_SPOTS; spot: number; setSpot: (n: number | ((i: number) => number)) => void;
   count: (theme: string) => number; onPlay: (code: string) => void; onBrowse: (f: SpotFilter) => void;
 }) {
-  const s = LIB_SPOTS[spot];
+  const s = spots[spot];
   // The spotlight does NOT auto-advance (§20.6) — carousels that move on their own
   // lose the user's place. The dots stay; the user drives.
   return (
@@ -497,7 +507,7 @@ function LibSpotlight({
           <Button size="m" variant="secondary" onDark onClick={() => onBrowse(s.filter)}>Böngészd a válogatást</Button>
         </div>
         <div className="lib-spot-dots">
-          {LIB_SPOTS.map((x, j) => (
+          {spots.map((x, j) => (
             <button key={x.title} className={j === spot ? "on" : ""} onClick={() => setSpot(j)} aria-label={x.title} />
           ))}
         </div>

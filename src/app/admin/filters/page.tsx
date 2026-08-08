@@ -5,6 +5,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { adminJson } from "@/lib/admin-fetch";
 import type { FilterDimension } from "@/lib/types";
+import { DEFAULT_FILTERS, DEFAULT_CHALLENGE_FILTERS, mergeWithDefaults } from "@/lib/filter-defaults";
 
 // theme/format/type match videos by string value → adding is safe; phase/level are
 // positional and dur is bucket-tied to durBucket() → structural, edit with care.
@@ -12,16 +13,24 @@ const STRUCTURAL = new Set(["phase", "level", "dur"]);
 
 export default function AdminFiltersPage() {
   const [dims, setDims] = useState<FilterDimension[] | null>(null);
+  const [chDims, setChDims] = useState<FilterDimension[] | null>(null);
   const [failed, setFailed] = useState(false);
 
+  // Firestore docs win; on empty prod the canonical defaults render so the
+  // taxonomy can be authored at all — the first save creates the docs.
   useEffect(() => {
     getDocs(collection(db, "filters"))
       .then((snap) => {
         const list = snap.docs.map((d) => ({ key: d.id, ...(d.data() as Omit<FilterDimension, "key">) }));
-        list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-        setDims(list);
+        setDims(mergeWithDefaults(DEFAULT_FILTERS, list));
       })
       .catch(() => setFailed(true));
+    getDocs(collection(db, "challengeFilters"))
+      .then((snap) => {
+        const list = snap.docs.map((d) => ({ key: d.id, ...(d.data() as Omit<FilterDimension, "key">) }));
+        setChDims(mergeWithDefaults(DEFAULT_CHALLENGE_FILTERS, list));
+      })
+      .catch(() => setChDims(DEFAULT_CHALLENGE_FILTERS));
   }, []);
 
   return (
@@ -47,19 +56,42 @@ export default function AdminFiltersPage() {
           ))}
         </div>
       )}
+
+      {chDims && (
+        <>
+          <div className="adm-head" style={{ marginTop: 28 }}>
+            <div className="adm-titles">
+              <div className="adm-eyebrow">KIHÍVÁSOK</div>
+              <h1 className="adm-h1">Kihívás-szűrők</h1>
+              <p className="adm-sub">A Kihívások archívum taxonómiája (testrész). A kihívás-videók erre hivatkoznak.</p>
+            </div>
+          </div>
+          <div className="adm-fils">
+            {chDims.map((d) => (
+              <DimensionEditor key={`ch-${d.key}`} dim={d} endpoint="/api/admin/challenge-filters" />
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }
 
-function DimensionEditor({ dim }: { dim: FilterDimension }) {
+function DimensionEditor({ dim, endpoint = "/api/admin/filters" }: { dim: FilterDimension & { stored?: boolean }; endpoint?: string }) {
   const [options, setOptions] = useState<string[]>(dim.options ?? []);
   const [baseline, setBaseline] = useState<string[]>(dim.options ?? []);
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [err, setErr] = useState("");
+  // Default-only dimension (no Firestore doc yet, empty-prod bootstrap): count
+  // as dirty so one Mentés creates it.
+  const [unsaved, setUnsaved] = useState(dim.stored === false);
 
   const structural = STRUCTURAL.has(dim.key);
-  const dirty = useMemo(() => JSON.stringify(options) !== JSON.stringify(baseline), [options, baseline]);
+  const dirty = useMemo(
+    () => unsaved || JSON.stringify(options) !== JSON.stringify(baseline),
+    [unsaved, options, baseline],
+  );
 
   const rename = (i: number, v: string) => setOptions((o) => o.map((x, j) => (j === i ? v : x)));
   const remove = (i: number) => setOptions((o) => o.filter((_, j) => j !== i));
@@ -88,12 +120,13 @@ function DimensionEditor({ dim }: { dim: FilterDimension }) {
     setStatus("saving");
     setErr("");
     try {
-      await adminJson(`/api/admin/filters/${dim.key}`, {
+      await adminJson(`${endpoint}/${dim.key}`, {
         method: "PUT",
         body: JSON.stringify({ options: clean }),
       });
       setOptions(clean);
       setBaseline(clean);
+      setUnsaved(false);
       setStatus("saved");
     } catch (e) {
       setStatus("error");
