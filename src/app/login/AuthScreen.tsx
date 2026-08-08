@@ -27,7 +27,7 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 type PendingExtra = { firstName: string; marketing: boolean } | null;
 
 export default function AuthScreen({ mode }: { mode: Mode }) {
-  const { user, loading, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail } =
+  const { user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail } =
     useAuth();
   const router = useRouter();
 
@@ -281,15 +281,8 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                   <GoogleMark />
                   {isReg ? "Regisztráció Google-lel" : "Folytatás Google-lel"}
                 </button>
-                <button
-                  className="ob"
-                  type="button"
-                  onClick={() => handleSso(signInWithApple)}
-                  disabled={busy}
-                >
-                  <AppleMark />
-                  {isReg ? "Regisztráció Apple-lel" : "Folytatás Apple-lel"}
-                </button>
+                {/* Apple sign-in deferred (no Apple Developer membership yet).
+                    signInWithApple/AppleMark are kept — re-add this button to enable. */}
               </div>
 
               <div className="div">vagy</div>

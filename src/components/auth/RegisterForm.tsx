@@ -6,7 +6,7 @@ import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 import { ensureUserDoc, saveOnboarding, BLANK_ONBOARDING } from "@/lib/user";
 import { readDraft, clearDraft } from "@/lib/onboarding-draft";
-import { authErrorHu, GoogleMark, AppleMark, EyeIcon } from "@/app/login/AuthScreen";
+import { authErrorHu, GoogleMark, EyeIcon } from "@/app/login/AuthScreen";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -16,7 +16,7 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 // If the email already exists during register, we switch to login in place —
 // the user is never dead-ended. Attach failure retries (40 §40.12).
 export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
-  const { user, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail } = useAuth();
+  const { user, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
 
   const [mode, setMode] = useState<"register" | "login">("register");
   const [name, setName] = useState("");
@@ -151,10 +151,7 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
           <GoogleMark />
           {isReg ? "Regisztráció Google-lel" : "Folytatás Google-lel"}
         </button>
-        <button type="button" className="ob" onClick={() => handleSso(signInWithApple)} disabled={busy}>
-          <AppleMark />
-          {isReg ? "Regisztráció Apple-lel" : "Folytatás Apple-lel"}
-        </button>
+        {/* Apple sign-in deferred (no Apple Developer membership yet). */}
       </div>
 
       <div className="div">vagy</div>
