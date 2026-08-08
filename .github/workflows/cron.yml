@@ -12,29 +12,21 @@ name: Cron
 on:
   schedule:
     - cron: "0 * * * *"    # hourly — workout reminders
-    - cron: "30 3 * * *"   # daily 03:30 UTC — purge deleted accounts
   workflow_dispatch:        # manual trigger for testing
+
+# NB: purge-accounts (GDPR 30-day deletion — a legal obligation) moved to
+# vercel.json crons: GH scheduled workflows auto-disable after 60 days of repo
+# inactivity, which is unacceptable for that job. Only the low-stakes hourly
+# reminder stays here (Vercel Hobby can't run hourly crons). If the project
+# upgrades to Vercel Pro, move this one too and delete this workflow.
 
 jobs:
   workout-reminders:
-    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 * * * *'
     runs-on: ubuntu-latest
     steps:
       - name: Fire workout reminders
         run: |
           curl -fsS -X GET "${PROD_BASE_URL}/api/cron/workout-reminders" \
-            -H "Authorization: Bearer ${CRON_SECRET}"
-        env:
-          PROD_BASE_URL: ${{ secrets.PROD_BASE_URL }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-
-  purge-accounts:
-    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 3 * * *'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Purge accounts past the 30-day window
-        run: |
-          curl -fsS -X GET "${PROD_BASE_URL}/api/cron/purge-accounts" \
             -H "Authorization: Bearer ${CRON_SECRET}"
         env:
           PROD_BASE_URL: ${{ secrets.PROD_BASE_URL }}

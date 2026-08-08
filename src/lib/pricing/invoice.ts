@@ -95,8 +95,17 @@ export async function issueInvoice(ref: string, payload: InvoicePayload): Promis
 
   const cfg = config();
   if (!cfg) {
-    console.log(`[invoice] skipped (no BILLINGO_API_KEY/BLOCK_ID) ref=${ref} ${payload.amountHuf} Ft`);
-    await markerRef.set({ status: "skipped_no_config" }, { merge: true });
+    if (process.env.NODE_ENV === "production") {
+      // A legally required NAV invoice was NOT issued. Record it as "failed"
+      // (the payload is already on the marker) so the daily cron re-issues it
+      // automatically once the Billingo env is fixed — and be loud about it.
+      console.error(`[invoice] FAILED — BILLINGO_API_KEY/BLOCK_ID not configured ref=${ref} ${payload.amountHuf} Ft`);
+      await markerRef.set({ status: "failed", error: "no_billingo_config", at: Date.now() }, { merge: true });
+      await notifyAdmin("invoice_failed", { ref, amountHuf: payload.amountHuf, error: "no_billingo_config" });
+    } else {
+      console.log(`[invoice] skipped (no BILLINGO_API_KEY/BLOCK_ID) ref=${ref} ${payload.amountHuf} Ft`);
+      await markerRef.set({ status: "skipped_no_config" }, { merge: true });
+    }
     return false;
   }
 

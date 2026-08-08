@@ -21,7 +21,10 @@ export async function sendEmail(msg: EmailInput): Promise<{ sent: boolean }> {
   const key = process.env.SENDGRID_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!key || !from) {
-    console.log(`[email] skipped (no SENDGRID_API_KEY/EMAIL_FROM) → ${msg.to}: ${msg.subject}`);
+    // In production a missing key means user-facing emails silently vanish —
+    // shout so it's visible in logs/monitoring, don't whisper.
+    const log = process.env.NODE_ENV === "production" ? console.error : console.log;
+    log(`[email] SKIPPED — SENDGRID_API_KEY/EMAIL_FROM not configured → ${msg.to}: ${msg.subject}`);
     return { sent: false };
   }
   const fromName = process.env.EMAIL_FROM_NAME; // e.g. "Alexa"
