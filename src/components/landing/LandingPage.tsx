@@ -22,21 +22,21 @@ import {
 /* ------------------------------------------------------------------ */
 /* shared category → color/word maps + the CourseCover gradient        */
 /* ------------------------------------------------------------------ */
-type Cat = "Alsótest" | "Felsőtest" | "Cardio + has" | "Teljes test" | "Mobility";
+type Cat = "Alsótest" | "Felsőtest" | "Kardió + has" | "Teljes test" | "Mobilitás";
 
 const CAT_VAR: Record<Cat, string> = {
   "Alsótest": "var(--cat-also)",
   "Felsőtest": "var(--cat-felso)",
-  "Cardio + has": "var(--cat-cardio)",
+  "Kardió + has": "var(--cat-cardio)",
   "Teljes test": "var(--cat-teljes)",
-  "Mobility": "var(--cat-mobility)",
+  "Mobilitás": "var(--cat-mobility)",
 };
 const CAT_WORD: Record<Cat, string> = {
   "Alsótest": "ALSÓ",
   "Felsőtest": "FELSŐ",
-  "Cardio + has": "CARDIO",
+  "Kardió + has": "KARDIÓ",
   "Teljes test": "TELJES",
-  "Mobility": "MOBILITY",
+  "Mobilitás": "MOBILITÁS",
 };
 // The app's LxCover gradient (relative-color OKLCH) — precomputed per category
 // by the browser at paint time. Identical formula for coverflow / journey / unlim.
@@ -172,12 +172,12 @@ function Ph({
 /* ------------------------------------------------------------------ */
 const coverflowCards: { cat: Cat; title: string; min: string }[] = [
   { cat: "Alsótest", title: "Fenék & comb égő", min: "24 perc" },
-  { cat: "Cardio + has", title: "Zsírégető cardio", min: "22 perc" },
+  { cat: "Kardió + has", title: "Zsírégető kardió", min: "22 perc" },
   { cat: "Felsőtest", title: "Erős kar & váll", min: "21 perc" },
   { cat: "Teljes test", title: "Teljes test égő", min: "28 perc" },
-  { cat: "Mobility", title: "Reggeli mobilitás", min: "14 perc" },
+  { cat: "Mobilitás", title: "Reggeli mobilitás", min: "14 perc" },
   { cat: "Alsótest", title: "Lépcsőző comb-sorozat", min: "19 perc" },
-  { cat: "Cardio + has", title: "Tabata core", min: "10 perc" },
+  { cat: "Kardió + has", title: "Tabata törzs", min: "10 perc" },
   { cat: "Felsőtest", title: "Tartás-reset", min: "17 perc" },
   { cat: "Teljes test", title: "Multi-mozgás mindenre", min: "26 perc" },
 ];
@@ -196,9 +196,9 @@ const starterWeeks: {
     rows: [
       { day: "H", cat: "Alsótest", title: "Láb alapokról", code: "F001" },
       { day: "K", cat: "Felsőtest", title: "Felsőtest indító", code: "F002" },
-      { day: "Sze", cat: "Cardio + has", title: "Csendes cardio", code: "F003" },
+      { day: "Sze", cat: "Kardió + has", title: "Csendes kardió", code: "F003" },
       { day: "Cs", cat: "Teljes test", title: "Mindent egy edzésben", code: "F004" },
-      { day: "P", cat: "Mobility", title: "Reset — alap flow", code: "F005" },
+      { day: "P", cat: "Mobilitás", title: "Reset — alap flow", code: "F005" },
     ],
   },
   {
@@ -207,20 +207,20 @@ const starterWeeks: {
     rows: [
       { day: "H", cat: "Alsótest", title: "Fenék-fókusz, első réteg", code: "F006" },
       { day: "K", cat: "Felsőtest", title: "Egyenes hát, nyitott mell", code: "F007" },
-      { day: "Sze", cat: "Cardio + has", title: "Lépés-alapú cardio + has", code: "F008" },
+      { day: "Sze", cat: "Kardió + has", title: "Lépés-alapú kardió + has", code: "F008" },
       { day: "Cs", cat: "Teljes test", title: "Egész test flow, könnyedén", code: "F009" },
-      { day: "P", cat: "Mobility", title: "Csípő + váll mobility", code: "F010" },
+      { day: "P", cat: "Mobilitás", title: "Csípő + váll mobilitás", code: "F010" },
     ],
   },
   {
     n: 3, ph: "epites", eyebrow: "🔨 Építés fázis",
-    desc: "Új variációk és cardio-alapozás. Belép a tempó és az új formátumok.",
+    desc: "Új variációk és kardió-alapozás. Belép a tempó és az új formátumok.",
     rows: [
       { day: "H", cat: "Alsótest", title: "Combé az erő — pulzusok", code: "F011" },
       { day: "K", cat: "Felsőtest", title: "Felsőtest variációkkal", code: "F012" },
-      { day: "Sze", cat: "Cardio + has", title: "Step it up — cardio építés", code: "F013" },
+      { day: "Sze", cat: "Kardió + has", title: "Step it up — kardió-építés", code: "F013" },
       { day: "Cs", cat: "Teljes test", title: "Teljes test fél órában", code: "F014" },
-      { day: "P", cat: "Mobility", title: "Lazító flow + mély nyújtás", code: "F015" },
+      { day: "P", cat: "Mobilitás", title: "Lazító flow + mély nyújtás", code: "F015" },
     ],
   },
   {
@@ -229,9 +229,9 @@ const starterWeeks: {
     rows: [
       { day: "H", cat: "Alsótest", title: "Lábmunka oldalra, átlósan", code: "F016" },
       { day: "K", cat: "Felsőtest", title: "Lapockák erősítése", code: "F017" },
-      { day: "Sze", cat: "Cardio + has", title: "Cardio combo + ferde has", code: "F018" },
+      { day: "Sze", cat: "Kardió + has", title: "Kardió-kombó + ferde has", code: "F018" },
       { day: "Cs", cat: "Teljes test", title: "Multi-mozgás mindenre", code: "F019" },
-      { day: "P", cat: "Mobility", title: "Mély nyújtás — egész test", code: "F020" },
+      { day: "P", cat: "Mobilitás", title: "Mély nyújtás — egész test", code: "F020" },
     ],
   },
 ];
@@ -239,14 +239,14 @@ const starterWeeks: {
 // Real seeded challenges (scripts/seed-challenges.mjs) — titles, lengths and
 // per-day minutes are the actual archive, not marketing filler.
 const challengeCards: { cat: Cat; title: string; days: string; mins: string }[] = [
-  { cat: "Cardio + has", title: "7 napos has-kihívás", days: "7 nap", mins: "napi 10–14 perc" },
+  { cat: "Kardió + has", title: "7 napos has-kihívás", days: "7 nap", mins: "napi 10–14 perc" },
   { cat: "Alsótest", title: "10 napos alsótest", days: "10 nap", mins: "napi 15–20 perc" },
-  { cat: "Mobility", title: "5 napos reggeli ébresztő", days: "5 nap", mins: "napi 8–12 perc" },
+  { cat: "Mobilitás", title: "5 napos reggeli ébresztő", days: "5 nap", mins: "napi 8–12 perc" },
   { cat: "Felsőtest", title: "5 napos tartás-kihívás", days: "5 nap", mins: "napi 8–12 perc" },
-  { cat: "Mobility", title: "14 napos reggeli flow", days: "14 nap", mins: "napi 12–18 perc" },
+  { cat: "Mobilitás", title: "14 napos reggeli flow", days: "14 nap", mins: "napi 12–18 perc" },
   { cat: "Felsőtest", title: "7 napos hát & tartás", days: "7 nap", mins: "napi 10–14 perc" },
-  { cat: "Cardio + has", title: "7 napos core", days: "7 nap", mins: "napi 10–14 perc" },
-  { cat: "Mobility", title: "6 napos mobilitás", days: "6 nap", mins: "napi 10–15 perc" },
+  { cat: "Kardió + has", title: "7 napos törzs", days: "7 nap", mins: "napi 10–14 perc" },
+  { cat: "Mobilitás", title: "6 napos mobilitás", days: "6 nap", mins: "napi 10–15 perc" },
 ];
 
 // FAQ — every answer must stay true to the shipped product (no roadmap claims).
@@ -807,7 +807,7 @@ export default function LandingPage() {
               <div className="ticon center">
                 <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2" /><path d="M16 10l6-3v10l-6-3" /></svg>
                 <h3 className="h-thin">edzés, amikor<br />neked jó</h3>
-                <p className="body">Vezetett, követhető edzések Alexával — alsótest, felsőtest, cardio és has, teljes test, mobility. Válaszd ki a hangulatod, nyomd meg a lejátszást, és mozogj vele, mintha ott lenne a szobában.</p>
+                <p className="body">Vezetett, követhető edzések Alexával — alsótest, felsőtest, kardió és has, teljes test, mobilitás. Válaszd ki a hangulatod, nyomd meg a lejátszást, és mozogj vele, mintha ott lenne a szobában.</p>
                 <a className="pill pill-outline" href="#elofizetes">Válaszd ki a csomagod</a>
               </div>
             </div>
@@ -1037,7 +1037,7 @@ export default function LandingPage() {
         <div className="foot">
           <div className="help">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>
-            <span>Kérdésed van? Írj nekünk, és segítünk — <a href="mailto:team@lexfit.hu">team@lexfit.hu</a></span>
+            <span>Kérdésed van? Írj nekünk, és segítünk — <a href="mailto:hi@lexfit.hu">hi@lexfit.hu</a></span>
           </div>
           <div className="legal">
             <a href="/aszf">Felhasználási feltételek</a> | <a href="/adatvedelem">Adatvédelem</a> |{" "}

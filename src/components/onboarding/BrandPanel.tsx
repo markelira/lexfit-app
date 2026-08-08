@@ -34,7 +34,7 @@ const CAP: Record<PanelKey, { eyebrow?: string; line: React.ReactNode; slogan?: 
   community: { eyebrow: "A közösség", line: <>1 200+ csoporttag,<br />akik már csinálják.</> },
   focus: { eyebrow: "Minden területre", line: "Van edzés arra, ahol erősödni akarsz." },
   level: { eyebrow: "Minden szint", line: "A szint hozzád igazodik — kezdőtől haladóig." },
-  days: { eyebrow: "A heted", line: "Heti 5 edzés, napi 30 perc." },
+  days: { eyebrow: "A heted", line: "Annyi nap, amennyi tényleg belefér." },
   player: { eyebrow: "A lejátszó", line: "Hang nélkül is végigvezet — TV-re is." },
   env: { eyebrow: "Minden helyzetre", line: "Bármi is az — van rá változat." },
   alone: { eyebrow: "Nem vagy egyedül", line: <>Egyedül nehéz. <b>Együtt muszáj.</b></>, slogan: true },

@@ -21,7 +21,7 @@ type Scene = {
 const CINE: Scene[] = [
   { dur: 3200, kind: "title", kicker: "LEXFIT · BEMUTATJA",
     bg: "radial-gradient(125% 125% at 30% 18%, oklch(0.52 0.05 168) 0%, oklch(0.16 0.04 168) 70%)" },
-  { dur: 4400, kind: "big", big: "EGY STABIL ALAP", sub: "8 hét alatt szokást építünk, formába hozunk, és felkészítünk minden következő edzésre.",
+  { dur: 4400, kind: "big", big: "EGY STABIL ALAP", sub: "Szokást építünk, formába hozunk, és felkészítünk minden következő edzésre.",
     bg: "radial-gradient(125% 125% at 72% 26%, oklch(0.56 0.17 32) 0%, oklch(0.15 0.03 330) 72%)" },
   { dur: 5000, kind: "rhythm", title: "A HETED", sub: "5 edzésnap, 2 pihenő. Napi fix 30 perc, eszköz nélkül — csak egy matrac.",
     bg: "linear-gradient(135deg, oklch(0.5 0.15 300) 0%, oklch(0.14 0.03 168) 78%)" },
@@ -29,7 +29,7 @@ const CINE: Scene[] = [
     bg: "radial-gradient(120% 120% at 60% 80%, oklch(0.52 0.16 45) 0%, oklch(0.14 0.03 340) 74%)" },
   { dur: 4600, kind: "phases", title: "4 FÁZIS", sub: "A formától az erőig — lépésről lépésre építünk fel.",
     bg: "radial-gradient(110% 130% at 50% 0%, oklch(0.5 0.16 150) 0%, oklch(0.15 0.03 340) 74%)" },
-  { dur: 4800, kind: "big", big: "MÉRD MAGAD", sub: "A 8. héten ugyanazt csinálod, mint az 1.-en. A különbség te leszel.",
+  { dur: 4800, kind: "big", big: "MÉRD MAGAD", sub: "A program végén ugyanazt csinálod, mint az elején. A különbség te leszel.",
     bg: "radial-gradient(125% 125% at 38% 82%, oklch(0.55 0.18 18) 0%, oklch(0.13 0.03 168) 72%)" },
   { dur: 5200, kind: "goals", title: "MIT NYERSZ?", sub: "Nem csak edzéseket. Egy erősebb, magabiztosabb verziódat.",
     bg: "radial-gradient(120% 120% at 40% 30%, oklch(0.5 0.15 280) 0%, oklch(0.14 0.03 345) 74%)" },
@@ -45,10 +45,10 @@ const CINE_PHASES = [
 ];
 const CINE_SPLIT: { d: string; theme?: string; rest?: boolean }[] = [
   { d: "Hétfő", theme: "Alsótest" }, { d: "Kedd", theme: "Felsőtest" }, { d: "Szerda", rest: true },
-  { d: "Csüt", theme: "Cardio + has" }, { d: "Péntek", theme: "Teljes test" },
-  { d: "Szombat", theme: "Mobility / nyújtás" }, { d: "Vasárnap", rest: true },
+  { d: "Csüt", theme: "Kardió + has" }, { d: "Péntek", theme: "Teljes test" },
+  { d: "Szombat", theme: "Mobilitás / nyújtás" }, { d: "Vasárnap", rest: true },
 ];
-const CINE_THEMES = ["Alsótest", "Felsőtest", "Cardio + has", "Teljes test", "Mobility / nyújtás"];
+const CINE_THEMES = ["Alsótest", "Felsőtest", "Kardió + has", "Teljes test", "Mobilitás / nyújtás"];
 const CINE_GOALS: [string, string][] = [
   ["💪", "Erősebb láb és törzs"], ["🧍", "Jobb testtartás"], ["🔁", "Napi mozgás-szokás"], ["📈", "Mérhető fejlődés"],
 ];
@@ -144,7 +144,7 @@ export function JoinCinematic({
             <>
               <div className="cine-kicker">{sc.kicker}</div>
               <div className="cine-title">FOUNDATION</div>
-              <div className="cine-sub">A 8 hetes alapprogram — kezdőknek és újrakezdőknek.</div>
+              <div className="cine-sub">Az alapprogram — kezdőknek és újrakezdőknek.</div>
             </>
           ) : sc.finale ? (
             <>

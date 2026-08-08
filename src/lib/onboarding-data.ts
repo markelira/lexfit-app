@@ -79,7 +79,7 @@ export const STEP_COPY: Record<string, { hd: string; sub: string; alexa: string 
   },
   about: {
     hd: "Mesélj magadról",
-    sub: "Pár alap adat — ezt vesszük kiindulásnak, és a 8. héten újra megnézzük. Bármit kihagyhatsz.",
+    sub: "Pár alap adat — ezt vesszük kiindulásnak, és a program végén újra megnézzük. Bármit kihagyhatsz.",
     alexa: "Pár adat rólad, hogy legyen mihez mérni a fejlődésed.",
   },
   level: {
@@ -130,9 +130,9 @@ export const WEEK = [
   { d: "Hétfő", dd: "H", theme: "Alsótest", work: true },
   { d: "Kedd", dd: "K", theme: "Felsőtest", work: true },
   { d: "Szerda", dd: "Sze", theme: "Pihenőnap", work: false },
-  { d: "Csütörtök", dd: "Cs", theme: "Cardio + has", work: true },
+  { d: "Csütörtök", dd: "Cs", theme: "Kardió + has", work: true },
   { d: "Péntek", dd: "P", theme: "Teljes test", work: true },
-  { d: "Szombat", dd: "Szo", theme: "Mobility", work: true },
+  { d: "Szombat", dd: "Szo", theme: "Mobilitás", work: true },
   { d: "Vasárnap", dd: "V", theme: "Pihenőnap", work: false },
 ];
 

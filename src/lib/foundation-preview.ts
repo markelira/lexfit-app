@@ -16,7 +16,7 @@ export interface PreviewWorkout {
 export const FOUNDATION_WEEK1: PreviewWorkout[] = [
   { code: "F001", order: 1, title: "Láb alapokról", theme: "Alsótest", mins: 22 },
   { code: "F002", order: 2, title: "Felsőtest indító", theme: "Felsőtest", mins: 22 },
-  { code: "F003", order: 3, title: "Csendes cardio", theme: "Cardio", mins: 22 },
+  { code: "F003", order: 3, title: "Csendes kardió", theme: "Kardió", mins: 22 },
   { code: "F004", order: 4, title: "Mindent egy edzésben", theme: "Teljes test", mins: 22 },
   { code: "F005", order: 5, title: "Reset — alap flow", theme: "Mobilitás", mins: 22 },
   { code: "F006", order: 6, title: "Fenék-fókusz", theme: "Fenék", mins: 22 },

@@ -4,9 +4,9 @@
 export const CAT: Record<string, { c: string; word: string; short: string }> = {
   "Alsótest": { c: "var(--cat-also)", word: "ALSÓTEST", short: "ALSÓ" },
   "Felsőtest": { c: "var(--cat-felso)", word: "FELSŐTEST", short: "FELSŐ" },
-  "Cardio + has": { c: "var(--cat-cardio)", word: "CARDIO + HAS", short: "CARDIO" },
+  "Kardió + has": { c: "var(--cat-cardio)", word: "KARDIÓ + HAS", short: "KARDIÓ" },
   "Teljes test": { c: "var(--cat-teljes)", word: "TELJES TEST", short: "TELJES" },
-  "Mobility / nyújtás": { c: "var(--cat-mobility)", word: "MOBILITY / NYÚJTÁS", short: "MOBILITY" },
+  "Mobilitás / nyújtás": { c: "var(--cat-mobility)", word: "MOBILITÁS / NYÚJTÁS", short: "MOBILITÁS" },
   "Tartás-fókusz": { c: "var(--cat-tartas)", word: "TARTÁS-FÓKUSZ", short: "TARTÁS" },
 };
 
@@ -33,10 +33,10 @@ export const levelWord = (n: number) => ["Kezdő", "Közepes", "Haladó"][n - 1]
 // ── Kihívások: body-part → cover word + colour (the archive's own taxonomy,
 //    distinct from the Videótár themes above). Falls back to the teljes hue. ──
 export const CH_CAT: Record<string, { c: string; word: string }> = {
-  "Has & core": { c: "var(--cat-cardio)", word: "HAS & CORE" },
+  "Has & törzs": { c: "var(--cat-cardio)", word: "HAS & TÖRZS" },
   "Fenék & comb": { c: "var(--cat-also)", word: "FENÉK & COMB" },
   "Karok & váll": { c: "var(--cat-felso)", word: "KAROK & VÁLL" },
-  "Tánc-cardio": { c: "var(--cat-teljes)", word: "TÁNC-CARDIO" },
+  "Tánc-kardió": { c: "var(--cat-teljes)", word: "TÁNC-KARDIÓ" },
   "Mobilitás": { c: "var(--cat-mobility)", word: "MOBILITÁS" },
   "Felsőtest": { c: "var(--cat-felso)", word: "FELSŐTEST" },
   "Tartás": { c: "var(--cat-tartas)", word: "TARTÁS" },

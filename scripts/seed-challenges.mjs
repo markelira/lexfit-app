@@ -28,7 +28,7 @@ if (!getApps().length) {
 const db = getFirestore();
 const TS = FieldValue.serverTimestamp();
 
-const BODY_PARTS = ["Has & core", "Fenék & comb", "Karok & váll", "Tánc-cardio", "Mobilitás", "Felsőtest", "Tartás"];
+const BODY_PARTS = ["Has & törzs", "Fenék & comb", "Karok & váll", "Tánc-kardió", "Mobilitás", "Felsőtest", "Tartás"];
 
 // Day-title pool (from the wireframe) — sliced to each challenge's length.
 const DAY_TITLES = [
@@ -38,7 +38,7 @@ const DAY_TITLES = [
 ];
 
 const CH = [
-  { slug: "7-napos-has-kihivas", title: "7 napos has-kihívás", month: "2024. november", sort: "2024-11", body: "Has & core", days: 7, mins: "napi 10–14 perc", participants: 312,
+  { slug: "7-napos-has-kihivas", title: "7 napos has-kihívás", month: "2024. november", sort: "2024-11", body: "Has & törzs", days: 7, mins: "napi 10–14 perc", participants: 312,
     synopsis: "Hét nap, napi 10–14 perc. A csoport ezt szavazta meg novemberben — most bármikor végigcsinálhatod a saját tempódban." },
   { slug: "5-napos-reggeli-ebreszto", title: "5 napos reggeli ébresztő", month: "2024. szeptember", sort: "2024-09", body: "Mobilitás", days: 5, mins: "napi 8–12 perc", participants: 143,
     synopsis: "Öt reggel, öt rövid felébresztő mozgás. A szeptemberi hét, bármikor újrajátszva." },
@@ -50,8 +50,8 @@ const CH = [
     synopsis: "Öt nap egyenes hát és nyitott mell. Rövid, de mindennap érzed." },
   { slug: "7-napos-hat-tartas", title: "7 napos hát & tartás", month: "2025. február", sort: "2025-02", body: "Tartás", days: 7, mins: "napi 10–14 perc", participants: 180,
     synopsis: "Hét nap a hátért és a tartásért — a februári csoport-választás." },
-  { slug: "7-napos-core", title: "7 napos core", month: "2025. február", sort: "2025-02", body: "Has & core", days: 7, mins: "napi 10–14 perc", participants: 167,
-    synopsis: "Hét nap fókuszált core-munka, eszköz nélkül." },
+  { slug: "7-napos-core", title: "7 napos törzs", month: "2025. február", sort: "2025-02", body: "Has & törzs", days: 7, mins: "napi 10–14 perc", participants: 167,
+    synopsis: "Hét nap fókuszált törzsmunka, eszköz nélkül." },
   { slug: "10-napos-alsotest", title: "10 napos alsótest", month: "2025. március", sort: "2025-03", body: "Fenék & comb", days: 10, mins: "napi 15–20 perc", participants: 158, featured: true, featuredLabel: "A CSOPORT VÁLASZTÁSA",
     synopsis: "Tíz nap, napi 15–20 perc. A csoport márciusi választása — most bármikor végigcsinálhatod." },
 ];

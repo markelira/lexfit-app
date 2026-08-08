@@ -21,13 +21,13 @@ import {
 
 type SpotFilter = { group?: keyof ActiveFilters; opt?: string; kind?: "short" };
 const LIB_SPOTS: { ey: string; title: string; theme: string; word: string; blurb: string; play: string; filter: SpotFilter }[] = [
-  { ey: "A HÉT VÁLOGATÁSA", title: "Csendes esték", theme: "Mobility / nyújtás", word: "CSEND",
+  { ey: "A HÉT VÁLOGATÁSA", title: "Csendes esték", theme: "Mobilitás / nyújtás", word: "CSEND",
     blurb: "Amikor elalszik a ház, te akkor is mozoghatsz. Ugrálás és zaj nélküli edzések — a szomszéd se veszi észre.",
     play: "N003", filter: { group: "type", opt: "🔇 Csendes" } },
-  { ey: "NINCS IDŐD? DE ENNYI VAN", title: "15 perc, ami belefér", theme: "Cardio + has", word: "GYORS",
+  { ey: "NINCS IDŐD? DE ENNYI VAN", title: "15 perc, ami belefér", theme: "Kardió + has", word: "GYORS",
     blurb: "A rövid edzés is edzés. Tizenöt perc, amit a napod bármelyik résébe becsúsztathatsz — kifogás nélkül.",
     play: "B007", filter: { kind: "short" } },
-  { ey: "INDÍTSD MOZGÁSSAL", title: "Reggeli rituálé", theme: "Mobility / nyújtás", word: "REGGEL",
+  { ey: "INDÍTSD MOZGÁSSAL", title: "Reggeli rituálé", theme: "Mobilitás / nyújtás", word: "REGGEL",
     blurb: "Pár perc átmozgatás ébredés után — és másképp indul az egész napod. Kíméletes, ébresztő flow-k.",
     play: "R001", filter: { group: "type", opt: "🌅 Reggeli" } },
 ];
@@ -36,10 +36,10 @@ const RAIL_FILTER: Record<string, SpotFilter> = {
   "Csendben is megy": { group: "type", opt: "🔇 Csendes" },
   "Erősödő alsótest": { group: "theme", opt: "Alsótest" },
   "Felsőtest & kar": { group: "theme", opt: "Felsőtest" },
-  "Cardio + has": { group: "theme", opt: "Cardio + has" },
+  "Kardió + has": { group: "theme", opt: "Kardió + has" },
   "Teljes test, fél óra": { group: "theme", opt: "Teljes test" },
   "Reggeli rituálé": { group: "type", opt: "🌅 Reggeli" },
-  "Mobility & nyújtás": { group: "theme", opt: "Mobility / nyújtás" },
+  "Mobilitás & nyújtás": { group: "theme", opt: "Mobilitás / nyújtás" },
   "Tartás-fókusz": { group: "theme", opt: "Tartás-fókusz" },
   "Falra fogva": { group: "type", opt: "🪑 Falra fogva" },
   "15 perc, ami belefér": { kind: "short" },
@@ -259,11 +259,11 @@ export default function LibraryPage() {
     { title: "15 perc, ami belefér", sub: "gyors rutinok", v: data.videos.filter((x) => x.mins <= 15) },
     { title: "Erősödő alsótest", sub: "comb · fenék", v: byTheme("Alsótest") },
     { title: "Felsőtest & kar", v: byTheme("Felsőtest") },
-    { title: "Cardio + has", sub: "pulzus fel", v: byTheme("Cardio + has") },
+    { title: "Kardió + has", sub: "pulzus fel", v: byTheme("Kardió + has") },
     { title: "Teljes test, fél óra", v: byTheme("Teljes test") },
     { title: "Reggeli rituálé", sub: "🌅 indítsd mozgással", v: byType("🌅 Reggeli") },
     { title: "Esti levezetés", sub: "🌙 lazíts el", v: data.videos.filter((x) => x.types.includes("🌙 Esti") || x.types.includes("🧘 Lazító")) },
-    { title: "Mobility & nyújtás", v: byTheme("Mobility / nyújtás") },
+    { title: "Mobilitás & nyújtás", v: byTheme("Mobilitás / nyújtás") },
     { title: "Tartás-fókusz", sub: "egyenes hát", v: byTheme("Tartás-fókusz") },
     { title: "Falra fogva", sub: "🪑 támaszkodj rá", v: byType("🪑 Falra fogva") },
     { title: "Kihívások & bónusz", sub: "a programon túl", v: byPhase(null) },
@@ -396,7 +396,7 @@ export default function LibraryPage() {
           <section className="lib-cats">
             <h2 className="lib-cats-h">Kategóriák</h2>
             <div className="lib-cattiles">
-              {["Alsótest", "Felsőtest", "Cardio + has", "Teljes test", "Mobility / nyújtás", "Tartás-fókusz"].map((t) => (
+              {["Alsótest", "Felsőtest", "Kardió + has", "Teljes test", "Mobilitás / nyújtás", "Tartás-fókusz"].map((t) => (
                 <button
                   key={t}
                   type="button"

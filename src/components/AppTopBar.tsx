@@ -21,7 +21,7 @@ const AVATAR_MENU: MenuItem[] = [
   { label: "Az edzésterved", icon: "calendarCheck", href: "/app/profile/settings?section=plan" },
   { label: "Emlékeztetők", icon: "bell", href: "/app/profile/settings?section=reminders" },
   { label: "Beállítások", icon: "sliders", href: "/app/profile/settings" },
-  { label: "Segítség", icon: "messageCircle", href: "mailto:info@amstudios.hu" },
+  { label: "Segítség", icon: "messageCircle", href: "mailto:hi@lexfit.hu" },
   { label: "Kijelentkezés", icon: "logOut", action: "logout", danger: true },
 ];
 
@@ -43,8 +43,8 @@ function LexMark() {
 const QUICK: { label: string; href: string }[] = [
   { label: "10 PERC ALATT", href: `/app/library?dur=${encodeURIComponent("5–15 perc")}` },
   { label: "ALSÓTEST", href: `/app/library?theme=${encodeURIComponent("Alsótest")}` },
-  { label: "CARDIO", href: `/app/library?theme=${encodeURIComponent("Cardio + has")}` },
-  { label: "MOBILITÁS", href: `/app/library?theme=${encodeURIComponent("Mobility / nyújtás")}` },
+  { label: "KARDIÓ", href: `/app/library?theme=${encodeURIComponent("Kardió + has")}` },
+  { label: "MOBILITÁS", href: `/app/library?theme=${encodeURIComponent("Mobilitás / nyújtás")}` },
   { label: "KEZDŐ", href: `/app/library?level=${encodeURIComponent("Kezdő")}` },
 ];
 

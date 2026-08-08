@@ -15,7 +15,7 @@ const EARNED_WEEK = perWeekHuf(EARNED);
 const STD = PRICES.annual_std.amountHuf;
 
 const BONUSES = [
-  "Személyre szabott 8 hetes terved",
+  "Személyre szabott edzésterved",
   "„Alapító” jelvény a közösségben",
   "A következő 4 zárt kihívás garantált helye",
 ];

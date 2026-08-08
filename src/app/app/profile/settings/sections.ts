@@ -138,7 +138,7 @@ export const SECTIONS: Section[] = [
       {
         rows: [
           { key: "faq", label: "Gyakori kérdések", icon: "messageCircle", kind: "chevron" },
-          { key: "contact", label: "Írj nekünk", icon: "mail", kind: "nav", href: "mailto:info@amstudios.hu" },
+          { key: "contact", label: "Írj nekünk", icon: "mail", kind: "nav", href: "mailto:hi@lexfit.hu" },
           { key: "legal", label: "Jogi tudnivalók", icon: "shield", kind: "chevron" },
         ],
       },

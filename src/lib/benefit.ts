@@ -32,24 +32,24 @@ const BENEFIT: Record<string, Record<Bucket, string>> = {
     burn: "Tónus a karban, égető",
     calm: "Nyitott váll, oldott nyak",
   },
-  "Cardio + has": {
+  "Kardió + has": {
     strength: "Lapos has, stabil törzs",
     burn: "Zsírégetés, felpörgő pulzus",
-    calm: "Enyhe cardio, has-fókusz",
+    calm: "Enyhe kardió, has-fókusz",
   },
   "Teljes test": {
     strength: "Erő az egész testben",
     burn: "Kalóriaégető, teljes test",
     calm: "Átmozgató, kíméletes",
   },
-  "Mobility / nyújtás": {
+  "Mobilitás / nyújtás": {
     strength: "Stabil, mozgékony ízületek",
     burn: "Aktív nyújtás, keringés",
     calm: "Kioldott gerinc, kevesebb merevség",
   },
   "Tartás-fókusz": {
-    strength: "Egyenes hát, erős core",
-    burn: "Core-égető, tartásjavító",
+    strength: "Egyenes hát, erős törzs",
+    burn: "Törzs-égető, tartásjavító",
     calm: "Oldott hát, jobb tartás",
   },
 };
@@ -58,7 +58,7 @@ const FALLBACK = BENEFIT["Teljes test"];
 
 function bucket({ theme, format = "", types = [] }: BenefitInput): Bucket {
   const fmt = format.toLowerCase();
-  if (theme === "Mobility / nyújtás" || /flow|nyújt|mobil/.test(fmt) || types.some((t) => /Esti|Lazító/i.test(t))) {
+  if (theme === "Mobilitás / nyújtás" || /flow|nyújt|mobil/.test(fmt) || types.some((t) => /Esti|Lazító/i.test(t))) {
     return "calm";
   }
   if (/emom|amrap|tabata|hiit|50\/50/.test(fmt) || types.some((t) => /Intenzív/i.test(t))) {

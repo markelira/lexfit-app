@@ -19,7 +19,7 @@ export default function RootError({ error, reset }: { error: Error; reset: () =>
       <h1 style={{ fontSize: 22, margin: 0 }}>Valami elromlott</h1>
       <p style={{ opacity: 0.7, margin: 0 }}>
         Ez a mi hibánk, nem a tiéd. Próbáld újra — ha nem segít, írj nekünk:{" "}
-        <a href="mailto:info@amstudios.hu">info@amstudios.hu</a>
+        <a href="mailto:hi@lexfit.hu">hi@lexfit.hu</a>
       </p>
       <button
         onClick={reset}

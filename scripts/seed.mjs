@@ -31,6 +31,17 @@ const lx = loadPrototype("lexfit-data.jsx");
 const SERIES = { B: "has-kihivas", R: "reggeli-flow", T: "tartas", N: "nyujtas", M: "mobility" };
 const seriesFromCode = (code) => SERIES[code[0]] ?? null;
 
+// 2026-08 glossary decision: the canonical taxonomy is fully Hungarian
+// (Kardió/Mobilitás). The prototype source files keep their original strings;
+// translate at seed time so the emulator matches production taxonomy.
+const THEME_HU = {
+  "Cardio + has": "Kardió + has",
+  "Mobility / nyújtás": "Mobilitás / nyújtás",
+  "Mobility": "Mobilitás",
+  "Cardio": "Kardió",
+};
+const huTheme = (t) => THEME_HU[t] ?? t;
+
 // blocks only exist for the "today" sample so far
 const blocksByCode = { [lx.LX_TODAY_PLAN.code]: lx.LX_TODAY_PLAN.blocks };
 
@@ -68,7 +79,7 @@ const workoutVideos = programWorkouts.map((wk) => ({
   kind: "workout",
   series: null,
   title: wk.title,
-  theme: wk.theme,
+  theme: huTheme(wk.theme),
   mins: wk.mins,
   level: wk.level,
   format: wk.format,
@@ -81,7 +92,7 @@ const bonusVideos = lx.LX_VIDEOS.filter((v) => v.phase === null).map((b) => ({
   kind: "bonus",
   series: seriesFromCode(b.code),
   title: b.title,
-  theme: b.theme,
+  theme: huTheme(b.theme),
   mins: b.mins,
   level: b.level,
   format: b.format,
@@ -139,7 +150,9 @@ const usedValues = {
   type: new Set(allForTaxonomy.flatMap((v) => v.types)),
 };
 const filters = Object.entries(lx.LX_FILTERS).map(([key, dim], i) => {
-  let options = dim.options;
+  // Translate the prototype's theme options to the Hungarian canonical
+  // taxonomy (dedup in case old+new both appear).
+  let options = key === "theme" ? [...new Set(dim.options.map(huTheme))] : dim.options;
   if (usedValues[key]) {
     const missing = [...usedValues[key]].filter((x) => !options.includes(x));
     if (missing.length) {

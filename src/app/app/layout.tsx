@@ -73,7 +73,7 @@ function Shell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <a href="mailto:info@amstudios.hu" className="lx-help">
+          <a href="mailto:hi@lexfit.hu" className="lx-help">
             <span className="av">A</span>
             <span className="pi">
               <span className="nm">Alexa</span>

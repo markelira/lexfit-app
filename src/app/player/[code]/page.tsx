@@ -28,9 +28,9 @@ import { buildFinishData } from "@/lib/finish-data";
 const CAT: Record<string, { c: string; word: string }> = {
   "Alsótest": { c: "var(--cat-also)", word: "ALSÓ" },
   "Felsőtest": { c: "var(--cat-felso)", word: "FELSŐ" },
-  "Cardio + has": { c: "var(--cat-cardio)", word: "CARDIO" },
+  "Kardió + has": { c: "var(--cat-cardio)", word: "KARDIÓ" },
   "Teljes test": { c: "var(--cat-teljes)", word: "TELJES" },
-  "Mobility / nyújtás": { c: "var(--cat-mobility)", word: "MOBILITY" },
+  "Mobilitás / nyújtás": { c: "var(--cat-mobility)", word: "MOBILITÁS" },
   "Tartás-fókusz": { c: "var(--cat-tartas)", word: "TARTÁS" },
 };
 const cat = (t: string) => CAT[t] ?? CAT["Teljes test"];

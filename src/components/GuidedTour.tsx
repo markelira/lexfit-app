@@ -16,21 +16,21 @@ type Rect = { top: number; left: number; w: number; h: number };
 
 const GW_SLIDES: Slide[] = [
   { grad: "var(--grad-hero)", word: "FOUNDATION", emoji: "👋", ey: "ÜDV A FOUNDATION-BEN",
-    h: "8 hét, ami megalapoz mindent",
-    p: "Ez a kezdő-újrakezdő alapprogramod. Heti 5 edzés, napi fix 30 perc, eszköz nélkül — elég egy matrac.",
+    h: "Az alap, amire minden épül",
+    p: "Ez a kezdő-újrakezdő alapprogramod. Rövid, vezetett edzések, eszköz nélkül — elég egy matrac.",
     a: "Szia! Alexa vagyok, végig veled csinálom. Megmutatom, hogy működik — 5 kártya, fél perc." },
   { grad: "linear-gradient(135deg, oklch(0.72 0.13 45), oklch(0.6 0.15 30))", word: "RITMUS", emoji: "🗓️", ey: "A HETED",
-    h: "Heti 5 nap + 2 pihenő",
-    p: "Hétfő alsó, kedd felső, csütörtök cardio, péntek teljes test, szombat mobility. Szerda és vasárnap pihenő — az is a terv része.",
+    h: "A te heted, a te ritmusod",
+    p: "Az edzésnapjaidat te választottad — alsótest, felsőtest, kardió, teljes test és mobilitás váltják egymást, a pihenőnap pedig ugyanúgy a terv része.",
     a: "Nem kell kitalálnod, mit csinálj. Minden napra megvan a dolgod — te csak megnyomod a Kezdést." },
   { grad: "linear-gradient(135deg, oklch(0.6 0.12 300), oklch(0.5 0.05 168))", word: "FÁZIS", emoji: "🌱", ey: "PROGRESSZIÓ",
-    h: "4 fázis, egyre feljebb",
-    p: "🌱 Alap → 🔨 Építés → 🔥 Elmélyítés → 🏆 Kifejezés. Kéthetente lépsz tovább; a gyakorlatok fokról fokra nehezednek.",
+    h: "Fázisról fázisra feljebb",
+    p: "🌱 Alap → 🔨 Építés → 🔥 Elmélyítés → 🏆 Kifejezés. Fázisonként lépsz tovább; a gyakorlatok fokról fokra nehezednek.",
     a: "Az első fázis a legkönnyebb, az utolsó a legerősebb. Nem ugrunk — felépítünk." },
   { grad: "linear-gradient(135deg, oklch(0.55 0.16 12), oklch(0.62 0.15 28))", word: "MÉRÉS", emoji: "📊", ey: "FEJLŐDÉS-MÉRÉS",
     h: "Méred a fejlődésed, nem hiszed",
-    p: "Az 5. és a 8. héten visszahozom a nyitóhét edzéseit. Ugyanaz a mozgás, ugyanannyi idő — számokban látod, mennyit erősödtél.",
-    a: "A 8. hét végén ugyanazt csinálod, mint az 1.-en. A különbség te leszel." },
+    p: "A program során visszahozom a nyitóhét edzéseit. Ugyanaz a mozgás, ugyanannyi idő — számokban látod, mennyit erősödtél.",
+    a: "A visszamérésen ugyanazt csinálod, mint az elején. A különbség te leszel." },
   { grad: "var(--grad-hero)", word: "START", emoji: "🚀", ey: "KÉSZ?",
     h: "Megmutatom az appot",
     p: "Egy gyors körbevezetés: hol indítod a mai edzést, hol követed a haladásod. Bármikor kihagyhatod.",
@@ -39,7 +39,7 @@ const GW_SLIDES: Slide[] = [
 
 const GT_STEPS: Step[] = [
   { sel: '[data-tour="start"]', h: "Itt indítod a mai edzést", t: "Ez a fő gomb. Bárhonnan jössz vissza, innen folytatod ott, ahol abbahagytad." },
-  { sel: '[data-tour="journey"]', h: "Hol tartasz a programban", t: "A te utad a 8 héten át. Zöld, ami kész; a rózsaszín jelző mutatja, hol jársz most; 📊 a két visszamérés." },
+  { sel: '[data-tour="journey"]', h: "Hol tartasz a programban", t: "A te utad a programon át. Zöld, ami kész; a rózsaszín jelző mutatja, hol jársz most; 📊 a visszamérések." },
   { sel: '[data-tour="today"]', h: "A mai edzésed — és ami jön", t: "Bal oldalon az előnézet, jobbra a leírás és a felépítés. Alul a Folytasd-sor: a soron következő edzéseid.",
     action: true, act: "Koppints a mai edzésre" },
 ];

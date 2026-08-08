@@ -20,9 +20,9 @@ const FMT: Record<string, string> = {
 const THEME: Record<string, string> = {
   "Alsótest": "Comb-, fenék- és vádlifókuszú edzés",
   "Felsőtest": "Kar-, váll- és hátfókuszú edzés",
-  "Cardio + has": "Pulzusemelő edzés erős hasfókusszal",
+  "Kardió + has": "Pulzusemelő edzés erős hasfókusszal",
   "Teljes test": "Az egész testet átmozgató edzés",
-  "Mobility / nyújtás": "Ízület-átmozgató, nyújtó egység",
+  "Mobilitás / nyújtás": "Ízület-átmozgató, nyújtó egység",
   "Tartás-fókusz": "Tartásjavító, gerincbarát egység",
 };
 
