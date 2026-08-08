@@ -1,4 +1,5 @@
 import "server-only";
+import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { subscriptionRef } from "./subscription";
 import { priceIdForRole } from "./checkout-server";
@@ -21,6 +22,28 @@ function addMonths(fromMs: number, months: number): number {
 export class LifecycleError extends Error {}
 
 /**
+ * A weekly-intro (or earned-annual) subscription is managed by a Stripe
+ * subscription schedule until its phases complete — and Stripe forbids
+ * canceling or setting cancel behavior on the subscription directly while a
+ * schedule manages it ("updating any cancelation behavior directly is not
+ * allowed"). Releasing the schedule detaches it and leaves the subscription in
+ * place as a standalone sub, so the normal cancel/withdrawal path then works.
+ * No-op when there is no schedule. Returns the live subscription so callers can
+ * reuse it without a second retrieve.
+ */
+export async function releaseScheduleIfManaged(
+  stripeSubscriptionId: string,
+): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+  const live = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+  if (live.schedule) {
+    const schedId = typeof live.schedule === "string" ? live.schedule : live.schedule.id;
+    await stripe.subscriptionSchedules.release(schedId);
+  }
+  return live;
+}
+
+/**
  * F2.3 pause — stop billing AND access. `pause_collection: void` halts invoicing;
  * the PAUSED status hard-denies access (hasAccessFromData). The remaining paid
  * time is banked (`pauseRemainingMs`) so resume restores exactly what was left —
@@ -35,6 +58,11 @@ export async function pauseSubscription(uid: string, months: PauseMonths): Promi
   const periodEnd = sub.currentPeriodEnd ?? sub.accessUntil ?? now;
   const remaining = Math.max(0, periodEnd - now);
 
+  // If still in the intro step-up window, release the managing schedule so the
+  // pause/resume updates (pause_collection, then trial_end on resume) aren't
+  // rejected. Trade-off: a sub paused during intro week resumes on the intro
+  // price instead of stepping up — rare, user-favorable; refine post-launch.
+  await releaseScheduleIfManaged(sub.stripeSubscriptionId);
   await getStripe().subscriptions.update(sub.stripeSubscriptionId, {
     pause_collection: { behavior: "void" },
   });
@@ -145,6 +173,10 @@ export async function cancelAtPeriodEnd(uid: string): Promise<number> {
   const sub = await loadSub(uid);
   if (!sub?.stripeSubscriptionId) throw new LifecycleError("no_subscription");
 
+  // Weekly-intro subs are schedule-managed during the step-up; release the
+  // schedule first or Stripe rejects the cancel. The user is leaving, so the
+  // intro→standard step-up is moot.
+  await releaseScheduleIfManaged(sub.stripeSubscriptionId);
   await getStripe().subscriptions.update(sub.stripeSubscriptionId, {
     cancel_at_period_end: true,
   });

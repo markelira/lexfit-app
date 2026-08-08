@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { verifyRequest } from "@/lib/auth-server";
 import { getStripe } from "@/lib/stripe";
 import { subscriptionRef } from "@/lib/pricing/subscription";
+import { releaseScheduleIfManaged } from "@/lib/pricing/lifecycle";
 import { logEvent, notifyAdmin } from "@/lib/pricing/events";
 import { sendEmail } from "@/lib/email";
 import { WITHDRAWAL_DAYS, DAY_MS } from "@/lib/pricing/config";
@@ -73,6 +74,9 @@ export async function POST(req: Request) {
           refundedMinor += amount;
         }
       }
+      // Weekly-intro subs are schedule-managed (490→1990 step-up); Stripe
+      // rejects a direct cancel while a schedule manages them. Release it first.
+      await releaseScheduleIfManaged(sub.stripeSubscriptionId);
       await stripe.subscriptions.cancel(sub.stripeSubscriptionId);
     } else {
       // One-off: single "period" = startedAt..accessUntil, paid via stored PI.
