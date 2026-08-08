@@ -4,6 +4,7 @@ import {
   GoogleAuthProvider,
   OAuthProvider,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -61,7 +62,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function signUpWithEmail(email: string, password: string) {
-    await createUserWithEmailAndPassword(auth, email, password);
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    // Non-blocking verification email (P5.4 decision): typo'd addresses get
+    // caught, but access is never gated on it — a failure here is invisible.
+    sendEmailVerification(cred.user).catch(() => {});
   }
 
   async function signOutUser() {
