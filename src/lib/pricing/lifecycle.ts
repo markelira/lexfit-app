@@ -208,7 +208,8 @@ export async function cancelAtPeriodEnd(uid: string): Promise<number> {
   // schedule first or Stripe rejects the cancel. The user is leaving, so the
   // intro→standard step-up is moot.
   console.log("[cxl] cancelAtPeriodEnd start", JSON.stringify({ uid, subId: sub.stripeSubscriptionId }));
-  await releaseScheduleIfManaged(sub.stripeSubscriptionId);
+  const live = await releaseScheduleIfManaged(sub.stripeSubscriptionId);
+  const schedBefore = live.schedule ? (typeof live.schedule === "string" ? live.schedule : live.schedule.id) : "none";
   try {
     await getStripe().subscriptions.update(sub.stripeSubscriptionId, {
       cancel_at_period_end: true,
@@ -216,7 +217,11 @@ export async function cancelAtPeriodEnd(uid: string): Promise<number> {
     console.log("[cxl] cancel_at_period_end set OK");
   } catch (e) {
     console.error("[cxl] cancel update FAILED", JSON.stringify(errInfo(e)));
-    throw e;
+    // TEMP [cxl]: surface the diagnostic to the client so the on-screen error
+    // tells us marker + schedule-before-release + released-flag.
+    throw new Error(
+      `[cxl-v3 sched=${schedBefore} released=${schedBefore !== "none"}] ${e instanceof Error ? e.message : String(e)}`,
+    );
   }
 
   const now = Date.now();
