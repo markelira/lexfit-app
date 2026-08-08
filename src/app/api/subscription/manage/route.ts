@@ -31,6 +31,7 @@ export async function POST(req: Request) {
     reason?: string;
   };
 
+  console.log("[cxl] manage route", JSON.stringify({ marker: "cxl-v3", action: body.action, uid: token.uid }));
   try {
     switch (body.action) {
       case "pause": {
@@ -60,6 +61,11 @@ export async function POST(req: Request) {
     if (e instanceof LifecycleError) {
       return NextResponse.json({ error: e.message }, { status: 409 });
     }
+    const x = e as { name?: string; type?: string; code?: string };
+    console.error(
+      "[cxl] manage route ERROR",
+      JSON.stringify({ action: body.action, name: x?.name, type: x?.type, code: x?.code, message: e instanceof Error ? e.message : String(e) }),
+    );
     return NextResponse.json(
       { error: `stripe_error: ${e instanceof Error ? e.message : ""}` },
       { status: 502 },

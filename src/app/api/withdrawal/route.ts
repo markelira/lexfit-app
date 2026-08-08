@@ -38,6 +38,7 @@ export async function POST(req: Request) {
   const ref = subscriptionRef(token.uid);
   const snap = await ref.get();
   const sub = snap.data() as SubscriptionDoc | undefined;
+  console.log("[cxl] withdrawal route", JSON.stringify({ marker: "cxl-v3", uid: token.uid, subId: sub?.stripeSubscriptionId, status: sub?.status }));
   if (!sub || sub.startedAt == null) {
     return NextResponse.json({ error: "no_subscription" }, { status: 404 });
   }
@@ -93,6 +94,8 @@ export async function POST(req: Request) {
       }
     }
   } catch (e) {
+    const x = e as { name?: string; type?: string; code?: string };
+    console.error("[cxl] withdrawal ERROR", JSON.stringify({ name: x?.name, type: x?.type, code: x?.code, message: e instanceof Error ? e.message : String(e) }));
     return NextResponse.json(
       { error: `stripe_error: ${e instanceof Error ? e.message : ""}` },
       { status: 502 },
