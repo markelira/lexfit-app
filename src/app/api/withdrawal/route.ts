@@ -38,7 +38,6 @@ export async function POST(req: Request) {
   const ref = subscriptionRef(token.uid);
   const snap = await ref.get();
   const sub = snap.data() as SubscriptionDoc | undefined;
-  console.log("[cxl] withdrawal route", JSON.stringify({ marker: "cxl-v3", uid: token.uid, subId: sub?.stripeSubscriptionId, status: sub?.status }));
   if (!sub || sub.startedAt == null) {
     return NextResponse.json({ error: "no_subscription" }, { status: 404 });
   }
@@ -53,7 +52,6 @@ export async function POST(req: Request) {
 
   const stripe = getStripe();
   let refundedMinor = 0;
-  let schedDiag = "n/a"; // TEMP [cxl]
 
   try {
     if (sub.stripeSubscriptionId) {
@@ -62,10 +60,7 @@ export async function POST(req: Request) {
       // direct cancel while that's true. Doing it up front means the operation
       // most likely to fail happens before refunds, so a failure can't orphan a
       // refund with the subscription still active.
-      const liveW = await releaseScheduleIfManaged(sub.stripeSubscriptionId);
-      schedDiag = liveW.schedule
-        ? typeof liveW.schedule === "string" ? liveW.schedule : liveW.schedule.id
-        : "none";
+      await releaseScheduleIfManaged(sub.stripeSubscriptionId);
 
       // Recurring: refund each paid invoice's unused portion from REAL invoices.
       const invoices = await stripe.invoices.list({
@@ -98,10 +93,8 @@ export async function POST(req: Request) {
       }
     }
   } catch (e) {
-    const x = e as { name?: string; type?: string; code?: string };
-    console.error("[cxl] withdrawal ERROR", JSON.stringify({ schedDiag, name: x?.name, type: x?.type, code: x?.code, message: e instanceof Error ? e.message : String(e) }));
     return NextResponse.json(
-      { error: `stripe_error [cxl-v3 sched=${schedDiag} released=${schedDiag !== "none" && schedDiag !== "n/a"}]: ${e instanceof Error ? e.message : ""}` },
+      { error: `stripe_error: ${e instanceof Error ? e.message : ""}` },
       { status: 502 },
     );
   }

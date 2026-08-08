@@ -36,42 +36,11 @@ export async function releaseScheduleIfManaged(
 ): Promise<Stripe.Subscription> {
   const stripe = getStripe();
   const live = await stripe.subscriptions.retrieve(stripeSubscriptionId);
-  // TEMP INSTRUMENTATION [cxl] — remove after the schedule-cancel bug is confirmed fixed.
-  console.log(
-    "[cxl] releaseScheduleIfManaged",
-    JSON.stringify({
-      marker: "cxl-v3",
-      askedId: stripeSubscriptionId,
-      retrievedId: live.id,
-      status: live.status,
-      schedule: live.schedule ?? null,
-    }),
-  );
   if (live.schedule) {
     const schedId = typeof live.schedule === "string" ? live.schedule : live.schedule.id;
-    try {
-      const released = await stripe.subscriptionSchedules.release(schedId);
-      console.log("[cxl] released schedule", JSON.stringify({ schedId, newStatus: released.status }));
-    } catch (e) {
-      console.error("[cxl] release FAILED", schedId, JSON.stringify(errInfo(e)));
-      throw e;
-    }
-  } else {
-    console.log("[cxl] no schedule attached — skipping release");
+    await stripe.subscriptionSchedules.release(schedId);
   }
   return live;
-}
-
-// TEMP [cxl] — compact Stripe error shape for logs.
-function errInfo(e: unknown): Record<string, unknown> {
-  const x = e as { name?: string; type?: string; code?: string; message?: string; statusCode?: number };
-  return {
-    name: x?.name,
-    type: x?.type,
-    code: x?.code,
-    statusCode: x?.statusCode,
-    message: e instanceof Error ? e.message : String(e),
-  };
 }
 
 /**
@@ -207,22 +176,10 @@ export async function cancelAtPeriodEnd(uid: string): Promise<number> {
   // Weekly-intro subs are schedule-managed during the step-up; release the
   // schedule first or Stripe rejects the cancel. The user is leaving, so the
   // intro→standard step-up is moot.
-  console.log("[cxl] cancelAtPeriodEnd start", JSON.stringify({ uid, subId: sub.stripeSubscriptionId }));
-  const live = await releaseScheduleIfManaged(sub.stripeSubscriptionId);
-  const schedBefore = live.schedule ? (typeof live.schedule === "string" ? live.schedule : live.schedule.id) : "none";
-  try {
-    await getStripe().subscriptions.update(sub.stripeSubscriptionId, {
-      cancel_at_period_end: true,
-    });
-    console.log("[cxl] cancel_at_period_end set OK");
-  } catch (e) {
-    console.error("[cxl] cancel update FAILED", JSON.stringify(errInfo(e)));
-    // TEMP [cxl]: surface the diagnostic to the client so the on-screen error
-    // tells us marker + schedule-before-release + released-flag.
-    throw new Error(
-      `[cxl-v3 sched=${schedBefore} released=${schedBefore !== "none"}] ${e instanceof Error ? e.message : String(e)}`,
-    );
-  }
+  await releaseScheduleIfManaged(sub.stripeSubscriptionId);
+  await getStripe().subscriptions.update(sub.stripeSubscriptionId, {
+    cancel_at_period_end: true,
+  });
 
   const now = Date.now();
   const accessUntil = sub.currentPeriodEnd ?? sub.accessUntil ?? now;
