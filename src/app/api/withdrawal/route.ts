@@ -5,6 +5,7 @@ import { verifyRequest } from "@/lib/auth-server";
 import { getStripe } from "@/lib/stripe";
 import { subscriptionRef } from "@/lib/pricing/subscription";
 import { logEvent, notifyAdmin } from "@/lib/pricing/events";
+import { sendEmail } from "@/lib/email";
 import { WITHDRAWAL_DAYS, DAY_MS } from "@/lib/pricing/config";
 import { unusedFraction } from "@/lib/pricing/refund";
 import type { SubscriptionDoc } from "@/lib/pricing/types";
@@ -115,8 +116,33 @@ export async function POST(req: Request) {
     plan: sub.plan,
     refundHuf: refundedMinor / 100,
   });
-  // TODO(F5): user confirmation email once the transactional provider suite is
-  // complete. The admin notification above is the durable record until then.
+
+  // 45/2014. Korm. r. 12. §: confirm receipt of the withdrawal on a durable
+  // medium. Best-effort — the refund already happened; a send failure must not
+  // fail the request.
+  if (token.email) {
+    const refundHuf = Math.round(refundedMinor / 100);
+    try {
+      await sendEmail({
+        to: token.email,
+        subject: "Elállásod megerősítése — LEXFIT",
+        text: [
+          "Szia!",
+          "",
+          "Megkaptuk az elállási nyilatkozatodat, és le is zártuk az előfizetésedet.",
+          refundHuf > 0
+            ? `A fel nem használt időszak árát (${refundHuf.toLocaleString("hu-HU")} Ft) visszatérítettük az eredeti fizetési módra. A bankodtól függően ez pár munkanapon belül jelenik meg.`
+            : "A már felhasznált időszak alapján visszatérítendő összeg nem keletkezett.",
+          "",
+          "A hozzáférésed ezzel lezárult. Ha bármikor visszatérnél, szeretettel várunk.",
+          "",
+          "LEXFIT",
+        ].join("\n"),
+      });
+    } catch (e) {
+      console.error("[withdrawal] confirmation email failed:", e);
+    }
+  }
 
   return NextResponse.json({ ok: true, refundedHuf: refundedMinor / 100 });
 }

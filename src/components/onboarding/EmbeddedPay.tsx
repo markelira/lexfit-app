@@ -95,7 +95,7 @@ export function EmbeddedPay({
           <button className="fnl-cta" disabled={!consented} onClick={() => setReady(true)}>
             Tovább a fizetéshez
           </button>
-          <p className="fnl-alt">Bármikor lemondható · 14 napos pénzvisszafizetési garancia</p>
+          <p className="fnl-alt">Bármikor lemondható · 14 napos elállási jog</p>
         </>
       ) : (
         <>
