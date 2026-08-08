@@ -4,7 +4,8 @@
 // Idempotent: re-running upserts content fields but PRESERVES Mux/published
 // fields so attaching videos later is never clobbered.
 //
-// Run: npm run seed   (= node --env-file=.env.local scripts/seed.mjs)
+// Run: npm run seed:local   (emulator only — guarded below)
+import "./require-emulator.mjs";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { loadPrototype } from "../seed/load-prototype.mjs";

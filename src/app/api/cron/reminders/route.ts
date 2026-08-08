@@ -41,7 +41,8 @@ async function emailFor(uid: string): Promise<string | null> {
  *  per user, idempotently via a milestone doc. Secured with CRON_SECRET. */
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
+  // Fail CLOSED: a missing CRON_SECRET must never make this public.
+  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

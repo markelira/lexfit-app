@@ -12,16 +12,9 @@ export async function GET() {
     // Lightweight admin read: proves the service-account key parses at runtime
     // and Firestore is reachable from this environment (e.g. Vercel).
     await adminDb.listCollections();
-    return NextResponse.json({
-      ok: true,
-      firestore: "connected",
-      project: process.env.FIREBASE_ADMIN_PROJECT_ID ?? null,
-      ts: new Date().toISOString(),
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { ok: false, error: error instanceof Error ? error.message : String(error) },
-      { status: 500 },
-    );
+    // Public endpoint: never expose project ids or raw error internals here.
+    return NextResponse.json({ ok: true, ts: new Date().toISOString() });
+  } catch {
+    return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

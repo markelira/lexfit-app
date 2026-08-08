@@ -10,6 +10,7 @@
 // admin. Do NOT seed production.
 //
 // Run: FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node --env-file=.env.local scripts/seed-challenges.mjs
+import "./require-emulator.mjs";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 

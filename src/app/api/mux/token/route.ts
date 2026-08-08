@@ -24,7 +24,13 @@ export async function GET(req: Request) {
   }
 
   const snap = await adminDb.collection(collection).doc(code).get();
-  const playbackId = snap.data()?.muxPlaybackId as string | undefined;
+  const data = snap.data();
+  // Draft/soon/archived content must not stream, even for entitled users who
+  // guess a code. (Docs without a status field predate the admin CMS — allow.)
+  if (data?.status !== undefined && data.status !== "published") {
+    return NextResponse.json({ error: "no video attached" }, { status: 404 });
+  }
+  const playbackId = data?.muxPlaybackId as string | undefined;
   if (!playbackId) return NextResponse.json({ error: "no video attached" }, { status: 404 });
 
   const tokens = await signPlaybackTokens(playbackId);

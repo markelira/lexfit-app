@@ -3,6 +3,7 @@
 // writes the playback id onto videos/{code}.
 //
 // Usage: node --env-file=.env.local scripts/attach-test-video.mjs [CODE] [URL]
+import "./require-emulator.mjs";
 import Mux from "@mux/mux-node";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";

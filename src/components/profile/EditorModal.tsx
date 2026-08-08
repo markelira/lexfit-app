@@ -6,7 +6,7 @@ import { lxPaths } from "@/lib/icons";
 
 // Explicit editor (30 §30.8): title, one control, Mentés (disabled until dirty),
 // Mégsem. Desktop modal; below --bp-mobile the same markup renders as a bottom
-// sheet (CSS). Escape closes. In P1 saving is fixture-only.
+// sheet (CSS). Escape closes.
 export function EditorModal({
   open, title, dirty, onClose, onSave, children, saveLabel = "Mentés", saving,
 }: {

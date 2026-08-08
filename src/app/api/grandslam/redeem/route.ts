@@ -31,7 +31,8 @@ export async function POST(req: Request) {
     throw e;
   }
 
-  const origin = req.headers.get("origin") ?? "http://localhost:3000";
+  const origin =
+    req.headers.get("origin") ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const customer = await getOrCreateCustomer(token.uid, token.email);
   const price = await priceIdForRole("annual_earned");
   const meta = { uid: token.uid, role: "annual_earned", scheduleEarnedAnnual: "true" };

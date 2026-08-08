@@ -18,7 +18,11 @@ npm run emulators    # Firestore + Storage emulator, loads ./.emulator-data
 npm run dev:local    # Next dev pointed at the emulator  → http://localhost:3000
 ```
 Emulator UI: http://localhost:4000 · Re-seed mock data (with emulators running):
-`npm run seed:local`. Without emulators, `npm run dev` runs against real Firebase.
+`npm run seed:local`.
+
+⚠️ Plain `npm run dev` runs against **production** Firebase — never use it for
+admin authoring or seeding. Seed scripts hard-exit unless pointed at the
+emulator; production content is authored via `/admin` only.
 
 Environment variables: copy `.env.example` → `.env.local` and fill in (see `CLAUDE.md`).
 `.env.local` is git-ignored and mirrored into Vercel for every environment.
@@ -27,7 +31,7 @@ Environment variables: copy `.env.example` → `.env.local` and fill in (see `CL
 ```bash
 npm run healthcheck  # verify Firebase Admin SDK + Firestore connectivity
 npm run build        # production build
-npm run seed         # (Phase 1) seed Firestore from prototype data
+npm run seed:local   # re-seed the EMULATOR from prototype data (never prod)
 ```
 
 ## Firebase

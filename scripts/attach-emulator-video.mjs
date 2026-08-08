@@ -2,6 +2,7 @@
 // the real signed asset in the cloud — no new asset created). Runs under
 // `firebase emulators:exec`, which sets FIRESTORE_EMULATOR_HOST so the Admin SDK
 // writes to the emulator, not production.
+import "./require-emulator.mjs";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 

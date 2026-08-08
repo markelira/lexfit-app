@@ -15,7 +15,8 @@ const THIRTY_DAYS_MS = 30 * 24 * 3600 * 1000;
 
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
+  // Fail CLOSED: a missing CRON_SECRET must never make this public.
+  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
