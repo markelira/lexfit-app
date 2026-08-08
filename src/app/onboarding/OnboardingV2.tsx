@@ -829,7 +829,7 @@ function PlanStep({
       <div className="fnl-foot">
         <button className="fnl-cta" onClick={onNext}>Előfizetek — {sel.cta}</button>
         <p className="pw-fine">
-          Az előfizetés automatikusan megújul, amíg le nem mondod. Bármikor lemondható · 14 napos pénzvisszafizetési garancia.
+          Az előfizetés automatikusan megújul, amíg le nem mondod. Bármikor lemondható · 14 napos elállási jog.
         </p>
         <div className="pw-links">
           <a href="/terms">Feltételek</a>

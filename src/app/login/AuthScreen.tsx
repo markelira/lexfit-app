@@ -433,7 +433,7 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
 
               <div className="trust">
                 {isReg ? <ShieldIcon /> : <LockIcon />}
-                {isReg ? "14 napos pénzvisszafizetési garancia" : "Titkosított kapcsolat"}
+                {isReg ? "14 napos elállási jog" : "Titkosított kapcsolat"}
               </div>
             </section>
           </div>

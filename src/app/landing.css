@@ -97,7 +97,7 @@
 .lxl .band-sage { background: var(--sage); }
 .lxl .sec { padding: 96px 0; }
 .lxl .sec-sm { padding: 64px 0; }
-.lxl .sec-funkciok { padding: 116px 0 28px; }
+.lxl .sec-first { padding: 116px 0 28px; } /* generous entry padding on the first band after the hero */
 .lxl .panel { position: relative; border-radius: 28px; overflow: hidden;
   background:
     radial-gradient(120% 90% at 12% 8%, oklch(1 0 168/.55), transparent 55%),
@@ -133,7 +133,6 @@
 .lxl .carousel { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; padding: 6px 40px; scrollbar-width: none; }
 .lxl .carousel::-webkit-scrollbar { display: none; }
 .lxl .carousel > * { flex: 0 0 auto; scroll-snap-align: center; }
-.lxl .food-tile { position: relative; width: 150px; height: 150px; border-radius: 16px; overflow: hidden; }
 
 /* ---- hero · premium light ---- */
 .lxl .hero { position: relative; background: var(--sage); border-radius: 28px; overflow: hidden; padding: 34px 0 96px; margin: 16px 16px 0; }
@@ -153,7 +152,7 @@
 .lxl .hero-row { display: flex; align-items: center; gap: 22px; margin-top: 34px; }
 .lxl .hero-cta2 { background: none; border: none; cursor: pointer; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: oklch(from var(--ink) l c h / .78); }
 .lxl .hero-cta2:hover { color: var(--ink); }
-.lxl .hero-trust { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: oklch(from var(--ink) l c h / .6); margin-top: 38px; }
+.lxl .hero-trust { font-family: var(--mono); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: oklch(from var(--ink) l c h / .78); margin-top: 38px; }
 .lxl .hero-device { position: relative; justify-self: center; width: 320px; height: 566px; border-radius: 24px; overflow: hidden; animation: lxl-heroFloat 6s ease-in-out infinite; }
 @keyframes lxl-heroFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 
@@ -202,8 +201,10 @@
 .lxl .j-dhead .j-day { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; color: oklch(1 0 168/.72); width: 26px; flex: none; }
 .lxl .j-dhead .j-t { font-size: 15px; font-weight: 500; letter-spacing: -.01em; transition: font-weight .3s; }
 .lxl .j-drow.active .j-dhead .j-t { font-weight: 700; }
-.lxl .j-card { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .6s cubic-bezier(.22,1,.36,1), opacity .45s ease, margin-top .5s ease; }
-.lxl .j-drow.active .j-card { max-height: 170px; opacity: 1; margin-top: 9px; }
+/* Expand via grid-template-rows (cheaper than the old max-height loop — 03 D11). */
+.lxl .j-card { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .6s cubic-bezier(.22,1,.36,1), opacity .45s ease, margin-top .5s ease; }
+.lxl .j-card-inner { overflow: hidden; min-height: 0; }
+.lxl .j-drow.active .j-card { grid-template-rows: 1fr; opacity: 1; margin-top: 9px; }
 .lxl .j-cover { position: relative; height: 150px; border-radius: 16px; overflow: hidden; display: flex; align-items: flex-end; padding: 16px; box-shadow: 0 20px 40px -22px oklch(0 0 168/.55); }
 .lxl .j-cover::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 85% 10%, oklch(1 0 168/.18), transparent 55%); }
 .lxl .j-ring { position: absolute; top: -38px; right: -26px; width: 150px; height: 150px; border-radius: 50%; border: 2px solid oklch(1 0 168/.28); z-index: 0; }
@@ -256,7 +257,8 @@
 /* ---- sticky nav · floating glass pill ---- */
 .lxl .stickynav { position: fixed; top: 0; left: 0; right: 0; z-index: 60; padding: 16px 20px 0; transform: translateY(-130%); transition: transform .34s cubic-bezier(.22,1,.36,1); }
 .lxl .stickynav.show { transform: none; }
-.lxl .stickynav .row1 { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: var(--col); margin: 0 auto; background: oklch(1 0 168/.6); border: 1px solid oklch(1 0 168/.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 999px; padding: 11px 12px 11px 24px; box-shadow: 0 20px 44px -26px oklch(.4 .03 168/.6), inset 0 1px 0 oklch(1 0 168/.85); }
+/* bg raised .6 → .74 so the pill stays legible over the navy bands (03 B6) */
+.lxl .stickynav .row1 { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: var(--col); margin: 0 auto; background: oklch(1 0 168/.74); border: 1px solid oklch(1 0 168/.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 999px; padding: 11px 12px 11px 24px; box-shadow: 0 20px 44px -26px oklch(.4 .03 168/.6), inset 0 1px 0 oklch(1 0 168/.85); }
 .lxl .stickynav .wordmark { color: var(--ink); }
 .lxl .stickynav .row1 .links { display: flex; gap: 22px; font-family: var(--mono); font-size: 11px; letter-spacing: .11em; text-transform: uppercase; }
 .lxl .stickynav .row1 .links a { color: oklch(.235 .014 168/.58); transition: color .2s; white-space: nowrap; }
@@ -282,19 +284,6 @@
 .lxl .castrow .dots i { width: 5px; height: 5px; border-radius: 99px; background: oklch(1 0 168/.5); }
 .lxl .castrow .wave { color: var(--accent); display: flex; }
 
-/* ---- achievement badges ---- */
-.lxl .badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 22px; max-width: 1000px; margin: 0 auto; }
-.lxl .badge { display: flex; flex-direction: column; align-items: center; gap: 9px; width: 82px; text-align: center; }
-.lxl .badge .hex { width: 64px; height: 72px; display: flex; align-items: center; justify-content: center; color: #fff;
-  clip-path: polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); }
-.lxl .badge .lab { font-family: var(--mono); font-size: 8.5px; letter-spacing: .06em; line-height: 1.3; text-transform: uppercase; color: oklch(.235 .014 168/.65); }
-/* badge tint fills */
-.lxl .t-sage { background: linear-gradient(160deg, oklch(.66 .04 168), oklch(.56 .045 168)); }
-.lxl .t-coral { background: linear-gradient(160deg, var(--cat-cardio), oklch(.56 .07 72)); }
-.lxl .t-teal { background: linear-gradient(160deg, var(--cat-felso), oklch(.40 .02 168)); }
-.lxl .t-blue { background: linear-gradient(160deg, oklch(.58 .03 225), oklch(.48 .035 225)); }
-.lxl .t-green { background: linear-gradient(160deg, oklch(.64 .045 168), oklch(.54 .05 168)); }
-
 /* ---- trainer cards ---- */
 .lxl .trainer-card { width: 326px; height: 420px; border-radius: 18px; position: relative; overflow: hidden; flex: 0 0 auto; }
 .lxl .trainer-card .role { position: absolute; top: 18px; left: 18px; z-index: 3; font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: oklch(1 0 168/.85); line-height: 1.4; }
@@ -309,6 +298,19 @@
 .lxl .aq-close { font-weight: 300; font-size: clamp(40px,6vw,76px); line-height: 1.02; letter-spacing: -.03em; color: #fff; margin: 30px 0 0; text-wrap: balance; }
 .lxl .aq-sign { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: oklch(1 0 168/.6); margin-top: 20px; }
 .lxl .aq-cta { margin-top: 30px; }
+
+/* ---- FAQ ---- */
+.lxl .faq { display: flex; flex-direction: column; gap: 10px; max-width: 720px; margin: 26px auto 0; text-align: left; }
+.lxl .faq-item { background: #fff; border: 1px solid oklch(0 0 168/.07); border-radius: 14px; padding: 0 20px; }
+.lxl .faq-item summary { cursor: pointer; font-weight: 600; font-size: 15px; letter-spacing: -.01em; padding: 16px 26px 16px 0; list-style: none; position: relative; }
+.lxl .faq-item summary::-webkit-details-marker { display: none; }
+.lxl .faq-item summary::after { content: "+"; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-weight: 400; font-size: 20px; color: var(--accent-2); transition: transform .25s var(--ease-out); }
+.lxl .faq-item[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+.lxl .faq-item summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.lxl .faq-item p { padding: 0 0 16px; font-size: 14.5px; line-height: 1.55; color: oklch(.235 .014 168/.72); }
+
+/* founder credential chips — left-aligned variant of .starter-facts */
+.lxl .founder-facts { justify-content: flex-start; margin-top: 20px; }
 
 /* ---- pricing ---- */
 .lxl .pricing-band { background: var(--sage-2); padding: 120px 0 90px; }
@@ -332,6 +334,33 @@
 .lxl .foot .help { display: flex; gap: 10px; max-width: 420px; line-height: 1.5; }
 .lxl .foot .legal a { color: var(--ink); opacity: .8; margin-left: 14px; }
 
+/* ---- stage-3 interaction layer ---- */
+/* Smooth anchor travel on the landing only; instant under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.lxl) { scroll-behavior: smooth; }
+}
+/* Anchored sections stop below the floating pill. */
+.lxl [id] { scroll-margin-top: 92px; }
+
+/* Coverflow is draggable: 1:1 tracking, momentum snap (03 A1). */
+.lxl .coverflow { touch-action: pan-y; cursor: grab; outline: none; user-select: none; -webkit-user-select: none; }
+.lxl .coverflow:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 18px; }
+.lxl .coverflow.dragging { cursor: grabbing; }
+.lxl .coverflow.dragging .cf-card { transition: opacity .6s ease; } /* 1:1 transform while dragging */
+
+/* Journey day rows are real buttons now. */
+.lxl button.j-drow { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; text-align: left; width: 100%; cursor: pointer; display: block; }
+.lxl .j-drow:focus-visible { outline: 2px solid oklch(1 0 168/.75); outline-offset: 3px; border-radius: 16px; }
+
+/* Press feedback on every liftable card, matching .pill:active. */
+.lxl .unlim-card:active, .lxl .trainer-card:active, .lxl .price-card:active, .lxl .cf-card:active { transform: translateY(1px); }
+
+/* Mobile sticky bottom CTA bar (02 C3) — hidden on desktop. */
+.lxl .mcta { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 60; display: none; align-items: center; justify-content: space-between; gap: 12px; background: oklch(1 0 168/.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid oklch(1 0 168/.7); border-radius: 18px; padding: 10px 10px 10px 16px; box-shadow: 0 20px 44px -20px oklch(.3 .03 168/.55); transform: translateY(140%); transition: transform .34s var(--ease-out); }
+.lxl .mcta.show { transform: none; }
+.lxl .mcta > span { font-family: var(--mono); font-size: 11.5px; letter-spacing: .03em; color: var(--ink); }
+.lxl .mcta .pill { padding: 12px 18px; font-size: 12px; white-space: nowrap; }
+
 /* ---- reveal system ----
    Two granularities of ONE motion: `.rise` moves the element as a block;
    `.rise.seq` keeps the element put and staggers its direct children. Both
@@ -351,12 +380,11 @@
 .lxl .rise.seq.in > :nth-child(6) { transition-delay: calc(var(--rise-step) * 5); }
 
 /* ---- hover micro-interactions — uniform lift on every static card ---- */
-.lxl .unlim-card, .lxl .food-tile, .lxl .trainer-card, .lxl .price-card {
+.lxl .unlim-card, .lxl .trainer-card, .lxl .price-card {
   transition: transform .32s var(--ease-out), box-shadow .32s var(--ease-out);
 }
 .lxl .unlim-card:hover { transform: translateY(-4px); box-shadow: 0 30px 56px -26px oklch(0 0 168/.6); }
 .lxl .trainer-card:hover { transform: translateY(-4px); }
-.lxl .food-tile:hover { transform: translateY(-4px); }
 .lxl .price-card:hover { transform: translateY(-4px); box-shadow: 0 26px 50px -26px oklch(0 0 168/.45); }
 
 /* ---- responsive ---- */
@@ -369,6 +397,10 @@
   .lxl .panel-pad { padding: 36px; }
 }
 @media (max-width: 760px) {
+  /* Sticky pill collapses to wordmark + CTA; the bottom bar carries the offer. */
+  .lxl .stickynav .row1 .links { display: none; }
+  .lxl .stickynav .row1 { padding: 9px 10px 9px 18px; }
+  .lxl .mcta { display: flex; }
   .lxl .panel-grid { grid-template-columns: 1fr; gap: 28px; }
   .lxl .panel-media { order: -1; }
   .lxl .cast-top { grid-template-columns: 1fr; gap: 26px; }
@@ -392,7 +424,7 @@
   .lxl .j-anim > * { animation: none !important; }
   .lxl .j-chap .fill, .lxl .sc-chap .fill { animation: none !important; }
   .lxl .rise, .lxl .rise.seq > * { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .lxl .unlim-card:hover, .lxl .food-tile:hover, .lxl .trainer-card:hover, .lxl .price-card:hover { transform: none !important; }
+  .lxl .unlim-card:hover, .lxl .trainer-card:hover, .lxl .price-card:hover { transform: none !important; }
   .lxl .sc-scene { transition: opacity .3s ease !important; }
 }
 
@@ -404,7 +436,7 @@
 .lxl .price-anchor .eyebrow { color: oklch(1 0 168/.68); }
 .lxl .pa-num { display: flex; align-items: baseline; justify-content: center; gap: 12px; margin-top: 12px; }
 .lxl .pa-num b { font-weight: 800; font-size: clamp(60px,11vw,132px); line-height: .92; letter-spacing: -.04em; color: #fff; }
-.lxl .pa-num span { font-family: var(--mono); font-size: clamp(15px,2vw,20px); letter-spacing: .1em; color: var(--sage); }
+.lxl .pa-num > span { font-family: var(--mono); font-size: clamp(15px,2vw,20px); letter-spacing: .1em; color: var(--sage); }
 .lxl .pa-lead { color: oklch(1 0 168/.74); margin-top: 18px; }
 .lxl .pa-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; margin: 26px 0 34px; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: oklch(1 0 168/.58); }
 .lxl .pa-row b { color: var(--sage); font-weight: 600; }

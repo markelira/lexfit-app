@@ -1,7 +1,9 @@
 # LEXFIT — project context for Claude Code
 
-LEXFIT is a Hungarian, women-first fitness web app — a guided 8-week program, not a
-generic workout library. This repo is the production rebuild of a finished prototype.
+LEXFIT is a Hungarian fitness web app for women and men — a guided 8-week program, not a
+generic workout library. (Positioning updated 2026-08: NO LONGER women-first; don't
+gender the copy or assume a female-only audience.) This repo is the production rebuild
+of a finished prototype.
 Full spec: `docs/build-plan.md` (and the matching PDF). Read it before any phase.
 
 ## Stack

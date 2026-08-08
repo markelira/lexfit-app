@@ -7,6 +7,7 @@
 // (scoped under `.lxl`). Every image is a striped <Ph> placeholder until real
 // photography exists (see handoff "Assets").
 
+import Image from "next/image";
 import Link from "next/link";
 import { PRICES } from "@/lib/pricing/config";
 import { formatHuf, perWeekHuf, annualSavingsPct } from "@/lib/pricing/display";
@@ -113,6 +114,40 @@ function Rise({
   );
 }
 
+// Count-up for the price-anchor number: rolls 0 → value on first reveal so the
+// per-week price lands as an event. Static under prefers-reduced-motion.
+function CountUp({ value }: { value: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const prm = usePrefersReducedMotion();
+  const [n, setN] = useState(value);
+  const started = useRef(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || prm) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting || started.current) return;
+        started.current = true;
+        io.disconnect();
+        const t0 = performance.now();
+        const dur = 900;
+        const step = (t: number) => {
+          const p = Math.min(1, (t - t0) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          setN(Math.round(value * eased));
+          if (p < 1) requestAnimationFrame(step);
+        };
+        setN(0);
+        requestAnimationFrame(step);
+      },
+      { threshold: 0.6 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [prm, value]);
+  return <span ref={ref}>{formatHuf(n)}</span>;
+}
+
 // Striped image placeholder — production swaps each for a real <Image>.
 function Ph({
   label,
@@ -138,7 +173,7 @@ function Ph({
 const coverflowCards: { cat: Cat; title: string; min: string }[] = [
   { cat: "Alsótest", title: "Fenék & comb égő", min: "24 perc" },
   { cat: "Cardio + has", title: "Zsírégető cardio", min: "22 perc" },
-  { cat: "Felsőtest", title: "Tónusos kar & váll", min: "21 perc" },
+  { cat: "Felsőtest", title: "Erős kar & váll", min: "21 perc" },
   { cat: "Teljes test", title: "Teljes test égő", min: "28 perc" },
   { cat: "Mobility", title: "Reggeli mobilitás", min: "14 perc" },
   { cat: "Alsótest", title: "Lépcsőző comb-sorozat", min: "19 perc" },
@@ -201,26 +236,45 @@ const starterWeeks: {
   },
 ];
 
-const unlimCards: { cat: Cat; title: string; min: string }[] = [
-  { cat: "Alsótest", title: "Fenék & comb alap", min: "28 perc" },
-  { cat: "Felsőtest", title: "Tónusos kar & váll", min: "24 perc" },
-  { cat: "Cardio + has", title: "Zsírégető kardió", min: "20 perc" },
-  { cat: "Teljes test", title: "Teljes test égő", min: "30 perc" },
-  { cat: "Mobility", title: "Reggeli mobilitás", min: "15 perc" },
-  { cat: "Alsótest", title: "Comb & fenék formáló", min: "26 perc" },
-  { cat: "Cardio + has", title: "Core & has fókusz", min: "18 perc" },
-  { cat: "Felsőtest", title: "Hát & tartás", min: "22 perc" },
-  { cat: "Teljes test", title: "Tánc kardió", min: "25 perc" },
-  { cat: "Mobility", title: "Estéli nyújtás", min: "12 perc" },
-  { cat: "Alsótest", title: "Láb erősítő", min: "30 perc" },
-  { cat: "Teljes test", title: "HIIT kör", min: "20 perc" },
+// Real seeded challenges (scripts/seed-challenges.mjs) — titles, lengths and
+// per-day minutes are the actual archive, not marketing filler.
+const challengeCards: { cat: Cat; title: string; days: string; mins: string }[] = [
+  { cat: "Cardio + has", title: "7 napos has-kihívás", days: "7 nap", mins: "napi 10–14 perc" },
+  { cat: "Alsótest", title: "10 napos alsótest", days: "10 nap", mins: "napi 15–20 perc" },
+  { cat: "Mobility", title: "5 napos reggeli ébresztő", days: "5 nap", mins: "napi 8–12 perc" },
+  { cat: "Felsőtest", title: "5 napos tartás-kihívás", days: "5 nap", mins: "napi 8–12 perc" },
+  { cat: "Mobility", title: "14 napos reggeli flow", days: "14 nap", mins: "napi 12–18 perc" },
+  { cat: "Felsőtest", title: "7 napos hát & tartás", days: "7 nap", mins: "napi 10–14 perc" },
+  { cat: "Cardio + has", title: "7 napos core", days: "7 nap", mins: "napi 10–14 perc" },
+  { cat: "Mobility", title: "6 napos mobilitás", days: "6 nap", mins: "napi 10–15 perc" },
 ];
 
-const badges: [string, string][] = [
-  ["24 HÉT", "t-teal"], ["500 PERC", "t-sage"], ["50 EDZÉS", "t-teal"],
-  ["15 EDZÉS", "t-green"], ["6 HÉT", "t-coral"], ["100 PERC", "t-green"],
-  ["50 VÍZNAPLÓ", "t-blue"], ["30 NAPLÓBEJEGYZÉS", "t-coral"], ["30 ALVÁSNAPLÓ", "t-teal"],
-  ["90 NAPLÓBEJEGYZÉS", "t-green"], ["500 VÍZNAPLÓ", "t-blue"], ["365 ALVÁSNAPLÓ", "t-teal"],
+// FAQ — every answer must stay true to the shipped product (no roadmap claims).
+const faq: [string, string][] = [
+  [
+    "Miért fizessek, ha a YouTube-on ingyen is van edzésvideó?",
+    "A videó ingyen van — a sorrend nem. A LEXFIT egy felépített program: minden edzés tudja, mi jött előtte és mi jön utána, a haladásod magától követődik, és nem neked kell minden nap kitalálnod, mit csinálj. Pont ezért működik akkor is, amikor a motiváció épp nincs otthon.",
+  ],
+  [
+    "Teljesen kezdő vagyok. Nekem való?",
+    "Igen — a Foundation pontosan ide készült: lassú tempó, alapgyakorlatok, bőséges modifikációkkal. A saját tempódban haladsz, és a pihenőnap nálunk a terv része.",
+  ],
+  [
+    "Férfiként is használhatom?",
+    "Igen. A LEXFIT nőknek és férfiaknak készült — a gyakorlatok saját testsúlyra épülnek, te pedig a saját szinteden és tempódban követed őket.",
+  ],
+  [
+    "Milyen eszköz kell hozzá?",
+    "Semmi — csak egy matrac és napi nagyjából 30 perc.",
+  ],
+  [
+    "Hogyan mondhatom le?",
+    "Bármikor, egy kattintással, a profilodból. Nincs hűségidő — a lemondás után a már kifizetett időszak végéig még minden elérhető.",
+  ],
+  [
+    "Megy TV-n vagy laptopon is?",
+    "Igen. A LEXFIT a böngészőben fut — nem kell letölteni semmit. Telefonon, laptopon és asztali gépen működik, az edzést pedig AirPlay-jel vagy Chromecasttal a TV-re is kiküldheted.",
+  ],
 ];
 
 const alexaChapters: [string, string, string][] = [
@@ -264,17 +318,20 @@ const pricing: {
   },
 ];
 
-const CTA_START = "/login"; // real conversion path (login → onboarding → app)
+// Primary conversion path: the built 7-question personalization quiz
+// (onboarding → auth → checkout). Login stays as the secondary "már tag vagy" path.
+const CTA_START = "/onboarding";
 
 /* ------------------------------------------------------------------ */
 /* sticky nav + scroll-spy                                             */
 /* ------------------------------------------------------------------ */
+// Labels are benefit words a stranger understands, not app-internal names.
 const NAV_LINKS: [string, string][] = [
-  ["#valos", "Valós idejű"],
-  ["#programok", "Foundation"],
+  ["#valos", "Edzések"],
+  ["#programok", "Program"],
+  ["#kihivasok", "Kihívások"],
   ["#youtube", "Bemutató"],
-  ["#profil", "Haladásom"],
-  ["#receptek", "Receptek"],
+  ["#elofizetes", "Árak"],
 ];
 
 function StickyNav() {
@@ -307,8 +364,13 @@ function StickyNav() {
           ))}
         </nav>
         <Link className="mini" href={CTA_START}>
-          Kezdd el a programot <span aria-hidden="true">→</span>
+          Összeállítom a tervem <span aria-hidden="true">→</span>
         </Link>
+      </div>
+      {/* Mobile-only sticky bottom bar: offer + one CTA (02 C3). */}
+      <div className={`mcta ${show ? "show" : ""}`}>
+        <span>Az első heted <b>{formatHuf(PRICES.week_intro.amountHuf)}</b></span>
+        <Link className="pill pill-dark" href={CTA_START}>Összeállítom a tervem</Link>
       </div>
     </div>
   );
@@ -317,32 +379,91 @@ function StickyNav() {
 /* ------------------------------------------------------------------ */
 /* coverflow                                                           */
 /* ------------------------------------------------------------------ */
+const CARD_STEP = 118; // px between adjacent coverflow cards
 function Coverflow() {
   const [ref, inView] = useInView(0.3);
   const prm = usePrefersReducedMotion();
   const N = coverflowCards.length;
   const [center, setCenter] = useState(Math.floor(N / 2));
+  // 1:1 drag: fractional card offset while the pointer is down; on release the
+  // flick velocity is projected forward (exponential decay) and snapped.
+  const [dragOffset, setDragOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const drag = useRef<{ startX: number; lastX: number; lastT: number; vx: number } | null>(null);
+  // Survives past pointerup so the trailing click can tell a drag from a tap.
+  const movedRef = useRef(false);
   useEffect(() => {
-    if (!inView || prm) return;
+    if (!inView || prm || dragging) return;
     const t = setInterval(() => setCenter((c) => (c + 1) % N), 2800);
     return () => clearInterval(t);
-  }, [inView, prm, N]);
+  }, [inView, prm, N, dragging]);
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    drag.current = { startX: e.clientX, lastX: e.clientX, lastT: performance.now(), vx: 0 };
+    movedRef.current = false;
+    setDragging(true);
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d) return;
+    const now = performance.now();
+    const dt = now - d.lastT;
+    if (dt > 0) d.vx = (e.clientX - d.lastX) / dt; // px/ms, latest sample
+    d.lastX = e.clientX;
+    d.lastT = now;
+    const dx = e.clientX - d.startX;
+    if (Math.abs(dx) > 6) movedRef.current = true; // hysteresis before it counts as a drag
+    setDragOffset(-dx / CARD_STEP);
+  };
+  const onPointerUp = () => {
+    const d = drag.current;
+    if (!d) return;
+    drag.current = null;
+    setDragging(false);
+    // Momentum projection (decelerationRate .998), clamped to ±3 cards.
+    const projPx = d.vx * 1000 * 0.998 / (1 - 0.998) / 1000;
+    const extra = Math.max(-3, Math.min(3, -projPx / CARD_STEP));
+    const target = Math.round(center + dragOffset + extra);
+    setCenter(((target % N) + N) % N);
+    setDragOffset(0);
+  };
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowLeft") { setCenter((c) => (c - 1 + N) % N); e.preventDefault(); }
+    if (e.key === "ArrowRight") { setCenter((c) => (c + 1) % N); e.preventDefault(); }
+  };
+  const eff = center + dragOffset;
   return (
-    <div className="coverflow" ref={ref}>
+    <div
+      className={`coverflow ${dragging ? "dragging" : ""}`}
+      ref={ref}
+      tabIndex={0}
+      role="group"
+      aria-label="Edzés-kártyák — nyilakkal vagy húzással lapozható"
+      onKeyDown={onKeyDown}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+    >
       {coverflowCards.map((c, i) => {
-        let o = i - center;
+        let o = i - eff;
         if (o > N / 2) o -= N;
         else if (o < -N / 2) o += N;
         const a = Math.abs(o);
         const hidden = a >= 4;
         const style: CSSProperties = {
-          transform: `translateX(${o * 118}px) scale(${Math.max(0.52, 1 - a * 0.14)})`,
+          transform: `translateX(${o * CARD_STEP}px) scale(${Math.max(0.52, 1 - a * 0.14)})`,
           opacity: hidden ? 0 : 1,
           zIndex: 20 - Math.round(a),
           pointerEvents: hidden ? "none" : "auto",
         };
         return (
-          <div key={i} className="cf-card" style={style} onClick={() => setCenter(i)}>
+          <div
+            key={i}
+            className="cf-card"
+            style={style}
+            onClick={() => { if (!movedRef.current) setCenter(i); }}
+          >
             <div className="cf-cover" style={{ background: coverGrad(CAT_VAR[c.cat]) }}>
               <span className="cf-ring" />
               <span className="cf-word">{CAT_WORD[c.cat]}</span>
@@ -396,23 +517,34 @@ function Journey() {
             const active = n === di;
             const op = n < di ? 0.34 : n > di ? Math.max(0.24, 1 - 0.2 * (n - di)) : 1;
             return (
-              <div key={n} className={`j-drow ${active ? "active" : ""}`} style={{ opacity: op }}>
+              // The rows look like an accordion, so they behave like one:
+              // clicking a day jumps the tour to it (03 A2).
+              <button
+                key={n}
+                type="button"
+                className={`j-drow ${active ? "active" : ""}`}
+                style={{ opacity: op }}
+                onClick={() => setTick(wi * 5 + n)}
+                aria-label={`${r.day} — ${r.title}`}
+              >
                 <div className="j-dhead">
                   <span className="j-dot" style={{ background: CAT_VAR[r.cat] }} />
                   <span className="j-day">{r.day}</span>
                   <span className="j-t">{r.title}</span>
                 </div>
                 <div className="j-card">
-                  <div className="j-cover" style={{ background: coverGrad(CAT_VAR[r.cat]) }}>
-                    <span className="j-ring" />
-                    <span className="j-word">{CAT_WORD[r.cat]}</span>
-                    <div className="j-cmeta">
-                      <b>{r.title}</b>
-                      <span>{r.code} · Foundation · 30 perc</span>
+                  <div className="j-card-inner">
+                    <div className="j-cover" style={{ background: coverGrad(CAT_VAR[r.cat]) }}>
+                      <span className="j-ring" />
+                      <span className="j-word">{CAT_WORD[r.cat]}</span>
+                      <div className="j-cmeta">
+                        <b>{r.title}</b>
+                        <span>{r.code} · Foundation · 30 perc</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -441,16 +573,16 @@ function Journey() {
 const SC_DUR = 5000;
 const scCaptions = [
   "A mai edzésed egy koppintásra",
-  "Mozogj együtt az edzőkkel, valós időben",
-  "A heted, felépítve — programok és kihívások",
-  "Friss receptek, hogy feltöltődj",
+  "Mozogj együtt Alexával, valós időben",
+  "A heted, felépítve — program és edzéstár",
+  "Kihívások — rövid célok, gyors sikerek",
   "Lásd, milyen messzire jutottál",
 ];
 const scSlots = [
   "Kezdőképernyő — a mai edzésed",
-  "Valós idejű edzés — együtt az edzővel",
-  "Programok — a heted egy helyen",
-  "Receptek — töltődj fel",
+  "Valós idejű edzés — együtt Alexával",
+  "Program — a heted egy helyen",
+  "Kihívások — mini-programok",
   "Profil — lásd a fejlődésed",
 ];
 
@@ -586,34 +718,69 @@ export default function LandingPage() {
           <div className="hero-nav">
             <span className="wordmark">LEXFIT</span>
             <nav className="links">
-              <a href="#funkciok">Funkciók</a>
               <a href="#alexa">Alexa</a>
+              <a href="#funkciok">Funkciók</a>
               <a href="#elofizetes">Előfizetés</a>
+              <Link href="/login">Belépés</Link>
             </nav>
           </div>
           <div className="hero-body">
             <div className="hero-copy">
               <div className="hero-eyebrow">A teljes otthoni edzésprogram</div>
               <h1>A változás<br /><b>otthon kezdődik</b></h1>
-              <p className="body">Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz — és egy edző, aki végig veled marad.</p>
+              <p className="body">Napi 30 perc, eszköz nélkül. Egy program, ami tudja, hol tartasz — és egy edző, aki végig veled marad. Nőknek és férfiaknak, minden szinten.</p>
               <div className="hero-row">
-                <Link className="pill pill-dark" href={CTA_START}>Kezdd el a programot</Link>
+                <Link className="pill pill-dark" href={CTA_START}>Összeállítom a tervem</Link>
                 <a className="hero-cta2" href="#youtube">Bemutató →</a>
               </div>
               <div className="hero-price">
                 Az első heted <b>{formatHuf(PRICES.week_intro.amountHuf)}</b> — utána {formatHuf(PRICES.week_std.amountHuf)}/hét, bármikor lemondható
               </div>
-              <div className="hero-trust">10 év versenysport mögötte · 14 napos garancia</div>
+              <div className="hero-trust">Alexa — 10 év versenysport · 14 napos elállási jog</div>
             </div>
             <div className="hero-device">
-              <Ph abs label="Kép helye — később töltöm fel" />
+              {/* LCP image — priority, no lazy-load. */}
+              <Image
+                src="/hero-alexa.jpg"
+                alt="Alexa nyújtás közben a stúdióban"
+                fill
+                priority
+                sizes="(max-width: 900px) 82vw, 320px"
+                style={{ objectFit: "cover" }}
+              />
             </div>
           </div>
         </div>
       </header>
 
-      {/* APP INTRO */}
-      <div className="band-cream sec sec-funkciok" id="funkciok">
+      {/* FOUNDER — the hero closes on "egy edző, aki végig veled marad";
+          the next section answers "ki ő?". A creator brand converts on the
+          person, so she opens the narrative; the promise-stack finale stays late. */}
+      <div className="band-cream sec-first" id="alexa">
+        <Rise className="wrap seq" style={{ paddingBottom: 30 }}>
+          <div className="eyebrow">Az alapító</div>
+          <h2 className="h-bold">Ismerd meg Alexát.</h2>
+          <p className="body" style={{ marginTop: 12, maxWidth: 560 }}>Tíz év versenysport, egy összeomlás, és egy felismerés, ami közösséggé vált. Ez az ő története — és innentől a tiéd is.</p>
+          <div className="starter-facts founder-facts">
+            <span>10 év versenysport</span>
+            <span>17 000+ fős ingyenes közösség</span>
+            <span>minden edzést ő vezet</span>
+          </div>
+        </Rise>
+        <Rise className="carousel">
+          {alexaChapters.map(([role, name, grad], i) => (
+            <div key={i} className="trainer-card">
+              <div className="grad" style={{ background: grad }} />
+              <Ph abs label={`Alexa — ${role.toLowerCase()}`} />
+              <span className="role">{role}</span>
+              <span className="name">{name}</span>
+            </div>
+          ))}
+        </Rise>
+      </div>
+
+      {/* APP INTRO — person established, now the product in one sentence. */}
+      <div className="band-cream sec-sm" id="funkciok">
         <div className="wrap">
           <Rise className="app-intro seq">
             <div className="eyebrow">Az app</div>
@@ -621,7 +788,7 @@ export default function LandingPage() {
               Minden, ami az edzéshez kell — egy appban.
             </h2>
             <p className="body" style={{ marginTop: 14 }}>
-              Edzésprogram, videótár és fejlődéskövetés egy helyen. Nincs több app, nincs több kifogás — csak te és a következő edzésed.
+              Edzésprogram, videótár és fejlődéskövetés egy helyen. Nincs több app, nincs több kifogás — csak te, Alexa, és a következő edzésed.
             </p>
           </Rise>
         </div>
@@ -640,7 +807,7 @@ export default function LandingPage() {
               <div className="ticon center">
                 <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2" /><path d="M16 10l6-3v10l-6-3" /></svg>
                 <h3 className="h-thin">edzés, amikor<br />neked jó</h3>
-                <p className="body">Minden héten új órák a legjobb edzőinktől. Erő, HIIT, jóga, pilates. Válaszd ki a hangulatod, nyomd meg a lejátszást, és mozogj velem, mintha ott lennének a szobában.</p>
+                <p className="body">Vezetett, követhető edzések Alexával — alsótest, felsőtest, cardio és has, teljes test, mobility. Válaszd ki a hangulatod, nyomd meg a lejátszást, és mozogj vele, mintha ott lenne a szobában.</p>
                 <a className="pill pill-outline" href="#elofizetes">Válaszd ki a csomagod</a>
               </div>
             </div>
@@ -648,18 +815,8 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* COVERFLOW */}
-      <div className="band-cream sec-sm">
-        <Rise className="wrap seq">
-          <h3 className="cap-title">Minden nap új edzés. Egy sem unalmas.</h3>
-          <p className="cap-body">Kövesd valós időben. Naplózz, kövesd a fejlődésed, mentsd a kedvenceid. Új listák hétről hétre — sosem fogysz ki a következő kihívásból.</p>
-        </Rise>
-        <Rise>
-          <Coverflow />
-        </Rise>
-      </div>
-
-      {/* CAST */}
+      {/* CAST — completes the follow-along scene: the workout runs in your
+          living room, in the browser, on any screen. */}
       <div className="band-navy sec">
         <div className="wrap">
           <Rise className="cast">
@@ -670,7 +827,7 @@ export default function LandingPage() {
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M6 5h16v11h-8M4 20l8-9" /></svg>
                 </div>
                 <h3 className="h-thin" style={{ color: "#fff" }}>vidd a<br />nagy képernyőre</h3>
-                <p className="body" style={{ color: "oklch(1 0 168/.8)", maxWidth: 340 }}>Egy koppintás, és a követhető edzésed a TV-n vagy a laptopon fut — Chromecasttal és AirPlay-jel, zökkenőmentesen.</p>
+                <p className="body" style={{ color: "oklch(1 0 168/.8)", maxWidth: 340 }}>A LEXFIT a böngészőben fut — nem kell letölteni semmit. Egy koppintás, és az edzésed a TV-n vagy a laptopon megy tovább, Chromecasttal és AirPlay-jel.</p>
               </div>
               <div className="cast-phone">
                 <div className="cast-beam" />
@@ -698,13 +855,24 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* COVERFLOW */}
+      <div className="band-cream sec-sm">
+        <Rise className="wrap seq">
+          <h3 className="cap-title">Minden napra más edzés. Egy sem unalmas.</h3>
+          <p className="cap-body">Kövesd valós időben. Mentsd a kedvenceid, és nézd, ahogy gyűlnek a befejezett edzéseid. Program, edzéstár és kihívások — sosem fogysz ki a következőből.</p>
+        </Rise>
+        <Rise>
+          <Coverflow />
+        </Rise>
+      </div>
+
       {/* PROGRAMS PANEL */}
       <FeaturePanel
         id="programok"
         mediaFirst={false}
         icon={<svg className="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M2 17l4-2 5 1 8-4 3 2v3H2z" /><path d="M6 15l1-4 4 1" /></svg>}
         heading={<>programok,<br />amik célba<br />érnek</>}
-        body="Nem kell kitalálnod, mit csinálj. Válassz egy programot, és mi végigvezetünk rajta — az első naptól az eredményig."
+        body="Nem kell kitalálnod, mit csinálj. Kezdd el a programot, és mi végigvezetünk rajta — az első naptól az eredményig."
         media={
           <div className="frame" style={{ width: "100%", maxWidth: 340, aspectRatio: "4 / 5", borderRadius: 20 }}>
             <Ph abs label="Kép helye — később töltöm fel" />
@@ -718,29 +886,29 @@ export default function LandingPage() {
           <div className="starter-head">
             <span className="starter-badge">A kezdő program</span>
             <h2 className="starter-title">4 hét, ami elindít.</h2>
-            <p className="cap-body">A teljes Foundation első fele: 4 hét, 20 vezetett edzés, heti 5 nap, napi fix 30 perc — eszköz nélkül. Két fázis vezet a forma és a szokás kialakításától az első igazi építésig.</p>
+            <p className="cap-body">A teljes Foundation első fele: 4 hét, 20 vezetett edzés, napi fix 30 perc — eszköz nélkül. Heti 5 napra tervezve, de te választod meg, mely napokon és milyen tempóban haladsz. Két fázis vezet a forma és a szokás kialakításától az első igazi építésig.</p>
           </div>
           <div className="starter-facts">
-            <span>20 edzés</span><span>5 nap / hét</span><span>fix 30 perc</span><span>eszköz nélkül</span><span>2 fázis</span>
+            <span>20 edzés</span><span>fix 30 perc</span><span>eszköz nélkül</span><span>2 fázis</span><span>a te napjaidon</span>
           </div>
           <Journey />
         </Rise>
       </div>
 
-      {/* UNLIM CAROUSEL */}
-      <div className="band-cream sec-sm">
+      {/* KIHÍVÁSOK — the real challenge archive (8 mini-programs, own player) */}
+      <div className="band-cream sec-sm" id="kihivasok">
         <Rise className="wrap seq">
-          <h3 className="cap-title">korlátlan lehetőség</h3>
-          <p className="cap-body">Alakítsd a kedvenc edzéseid személyre szabott tervvé. Hívd meg a barátaid, tartsátok formában egymást, és érjétek el együtt, amit egyedül nehezebb.</p>
+          <h3 className="cap-title">kihívások</h3>
+          <p className="cap-body">Rövid, 5–14 napos mini-programok a nagy program mellé. Válassz egyet, csináld végig a saját tempódban — és közben a sorozatod is épül.</p>
         </Rise>
         <Rise className="carousel" style={{ marginTop: 34 }}>
-          {unlimCards.map((u, i) => (
+          {challengeCards.map((u, i) => (
             <div key={i} className="unlim-card" style={{ background: coverGrad(CAT_VAR[u.cat]) }}>
               <span className="uc-ring" />
               <span className="uc-word">{CAT_WORD[u.cat]}</span>
               <div className="uc-meta">
                 <b>{u.title}</b>
-                <span>{u.min} · Alexa</span>
+                <span>{u.days} · {u.mins}</span>
               </div>
             </div>
           ))}
@@ -764,7 +932,7 @@ export default function LandingPage() {
               <div className="ticon center">
                 <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0116 0" /></svg>
                 <h3 className="h-thin">lásd, milyen<br />messzire jutottál</h3>
-                <p className="body">Az app szinkronban van a Health és a Naptár appjaiddal. Egy pillantás, és látod a fejlődésed — ami látszik, az motivál.</p>
+                <p className="body">Minden befejezett edzés automatikusan beszámít — nálunk a pipát nem lehet átpörgetéssel megszerezni. Egy pillantás, és látod a fejlődésed — ami látszik, az motivál.</p>
                 <a className="pill pill-outline" href="#elofizetes">Válaszd ki a csomagod</a>
               </div>
               <div className="panel-media" style={{ gap: 16 }}>
@@ -780,30 +948,12 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ACHIEVEMENTS */}
-      <div className="band-cream sec-sm">
-        <Rise className="wrap seq">
-          <h3 className="cap-title">gyűjtsd a jelvényeket</h3>
-          <p className="cap-body">Jelvények a vízért, az alvásért, minden edzésért. Hálanaplóval a fejben is rendet raksz, a virtuális naplóddal pedig végigköveted az egész utad.</p>
-          <div className="badges" style={{ marginTop: 38 }}>
-            {badges.map(([label, tint], i) => (
-              <div key={i} className="badge">
-                <div className={`hex ${tint}`}>
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" /></svg>
-                </div>
-                <span className="lab">{label}</span>
-              </div>
-            ))}
-          </div>
-        </Rise>
-      </div>
-
       {/* PRICE ANCHOR — the value reframe, mid-narrative */}
       <div className="band-navy sec price-anchor">
         <Rise className="wrap seq">
           <div className="eyebrow">A te árad</div>
           <div className="pa-num">
-            <b>{formatHuf(perWeekHuf(PRICES.annual_std.amountHuf))}</b>
+            <b><CountUp value={perWeekHuf(PRICES.annual_std.amountHuf)} /></b>
             <span>/ hét</span>
           </div>
           <p className="cap-body pa-lead">
@@ -818,53 +968,6 @@ export default function LandingPage() {
         </Rise>
       </div>
 
-      {/* RECIPES PANEL */}
-      <FeaturePanel
-        id="receptek"
-        icon={<svg className="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M3 11h18a9 9 0 01-18 0zM12 3v4" /></svg>}
-        heading={<>minden héten<br />friss recept</>}
-        body="Táplálkozási szakértőnk állítja össze mind. Egyszerű, finom, és pontosan annyi energiát ad, amennyi a következő edzésedhez kell."
-        media={
-          <div className="frame" style={{ width: "100%", maxWidth: 340, aspectRatio: "4 / 5", borderRadius: 20 }}>
-            <Ph abs label="Kép helye — később töltöm fel" />
-          </div>
-        }
-      />
-
-      {/* RECIPES CAROUSEL */}
-      <div className="band-cream sec-sm">
-        <Rise className="wrap seq">
-          <h3 className="cap-title">200+ recept minden ízléshez</h3>
-          <p className="cap-body">Szűrj étrend vagy preferencia szerint. Reggeli, ebéd, snack, vacsora, ital — a konyhád is része az utadnak.</p>
-        </Rise>
-        <Rise className="carousel" style={{ marginTop: 34 }}>
-          {Array.from({ length: 14 }, (_, i) => (
-            <div key={i} className="food-tile">
-              <Ph abs label="étel" />
-            </div>
-          ))}
-        </Rise>
-      </div>
-
-      {/* FOUNDER */}
-      <div className="band-cream sec-sm" id="alexa">
-        <Rise className="wrap seq" style={{ paddingBottom: 30 }}>
-          <div className="eyebrow">Az alapító</div>
-          <h2 className="h-bold">Ismerd meg Alexát.</h2>
-          <p className="body" style={{ marginTop: 12, maxWidth: 560 }}>Tíz év versenysport, egy összeomlás, és egy felismerés, ami közösséggé vált. Ez az ő története — és innentől a tiéd is.</p>
-        </Rise>
-        <Rise className="carousel">
-          {alexaChapters.map(([role, name, grad], i) => (
-            <div key={i} className="trainer-card">
-              <div className="grad" style={{ background: grad }} />
-              <Ph abs label={`Alexa — ${role.toLowerCase()}`} />
-              <span className="role">{role}</span>
-              <span className="name">{name}</span>
-            </div>
-          ))}
-        </Rise>
-      </div>
-
       {/* FOUNDER FINALE */}
       <div className="band-navy sec alexa-band">
         <Rise className="wrap seq">
@@ -876,7 +979,22 @@ export default function LandingPage() {
           </div>
           <div className="aq-close">Egyedül nehéz.<br />Együtt muszáj.</div>
           <div className="aq-sign">— Alexa</div>
-          <a className="pill pill-sage aq-cta" href="#elofizetes">Csatlakozz a csapathoz</a>
+          <Link className="pill pill-sage aq-cta" href={CTA_START}>Kezdjük együtt →</Link>
+        </Rise>
+      </div>
+
+      {/* FAQ */}
+      <div className="band-cream sec-sm" id="gyik">
+        <Rise className="wrap seq">
+          <h3 className="cap-title">Gyakori kérdések</h3>
+          <div className="faq">
+            {faq.map(([q, a], i) => (
+              <details key={i} className="faq-item">
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </details>
+            ))}
+          </div>
         </Rise>
       </div>
 
@@ -908,12 +1026,12 @@ export default function LandingPage() {
             ))}
           </Rise>
           <div className="price-trust">
-            <span>14 napos garancia</span>
+            <span>14 napos elállási jog</span>
             <span>Bármikor egy kattintással lemondható</span>
-            <span>Biztonságos fizetés · Stripe</span>
+            <span>Biztonságos bankkártyás fizetés · Visa · Mastercard</span>
           </div>
           <div className="price-foot">
-            <Link className="pill pill-dark" href={CTA_START}>Kezdd el még ma</Link>
+            <Link className="pill pill-dark" href={CTA_START}>Összeállítom a tervem</Link>
           </div>
         </div>
         <div className="foot">
