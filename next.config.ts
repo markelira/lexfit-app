@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -24,4 +25,15 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry build wrap: proxies client events through /monitoring (ad-blocker
+// bypass) and, once SENTRY_AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT are set in the
+// build env, uploads source maps for readable stack traces. Without those env
+// vars it degrades gracefully to runtime-only monitoring.
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  silent: !process.env.CI,
+});
