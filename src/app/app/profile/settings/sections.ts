@@ -9,7 +9,7 @@ export type RowKind =
   | "value"    // read-only value on the right, no control
   | "action"   // clickable row, no chevron (e.g. Kijelentkezés)
   | "pills"    // inline weekday multi-select (Mely napokon)
-  | "nav";     // navigates elsewhere (e.g. /app/szm, /app/membership)
+  | "nav";     // navigates elsewhere (e.g. /app/membership)
 
 export interface SectionRow {
   key: string;
@@ -138,7 +138,7 @@ export const SECTIONS: Section[] = [
       {
         rows: [
           { key: "faq", label: "Gyakori kérdések", icon: "messageCircle", kind: "chevron" },
-          { key: "contact", label: "Írj Alexának", icon: "mail", kind: "nav", href: "/app/szm" },
+          { key: "contact", label: "Írj nekünk", icon: "mail", kind: "nav", href: "mailto:info@amstudios.hu" },
           { key: "legal", label: "Jogi tudnivalók", icon: "shield", kind: "chevron" },
         ],
       },

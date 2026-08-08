@@ -1010,7 +1010,7 @@ export default function LandingPage() {
             {pricing.map((p, i) => (
               <Link
                 key={i}
-                href={`/subscribe?plan=${p.role}`}
+                href="/onboarding"
                 className={`price-card ${p.featured ? "featured" : ""}`}
                 aria-label={`${p.plan} csomag kiválasztása`}
               >

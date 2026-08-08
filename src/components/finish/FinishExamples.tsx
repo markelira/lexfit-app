@@ -3,8 +3,10 @@
 import { FinishOverlay } from "@/components/finish/FinishOverlay";
 import type { FinishData, OverlayDir } from "@/lib/finish-overlays";
 
-// Real member finish-selfies with the actual system overlays, each placed on a
-// dark zone of its photo so the pure-white type reads. All five directions shown.
+// Example finish-cards showing how the share overlay looks. The photos are
+// consented (owner-confirmed 2026-08-08); the overlay STATS are illustrative
+// sample values, so every card is explicitly labelled "minta" — never present
+// these numbers as real member results.
 interface Example { name: string; img: string; dir: OverlayDir; data: FinishData; scrim: boolean; pos: string }
 // A different overlay per card — the real FinishOverlay directions (no vertical
 // spine), each placed on a workable zone of its photo. Scrim on the brighter
@@ -35,14 +37,14 @@ export function FinishExamples({ onPick }: { onPick: () => void }) {
             onClick={onPick}
             aria-hidden={i >= EXAMPLES.length}
             tabIndex={i >= EXAMPLES.length ? -1 : 0}
-            aria-label={`${e.name} megosztott edzése — készíts sajátot`}
+            aria-label={`Minta megosztókép (${e.name}) — készíts sajátot`}
           >
             <div className="fex-frame">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={e.img} alt="" style={{ objectPosition: e.pos }} loading="lazy" />
               <FinishOverlay dir={e.dir} data={e.data} scrim={e.scrim} />
             </div>
-            <span className="fex-name">{e.name}</span>
+            <span className="fex-name">{e.name} · minta</span>
           </button>
         ))}
       </div>

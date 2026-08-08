@@ -21,7 +21,7 @@ const AVATAR_MENU: MenuItem[] = [
   { label: "Az edzésterved", icon: "calendarCheck", href: "/app/profile/settings?section=plan" },
   { label: "Emlékeztetők", icon: "bell", href: "/app/profile/settings?section=reminders" },
   { label: "Beállítások", icon: "sliders", href: "/app/profile/settings" },
-  { label: "Segítség", icon: "messageCircle", href: "/app/szm" },
+  { label: "Segítség", icon: "messageCircle", href: "mailto:info@amstudios.hu" },
   { label: "Kijelentkezés", icon: "logOut", action: "logout", danger: true },
 ];
 
@@ -205,6 +205,7 @@ export function AppTopBar({ streak }: { streak: number }) {
   function onMenuItem(item: MenuItem) {
     setMenuOpen(false);
     if (item.action === "logout") { void logout(); return; }
+    if (item.href?.startsWith("mailto:")) { window.location.href = item.href; return; }
     if (item.href) router.push(item.href);
   }
 

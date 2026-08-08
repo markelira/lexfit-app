@@ -836,7 +836,7 @@ export default function Page() {
   const params = useParams();
   const code = String(params.code);
   return (
-    <Protected>
+    <Protected requirePaid>
       <PlayerScreen code={code} />
     </Protected>
   );

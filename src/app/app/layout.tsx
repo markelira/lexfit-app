@@ -73,13 +73,13 @@ function Shell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <Link href="/app/szm" className="lx-help">
+          <a href="mailto:info@amstudios.hu" className="lx-help">
             <span className="av">A</span>
             <span className="pi">
               <span className="nm">Alexa</span>
               <span className="sb">segítség</span>
             </span>
-          </Link>
+          </a>
         </aside>
 
         <main className="lx-main">
@@ -105,7 +105,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Protected>
+    <Protected requirePaid>
       <Shell>{children}</Shell>
     </Protected>
   );

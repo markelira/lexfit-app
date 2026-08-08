@@ -164,11 +164,11 @@ Analytics (+ cookie-consent banner it triggers), welcome email + branded email t
 ---
 
 ## Open decisions for the owner (blocking their phases)
-1. **E4 hard gate** — soft gate vs entitlement-gated `/app` (Phase 5.1; recommend hard gate).
-2. **`/app/szm`** — hide vs teaser-without-numbers (Phase 6; recommend hide + repoint help links).
-3. **`FinishExamples`** — remove vs replace with consented real examples (Phase 6; recommend remove for launch).
-4. **Email verification** — none vs non-blocking (Phase 5.4; recommend non-blocking).
+1. ~~**E4 hard gate**~~ ✅ DECIDED 2026-08-08: **hard gate** — unpaid users cannot enter /app, routed to payment.
+2. ~~**`/app/szm`**~~ ✅ DECIDED 2026-08-08: **hide for launch**, repoint help links; real community post-launch.
+3. ~~**`FinishExamples`**~~ ✅ DECIDED 2026-08-08: **keep — owner confirms likeness consent**; remove/replace the invented stats with honest labels.
+4. **Email verification** — proceeding with the recommendation: non-blocking verification email post-signup (Phase 5.4).
 5. **Landing placeholder images** — confirm "ship as-is" knowing the striped „később töltöm fel" boxes are publicly visible (recommend at least removing the labels).
 6. **`PROGRAMS` registry** — confirm or trim the 4 speculative program entries.
 7. ~~**Company/legal data**~~ ✅ ANSWERED 2026-08-08: AM Studios Group Kft., 3532 Miskolc, Miklós utca 17. 2. em. 26. ajtó, adószám 33004312-1-05, cégjegyzékszám 05 09 039717 (Miskolci Törvényszék Cégbírósága), info@amstudios.hu. ✅ RESOLVED: owner confirmed **alanyi adómentes** — Billingo invoices switched to AAM (`BILLINGO_VAT_CODE`, default "AAM"), dead `VAT_RATE` removed, legal drafts state AAM as fact. Phase 7 smoke test must verify the first live invoice prints AAM.
-8. **HU fitness glossary sign-off** — approve the term-by-term translation list (Phase 6): which English terms get translated (Mobility → Mobilitás, core → törzs, …) and which stay as accepted Hungarian gym loanwords (cardio/kardió spelling, Tabata, EMOM). Taxonomy rename must happen before Phase 8 content upload while prod is still empty.
+8. ~~**HU fitness glossary**~~ ✅ DECIDED 2026-08-08: full Hungarian incl. **Kardió** — Mobilitás, törzs, kardió; taxonomy rename before content upload (prod empty).

@@ -150,7 +150,10 @@ function SettingsContent({ profile: p, activeKey, rawSection, reload }: { profil
     if (row.key === "export") { void doExport(); return; }
     if (row.key === "delete") { setDeleteOpen(true); return; }
     if (row.kind === "chevron") setEditor(row);
-    else if (row.kind === "nav" && row.href) router.push(row.href);
+    else if (row.kind === "nav" && row.href) {
+      if (row.href.startsWith("mailto:")) window.location.href = row.href;
+      else router.push(row.href);
+    }
     else if (row.kind === "action" && row.key === "logout") void logout();
   };
 
