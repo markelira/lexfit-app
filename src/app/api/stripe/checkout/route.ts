@@ -1,6 +1,7 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { verifyRequest } from "@/lib/auth-server";
+import { allowRequest, DAY_MS_RL } from "@/lib/rate-limit";
 import { getStripe } from "@/lib/stripe";
 import { getOrCreateCustomer, subscriptionRef } from "@/lib/pricing/subscription";
 import {
@@ -46,6 +47,11 @@ export async function POST(req: Request) {
   };
   const consentError = validateConsent(role, consent);
   if (consentError) return NextResponse.json({ error: consentError }, { status: 400 });
+
+  // Every call writes a consent doc + creates a Stripe session — cap per uid.
+  if (!(await allowRequest("checkout", token.uid, 20, DAY_MS_RL))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
 
   // Persist consent BEFORE creating the session — if this throws, no checkout.
   const consentId = await recordConsent(token.uid, role, consent, {

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { verifyRequest } from "@/lib/auth-server";
+import { allowRequest, DAY_MS_RL } from "@/lib/rate-limit";
 import { adminDb } from "@/lib/firebase-admin";
 
 export const runtime = "nodejs";
@@ -33,6 +34,11 @@ function sanitize(d: unknown): Record<string, unknown> {
 export async function POST(req: Request) {
   const token = await verifyRequest(req);
   if (!token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  // Unbounded doc creation otherwise (TTL only cleans up later) — cap per uid.
+  if (!(await allowRequest("finishShare", token.uid, 30, DAY_MS_RL))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
 
   const body = (await req.json().catch(() => ({}))) as { data?: unknown };
   const id = randomBytes(18).toString("base64url");

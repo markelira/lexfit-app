@@ -2,6 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { verifyRequest } from "@/lib/auth-server";
+import { allowRequest, HOUR_MS } from "@/lib/rate-limit";
 import { adminDb } from "@/lib/firebase-admin";
 import { computeStreak } from "@/lib/streak";
 
@@ -91,6 +92,12 @@ export async function POST(req: Request) {
   const token = await verifyRequest(req);
   if (!token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const uid = token.uid;
+
+  // One call fans out to up to ~100 Mux Data fetches — cap per uid well above
+  // legit usage (client throttles to 15 min, force paths are user actions).
+  if (!(await allowRequest("progressSync", uid, 30, HOUR_MS))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
 
   const ref = adminDb.doc(`users/${uid}/progress/state`);
   const snap = await ref.get();
