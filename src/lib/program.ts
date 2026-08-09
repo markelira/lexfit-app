@@ -8,23 +8,23 @@ import type { Program, Video } from "@/lib/types";
 export interface WorkoutItem extends Video {
   // session/program context merged onto the library video:
   order: number;
-  week: number;
-  day: string;
-  dayName: string;
   phaseIdx: number;
   retest: "soft" | "final" | null;
 }
 
-export interface WeekGroup {
-  num: number;
-  phaseIdx: number;
-  retest: "soft" | "final" | null;
-  workouts: WorkoutItem[];
+export interface PhaseGroup {
+  idx: number;                 // phaseIdx (or -1 for ungrouped)
+  icon: string;
+  name: string;
+  desc: string;
+  colorVar: string;
+  workouts: WorkoutItem[];     // in playlist order
 }
 
 export interface FoundationData {
   program: Program;
-  weeks: WeekGroup[];
+  phases: PhaseGroup[];        // ordered, phase-grouped playlist
+  playlist: WorkoutItem[];     // the flat ordered pool (source of truth)
   byCode: Record<string, WorkoutItem>;
   // user state
   joined: boolean;
@@ -56,38 +56,52 @@ export async function loadFoundation(uid: string): Promise<FoundationData | null
   const currentIndex = userProgress?.currentIndex ?? 0;
   const streak = userProgress?.streak ?? 0;
 
-  // Build week groups from sessions, merging each session's video metadata.
+  // Build the ordered playlist from sessions, merging each session's video.
   const byCode: Record<string, WorkoutItem> = {};
-  const weekMap = new Map<number, WeekGroup>();
+  const playlist: WorkoutItem[] = [];
   sessionsSnap.forEach((d) => {
     const s = d.data() as {
-      videoCode: string; order: number; week: number; day: string; dayName: string;
-      phaseIdx: number; retest: "soft" | "final" | null;
+      videoCode: string; order: number; phaseIdx: number | null;
+      retest: "soft" | "final" | null;
     };
     const v = videoByCode[s.videoCode];
     if (!v) return;
     const item: WorkoutItem = {
       ...v,
-      order: s.order, week: s.week, day: s.day, dayName: s.dayName,
-      phaseIdx: s.phaseIdx, retest: s.retest,
+      order: s.order,
+      phaseIdx: s.phaseIdx ?? -1,
+      retest: s.retest ?? null,
     };
     byCode[v.code] = item;
-    if (!weekMap.has(s.week)) {
-      weekMap.set(s.week, { num: s.week, phaseIdx: s.phaseIdx, retest: s.retest, workouts: [] });
-    }
-    weekMap.get(s.week)!.workouts.push(item);
+    playlist.push(item);
   });
+  playlist.sort((a, b) => a.order - b.order);
 
-  const weeks = [...weekMap.values()].sort((a, b) => a.num - b.num);
-  weeks.forEach((w) => w.workouts.sort((a, b) => a.order - b.order));
+  // Group by phase (in playlist order), deriving each phase's meta from the
+  // program's phases[] and its size from the workouts that carry that phaseIdx.
+  const phaseMeta = new Map(program.phases.map((p) => [p.idx, p]));
+  const phaseMap = new Map<number, PhaseGroup>();
+  for (const w of playlist) {
+    if (!phaseMap.has(w.phaseIdx)) {
+      const meta = phaseMeta.get(w.phaseIdx);
+      phaseMap.set(w.phaseIdx, {
+        idx: w.phaseIdx,
+        icon: meta?.icon ?? "",
+        name: meta?.name ?? "",
+        desc: meta?.desc ?? "",
+        colorVar: meta?.colorVar ?? "var(--cat-teljes)",
+        workouts: [],
+      });
+    }
+    phaseMap.get(w.phaseIdx)!.workouts.push(w);
+  }
+  const phases = [...phaseMap.values()].sort((a, b) => a.idx - b.idx);
 
   // The session the user is on (preview → first session).
   const todayCode =
-    weeks.flatMap((w) => w.workouts).find((w) => w.order === currentIndex)?.code ??
-    weeks[0]?.workouts[0]?.code ??
-    null;
+    playlist.find((w) => w.order === currentIndex)?.code ?? playlist[0]?.code ?? null;
 
-  return { program, weeks, byCode, joined, doneCount, currentIndex, streak, todayCode };
+  return { program, phases, playlist, byCode, joined, doneCount, currentIndex, streak, todayCode };
 }
 
 /** Per-workout state for the cards. */

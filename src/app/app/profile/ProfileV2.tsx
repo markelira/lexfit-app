@@ -52,7 +52,7 @@ export default function ProfileV2() {
     );
   }
 
-  const meta = `${p.programme.label} · ${p.programme.week}. hét · tag ${monthYearHu(p.identity.memberSince)} óta`;
+  const meta = `${p.programme.label} · ${p.programme.step}/${p.programme.total}. edzés · tag ${monthYearHu(p.identity.memberSince)} óta`;
   const planSummary = `Heti ${p.plan.daysPerWeek} edzés · ${weekdayNamesHu(p.plan.weekdays)}`;
   const isNew = p.stats.doneCount === 0 && p.stats.streak === 0;
 

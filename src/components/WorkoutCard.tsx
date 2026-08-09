@@ -38,8 +38,8 @@ export function WorkoutCard({
   v,
   isToday = false,
   isProgram = false,
-  programWeek = null,
-  programWeeks = null,
+  programStep = null,
+  programTotal = null,
   resume,
   completedAt = null,
   completedTime = null,
@@ -50,8 +50,8 @@ export function WorkoutCard({
   v: WorkoutCardVideo;
   isToday?: boolean;
   isProgram?: boolean;
-  programWeek?: number | null; // this workout's Foundation week (for the avatar ring)
-  programWeeks?: number | null; // total weeks in the programme
+  programStep?: number | null; // this workout's 1-based position in the program
+  programTotal?: number | null; // total workouts in the program
   resume?: number; // 0–1 fraction, if in progress
   completedAt?: string | null; // YYYY-MM-DD, if completed
   completedTime?: string | null; // local HH:MM, if recorded
@@ -63,9 +63,10 @@ export function WorkoutCard({
   const frac = done ? 1 : resume;
   const showBar = frac != null && frac > 0;
 
-  // Avatar ring encodes the user's Foundation week (§4 #4); plain outside the programme.
+  // Avatar ring encodes progress THROUGH the program by workout position (§4 #4);
+  // plain outside a program. Cadence-neutral — no week assumption.
   const ringPct =
-    isProgram && programWeek && programWeeks ? Math.round((Math.min(programWeek, programWeeks) / programWeeks) * 100) : null;
+    isProgram && programStep && programTotal ? Math.round((Math.min(programStep, programTotal) / programTotal) * 100) : null;
 
   // state line — rendered ONLY when there is state to report (§4 #5)
   let state: { text: string; done?: boolean } | null = null;
@@ -102,7 +103,7 @@ export function WorkoutCard({
             className="wc-ava ring"
             style={{ "--wp": ringPct } as React.CSSProperties}
             aria-hidden="true"
-            title={`Foundation · ${programWeek}. hét`}
+            title={`Foundation · ${programStep}/${programTotal}. edzés`}
           >
             <span className="inner">{done ? <LxIcon d={lxPaths.check} size={14} sw={2.6} /> : ALEXA_FACE}</span>
           </span>

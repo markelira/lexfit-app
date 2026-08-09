@@ -18,8 +18,6 @@ interface Draft {
   goal: string;
   equipment: string;
   synopsis: string;
-  weeks: string;
-  perWeek: string;
   defaultMins: string;
   access: string;
   status: string;
@@ -44,8 +42,6 @@ export function ProgramForm({ initial, create }: { initial: Program | null; crea
     goal: initial?.goal ?? "",
     equipment: initial?.equipment ?? "",
     synopsis: initial?.synopsis ?? "",
-    weeks: numStr(initial?.weeks),
-    perWeek: numStr(initial?.perWeek),
     defaultMins: numStr(initial?.defaultMins),
     access: initial?.access ?? "members",
     status: initial?.status ?? "draft",
@@ -53,7 +49,7 @@ export function ProgramForm({ initial, create }: { initial: Program | null; crea
     cover: initial?.cover ?? "",
     trailerPlaybackId: initial?.trailerPlaybackId ?? "",
     facts: initial?.facts ?? [],
-    phases: initial?.phases?.map(({ icon, name, weeks, short, desc, colorVar }) => ({ icon, name, weeks, short, desc, colorVar })) ?? [],
+    phases: initial?.phases?.map(({ icon, name, short, desc, colorVar }) => ({ icon, name, short, desc, colorVar })) ?? [],
   }));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -69,7 +65,7 @@ export function ProgramForm({ initial, create }: { initial: Program | null; crea
   const setFact = (i: number, patch: Partial<ProgramFact>) => set("facts", d.facts.map((f, j) => (j === i ? { ...f, ...patch } : f)));
   const rmFact = (i: number) => set("facts", d.facts.filter((_, j) => j !== i));
   // phases
-  const addPhase = () => set("phases", [...d.phases, { icon: "🌱", name: "", weeks: "", short: "", desc: "", colorVar: "var(--cat-mobility)" }]);
+  const addPhase = () => set("phases", [...d.phases, { icon: "🌱", name: "", short: "", desc: "", colorVar: "var(--cat-mobility)" }]);
   const setPhase = (i: number, patch: Partial<PhaseDraft>) => set("phases", d.phases.map((p, j) => (j === i ? { ...p, ...patch } : p)));
   const rmPhase = (i: number) => set("phases", d.phases.filter((_, j) => j !== i));
 
@@ -163,17 +159,6 @@ export function ProgramForm({ initial, create }: { initial: Program | null; crea
 
         <div className="adm-2col">
           <div className="adm-frow">
-            <label className="adm-flabel">Hetek</label>
-            <input type="number" value={d.weeks} onChange={(e) => set("weeks", e.target.value)} placeholder="8" />
-          </div>
-          <div className="adm-frow">
-            <label className="adm-flabel">Heti alkalom</label>
-            <input type="number" value={d.perWeek} onChange={(e) => set("perWeek", e.target.value)} placeholder="5" />
-          </div>
-        </div>
-
-        <div className="adm-2col">
-          <div className="adm-frow">
             <label className="adm-flabel">Alap hossz (perc)</label>
             <input type="number" value={d.defaultMins} onChange={(e) => set("defaultMins", e.target.value)} placeholder="30" />
           </div>
@@ -238,7 +223,6 @@ export function ProgramForm({ initial, create }: { initial: Program | null; crea
                 <div className="adm-sub-row">
                   <input type="text" style={{ flex: "0 0 60px" }} value={p.icon} onChange={(e) => setPhase(i, { icon: e.target.value })} placeholder="🌱" />
                   <input type="text" value={p.name} onChange={(e) => setPhase(i, { name: e.target.value })} placeholder="Név (Alap)" />
-                  <input type="text" value={p.weeks} onChange={(e) => setPhase(i, { weeks: e.target.value })} placeholder="Hét 1–2" />
                   <button className="adm-iconbtn danger" onClick={() => rmPhase(i)} title="Fázis törlése">✕</button>
                 </div>
                 <div className="adm-sub-row">

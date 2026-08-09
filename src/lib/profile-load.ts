@@ -40,14 +40,11 @@ const priceByLookupKey = (key: string): number | null =>
 
 const mondayOf = (d: Date) => addDays(d, -((d.getDay() + 6) % 7));
 
-/** The current programme week from the session at currentIndex (clamped). */
-function weekFor(fnd: FoundationData | null, currentIndex: number): number {
+/** 1-based position in the program playlist (which workout you're on), clamped. */
+function stepFor(fnd: FoundationData | null, currentIndex: number): number {
   if (!fnd) return 1;
-  const perWeek = fnd.program?.perWeek ?? 5;
-  const totalWeeks = fnd.program?.weeks ?? 8;
-  const at = Object.values(fnd.byCode).find((i) => i.order === currentIndex);
-  const w = at?.week ?? Math.floor(currentIndex / perWeek) + 1;
-  return Math.max(1, Math.min(totalWeeks, w));
+  const total = fnd.program?.totalSessions || fnd.playlist.length || 1;
+  return Math.max(1, Math.min(total, currentIndex + 1));
 }
 
 /** The 7 week cells, Monday-first: prefs weekdays × completions of the current week. */
@@ -90,8 +87,12 @@ export async function loadProfile(uid: string): Promise<ProfileData> {
   const name = full.trim().split(/\s+/)[0] || (email ? email.split("@")[0] : "");
 
   const currentIndex = progress?.currentIndex ?? fnd?.currentIndex ?? 0;
-  const week = weekFor(fnd, currentIndex);
-  const nextRetestWeek = fnd?.weeks.find((w) => w.retest && w.num > week)?.num ?? null;
+  const step = stepFor(fnd, currentIndex);
+  // Next visszamérés (retest) workout ahead of where you are, by playlist order.
+  const nextRetestStep =
+    (fnd?.playlist.find((w) => w.retest && w.order >= currentIndex)?.order ?? null) != null
+      ? (fnd!.playlist.find((w) => w.retest && w.order >= currentIndex)!.order + 1)
+      : null;
 
   // stats — watchByDay sum is "perc mozgás"; streak recomputed rest-day-aware
   const completed = progress?.completed ?? [];
@@ -113,9 +114,10 @@ export async function loadProfile(uid: string): Promise<ProfileData> {
     programme: {
       slug: fnd?.program?.slug ?? "foundation",
       label: fnd?.program?.title ?? "Foundation",
-      week,
-      nextRetestWeek,
-      weeksToRetest: nextRetestWeek != null ? Math.max(0, nextRetestWeek - week) : null,
+      step,
+      total: fnd?.program?.totalSessions || fnd?.playlist.length || 0,
+      nextRetestStep,
+      stepsToRetest: nextRetestStep != null ? Math.max(0, nextRetestStep - step) : null,
     },
     stats: { doneCount: progress?.doneCount ?? 0, minutes, streak },
     week: buildWeek(prefs.plan.weekdays, completed),

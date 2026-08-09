@@ -73,11 +73,12 @@ export interface Video {
 export interface ProgramPhase {
   idx: number;
   icon: string;
-  name: string;
-  weeks: string;       // human label, e.g. "Hét 1–2"
+  name: string;        // e.g. "Alap", "Építés"
   short: string;
   desc: string;
   colorVar: string;    // CSS var, e.g. "var(--cat-mobility)"
+  // NB: phase size is DERIVED from how many sessions carry this phaseIdx — a
+  // program is an ordered, phase-grouped playlist, not a fixed-week calendar.
 }
 
 export interface ProgramFact {
@@ -96,11 +97,11 @@ export interface Program {
   equipment: string | null;  // "nincs (matrac)"
   synopsis: string;
   facts: ProgramFact[];
-  // Structure — all nullable so varied programs (no phases, different cadence,
-  // single videos) fit without code assumptions.
-  weeks: number | null;
-  perWeek: number | null;
-  totalSessions: number;
+  // Structure — a program is an ORDERED, PHASE-GROUPED POOL of workouts. It does
+  // NOT author a weeks × per-week calendar: how many workouts a user does per
+  // week (and on which days) is the USER's onboarding choice
+  // (prefs.plan.daysPerWeek / weekdays), so "weeks" are emergent, never authored.
+  totalSessions: number;     // pool size (derived from the playlist length)
   defaultMins: number | null;
   phases: ProgramPhase[];    // [] if the program has no phases
   // Presentation
@@ -114,14 +115,14 @@ export interface Program {
   updatedAt?: unknown;
 }
 
-/** programs/{slug}/sessions/{id} — a playlist entry pointing at a video. */
+/** programs/{slug}/sessions/{id} — a playlist entry pointing at a video.
+ *  The playlist is the whole structure: `order` is the sequence a user walks
+ *  through (one workout per completion), `phaseIdx` groups it. No weekday/week
+ *  is authored — the user's cadence schedules it. */
 export interface ProgramSession {
   id: string;                // session doc id (zero-padded order, e.g. "00")
   videoCode: string;         // → videos/{code}
   order: number;             // 0-based position in the program
-  week: number | null;
-  day: string | null;        // "H" | "K" | "Cs" | "P" | "Szo"
-  dayName: string | null;
   phaseIdx: number | null;   // index into program.phases, or null
   retest: RetestKind;
 }

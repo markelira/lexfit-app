@@ -113,12 +113,12 @@ const program = {
   equipment: factOf("Eszköz"),
   synopsis: meta.synopsis,
   facts: meta.facts.map(([label, value]) => ({ label, value })),
-  weeks: meta.weeks,
-  perWeek: meta.perWeek,
+  // A program is an ordered, phase-grouped POOL — no authored weeks/per-week
+  // calendar (the user's cadence schedules it).
   totalSessions: programWorkouts.length,
   defaultMins: meta.mins,
   phases: prog.PROG_PHASES.map((p) => ({
-    idx: p.idx, icon: p.icon, name: p.name, weeks: p.weeks,
+    idx: p.idx, icon: p.icon, name: p.name,
     short: p.short, desc: p.desc, colorVar: p.c,
   })),
   cover: null,
@@ -132,9 +132,6 @@ const sessions = programWorkouts.map((wk) => ({
   id: String(wk.globalIndex).padStart(2, "0"),
   videoCode: wk.code,
   order: wk.globalIndex,
-  week: wk.week,
-  day: wk.day,
-  dayName: wk.dayName,
   phaseIdx: wk.phase,
   retest: wk.retest,
 }));

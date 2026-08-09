@@ -45,8 +45,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ slug: st
     facts: facts
       .map((f) => ({ label: str((f as Record<string, unknown>).label), value: str((f as Record<string, unknown>).value) }))
       .filter((f) => f.label),
-    weeks: numOrNull(b.weeks),
-    perWeek: numOrNull(b.perWeek),
     defaultMins: numOrNull(b.defaultMins),
     phases: phases.map((p, i) => {
       const o = p as Record<string, unknown>;
@@ -54,7 +52,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ slug: st
         idx: i,
         icon: str(o.icon),
         name: str(o.name),
-        weeks: str(o.weeks),
         short: str(o.short),
         desc: str(o.desc),
         colorVar: str(o.colorVar) || "var(--cat-teljes)",

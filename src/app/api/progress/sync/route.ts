@@ -135,16 +135,18 @@ export async function POST(req: Request) {
     return true;
   });
 
-  // 3 · Program context: code → session order, plus the weekly workout-day set.
+  // 3 · Program context: code → session order (playlist position). The streak's
+  // workout-day set comes from the USER's chosen training days (their cadence),
+  // NOT an authored program calendar — a program is an ordered pool.
   const sessionsSnap = await adminDb.collection("programs/foundation/sessions").get();
   const orderByCode: Record<string, number> = {};
-  const DAY_IDX: Record<string, number> = { h: 0, k: 1, sze: 2, cs: 3, p: 4, szo: 5, v: 6 };
-  const workoutIdx = new Set<number>();
   sessionsSnap.forEach((d) => {
-    const s = d.data() as { videoCode?: string; order?: number; week?: number; day?: string };
+    const s = d.data() as { videoCode?: string; order?: number };
     if (s.videoCode != null && s.order != null) orderByCode[s.videoCode] = s.order;
-    if (s.week === 1) { const i = DAY_IDX[(s.day ?? "").toLowerCase()]; if (i != null) workoutIdx.add(i); }
   });
+  const prefsPlan = (await adminDb.doc(`users/${uid}/settings/prefs`).get()).data()?.plan ?? {};
+  const workoutIdx = new Set<number>(((prefsPlan.weekdays ?? []) as number[]).map((w) => w - 1)); // 1..7 → 0..6 (Mon-first)
+  const restDayKeepsStreak = (prefsPlan.restDayKeepsStreak ?? true) as boolean;
 
   // 4 · Fold views into watch seconds and completions. Kihívások membership is
   // detected lazily (a code missing from videos/ but present in challengeVideos/)
@@ -250,10 +252,7 @@ export async function POST(req: Request) {
     }, { merge: true });
   }));
 
-  // The streak honors the user's rest-day-forgiveness pref (settings/prefs).
-  const prefsSnap = await adminDb.doc(`users/${uid}/settings/prefs`).get();
-  const restDayKeepsStreak = (prefsSnap.data()?.plan?.restDayKeepsStreak ?? true) as boolean;
-
+  // restDayKeepsStreak + workoutIdx read once from prefs (step 3 above).
   const dates = baseCompleted.map((c) => c.at);
   const distinct = new Set(baseCompleted.map((c) => c.code));
   const todayStr = budapest(new Date().toISOString()).day;

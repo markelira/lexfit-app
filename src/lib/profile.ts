@@ -67,9 +67,10 @@ export interface ProfileData {
   programme: {
     slug: string;
     label: string;              // program.title, never the literal "Foundation"
-    week: number;
-    nextRetestWeek: number | null;
-    weeksToRetest: number | null;
+    step: number;               // 1-based position in the program playlist
+    total: number;              // total workouts in the program
+    nextRetestStep: number | null;
+    stepsToRetest: number | null;
   };
   stats: { doneCount: number; minutes: number; streak: number };
   week: { weekday: number; state: WeekCellState }[]; // 7 entries, Monday-first

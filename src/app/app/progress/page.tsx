@@ -194,8 +194,9 @@ function derive(
   restDayKeepsStreak = true,
   plan: { weekdays: number[]; daysPerWeek: number } = { weekdays: [], daysPerWeek: 0 },
 ) {
-  const program = fnd?.program ?? null;
-  const perWeek = program?.perWeek ?? 5;
+  // Emergent "week" divisor = the user's own weekly cadence, never an authored
+  // per-week (a program is an ordered pool, not a fixed calendar).
+  const cadence = plan.daysPerWeek || 5;
 
   const confirmed = p?.completed ?? [];
   // Optimistic bridge: workouts the player saw finish that the Mux sync hasn't
@@ -212,14 +213,14 @@ function derive(
 
   const currentWeek = start
     ? Math.max(1, Math.floor(daysBetween(start, today) / 7) + 1)
-    : Math.max(1, Math.floor((p?.currentIndex ?? 0) / perWeek) + 1);
+    : Math.max(1, Math.floor((p?.currentIndex ?? 0) / cadence) + 1);
 
   // THIS week's status comes from the SHARED collector (lib/week-progress) so
   // this card is identical to the home (/app) strip — same plan training days,
   // same completions (confirmed + pending), same calendar week and target.
   const wk = computeWeekProgress({
     weekdays: plan.weekdays,
-    daysPerWeek: plan.daysPerWeek || perWeek,
+    daysPerWeek: cadence,
     completed: confirmed,
     pending,
     now: today,

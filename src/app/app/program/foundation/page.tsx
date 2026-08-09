@@ -57,7 +57,7 @@ export default function FoundationDetailPage() {
   if (loading) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
   if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>A Foundation program még nem érhető el.</p>;
 
-  const { program, weeks, joined, doneCount, currentIndex, todayCode } = data;
+  const { program, phases, playlist, joined, doneCount, currentIndex, todayCode } = data;
   const play = (code: string | null) => code && router.push(`/player/${code}?autostart=1`);
 
   const resumeMap = progress?.resume ?? {};
@@ -65,7 +65,7 @@ export default function FoundationDetailPage() {
   (progress?.completed ?? []).forEach((c) => (completedMap[c.code] = { at: typeof c.at === "string" ? c.at : "", atTime: c.atTime }));
   const resumeFrac = (mux: number | null, mins: number, code: string) =>
     resumeMap[code] != null ? Math.min(1, resumeMap[code] / ((mux || mins * 60) || 1)) : undefined;
-  const programWeeks = program.weeks ?? weeks.length;
+  const programTotal = program.totalSessions || playlist.length;
 
   return (
     <div className="home fade-in">
@@ -90,21 +90,21 @@ export default function FoundationDetailPage() {
       )}
 
       <div className="home-rows">
-        {weeks.map((w) => (
-          <section className="hrow-sec" key={w.num}>
+        {phases.map((ph) => (
+          <section className="hrow-sec" key={ph.idx}>
             <div className="hrow-head">
-              <h3>{w.num}. hét</h3>
-              {w.retest && <span style={{ marginLeft: "auto", fontFamily: "var(--mono)", fontSize: 10.5, letterSpacing: "0.06em", color: "var(--accent-2)", background: "var(--accent-soft)", padding: "3px 9px", borderRadius: 999 }}>VISSZAMÉRÉS</span>}
+              <h3>{ph.icon ? `${ph.icon} ` : ""}{ph.name || "Edzések"} <span style={{ color: "var(--ink-3)", fontWeight: 600, fontSize: 13 }}>· {ph.workouts.length} edzés</span></h3>
+              {ph.workouts.some((w) => w.retest) && <span style={{ marginLeft: "auto", fontFamily: "var(--mono)", fontSize: 10.5, letterSpacing: "0.06em", color: "var(--accent-2)", background: "var(--accent-soft)", padding: "3px 9px", borderRadius: 999 }}>VISSZAMÉRÉS</span>}
             </div>
             <div className="hrow">
-              {w.workouts.map((v) => (
+              {ph.workouts.map((v) => (
                 <WorkoutCard
                   key={v.code}
                   v={v}
                   isToday={v.code === todayCode}
                   isProgram
-                  programWeek={v.week}
-                  programWeeks={programWeeks}
+                  programStep={v.order + 1}
+                  programTotal={programTotal}
                   resume={resumeFrac(v.muxDuration, v.mins, v.code)}
                   completedAt={completedMap[v.code] ? completedMap[v.code].at : null}
                   completedTime={completedMap[v.code]?.atTime ?? null}

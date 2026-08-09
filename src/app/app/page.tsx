@@ -119,11 +119,10 @@ export default function KezdolapPage() {
   if (loading) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
   if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>A Foundation program még nem érhető el.</p>;
 
-  const { program, weeks, joined, doneCount, currentIndex, todayCode } = data;
-  const perWeek = program.perWeek || 5;
-  // Current week per handout §5: which session you're ON, not how many you've finished.
-  const curWeek = joined ? Math.min(weeks.length || 1, Math.floor(currentIndex / perWeek) + 1) : 1;
-  const programWeeks = program.weeks ?? weeks.length;
+  const { program, playlist, joined, doneCount, currentIndex, todayCode } = data;
+  // The program is an ordered pool; "this week" is the user's own cadence.
+  const daysPerWeek = prefs?.plan.daysPerWeek ?? 5;
+  const programTotal = program.totalSessions || playlist.length;
   const name = user?.displayName?.split(" ")[0] ?? "te";
   const play = (code: string | null) => code && router.push(`/player/${code}?autostart=1`);
 
@@ -159,8 +158,8 @@ export default function KezdolapPage() {
         v={v}
         isToday={v.code === todayCode}
         isProgram={!!item}
-        programWeek={item?.week ?? null}
-        programWeeks={programWeeks}
+        programStep={item ? item.order + 1 : null}
+        programTotal={programTotal}
         resume={resumeFrac(v)}
         completedAt={comp ? comp.at : null}
         completedTime={comp?.atTime ?? null}
@@ -180,8 +179,9 @@ export default function KezdolapPage() {
     .sort((a, b) => (resumeAt[b] ?? 0) - (resumeAt[a] ?? 0)); // most recent first (§3.3)
   const rowResume = resumeCodes.map((c) => videoByCode[c]);
 
-  // 2 · A Foundation heted — current week's sessions
-  const rowWeek = joined ? weeks.find((w) => w.num === curWeek)?.workouts ?? [] : [];
+  // 2 · A heted — the next `daysPerWeek` upcoming workouts from where you are,
+  // at YOUR chosen cadence (not an authored week).
+  const rowWeek = joined ? playlist.slice(currentIndex, currentIndex + daysPerWeek) : [];
 
   // 3 · Listám
   const rowList = [...myList].map((c) => videoByCode[c]).filter(Boolean) as AnyVideo[];
@@ -208,7 +208,8 @@ export default function KezdolapPage() {
         program={program}
         joined={joined}
         name={name}
-        curWeek={curWeek}
+        step={currentIndex + 1}
+        total={programTotal}
         today={todayVideo}
         onPlayToday={() => play(todayCode)}
         onSecondary={() => todayVideo && setModalVideo(todayVideo)}
@@ -218,14 +219,14 @@ export default function KezdolapPage() {
       <WeekStrip
         week={computeWeekProgress({
           weekdays: prefs?.plan.weekdays ?? [],
-          daysPerWeek: prefs?.plan.daysPerWeek ?? perWeek,
+          daysPerWeek: prefs?.plan.daysPerWeek ?? 5,
           completed: progress?.completed ?? [],
           pending: getPendingCompletions(),
         })}
       />
 
       <div className="home-rows">
-        <HomeRow title="A Foundation heted" allLabel="Program" onAll={() => router.push("/app/program/foundation")} cards={rowWeek.map(cardFor)} />
+        <HomeRow title="A heted" allLabel="Program" onAll={() => router.push("/app/program/foundation")} cards={rowWeek.map(cardFor)} />
         <HomeRow title="Folytatod" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowResume.map(cardFor)} />
         <HomeRow title="Listám" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowList.map(cardFor)} />
         <HomeRow title="Ha csak 15 perced van" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowShort.map(cardFor)} />
@@ -248,7 +249,7 @@ export default function KezdolapPage() {
       {modalVideo && (
         <NcardModal
           video={{ ...modalVideo, phase: modalVideo.phaseIdx }}
-          pool={weeks.flatMap((w) => w.workouts).map((w) => ({ ...w, phase: w.phaseIdx }))}
+          pool={playlist.map((w) => ({ ...w, phase: w.phaseIdx }))}
           saved={myList.has(modalVideo.code)}
           onToggleSave={() => toggleSave(modalVideo.code)}
           onClose={() => setModalVideo(null)}
@@ -276,12 +277,13 @@ export default function KezdolapPage() {
 
 /* ════════ Billboard — today's workout (§3.1) ════════ */
 function Billboard({
-  program, joined, name, curWeek, today, onPlayToday, onSecondary, onJoin,
+  program, joined, name, step, total, today, onPlayToday, onSecondary, onJoin,
 }: {
   program: FoundationData["program"];
   joined: boolean;
   name: string;
-  curWeek: number;
+  step: number;   // 1-based position in the program playlist
+  total: number;  // total workouts in the program
   today: WorkoutItem | undefined;
   onPlayToday: () => void;
   onSecondary: () => void;
@@ -289,8 +291,8 @@ function Billboard({
 }) {
   const equip = !program.equipment || /nincs/i.test(program.equipment) ? "ESZKÖZ NÉLKÜL" : program.equipment.toUpperCase();
   const eyebrow = joined
-    ? `${program.title.toUpperCase()} · ${curWeek}. HÉT · MAI EDZÉS`
-    : "LEXFIT · OTTHONI EDZÉS"; // no hardcoded program length (it's data-driven)
+    ? `${program.title.toUpperCase()} · ${step}/${total}. EDZÉS · MAI`
+    : "LEXFIT · OTTHONI EDZÉS"; // cadence-driven; no fixed program length
 
   return (
     <section className="hb">
