@@ -397,6 +397,9 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--ink-3);
+  /* 5 tabs on narrow screens: never wrap a label to a second line */
+  min-width: 0;
+  white-space: nowrap;
 }
 .lx .lx-tab .ic {
   width: 46px;
@@ -422,7 +425,9 @@
 
   .lx .lx-tabbar {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    /* one row, equal columns, regardless of how many nav items exist */
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
     position: fixed;
     left: 0;
     right: 0;
