@@ -16,6 +16,11 @@ export interface LibraryData {
   filters: Record<string, FilterDimension>;
 }
 
+/** Draft/soon/archived videos never surface to users — same rule as the Mux
+ *  token route (which 404s them): docs without a status predate the CMS → allow. */
+export const isPublishedVideo = (v: { status?: string }) =>
+  v.status === undefined || v.status === "published";
+
 export async function loadLibrary(): Promise<LibraryData> {
   const [videosSnap, filtersSnap, sessionsSnap] = await Promise.all([
     getDocs(collection(db, "videos")),
@@ -29,10 +34,12 @@ export async function loadLibrary(): Promise<LibraryData> {
     phaseByCode[s.videoCode] = s.phaseIdx;
   });
 
-  const videos: LibVideo[] = videosSnap.docs.map((d) => {
-    const v = { code: d.id, ...(d.data() as Omit<Video, "code">) };
-    return { ...v, phase: phaseByCode[v.code] ?? null };
-  });
+  const videos: LibVideo[] = videosSnap.docs
+    .map((d) => {
+      const v = { code: d.id, ...(d.data() as Omit<Video, "code">) };
+      return { ...v, phase: phaseByCode[v.code] ?? null };
+    })
+    .filter(isPublishedVideo);
   videos.sort((a, b) => a.code.localeCompare(b.code));
 
   const filters: Record<string, FilterDimension> = {};

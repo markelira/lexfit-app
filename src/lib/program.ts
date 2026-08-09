@@ -3,6 +3,7 @@
 import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { getProgress } from "@/lib/progress";
+import { isPublishedVideo } from "@/lib/library";
 import { programPosition } from "@/lib/program-index";
 import type { Program, Video } from "@/lib/types";
 
@@ -62,7 +63,10 @@ export async function loadProgram(slug: string, uid: string): Promise<ProgramDat
 
   const videoByCode: Record<string, Video> = {};
   videosSnap.forEach((d) => {
-    videoByCode[d.id] = { code: d.id, ...(d.data() as Omit<Video, "code">) };
+    const v = { code: d.id, ...(d.data() as Omit<Video, "code">) };
+    // Draft videos drop out of the playlist entirely — they can't stream anyway
+    // (the Mux token route 404s them), so showing a dead card would be worse.
+    if (isPublishedVideo(v)) videoByCode[d.id] = v;
   });
 
   const streak = userProgress?.streak ?? 0;

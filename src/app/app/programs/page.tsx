@@ -156,7 +156,7 @@ function ProgramBand({
 
   return (
     <section className="pgs">
-      <div className="pgs-hero">
+      <div className="pgs-hero" style={{ "--pgs-h": pv.hue } as React.CSSProperties}>
         <span className="pgs-ring" aria-hidden="true" />
         <span className="pgs-word" aria-hidden="true">{p.title.toUpperCase()}</span>
         <span className="pgs-scrim" aria-hidden="true" />

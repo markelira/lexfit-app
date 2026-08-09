@@ -15,15 +15,26 @@ export interface ProgramVisual {
   key: string;
   name: string; // wordmark, e.g. "ALAPOZÓ"
   icon: ProgramIcon;
+  hue: number; // oklch hue for the program's BANNER art (cards/lockups stay colorless)
 }
 
 const ICONS: ProgramIcon[] = ["dot", "square", "bar", "triangle", "diamond"];
+// Banner hues — distinct, same lightness/chroma treatment everywhere so the
+// bands feel like one family. Foundation keeps the app's green.
+const HUES = [168, 255, 80, 25, 305];
 
 const ICON_BY_SLUG: Record<string, ProgramIcon> = {
   foundation: "dot",
   elsolepes: "square",
   napindito: "bar",
   "5naposhasmelytorzschallange": "triangle",
+};
+
+const HUE_BY_SLUG: Record<string, number> = {
+  foundation: 168, // green (the app accent)
+  elsolepes: 255, // blue
+  napindito: 80, // amber
+  "5naposhasmelytorzschallange": 25, // coral
 };
 
 const hash = (s: string) => {
@@ -39,6 +50,7 @@ export function programVisual(slug: string, displayName?: string | null): Progra
     key: slug,
     name: (displayName || slug).toUpperCase(),
     icon: ICON_BY_SLUG[slug] ?? ICONS[hash(slug) % ICONS.length],
+    hue: HUE_BY_SLUG[slug] ?? HUES[hash(slug) % HUES.length],
   };
 }
 
