@@ -15,6 +15,15 @@
   background: var(--wf-page);
 }
 
+/* While the app shell is on screen, the DOCUMENT behind it must match its
+   neutral chrome — otherwise the green marketing --bg peeks out above the
+   sticky top bar on overscroll/rubber-band. (#f5f5f5 = --wf-chrome; the token
+   itself is scoped to .lx-shell, out of reach of html/body.) */
+html:has(.lx-shell),
+body:has(.lx-shell) {
+  background: #f5f5f5;
+}
+
 /* ══════════════════ TOP BAR (new — RULE 03, every route) ══════════════════ */
 .lx .lxtb {
   position: sticky;
