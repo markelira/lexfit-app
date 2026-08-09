@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
+import { ProgressSkeleton } from "@/components/Skeletons";
 import { getOnboarding } from "@/lib/user";
 import {
   getProgress, addObservation, syncMuxProgress,
@@ -88,7 +89,7 @@ export default function HaladasomPage() {
   async function refresh() { if (user) setProgress(await getProgress(user.uid)); }
   async function submitWin(text: string) { if (user) { await addObservation(user.uid, text, model.currentWeek); await refresh(); } }
 
-  if (loading) return <p className="hp-loading">Töltés…</p>;
+  if (loading) return <ProgressSkeleton />;
 
   const m = model;
 

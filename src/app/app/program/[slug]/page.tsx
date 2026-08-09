@@ -14,6 +14,7 @@ import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { loadProgram, type ProgramData } from "@/lib/program";
 import { loadProgramIndex, type ProgramIndex } from "@/lib/program-index";
+import { ProgramDetailSkeleton } from "@/components/Skeletons";
 
 // Programme detail — ANY published programme in full: phases, facts and every
 // workout, with the user's position. Foundation keeps its stored guided cursor;
@@ -60,7 +61,7 @@ export default function ProgramDetailPage() {
     await setSaved(user.uid, code, !has);
   }
 
-  if (loading) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
+  if (loading) return <ProgramDetailSkeleton />;
   if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>Ez a program még nem érhető el.</p>;
 
   const { program, phases, playlist, joined, doneCount, currentIndex, todayCode } = data;

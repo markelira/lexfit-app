@@ -10,6 +10,7 @@ import { Button } from "@/components/Button";
 import { getMyList, setSaved } from "@/lib/mylist";
 import { challengeCatOf, challengeGrad } from "@/lib/categories";
 import { type ChallengeDetail, loadChallenge } from "@/lib/challenges";
+import { ChallengeDetailSkeleton } from "@/components/Skeletons";
 
 export default function ChallengeDetailPage() {
   const params = useParams();
@@ -32,7 +33,7 @@ export default function ChallengeDetailPage() {
     await setSaved(user.uid, slug, next);
   }
 
-  if (d === undefined) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
+  if (d === undefined) return <ChallengeDetailSkeleton />;
   if (d === null) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>Ez a kihívás nem található.</p>;
 
   const { challenge: c, days, doneCount, state, nextOrder, fbGroupUrl } = d;

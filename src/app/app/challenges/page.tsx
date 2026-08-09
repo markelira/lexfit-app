@@ -11,6 +11,7 @@ import { BottomSheet } from "@/components/BottomSheet";
 import { useIsMobile } from "@/lib/useIsMobile";
 import { Rail } from "@/components/Rail";
 import { ChallengeCard } from "@/components/ChallengeCard";
+import { ChallengesSkeleton } from "@/components/Skeletons";
 import { getMyList, setSaved } from "@/lib/mylist";
 import {
   type ActiveChallengeFilters, type ChallengeCardData, type ChallengesData,
@@ -157,7 +158,7 @@ export default function ChallengesPage() {
   );
 
   if (failed) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>Nem sikerült betölteni a kihívásokat. Frissítsd az oldalt.</p>;
-  if (!data) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
+  if (!data) return <ChallengesSkeleton />;
 
   const inProgress = data.challenges.filter((c) => c.state === "folyamatban");
   const recent = data.challenges.slice(0, 10); // already newest-first

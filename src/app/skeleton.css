@@ -1,0 +1,37 @@
+/* ── Skeleton loading system (app-wide) ─────────────────────────────────────
+   Same shimmer recipe as the Profil pf-skel (familiarity: one loading language
+   everywhere): surface-2/line gradient sweep, 1.4s, static under
+   prefers-reduced-motion. Skeletons MIRROR the layout they precede — pages
+   compose them from the real layout containers (hb, pgs-hero, hrow, ch-grid…)
+   so nothing jumps when content arrives. */
+
+.lx .skel {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--line) 37%, var(--surface-2) 63%);
+  background-size: 400% 100%;
+  animation: skel-shimmer 1.4s ease infinite;
+  border-radius: var(--r-sm);
+}
+@keyframes skel-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* Dark hero surface — neutralizes hb/pgs-hero/lib-spot art while loading so
+   there's no wrong-color flash before the real program/category art arrives. */
+/* doubled class = higher specificity than .lx .hb / .lx .pgs-hero / .lx .lib-spot,
+   so the neutral surface wins regardless of CSS import order */
+.lx .skel-hero.skel-hero {
+  background: linear-gradient(90deg, oklch(0.32 0.008 168) 25%, oklch(0.37 0.008 168) 37%, oklch(0.32 0.008 168) 63%);
+  background-size: 400% 100%;
+  animation: skel-shimmer 1.4s ease infinite;
+}
+/* ghost bars on dark hero surfaces */
+.lx .skel-ghost {
+  background: oklch(1 0 0 / 0.12);
+  border-radius: var(--r-sm);
+}
+.lx .skel-ghost.pill { border-radius: 999px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lx .skel, .lx .skel-hero.skel-hero { animation: none; }
+}

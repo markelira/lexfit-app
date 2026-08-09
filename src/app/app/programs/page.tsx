@@ -17,6 +17,7 @@ import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { programVisual } from "@/lib/programs";
 import { loadLibrary, type LibVideo } from "@/lib/library";
+import { ProgramsSkeleton } from "@/components/Skeletons";
 import { loadProgramIndex, programPosition, type ProgramEntry, type ProgramIndex } from "@/lib/program-index";
 
 // Programok — Netflix/Apple TV catalog in the Kezdőlap's visual grammar: every
@@ -71,7 +72,7 @@ export default function ProgramsPage() {
     await setSaved(user.uid, code, !has);
   }
 
-  if (loading) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
+  if (loading) return <ProgramsSkeleton />;
   const programs = pindex?.programs ?? [];
   if (!programs.length) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>Még nincs elérhető program.</p>;
 

@@ -19,6 +19,7 @@ import {
   type ActiveFilters, type LibVideo, type LibraryData, emptyFilters, filterVideos, loadLibrary,
 } from "@/lib/library";
 import { loadProgramIndex, type ProgramIndex } from "@/lib/program-index";
+import { LibrarySkeleton } from "@/components/Skeletons";
 
 type SpotFilter = { group?: keyof ActiveFilters; opt?: string; kind?: "short" };
 const LIB_SPOTS: { ey: string; title: string; theme: string; word: string; blurb: string; play: string; filter: SpotFilter }[] = [
@@ -263,7 +264,7 @@ export default function LibraryPage() {
   );
 
   if (failed) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>Nem sikerült betölteni a videótárat. Frissítsd az oldalt.</p>;
-  if (!data) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
+  if (!data) return <LibrarySkeleton />;
 
   const byTheme = (t: string) => data.videos.filter((v) => v.theme === t);
   const byType = (t: string) => data.videos.filter((v) => v.types.includes(t));

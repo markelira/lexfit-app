@@ -27,6 +27,7 @@ import { confirmCheckout } from "@/lib/billing";
 import { getPrefs, updatePrefs } from "@/lib/prefs";
 import type { Prefs } from "@/lib/profile";
 import { FirstEntry } from "@/components/FirstEntry";
+import { HomeSkeleton } from "@/components/Skeletons";
 
 type AnyVideo = WorkoutItem | LibVideo;
 
@@ -119,7 +120,7 @@ export default function KezdolapPage() {
     window.dispatchEvent(new Event(GUIDE_START_EVENT));
   }
 
-  if (loading) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
+  if (loading) return <HomeSkeleton />;
   if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>A Foundation program még nem érhető el.</p>;
 
   const { program, playlist, joined, doneCount, currentIndex, todayCode } = data;
