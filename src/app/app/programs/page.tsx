@@ -110,6 +110,11 @@ export default function ProgramsPage() {
 
       <MobileWorkoutSheet
         v={sheetVideo}
+        programHue={
+          sheetVideo && pindex
+            ? pindex.bySlug[pindex.programOfVideo[sheetVideo.code] ?? ""]?.hue ?? null
+            : null
+        }
         saved={sheetVideo ? myList.has(sheetVideo.code) : false}
         onPlay={(c) => { setSheetVideo(null); play(c); }}
         onToggleSave={toggleSave}
@@ -156,7 +161,7 @@ function ProgramBand({
 
   return (
     <section className="pgs">
-      <div className="pgs-hero" style={{ "--pgs-h": pv.hue } as React.CSSProperties}>
+      <div className="pgs-hero" style={{ "--pgs-h": p.hue } as React.CSSProperties}>
         <span className="pgs-ring" aria-hidden="true" />
         <span className="pgs-word" aria-hidden="true">{p.title.toUpperCase()}</span>
         <span className="pgs-scrim" aria-hidden="true" />
@@ -201,6 +206,7 @@ function ProgramBand({
                 isProgram
                 programStep={i + 1}
                 programTotal={total}
+                programHue={p.hue}
                 resume={resumeFrac(v)}
                 completedAt={completedMap[v.code] ? completedMap[v.code].at : null}
                 completedTime={completedMap[v.code]?.atTime ?? null}

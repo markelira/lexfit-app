@@ -105,10 +105,13 @@ export function AppTopBar({ streak }: { streak: number }) {
     if (user) getMyList(user.uid).then(setMyList).catch(() => {});
   }, [searchOpen, videos.length, pindex, user]);
 
-  // Program-membership eyebrow for search results (mixed context).
-  const badgeFor = (code: string) => {
+  // Program membership for search results: eyebrow + brand-hued cover.
+  const memberOf = (code: string) => {
     const slug = pindex?.programOfVideo[code];
-    const p = slug ? pindex?.bySlug[slug] : null;
+    return slug ? pindex?.bySlug[slug] ?? null : null;
+  };
+  const badgeFor = (code: string) => {
+    const p = memberOf(code);
     return p ? { slug: p.slug, name: p.hu || p.title } : null;
   };
 
@@ -290,7 +293,7 @@ export function AppTopBar({ streak }: { streak: number }) {
         <>
           <div className="sp-grid">
             {results.map((v) => (
-              <WorkoutCard key={v.code} v={v} isProgram={v.phase != null} programBadge={badgeFor(v.code)} saved={myList.has(v.code)} onToggleSave={toggleSave} onPlay={commitAndPlay} />
+              <WorkoutCard key={v.code} v={v} isProgram={v.phase != null} programBadge={badgeFor(v.code)} programHue={memberOf(v.code)?.hue ?? null} saved={myList.has(v.code)} onToggleSave={toggleSave} onPlay={commitAndPlay} />
             ))}
           </div>
           <button type="button" className="sp-all" onClick={commitAndGoLibrary}>
@@ -322,6 +325,7 @@ export function AppTopBar({ streak }: { streak: number }) {
                     v={v}
                     isProgram={v.phase != null}
                     programBadge={badgeFor(v.code)}
+                    programHue={memberOf(v.code)?.hue ?? null}
                     saved={myList.has(v.code)}
                     onToggleSave={toggleSave}
                     onPlay={commitAndPlay}

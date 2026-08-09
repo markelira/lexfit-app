@@ -13,6 +13,7 @@ import { Button } from "@/components/Button";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { loadProgram, type ProgramData } from "@/lib/program";
+import { loadProgramIndex, type ProgramIndex } from "@/lib/program-index";
 
 // Programme detail — ANY published programme in full: phases, facts and every
 // workout, with the user's position. Foundation keeps its stored guided cursor;
@@ -26,6 +27,7 @@ export default function ProgramDetailPage() {
   const [loading, setLoading] = useState(true);
   const [myList, setMyList] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState<ProgressState | null>(null);
+  const [pindex, setPindex] = useState<ProgramIndex | null>(null);
 
   const reload = useCallback(async () => {
     if (!user || !slug) return;
@@ -40,6 +42,7 @@ export default function ProgramDetailPage() {
 
   useEffect(() => {
     reload();
+    loadProgramIndex().then(setPindex).catch(() => {});
     if (user) {
       getMyList(user.uid).then(setMyList).catch(() => {});
       getProgress(user.uid).then(setProgress).catch(() => {});
@@ -71,6 +74,7 @@ export default function ProgramDetailPage() {
   const programTotal = program.totalSessions || playlist.length;
   const todayItem = playlist.find((w) => w.code === todayCode) ?? null;
   const finished = programTotal > 0 && doneCount >= programTotal;
+  const hue = pindex?.bySlug[slug]?.hue ?? null;
 
   return (
     <div className="home fade-in">
@@ -126,6 +130,7 @@ export default function ProgramDetailPage() {
                   isProgram
                   programStep={v.order + 1}
                   programTotal={programTotal}
+                  programHue={hue}
                   resume={resumeFrac(v.muxDuration, v.mins, v.code)}
                   completedAt={completedMap[v.code] ? completedMap[v.code].at : null}
                   completedTime={completedMap[v.code]?.atTime ?? null}

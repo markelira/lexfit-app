@@ -19,9 +19,11 @@ export interface ProgramVisual {
 }
 
 const ICONS: ProgramIcon[] = ["dot", "square", "bar", "triangle", "diamond"];
-// Banner hues — distinct, same lightness/chroma treatment everywhere so the
-// bands feel like one family. Foundation keeps the app's green.
-const HUES = [168, 255, 80, 25, 305];
+// Program brand hues — same lightness/chroma treatment everywhere so the family
+// stays cohesive. Chosen AWAY from the category hues (168/150/72/42/225/295)
+// so a program cover never masquerades as a category color, and used for both
+// the /app/programs banner and program-member workout-card covers.
+const HUES = [168, 255, 110, 25, 315, 200, 60, 340];
 
 const ICON_BY_SLUG: Record<string, ProgramIcon> = {
   foundation: "dot",
@@ -33,7 +35,7 @@ const ICON_BY_SLUG: Record<string, ProgramIcon> = {
 const HUE_BY_SLUG: Record<string, number> = {
   foundation: 168, // green (the app accent)
   elsolepes: 255, // blue
-  napindito: 80, // amber
+  napindito: 110, // olive/lime
   "5naposhasmelytorzschallange": 25, // coral
 };
 
@@ -56,3 +58,39 @@ export function programVisual(slug: string, displayName?: string | null): Progra
 
 /** @deprecated legacy alias — prefer programVisual(slug, title). */
 export const programOf = (key: string): ProgramVisual => programVisual(key || "foundation");
+
+/**
+ * Assign every live program a UNIQUE hue, deterministically. Call with the
+ * published slugs in catalog order (lib/program-index does this): each program
+ * takes its preferred hue (hand-picked or hash-picked), and on a collision
+ * probes forward through the palette to the next free hue. Two live programs
+ * can therefore never share a color (until there are more programs than
+ * palette entries — 8 today).
+ */
+export function assignProgramHues(slugsInOrder: string[]): Record<string, number> {
+  const used = new Set<number>();
+  const out: Record<string, number> = {};
+  for (const slug of slugsInOrder) {
+    let h = HUE_BY_SLUG[slug] ?? HUES[hash(slug) % HUES.length];
+    if (used.has(h)) {
+      let i = HUES.indexOf(h);
+      if (i === -1) i = hash(slug) % HUES.length;
+      for (let step = 1; step <= HUES.length && used.has(h); step++) {
+        h = HUES[(i + step) % HUES.length];
+      }
+    }
+    used.add(h);
+    out[slug] = h;
+  }
+  return out;
+}
+
+/**
+ * Program-brand cover gradient for workout cards — same shape and
+ * lightness/chroma family as the category cardGrad, so program-colored and
+ * category-colored covers sit together naturally.
+ */
+export function programGrad(hue: number): string {
+  const c = `oklch(0.53 0.075 ${hue})`;
+  return `linear-gradient(135deg, oklch(from ${c} calc(l + 0.07) c h) 0%, ${c} 100%)`;
+}

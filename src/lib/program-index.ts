@@ -8,10 +8,12 @@
 // catalog order.
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { assignProgramHues } from "@/lib/programs";
 import type { Program, ProgramSession } from "@/lib/types";
 
 export interface ProgramEntry extends Program {
   codes: string[]; // the playlist, in order
+  hue: number; // UNIQUE brand hue among live programs (assignProgramHues)
 }
 
 export interface ProgramIndex {
@@ -31,9 +33,11 @@ export function loadProgramIndex(): Promise<ProgramIndex> {
       const ordered = sess.docs
         .map((s) => s.data() as ProgramSession)
         .sort((a, b) => a.order - b.order);
-      programs.push({ slug: d.id, ...(d.data() as Omit<Program, "slug">), codes: ordered.map((s) => s.videoCode) });
+      programs.push({ slug: d.id, ...(d.data() as Omit<Program, "slug">), codes: ordered.map((s) => s.videoCode), hue: 0 });
     }
     programs.sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.title.localeCompare(b.title));
+    const hues = assignProgramHues(programs.map((p) => p.slug));
+    for (const p of programs) p.hue = hues[p.slug];
 
     const bySlug: Record<string, ProgramEntry> = {};
     const programOfVideo: Record<string, string> = {};

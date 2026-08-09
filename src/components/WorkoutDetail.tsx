@@ -6,6 +6,7 @@ import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { cardGrad, catWord, levelWord } from "@/lib/categories";
 import { ProgramLockup } from "@/components/ProgramLockup";
+import { programGrad } from "@/lib/programs";
 import { usePreviewClip } from "@/components/use-preview-clip";
 import { phaseLabel, matchPct, workoutDesc, workoutBlocks } from "@/lib/workout-desc";
 import type { VideoBlock } from "@/lib/types";
@@ -29,7 +30,7 @@ export interface CardVideo {
 // modal and the program-overview spotlight; the caller supplies the surrounding shell.
 export function WorkoutDetail({
   video, pool = [], saved, onToggleSave, onPlay, onClose,
-  program = "foundation", programName = null, trainer = TRAINER, showClose = true, showSimilar = true,
+  program = "foundation", programName = null, programHue = null, trainer = TRAINER, showClose = true, showSimilar = true,
 }: {
   video: CardVideo;
   pool?: CardVideo[];
@@ -39,6 +40,7 @@ export function WorkoutDetail({
   onClose: () => void;
   program?: string;
   programName?: string | null;
+  programHue?: number | null;
   trainer?: string | null;
   showClose?: boolean;
   showSimilar?: boolean;
@@ -56,7 +58,7 @@ export function WorkoutDetail({
 
   return (
     <>
-      <div className="nmod-hero" style={{ background: cardGrad(v.theme) }}>
+      <div className="nmod-hero" style={{ background: programHue != null ? programGrad(programHue) : cardGrad(v.theme) }}>
         {trainer && <div className="nmod-photo" style={{ backgroundImage: `url(${trainer})` }} aria-hidden="true" />}
         <div className={`nmod-kb${ended ? " paused" : ""}`} key={v.code}>
           <span className="nmod-ring" />
@@ -157,7 +159,7 @@ export function WorkoutDetail({
             <div className="nmod-simgrid">
               {similar.map((x) => (
                 <button key={x.code} className="ncard" onClick={() => { setV(x); setLiked(false); }}>
-                  <div className="ncard-art" style={{ background: cardGrad(x.theme) }}>
+                  <div className="ncard-art" style={{ background: programHue != null ? programGrad(programHue) : cardGrad(x.theme) }}>
                     {trainer && <div className="ncard-photo" style={{ backgroundImage: `url(${trainer})` }} aria-hidden="true" />}
                     <span className="ncard-ring" />
                     <ProgramLockup program={program} name={programName} variant="corner-tab" />

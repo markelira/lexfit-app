@@ -5,7 +5,7 @@ import { lxPaths } from "@/lib/icons";
 import { Cover } from "@/components/Cover";
 import { ProgramMark } from "@/components/ProgramMark";
 import { benefitOf } from "@/lib/benefit";
-import { programVisual } from "@/lib/programs";
+import { programGrad, programVisual } from "@/lib/programs";
 
 export interface WorkoutCardVideo {
   code: string;
@@ -43,6 +43,7 @@ export function WorkoutCard({
   programStep = null,
   programTotal = null,
   programBadge = null,
+  programHue = null,
   resume,
   completedAt = null,
   completedTime = null,
@@ -58,6 +59,9 @@ export function WorkoutCard({
   /** Program membership eyebrow for MIXED contexts (home rows, Videótár, search).
    *  Omit on a program's own page where every card shares one program. */
   programBadge?: { slug: string; name: string } | null;
+  /** The program's UNIQUE brand hue — colors the cover in place of the category
+   *  gradient. Pass for every program-member card; standalone videos omit it. */
+  programHue?: number | null;
   resume?: number; // 0–1 fraction, if in progress
   completedAt?: string | null; // YYYY-MM-DD, if completed
   completedTime?: string | null; // local HH:MM, if recorded
@@ -88,7 +92,7 @@ export function WorkoutCard({
   return (
     <div className="wc">
       <div className="wc-thumb">
-        <Cover className="wc-cover-art" theme={v.theme} code={v.code} />
+        <Cover className="wc-cover-art" theme={v.theme} code={v.code} grad={programHue != null ? programGrad(programHue) : undefined} />
         {isToday && <span className="wc-ribbon">MAI EDZÉSED</span>}
         <span className="wc-play" aria-hidden="true">
           <LxIcon d={lxPaths.play} size={16} fill />

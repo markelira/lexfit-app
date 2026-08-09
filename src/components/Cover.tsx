@@ -17,6 +17,7 @@ export function Cover({
   trainer,
   focal = "64% 18%",
   className = "",
+  grad,
   children,
 }: {
   theme: string;
@@ -24,10 +25,13 @@ export function Cover({
   trainer?: string | null;
   focal?: string;
   className?: string;
+  /** Background override — program-member covers pass their program's brand
+   *  gradient (programGrad); without it the category gradient applies. */
+  grad?: string;
   children?: React.ReactNode;
 }) {
   return (
-    <div className={`lx-cover ${className}`} style={{ background: cardGrad(theme) }}>
+    <div className={`lx-cover ${className}`} style={{ background: grad ?? cardGrad(theme) }}>
       {trainer && (
         <div
           className="lx-cover-photo"

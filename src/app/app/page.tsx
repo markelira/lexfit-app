@@ -152,17 +152,18 @@ export default function KezdolapPage() {
       ? Math.min(1, resumeMap[v.code] / ((v.muxDuration || v.mins * 60) || 1))
       : undefined;
 
-  // Program-membership eyebrow for mixed rows (Folytatod/Listám/15 perc) —
-  // resolved from the playlists (lib/program-index); standalone videos get none.
-  const badgeFor = (code: string) => {
+  // Program membership from the playlists (lib/program-index): the eyebrow
+  // badge shows only in mixed rows, but the program's brand hue colors the
+  // cover EVERYWHERE. Standalone videos keep their category color.
+  const memberOf = (code: string) => {
     const slug = pindex?.programOfVideo[code];
-    const p = slug ? pindex?.bySlug[slug] : null;
-    return p ? { slug: p.slug, name: p.hu || p.title } : null;
+    return slug ? pindex?.bySlug[slug] ?? null : null;
   };
 
   const cardFor = (v: AnyVideo, withBadge = true) => {
     const item = data.byCode[v.code];
     const comp = completedMap[v.code];
+    const member = memberOf(v.code);
     return (
       <WorkoutCard
         key={v.code}
@@ -171,7 +172,8 @@ export default function KezdolapPage() {
         isProgram={!!item}
         programStep={item ? item.order + 1 : null}
         programTotal={programTotal}
-        programBadge={withBadge ? badgeFor(v.code) : null}
+        programBadge={withBadge && member ? { slug: member.slug, name: member.hu || member.title } : null}
+        programHue={member?.hue ?? null}
         resume={resumeFrac(v)}
         completedAt={comp ? comp.at : null}
         completedTime={comp?.atTime ?? null}
@@ -261,6 +263,7 @@ export default function KezdolapPage() {
       {modalVideo && (
         <NcardModal
           programName={program.hu || program.title}
+          programHue={pindex?.bySlug[program.slug]?.hue ?? null}
           video={{ ...modalVideo, phase: modalVideo.phaseIdx }}
           pool={playlist.map((w) => ({ ...w, phase: w.phaseIdx }))}
           saved={myList.has(modalVideo.code)}
@@ -278,6 +281,7 @@ export default function KezdolapPage() {
       )}
       <MobileWorkoutSheet
         v={sheetVideo}
+        programHue={sheetVideo ? memberOf(sheetVideo.code)?.hue ?? null : null}
         saved={sheetVideo ? myList.has(sheetVideo.code) : false}
         onPlay={(c) => { setSheetVideo(null); play(c); }}
         onToggleSave={toggleSave}

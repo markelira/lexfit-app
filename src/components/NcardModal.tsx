@@ -10,11 +10,11 @@ const TRAINER = "/trainer-underlayer.jpg";
 
 // Card detail modal — the shared WorkoutDetail in a full-screen backdrop + panel.
 export function NcardModal({
-  video, pool = [], saved, onToggleSave, onClose, onPlay, program = "foundation", programName = null, trainer = TRAINER,
+  video, pool = [], saved, onToggleSave, onClose, onPlay, program = "foundation", programName = null, programHue = null, trainer = TRAINER,
 }: {
   video: CardVideo; pool?: CardVideo[]; saved: boolean;
   onToggleSave: () => void; onClose: () => void; onPlay: (code: string) => void;
-  program?: string; programName?: string | null; trainer?: string | null;
+  program?: string; programName?: string | null; programHue?: number | null; trainer?: string | null;
 }) {
   useEffect(() => {
     const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -39,6 +39,7 @@ export function NcardModal({
           onClose={onClose}
           program={program}
           programName={programName}
+          programHue={programHue}
           trainer={trainer}
         />
       </div>

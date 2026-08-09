@@ -116,10 +116,14 @@ export default function LibraryPage() {
     }
   }, [user]);
 
-  // Program-membership eyebrow (colorless lockup) — playlists are the source.
-  const badgeFor = (code: string) => {
+  // Program membership (playlists are the source): eyebrow for mixed rails,
+  // brand hue for the cover everywhere.
+  const memberOf = (code: string) => {
     const slug = pindex?.programOfVideo[code];
-    const p = slug ? pindex?.bySlug[slug] : null;
+    return slug ? pindex?.bySlug[slug] ?? null : null;
+  };
+  const badgeFor = (code: string) => {
+    const p = memberOf(code);
     return p ? { slug: p.slug, name: p.hu || p.title } : null;
   };
 
@@ -250,6 +254,7 @@ export default function LibraryPage() {
       v={v}
       isProgram={v.phase != null}
       programBadge={withBadge ? badgeFor(v.code) : null}
+      programHue={memberOf(v.code)?.hue ?? null}
       resume={resumeOf(v)}
       saved={myList.has(v.code)}
       onToggleSave={toggleSave}
@@ -515,6 +520,7 @@ export default function LibraryPage() {
 
       <MobileWorkoutSheet
         v={sheetVideo}
+        programHue={sheetVideo ? memberOf(sheetVideo.code)?.hue ?? null : null}
         saved={sheetVideo ? myList.has(sheetVideo.code) : false}
         onPlay={(c) => { setSheetVideo(null); router.push(`/player/${c}?autostart=1`); }}
         onToggleSave={toggleSave}

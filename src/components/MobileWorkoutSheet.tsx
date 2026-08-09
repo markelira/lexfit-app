@@ -5,6 +5,7 @@ import { Button } from "@/components/Button";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { cardGrad, levelWord } from "@/lib/categories";
+import { programGrad } from "@/lib/programs";
 import type { VideoBlock } from "@/lib/types";
 
 export interface SheetVideo {
@@ -41,12 +42,15 @@ export function MobileWorkoutSheet({
   onPlay,
   onToggleSave,
   onClose,
+  programHue = null,
 }: {
   v: SheetVideo | null;
   saved: boolean;
   onPlay: (code: string) => void;
   onToggleSave: (code: string) => void;
   onClose: () => void;
+  /** Program brand hue — overrides the category gradient on the art band. */
+  programHue?: number | null;
 }) {
   if (!v) return null;
   const segs = segments(v);
@@ -54,7 +58,7 @@ export function MobileWorkoutSheet({
 
   return (
     <BottomSheet open onClose={onClose} ariaLabel={v.title}>
-      <div className="mws-art" style={{ background: cardGrad(v.theme) }}>
+      <div className="mws-art" style={{ background: programHue != null ? programGrad(programHue) : cardGrad(v.theme) }}>
         <h2 className="mws-title">{v.title}</h2>
       </div>
 
