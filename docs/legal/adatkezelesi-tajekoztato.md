@@ -92,6 +92,7 @@ Az Adatkezelő az alábbi adatfeldolgozókat, illetve önálló adatkezelőként
 | **Billingo Technologies Zrt.** (Magyarország) | NAV-kompatibilis e-számla kiállítása és megküldése | számlázási név, cím, e-mail, vásárlási adatok | EU-n (Magyarországon) belül; a számlaadatok jogszabály alapján a NAV részére továbbításra kerülnek |
 | **Twilio Inc. — SendGrid** (USA) | tranzakciós és emlékeztető e-mailek kiküldése | e-mail-cím, név, az üzenet tartalma | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
 | **Vercel Inc.** (USA) | webalkalmazás-tárhely és -kiszolgálás | a kiszolgáláshoz szükséges technikai adatok (IP-cím, kérésnaplók) | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
+| **Google LLC — reCAPTCHA (Firebase App Check)** | visszaélés- és botvédelem (a kérések valódi alkalmazásból való származásának ellenőrzése) | eszköz- és böngészőadatok, IP-cím, felhasználói interakciós jelek; a feldolgozás a Google reCAPTCHA feltételei szerint történik | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC. A reCAPTCHA használatára a Google [Adatvédelmi irányelvei](https://policies.google.com/privacy) és [Szolgáltatási feltételei](https://policies.google.com/terms) irányadók |
 
 Az Adatkezelő személyes adatot a fentieken túl kizárólag jogszabályi kötelezettség alapján (pl. NAV, hatóság, bíróság megkeresésére) továbbít. Az Adatkezelő személyes adatot hirdetési célra nem ad át és nem értékesít.
 
