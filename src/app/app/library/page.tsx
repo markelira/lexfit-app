@@ -243,12 +243,13 @@ export default function LibraryPage() {
     return r.length;
   };
 
-  const card = (v: LibVideo) => (
+  // withBadge=false inside a program's own rail — the rail title already names it.
+  const card = (v: LibVideo, withBadge = true) => (
     <WorkoutCard
       key={v.code}
       v={v}
       isProgram={v.phase != null}
-      programBadge={badgeFor(v.code)}
+      programBadge={withBadge ? badgeFor(v.code) : null}
       resume={resumeOf(v)}
       saved={myList.has(v.code)}
       onToggleSave={toggleSave}
@@ -270,6 +271,12 @@ export default function LibraryPage() {
   };
   const activeTheme = active.theme.size === 1 ? [...active.theme][0] : null;
   const resumed = data.videos.filter((v) => (resumeMap[v.code] ?? 0) > 0);
+
+  // One rail per published program, in catalog order, videos in playlist order.
+  const libByCode = new Map(data.videos.map((v) => [v.code, v]));
+  const programRails = (pindex?.programs ?? [])
+    .map((p) => ({ p, v: p.codes.map((c) => libByCode.get(c)).filter(Boolean) as LibVideo[] }))
+    .filter((r) => r.v.length > 0);
   const rails: { title: string; sub?: string; v: LibVideo[] }[] = [
     ...(resumed.length ? [{ title: "Folytatás", sub: "ott veszed fel, ahol abbahagytad", v: resumed }] : []),
     { title: "A te fázisod · 🔨 Építés", sub: "a mostani heteid", v: byPhase(1) },
@@ -435,7 +442,24 @@ export default function LibraryPage() {
 
           {filterControls}
 
-          {/* Row budget: at most three editorial rows (§20.2 C3). Rest reachable via tiles + chips. */}
+          {/* Programok — one rail per published program, playlist order. */}
+          {programRails.length > 0 && (
+            <section className="lib-cats" style={{ marginBottom: 0 }}>
+              <h2 className="lib-cats-h">Programok</h2>
+            </section>
+          )}
+          {programRails.map(({ p, v }) => (
+            <Rail
+              key={p.slug}
+              title={p.hu || p.title}
+              sub={`${v.length} edzés · a program sorrendjében`}
+              items={v}
+              renderItem={(v) => card(v, false)}
+              onAll={() => router.push(`/app/program/${p.slug}`)}
+            />
+          ))}
+
+          {/* Editorial rows: at most three (§20.2 C3). Rest reachable via tiles + chips. */}
           {rails
             .filter((r) => ["A te fázisod · 🔨 Építés", "15 perc, ami belefér", "Csendben is megy"].includes(r.title) && r.v.length > 0)
             .map((r) => (
@@ -448,6 +472,14 @@ export default function LibraryPage() {
                 onAll={RAIL_FILTER[r.title] ? () => browseFrom(RAIL_FILTER[r.title]) : undefined}
               />
             ))}
+
+          {/* Minden edzés — the complete library, so no video is unreachable in browse. */}
+          <Rail
+            title="Minden edzés"
+            sub={`${data.videos.length} videó`}
+            items={data.videos}
+            renderItem={(v) => card(v)}
+          />
         </>
       )}
 
