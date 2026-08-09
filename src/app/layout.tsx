@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { Analytics } from "@/components/Analytics";
 
 // LEXFIT brand fonts (per Build Plan §Phase 0). Real design tokens from
 // lexfit-tokens.css get layered in once the prototype files are dropped in.
@@ -21,8 +22,13 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu"),
   title: "LEXFIT",
   description: "LEXFIT — vezetett otthoni edzésprogram.",
+  // Google Search Console ownership proof (URL-prefix property). Unset = no tag.
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export default function RootLayout({
@@ -38,6 +44,7 @@ export default function RootLayout({
       </head>
       <body>
         <AuthProvider>{children}</AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
