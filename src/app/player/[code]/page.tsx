@@ -1,13 +1,15 @@
 "use client";
 
 import "./player.css";
+import "../../skeleton.css";
 import MuxPlayer from "@mux/mux-player-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
-import { Protected, Loader } from "@/components/Protected";
+import { Protected } from "@/components/Protected";
+import { PlayerSkeleton } from "@/components/Skeletons";
 import { Check } from "@/components/OnbAside";
 import { getPlaybackTokens, type PlaybackResponse } from "@/lib/playback";
 import {
@@ -520,13 +522,13 @@ function PlayerScreen({ code }: { code: string }) {
         <button className="btn ghost" onClick={() => router.push("/app")}>← Vissza</button>
       </div>
     );
-  if (!video) return <Loader label="Edzés…" />;
+  if (!video) return <PlayerSkeleton />;
 
   // ── preview ──
   if (stage === "preview") {
     // Arrived via an explicit play action → don't flash the redundant preview,
     // show a loader until start() flips us into playback.
-    if (wantAutostart && video.muxPlaybackId) return <Loader label="Edzés…" />;
+    if (wantAutostart && video.muxPlaybackId) return <PlayerSkeleton />;
     return (
       <div className="lx szm-player szm-pl-prevwrap">
         <div className="szm-pl-stagebg" style={{ background: grad(video.theme) }} aria-hidden="true" />
@@ -852,7 +854,7 @@ export default function Page() {
   const params = useParams();
   const code = String(params.code);
   return (
-    <Protected requirePaid>
+    <Protected requirePaid fallback={<PlayerSkeleton />}>
       <PlayerScreen code={code} />
     </Protected>
   );

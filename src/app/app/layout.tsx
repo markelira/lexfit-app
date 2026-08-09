@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
+import { AppShellSkeleton } from "@/components/Skeletons";
 import { useAuth } from "@/lib/auth-context";
 import { AppTopBar } from "@/components/AppTopBar";
 import { LxIcon } from "@/components/LxIcon";
@@ -111,7 +112,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Protected requirePaid>
+    <Protected requirePaid fallback={<AppShellSkeleton />}>
       <Shell>{children}</Shell>
     </Protected>
   );

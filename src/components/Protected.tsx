@@ -6,21 +6,37 @@ import { useAuth } from "@/lib/auth-context";
 import { hasOnboarded } from "@/lib/user";
 import { getSubscription, isSubscribed } from "@/lib/billing";
 
-/** Full-screen branded loader shown while auth/onboarding state resolves. */
+/** Full-screen branded loader shown while auth/onboarding state resolves —
+ *  a quiet pulsing brand mark, no text (the label feeds screen readers only). */
 export function Loader({ label = "Töltés…" }: { label?: string }) {
   return (
     <div
-      style={{
-        minHeight: "100dvh",
-        display: "grid",
-        placeItems: "center",
-        fontFamily: "var(--mono)",
-        color: "var(--ink-3)",
-        fontSize: 13,
-        letterSpacing: "0.04em",
-      }}
+      role="status"
+      aria-label={label}
+      aria-busy="true"
+      style={{ minHeight: "100dvh", display: "grid", placeItems: "center" }}
     >
-      {label}
+      <div aria-hidden="true" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+        <div
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 13,
+            background: "var(--accent-2, oklch(0.5 0.046 168))",
+            animation: "lx-loader-pulse 1.2s ease-in-out infinite",
+          }}
+        />
+        <div style={{ width: 58, height: 8, borderRadius: 999, background: "var(--line, oklch(0.9 0.012 168))" }} />
+      </div>
+      <style>{`
+        @keyframes lx-loader-pulse {
+          0%, 100% { opacity: 0.35; transform: scale(0.92); }
+          50% { opacity: 1; transform: scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [aria-busy="true"] div { animation: none !important; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -42,10 +58,14 @@ export function Protected({
   children,
   requireOnboarded = true,
   requirePaid = false,
+  fallback,
 }: {
   children: React.ReactNode;
   requireOnboarded?: boolean;
   requirePaid?: boolean;
+  /** Rendered while the gate resolves — pass a page skeleton for a seamless
+   *  load; defaults to the branded Loader. */
+  fallback?: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -92,6 +112,6 @@ export function Protected({
     };
   }, [user, loading, requireOnboarded, requirePaid, router]);
 
-  if (loading || !user || checking) return <Loader />;
+  if (loading || !user || checking) return <>{fallback ?? <Loader />}</>;
   return <>{children}</>;
 }

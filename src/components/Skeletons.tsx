@@ -81,11 +81,11 @@ function HeroGhosts({ title = 40, syn = 2, cta = true }: { title?: number; syn?:
 
 /* ── page composites ── */
 
-/** Kezdőlap: billboard + week strip + rows. */
-export function HomeSkeleton() {
+/** Kezdőlap body: billboard + week strip + rows (also used by the shell gate). */
+function HomeSkeletonBody() {
   return (
-    <SkelPage className="home fade-in">
-      <section className="hb skel-hero" style={{ boxShadow: "none" }}>
+    <>
+      <section className="hb skel-hero" style={{ boxShadow: "none" }} aria-hidden="true">
         <div className="hb-content">
           <HeroGhosts title={46} syn={2} />
         </div>
@@ -95,7 +95,86 @@ export function HomeSkeleton() {
         <SkelRow />
         <SkelRow cards={3} />
       </div>
+    </>
+  );
+}
+
+/** Kezdőlap: billboard + week strip + rows. */
+export function HomeSkeleton() {
+  return (
+    <SkelPage className="home fade-in">
+      <HomeSkeletonBody />
     </SkelPage>
+  );
+}
+
+/** The /app auth+entitlement gate: the WHOLE shell as a skeleton — top bar,
+ *  sidebar (desktop; CSS hides it on mobile) and Kezdőlap-shaped content — so
+ *  entering the app never shows a blank branded screen. */
+export function AppShellSkeleton() {
+  return (
+    <div className="lx lx-shell" role="status" aria-label="Töltés…" aria-busy="true">
+      <header className="lxtb" aria-hidden="true">
+        <div style={{ display: "flex", alignItems: "center", gap: 11, paddingLeft: 18, width: 244, flexShrink: 1 }}>
+          <Skel style={{ width: 34, height: 34, borderRadius: 10, flex: "none" }} />
+          <Skel style={{ width: 72, height: 14 }} />
+        </div>
+        <Skel style={{ height: 38, flex: 1, maxWidth: 480, borderRadius: 999, margin: "0 16px" }} />
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, paddingRight: 18 }}>
+          <Skel style={{ width: 62, height: 30, borderRadius: 999 }} />
+          <Skel style={{ width: 34, height: 34, borderRadius: "50%" }} />
+        </div>
+      </header>
+      <div className="lx-body" aria-hidden="true">
+        <aside className="lx-sidebar">
+          <div style={{ display: "flex", flexDirection: "column", gap: 18, padding: "26px 16px" }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Skel style={{ width: 19, height: 19, borderRadius: 6, flex: "none" }} />
+                <Skel style={{ height: 12, width: `${60 + (i % 3) * 14}%` }} />
+              </div>
+            ))}
+          </div>
+        </aside>
+        <main className="lx-main">
+          <div className="lx-main-in">
+            <div className="home">
+              <HomeSkeletonBody />
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+/** Player gate: dark theater skeleton — video stage + control/meta ghosts. */
+export function PlayerSkeleton() {
+  return (
+    <div
+      className="lx"
+      role="status"
+      aria-label="Edzés betöltése…"
+      aria-busy="true"
+      style={{ minHeight: "100dvh", background: "oklch(0.16 0.01 168)", display: "flex", flexDirection: "column" }}
+    >
+      <div style={{ width: "100%", maxWidth: 1160, margin: "0 auto", padding: "68px 20px 40px" }} aria-hidden="true">
+        <div className="skel-hero" style={{ aspectRatio: "16 / 9", borderRadius: 18 }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 20 }}>
+          <div className="skel-ghost pill" style={{ width: 46, height: 46, borderRadius: "50%", flex: "none" }} />
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 9 }}>
+            <div className="skel-ghost" style={{ height: 15, width: "min(320px, 60%)" }} />
+            <div className="skel-ghost" style={{ height: 11, width: "min(200px, 38%)" }} />
+          </div>
+          <div className="skel-ghost pill" style={{ width: 120, height: 40 }} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 28 }}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="skel-ghost" style={{ height: 46, borderRadius: 12 }} />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
