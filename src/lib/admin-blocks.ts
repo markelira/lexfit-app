@@ -68,6 +68,18 @@ export function buildBlocks(raw: RawBlock[] | undefined, dur: number): CleanBloc
     })
     .filter((bl) => bl.name);
 
+  // Heal missing block starts before the all-or-nothing check (same rules as
+  // the player's lib/blocks.ts inferBlockStarts): a missing start becomes the
+  // block's first stamped exercise; the first block defaults to 0:00. One
+  // forgotten field must never zero out every block's mins.
+  blocks = blocks.map((bl, i) => {
+    if (typeof bl.start === "number") return bl;
+    const firstStamped = bl.items.find((ex) => typeof ex.start === "number")?.start;
+    if (typeof firstStamped === "number") return { ...bl, start: firstStamped };
+    if (i === 0) return { ...bl, start: 0 };
+    return bl;
+  });
+
   const allStamped = blocks.length > 0 && blocks.every((bl) => typeof bl.start === "number");
   if (allStamped) {
     blocks.sort((a, b) => a.start! - b.start!);

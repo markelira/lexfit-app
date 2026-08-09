@@ -16,7 +16,7 @@ import {
 } from "@/lib/progress";
 import { computeStreak, ymd } from "@/lib/streak";
 import { getMyList, setSaved as setSavedRemote } from "@/lib/mylist";
-import { normalizeExercise } from "@/lib/blocks";
+import { inferBlockStarts, normalizeExercise } from "@/lib/blocks";
 import type { Video, VideoBlock } from "@/lib/types";
 import { secToClock } from "@/lib/time";
 import { LxIcon } from "@/components/LxIcon";
@@ -42,7 +42,9 @@ const levelWord = (n: number) => ["Kezdő", "Közepes", "Haladó"][n - 1] ?? "Ke
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 function planBlocks(v: Video): VideoBlock[] {
-  if (v.blocks?.length) return v.blocks;
+  // Heal missing block stamps (first block → 0:00, others → first stamped
+  // exercise) so one forgotten field can't collapse the chapter math.
+  if (v.blocks?.length) return inferBlockStarts(v.blocks);
   return [
     { name: "Bemelegítés", mins: Math.max(2, Math.round(v.mins * 0.15)), items: ["Átmozgatás Alexával"] },
     { name: "Fő rész", mins: Math.round(v.mins * 0.65), items: ["Vezetett blokk — kövesd Alexát"] },
@@ -166,6 +168,13 @@ function PlayerScreen({ code }: { code: string }) {
         return { start: s / dur, end: e / dur, startSec: s, endSec: e };
       });
     }
+    // Guard totalMins=0 (mins never authored): distribute evenly instead of
+    // dividing by zero — NaN bounds silently killed the seekbar + active-block
+    // detection (found live 2026-08-09).
+    if (totalMins <= 0) {
+      const n = Math.max(1, blocks.length);
+      return blocks.map((_, i) => ({ start: i / n, end: (i + 1) / n, startSec: 0, endSec: 0 }));
+    }
     let acc = 0;
     return blocks.map((b) => {
       const start = acc / totalMins;
@@ -173,10 +182,17 @@ function PlayerScreen({ code }: { code: string }) {
       return { start, end: acc / totalMins, startSec: 0, endSec: 0 };
     });
   }, [blocks, totalMins, stamped, dur]);
-  // Layout weight for the segment/timeline widths: real block seconds when stamped.
-  const weight = (i: number) => (stamped ? Math.max(1, bounds[i].endSec - bounds[i].startSec) : blocks[i].mins);
+  // Layout weight for the segment/timeline widths: real block seconds when
+  // stamped; authored minutes otherwise (min 1 so a 0-min block stays visible).
+  const weight = (i: number) => (stamped ? Math.max(1, bounds[i].endSec - bounds[i].startSec) : Math.max(1, blocks[i].mins));
+  // Rail/preview duration label: derive from stamps when available (stored mins
+  // can be 0 when the video was saved before its Mux duration existed).
+  const blockMins = (i: number) =>
+    stamped && dur > 0 ? Math.max(1, Math.round((bounds[i].endSec - bounds[i].startSec) / 60)) : blocks[i].mins;
   const cb = bounds.findIndex((b) => frac >= b.start && frac < b.end);
-  const active = cb === -1 ? Math.max(0, bounds.length - 1) : cb;
+  // No match → past the end means the last block; anything else (start, NaN
+  // safety) means the first — never default to the end at 0:00.
+  const active = cb !== -1 ? cb : frac >= 1 ? Math.max(0, bounds.length - 1) : 0;
   const blockEndSec = (bounds[active]?.end ?? 1) * dur;
   const blockLeft = Math.max(0, Math.ceil(blockEndSec - cur));
   const nextBlock = blocks[active + 1];
@@ -540,7 +556,7 @@ function PlayerScreen({ code }: { code: string }) {
                 <div key={b.name} className="pb">
                   <span className="i">{i + 1}</span>
                   <span className="nm">{b.name}</span>
-                  <span className="mn">{b.mins}′</span>
+                  <span className="mn">{blockMins(i)}′</span>
                 </div>
               ))}
             </div>
@@ -747,7 +763,7 @@ function PlayerScreen({ code }: { code: string }) {
                 <button className="pf-blk-hd" onClick={() => setExpanded(i)} aria-expanded={open}>
                   <span className={`n${done ? " done" : now ? " on" : ""}`}>{done ? <Check size={11} /> : i + 1}</span>
                   <span className="nm">{b.name}</span>
-                  <span className="m">{b.mins}′</span>
+                  <span className="m">{blockMins(i)}′</span>
                 </button>
                 {open && b.items.map(normalizeExercise).map((ex, k) => {
                   const exDone = now ? activeEx > k : done;
@@ -801,7 +817,7 @@ function PlayerScreen({ code }: { code: string }) {
                   <button className={`pf-mblk-hd${bNow ? " now" : ""}`} onClick={() => setExpanded(bi)} aria-expanded={bOpen}>
                     <span className={`n${bDone ? " done" : bNow ? " on" : ""}`}>{bDone ? <LxIcon d={lxPaths.check} size={11} /> : bi + 1}</span>
                     <span className="nm">{b.name}</span>
-                    <span className="m">{b.mins}′</span>
+                    <span className="m">{blockMins(bi)}′</span>
                   </button>
                   {bOpen && items.map((ex, k) => {
                     const exActive = bNow && k === activeEx;
