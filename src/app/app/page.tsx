@@ -22,6 +22,7 @@ import { ChallengeCard } from "@/components/ChallengeCard";
 import { GuideController, GUIDE_START_EVENT } from "@/components/GuidedTour";
 import { JoinCinematic } from "@/components/JoinCinematic";
 import { loadFoundation, type FoundationData, type WorkoutItem } from "@/lib/program";
+import { loadProgramIndex, type ProgramIndex } from "@/lib/program-index";
 import { confirmCheckout } from "@/lib/billing";
 import { getPrefs, updatePrefs } from "@/lib/prefs";
 import type { Prefs } from "@/lib/profile";
@@ -42,6 +43,7 @@ export default function KezdolapPage() {
   const [libVideos, setLibVideos] = useState<LibVideo[]>([]);
   const [challenges, setChallenges] = useState<ChallengeCardData[]>([]);
   const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
+  const [pindex, setPindex] = useState<ProgramIndex | null>(null);
   const isMobile = useIsMobile();
 
   const reload = useCallback(async () => {
@@ -70,6 +72,7 @@ export default function KezdolapPage() {
   useEffect(() => {
     reload();
     loadLibrary().then((d) => setLibVideos(d.videos)).catch(() => {});
+    loadProgramIndex().then(setPindex).catch(() => {});
     if (user) {
       getMyList(user.uid).then(setMyList).catch(() => {});
       getProgress(user.uid).then(setProgress).catch(() => {});
@@ -149,7 +152,15 @@ export default function KezdolapPage() {
       ? Math.min(1, resumeMap[v.code] / ((v.muxDuration || v.mins * 60) || 1))
       : undefined;
 
-  const cardFor = (v: AnyVideo) => {
+  // Program-membership eyebrow for mixed rows (Folytatod/Listám/15 perc) —
+  // resolved from the playlists (lib/program-index); standalone videos get none.
+  const badgeFor = (code: string) => {
+    const slug = pindex?.programOfVideo[code];
+    const p = slug ? pindex?.bySlug[slug] : null;
+    return p ? { slug: p.slug, name: p.hu || p.title } : null;
+  };
+
+  const cardFor = (v: AnyVideo, withBadge = true) => {
     const item = data.byCode[v.code];
     const comp = completedMap[v.code];
     return (
@@ -160,6 +171,7 @@ export default function KezdolapPage() {
         isProgram={!!item}
         programStep={item ? item.order + 1 : null}
         programTotal={programTotal}
+        programBadge={withBadge ? badgeFor(v.code) : null}
         resume={resumeFrac(v)}
         completedAt={comp ? comp.at : null}
         completedTime={comp?.atTime ?? null}
@@ -226,10 +238,10 @@ export default function KezdolapPage() {
       />
 
       <div className="home-rows">
-        <HomeRow title="A heted" allLabel="Program" onAll={() => router.push("/app/program/foundation")} cards={rowWeek.map(cardFor)} />
-        <HomeRow title="Folytatod" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowResume.map(cardFor)} />
-        <HomeRow title="Listám" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowList.map(cardFor)} />
-        <HomeRow title="Ha csak 15 perced van" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowShort.map(cardFor)} />
+        <HomeRow title="A heted" allLabel="Program" onAll={() => router.push("/app/program/foundation")} cards={rowWeek.map((v) => cardFor(v, false))} />
+        <HomeRow title="Folytatod" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowResume.map((v) => cardFor(v))} />
+        <HomeRow title="Listám" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowList.map((v) => cardFor(v))} />
+        <HomeRow title="Ha csak 15 perced van" allLabel="Összes" onAll={() => router.push("/app/library")} cards={rowShort.map((v) => cardFor(v))} />
         <HomeRow
           title="Szavazz Magadra · kihívások"
           allLabel="Kihívások"
@@ -248,6 +260,7 @@ export default function KezdolapPage() {
 
       {modalVideo && (
         <NcardModal
+          programName={program.hu || program.title}
           video={{ ...modalVideo, phase: modalVideo.phaseIdx }}
           pool={playlist.map((w) => ({ ...w, phase: w.phaseIdx }))}
           saved={myList.has(modalVideo.code)}

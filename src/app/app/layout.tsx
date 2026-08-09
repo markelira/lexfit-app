@@ -20,13 +20,18 @@ const ymd = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.ge
 // item, at every breakpoint (F-10). Order matches the shell wireframe.
 const NAV: [string, keyof typeof lxPaths, string][] = [
   ["/app", "house", "Kezdőlap"],
+  ["/app/programs", "layers", "Programok"],
   ["/app/library", "grid", "Videótár"],
   ["/app/progress", "chart", "Haladásom"],
   ["/app/challenges", "trophy", "Kihívások"],
 ];
 
 const isActive = (href: string, pathname: string) =>
-  href === "/app" ? pathname === "/app" : pathname.startsWith(href);
+  href === "/app"
+    ? pathname === "/app"
+    : href === "/app/programs"
+      ? pathname.startsWith("/app/programs") || pathname.startsWith("/app/program/")
+      : pathname.startsWith(href);
 
 function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

@@ -3,7 +3,9 @@
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { Cover } from "@/components/Cover";
+import { ProgramMark } from "@/components/ProgramMark";
 import { benefitOf } from "@/lib/benefit";
+import { programVisual } from "@/lib/programs";
 
 export interface WorkoutCardVideo {
   code: string;
@@ -40,6 +42,7 @@ export function WorkoutCard({
   isProgram = false,
   programStep = null,
   programTotal = null,
+  programBadge = null,
   resume,
   completedAt = null,
   completedTime = null,
@@ -52,6 +55,9 @@ export function WorkoutCard({
   isProgram?: boolean;
   programStep?: number | null; // this workout's 1-based position in the program
   programTotal?: number | null; // total workouts in the program
+  /** Program membership eyebrow for MIXED contexts (home rows, Videótár, search).
+   *  Omit on a program's own page where every card shares one program. */
+  programBadge?: { slug: string; name: string } | null;
   resume?: number; // 0–1 fraction, if in progress
   completedAt?: string | null; // YYYY-MM-DD, if completed
   completedTime?: string | null; // local HH:MM, if recorded
@@ -103,7 +109,7 @@ export function WorkoutCard({
             className="wc-ava ring"
             style={{ "--wp": ringPct } as React.CSSProperties}
             aria-hidden="true"
-            title={`Foundation · ${programStep}/${programTotal}. edzés`}
+            title={`${programBadge?.name ?? "Program"} · ${programStep}/${programTotal}. edzés`}
           >
             <span className="inner">{done ? <LxIcon d={lxPaths.check} size={14} sw={2.6} /> : ALEXA_FACE}</span>
           </span>
@@ -113,6 +119,16 @@ export function WorkoutCard({
           </span>
         )}
         <div className="wc-txt">
+          {programBadge &&
+            (() => {
+              const pv = programVisual(programBadge.slug, programBadge.name);
+              return (
+                <div className="wc-program">
+                  <ProgramMark shape={pv.icon} size={8} />
+                  <span>{pv.name}</span>
+                </div>
+              );
+            })()}
           <div className="wc-name">{v.title}</div>
           {state ? (
             <div className={`wc-state${state.done ? " done" : ""}`}>{state.text}</div>

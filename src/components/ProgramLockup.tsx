@@ -1,4 +1,4 @@
-import { programOf } from "@/lib/programs";
+import { programVisual } from "@/lib/programs";
 import { ProgramMark } from "./ProgramMark";
 
 // The consistent, COLORLESS program badge. Identical styling on every program and
@@ -9,12 +9,15 @@ type Variant = "top-left" | "corner-tab";
 
 export function ProgramLockup({
   program,
+  name,
   variant = "top-left",
 }: {
   program: string;
+  /** Display name (the program's Hungarian title); falls back to the slug. */
+  name?: string | null;
   variant?: Variant;
 }) {
-  const p = programOf(program);
+  const p = programVisual(program, name);
 
   if (variant === "corner-tab") {
     return (

@@ -4,36 +4,39 @@ import "../../foundation.css";
 import "../../home.css";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { getProgress, type ProgressState } from "@/lib/progress";
 import { getMyList, setSaved } from "@/lib/mylist";
 import { WorkoutCard } from "@/components/WorkoutCard";
+import { Button } from "@/components/Button";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
-import { loadFoundation, type FoundationData } from "@/lib/program";
+import { loadProgram, type ProgramData } from "@/lib/program";
 
-// Programme detail — the Foundation programme in full: phases, facts and every
-// week. This is where the programme-specific content lives (README §3.4), reached
-// from the Kezdőlap "A Foundation heted · Program ›" link.
-export default function FoundationDetailPage() {
+// Programme detail — ANY published programme in full: phases, facts and every
+// workout, with the user's position. Foundation keeps its stored guided cursor;
+// other programmes derive position from completions (lib/program.ts).
+export default function ProgramDetailPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const [data, setData] = useState<FoundationData | null>(null);
+  const params = useParams<{ slug: string }>();
+  const slug = params.slug;
+  const [data, setData] = useState<ProgramData | null>(null);
   const [loading, setLoading] = useState(true);
   const [myList, setMyList] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState<ProgressState | null>(null);
 
   const reload = useCallback(async () => {
-    if (!user) return;
+    if (!user || !slug) return;
     try {
-      setData(await loadFoundation(user.uid));
+      setData(await loadProgram(slug, user.uid));
     } catch {
       setData(null);
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, slug]);
 
   useEffect(() => {
     reload();
@@ -55,7 +58,7 @@ export default function FoundationDetailPage() {
   }
 
   if (loading) return <p style={{ fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 40 }}>Töltés…</p>;
-  if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>A Foundation program még nem érhető el.</p>;
+  if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>Ez a program még nem érhető el.</p>;
 
   const { program, phases, playlist, joined, doneCount, currentIndex, todayCode } = data;
   const play = (code: string | null) => code && router.push(`/player/${code}?autostart=1`);
@@ -66,16 +69,30 @@ export default function FoundationDetailPage() {
   const resumeFrac = (mux: number | null, mins: number, code: string) =>
     resumeMap[code] != null ? Math.min(1, resumeMap[code] / ((mux || mins * 60) || 1)) : undefined;
   const programTotal = program.totalSessions || playlist.length;
+  const todayItem = playlist.find((w) => w.code === todayCode) ?? null;
+  const finished = programTotal > 0 && doneCount >= programTotal;
 
   return (
     <div className="home fade-in">
-      <Link href="/app" className="hrow-head" style={{ marginBottom: 4, textDecoration: "none", color: "var(--ink-2)", fontSize: 13, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}>
-        <LxIcon d={lxPaths.arrowR} size={14} style={{ transform: "rotate(180deg)" }} /> Kezdőlap
+      <Link href="/app/programs" className="hrow-head" style={{ marginBottom: 4, textDecoration: "none", color: "var(--ink-2)", fontSize: 13, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}>
+        <LxIcon d={lxPaths.arrowR} size={14} style={{ transform: "rotate(180deg)" }} /> Programok
       </Link>
 
       <section>
-        <div className="pg-h" style={{ fontSize: 28 }}>{program.title} <span style={{ color: "var(--ink-3)", fontWeight: 600 }}>· {program.hu}</span></div>
+        <div className="pg-h" style={{ fontSize: 28 }}>{program.hu || program.title}{program.hu && program.title && program.hu !== program.title && <span style={{ color: "var(--ink-3)", fontWeight: 600 }}> · {program.title}</span>}</div>
         <p style={{ color: "var(--ink-2)", marginTop: 10, fontSize: 15, maxWidth: "60ch", lineHeight: 1.55 }}>{program.synopsis}</p>
+        {todayItem && !finished && (
+          <div style={{ marginTop: 16 }}>
+            <Button size="l" variant="primary" iconLeft={lxPaths.play} onClick={() => play(todayItem.code)}>
+              {joined ? `Folytasd: ${todayItem.order + 1}. edzés` : "Kezdd el"}
+            </Button>
+          </div>
+        )}
+        {(joined || doneCount > 0) && programTotal > 0 && (
+          <p className="mono" style={{ fontSize: 12.5, color: "var(--ink-3)", marginTop: 12 }}>
+            {finished ? `Mind a ${programTotal} edzés kész 🎉` : `${doneCount} / ${programTotal} edzés kész`}
+          </p>
+        )}
       </section>
 
       {program.facts.length > 0 && (
@@ -87,6 +104,10 @@ export default function FoundationDetailPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {playlist.length === 0 && (
+        <p style={{ color: "var(--ink-2)", marginTop: 24 }}>A program edzései hamarosan érkeznek.</p>
       )}
 
       <div className="home-rows">
@@ -101,7 +122,7 @@ export default function FoundationDetailPage() {
                 <WorkoutCard
                   key={v.code}
                   v={v}
-                  isToday={v.code === todayCode}
+                  isToday={v.code === todayCode && !finished}
                   isProgram
                   programStep={v.order + 1}
                   programTotal={programTotal}
@@ -118,9 +139,9 @@ export default function FoundationDetailPage() {
         ))}
       </div>
 
-      {!joined && (
+      {!joined && programTotal > 0 && (
         <p className="mono" style={{ fontSize: 12.5, color: "var(--ink-3)" }}>
-          {doneCount} / {program.totalSessions} kész · aktuális: {currentIndex + 1}.
+          {doneCount} / {programTotal} kész · aktuális: {currentIndex + 1}.
         </p>
       )}
     </div>

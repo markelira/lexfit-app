@@ -29,7 +29,7 @@ export interface CardVideo {
 // modal and the program-overview spotlight; the caller supplies the surrounding shell.
 export function WorkoutDetail({
   video, pool = [], saved, onToggleSave, onPlay, onClose,
-  program = "foundation", trainer = TRAINER, showClose = true, showSimilar = true,
+  program = "foundation", programName = null, trainer = TRAINER, showClose = true, showSimilar = true,
 }: {
   video: CardVideo;
   pool?: CardVideo[];
@@ -38,6 +38,7 @@ export function WorkoutDetail({
   onPlay: (code: string) => void;
   onClose: () => void;
   program?: string;
+  programName?: string | null;
   trainer?: string | null;
   showClose?: boolean;
   showSimilar?: boolean;
@@ -79,7 +80,7 @@ export function WorkoutDetail({
         )}
         <span className="nmod-vig" />
         {showClose && <button className="nmod-close" onClick={onClose} aria-label="Bezárás">✕</button>}
-        <ProgramLockup program={program} variant="top-left" />
+        <ProgramLockup program={program} name={programName} variant="top-left" />
         <span className="nmod-prevbadge">
           {ended ? "ELŐNÉZET VÉGE" : `ELŐNÉZET · 0:${String(60 - sec).padStart(2, "0")}`}
         </span>
@@ -159,7 +160,7 @@ export function WorkoutDetail({
                   <div className="ncard-art" style={{ background: cardGrad(x.theme) }}>
                     {trainer && <div className="ncard-photo" style={{ backgroundImage: `url(${trainer})` }} aria-hidden="true" />}
                     <span className="ncard-ring" />
-                    <ProgramLockup program={program} variant="corner-tab" />
+                    <ProgramLockup program={program} name={programName} variant="corner-tab" />
                     <div className="ncard-lockup"><div className="ey">LEXFIT · {x.code}</div><div className="wd">{catWord(x.theme)}</div><div className="un" /></div>
                     <span className="ncard-vig" />
                     <span className="ncard-chip">{x.mins} PERC</span>

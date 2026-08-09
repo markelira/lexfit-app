@@ -124,6 +124,21 @@
   font-size: 12px;
 }
 .lx .wc-txt { flex: 1; min-width: 0; }
+/* program-membership eyebrow — colorless lockup (mark + wordmark), mixed rows only */
+.lx .wc-program {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 2px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.lx .wc-program svg { flex: none; opacity: 0.75; }
+.lx .wc-program span { overflow: hidden; text-overflow: ellipsis; }
 .lx .wc-name {
   font-size: 13px;
   font-weight: 700;

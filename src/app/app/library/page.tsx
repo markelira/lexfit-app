@@ -18,6 +18,7 @@ import { getProgress } from "@/lib/progress";
 import {
   type ActiveFilters, type LibVideo, type LibraryData, emptyFilters, filterVideos, loadLibrary,
 } from "@/lib/library";
+import { loadProgramIndex, type ProgramIndex } from "@/lib/program-index";
 
 type SpotFilter = { group?: keyof ActiveFilters; opt?: string; kind?: "short" };
 const LIB_SPOTS: { ey: string; title: string; theme: string; word: string; blurb: string; play: string; filter: SpotFilter }[] = [
@@ -87,6 +88,7 @@ export default function LibraryPage() {
   const [draft, setDraft] = useState<ActiveFilters>(emptyFilters);
   const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
   const [openChip, setOpenChip] = useState<string | null>(null); // desktop chip dropdown
+  const [pindex, setPindex] = useState<ProgramIndex | null>(null);
 
   // Read the search + filter state from the URL (top-bar search / quick filters).
   // Reactive so a shell search while already on the library updates the page.
@@ -107,11 +109,19 @@ export default function LibraryPage() {
 
   useEffect(() => {
     loadLibrary().then(setData).catch(() => setFailed(true));
+    loadProgramIndex().then(setPindex).catch(() => {});
     if (user) {
       getMyList(user.uid).then(setMyList).catch(() => {});
       getProgress(user.uid).then((p) => p && setResumeMap(p.resume ?? {})).catch(() => {});
     }
   }, [user]);
+
+  // Program-membership eyebrow (colorless lockup) — playlists are the source.
+  const badgeFor = (code: string) => {
+    const slug = pindex?.programOfVideo[code];
+    const p = slug ? pindex?.bySlug[slug] : null;
+    return p ? { slug: p.slug, name: p.hu || p.title } : null;
+  };
 
   // Keep the URL meaningful — q + filter state (§20.2 C2). Linkable, analytics-legible.
   // Skip the mount write so it can't wipe params we were opened with (e.g. ?q= from the
@@ -238,6 +248,7 @@ export default function LibraryPage() {
       key={v.code}
       v={v}
       isProgram={v.phase != null}
+      programBadge={badgeFor(v.code)}
       resume={resumeOf(v)}
       saved={myList.has(v.code)}
       onToggleSave={toggleSave}

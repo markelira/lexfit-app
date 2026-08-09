@@ -9,6 +9,7 @@ import { lxPaths } from "@/lib/icons";
 import { useAuth } from "@/lib/auth-context";
 import { useIsMobile } from "@/lib/useIsMobile";
 import { loadLibrary, type LibVideo } from "@/lib/library";
+import { loadProgramIndex, type ProgramIndex } from "@/lib/program-index";
 import { getMyList, setSaved } from "@/lib/mylist";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { BottomSheet } from "@/components/BottomSheet";
@@ -65,6 +66,7 @@ export function AppTopBar({ streak }: { streak: number }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [videos, setVideos] = useState<LibVideo[]>([]);
+  const [pindex, setPindex] = useState<ProgramIndex | null>(null);
   const [recent, setRecent] = useState<string[]>([]);
   const [myList, setMyList] = useState<Set<string>>(new Set());
 
@@ -99,8 +101,16 @@ export function AppTopBar({ streak }: { streak: number }) {
   useEffect(() => {
     if (!searchOpen) return;
     if (!videos.length) loadLibrary().then((d) => setVideos(d.videos)).catch(() => {});
+    if (!pindex) loadProgramIndex().then(setPindex).catch(() => {});
     if (user) getMyList(user.uid).then(setMyList).catch(() => {});
-  }, [searchOpen, videos.length, user]);
+  }, [searchOpen, videos.length, pindex, user]);
+
+  // Program-membership eyebrow for search results (mixed context).
+  const badgeFor = (code: string) => {
+    const slug = pindex?.programOfVideo[code];
+    const p = slug ? pindex?.bySlug[slug] : null;
+    return p ? { slug: p.slug, name: p.hu || p.title } : null;
+  };
 
   async function toggleSave(code: string) {
     if (!user) return;
@@ -280,7 +290,7 @@ export function AppTopBar({ streak }: { streak: number }) {
         <>
           <div className="sp-grid">
             {results.map((v) => (
-              <WorkoutCard key={v.code} v={v} isProgram={v.phase != null} saved={myList.has(v.code)} onToggleSave={toggleSave} onPlay={commitAndPlay} />
+              <WorkoutCard key={v.code} v={v} isProgram={v.phase != null} programBadge={badgeFor(v.code)} saved={myList.has(v.code)} onToggleSave={toggleSave} onPlay={commitAndPlay} />
             ))}
           </div>
           <button type="button" className="sp-all" onClick={commitAndGoLibrary}>
@@ -311,6 +321,7 @@ export function AppTopBar({ streak }: { streak: number }) {
                     key={v.code}
                     v={v}
                     isProgram={v.phase != null}
+                    programBadge={badgeFor(v.code)}
                     saved={myList.has(v.code)}
                     onToggleSave={toggleSave}
                     onPlay={commitAndPlay}
