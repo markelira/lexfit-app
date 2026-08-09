@@ -86,11 +86,13 @@ export function assignProgramHues(slugsInOrder: string[]): Record<string, number
 }
 
 /**
- * Program-brand cover gradient for workout cards — same shape and
- * lightness/chroma family as the category cardGrad, so program-colored and
- * category-colored covers sit together naturally.
+ * Program-brand cover art for workout cards — the SAME art as the program's
+ * /app/programs banner, miniaturized: the 120° dark→light band gradient
+ * (identical stops to .pgs-hero) under a bottom vignette, so a card reads as
+ * a cut-out of its program's banner.
  */
 export function programGrad(hue: number): string {
-  const c = `oklch(0.53 0.075 ${hue})`;
-  return `linear-gradient(135deg, oklch(from ${c} calc(l + 0.07) c h) 0%, ${c} 100%)`;
+  const band = `linear-gradient(120deg, oklch(0.28 0.05 ${hue}) 0%, oklch(0.5 0.05 ${hue}) 58%, oklch(0.66 0.05 ${hue}) 100%)`;
+  const vignette = `linear-gradient(to top, oklch(0.2 0.03 ${hue} / 0.5), transparent 55%)`;
+  return `${vignette}, ${band}`;
 }
