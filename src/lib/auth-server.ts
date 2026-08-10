@@ -14,8 +14,8 @@ export async function verifyRequest(req: Request): Promise<DecodedIdToken | null
   }
 }
 
-// Admin allowlist — the owner account.
-const ADMIN_EMAILS = new Set(["gorgeimarko@gmail.com"]);
+// Admin allowlist — the owner + AM Studios (Kecskeméti Ádám).
+const ADMIN_EMAILS = new Set(["gorgeimarko@gmail.com", "kecskemetiad@gmail.com"]);
 
 /**
  * Admin = allowlisted email that signed in with GOOGLE. Pinning the provider
