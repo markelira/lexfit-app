@@ -100,8 +100,6 @@ function PlayerScreen({ code }: { code: string }) {
   // Playlist accordion: which block is expanded. null = follow the current block.
   const [expanded, setExpanded] = useState<number | null>(null);
   // L3 up-next: tomorrow's Foundation session + its autoplay countdown.
-  const [nextSess, setNextSess] = useState<{ code: string; title: string; theme: string } | null>(null);
-  const [upCount, setUpCount] = useState(7);
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -452,44 +450,11 @@ function PlayerScreen({ code }: { code: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage, dur, bounds, keysOpen, paused, muted, speed]);
 
-  // Resolve tomorrow's Foundation session (order + 1) for the up-next card.
-  useEffect(() => {
-    if (!sessionOrder) return;
-    let live = true;
-    (async () => {
-      const q = query(collection(db, "programs", "foundation", "sessions"), where("order", "==", sessionOrder + 1));
-      const snap = await getDocs(q);
-      if (!live || snap.empty) return;
-      const nextCode = snap.docs[0].data().videoCode as string | undefined;
-      if (!nextCode) return;
-      const vs = await getDoc(doc(db, "videos", nextCode));
-      if (live && vs.exists()) {
-        const d = vs.data() as Omit<Video, "code">;
-        setNextSess({ code: nextCode, title: d.title, theme: d.theme });
-      }
-    })();
-    return () => { live = false; };
-  }, [sessionOrder]);
-
   // Reflect saved state for the mobile "Mentés" pill.
   useEffect(() => {
     if (!user) return;
     getMyList(user.uid).then((s) => setSaved(s.has(code))).catch(() => {});
   }, [user, code]);
-
-  // Up-next autoplay countdown on the completion screen (offer, never a surprise).
-  useEffect(() => {
-    if (stage !== "finished" || !nextSess) return;
-    setUpCount(7);
-    const id = setInterval(() => {
-      setUpCount((n) => {
-        if (n <= 1) { clearInterval(id); router.push(`/player/${nextSess.code}?autostart=1`); return 0; }
-        return n - 1;
-      });
-    }, 1000);
-    return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage, nextSess]);
 
   // Controls stay on at all times; they only idle-fade in fullscreen (theater immersion).
   useEffect(() => {
@@ -685,12 +650,6 @@ function PlayerScreen({ code }: { code: string }) {
                 streak={result?.streak ?? 1}
                 onShare={() => setShareOpen(true)}
                 onSkip={exit}
-                next={nextSess ? {
-                  title: nextSess.title,
-                  grad: grad(nextSess.theme),
-                  count: upCount,
-                  onGo: () => router.push(`/player/${nextSess.code}?autostart=1`),
-                } : null}
               />
             )}
 

@@ -12,14 +12,13 @@ import { FinishExamples } from "@/components/finish/FinishExamples";
  * materialize-in.
  */
 export function FinishComplete({
-  title, mins, streak, onShare, onSkip, next,
+  title, mins, streak, onShare, onSkip,
 }: {
   title: string;
   mins: number;
   streak: number;
   onShare: () => void;
   onSkip: () => void;
-  next?: { title: string; grad: string; count: number; onGo: () => void } | null;
 }) {
   return (
     <div className="fc">
@@ -36,13 +35,6 @@ export function FinishComplete({
         </button>
 
         <div className="fc-foot">
-          {next ? (
-            <button className="fc-next" onClick={next.onGo}>
-              <span className="th" style={{ background: next.grad }} aria-hidden="true" />
-              <span className="tx"><span className="k">KÖVETKEZIK</span><span className="n">{next.title}</span></span>
-              <span className="c"><b>{next.count}</b> mp</span>
-            </button>
-          ) : <span className="fc-next-empty" />}
           <button type="button" className="fc-skip" onClick={onSkip}>Most nem · kihagyom</button>
         </div>
       </div>
