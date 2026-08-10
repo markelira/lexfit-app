@@ -1,20 +1,24 @@
 import "server-only";
+import * as Sentry from "@sentry/nextjs";
 
-// Transactional email — brought forward from F5 because F2.2's day-5 renewal
-// reminder (a J6 trust element) and the F3 offer notifications can't ship
-// without it. Only the provider wiring lives here; the full templated suite
-// remains F5.
-//
-// Provider: SendGrid v3 Mail Send API via fetch (no SDK dependency). Set
-// SENDGRID_API_KEY and EMAIL_FROM (EMAIL_FROM must be a verified SendGrid
+// Transactional email — SendGrid v3 Mail Send API via fetch (no SDK dependency).
+// Set SENDGRID_API_KEY and EMAIL_FROM (EMAIL_FROM must be a verified SendGrid
 // sender, else sends 403). Without a key (local dev) sends are logged & skipped
 // so flows still work without a provider.
+//
+// `categories` tag the send in SendGrid stats (auth/billing/habit/recap/
+// marketing) so spam-complaint spikes are attributable per stream.
+// `listUnsubscribeUrl` adds the RFC 8058 one-click headers — REQUIRED on every
+// non-transactional send (Grtv. opt-out applies at any volume); never set it on
+// transactional mail.
 
 export interface EmailInput {
   to: string;
   subject: string;
   text: string;
   html?: string;
+  categories?: string[];
+  listUnsubscribeUrl?: string;
 }
 
 export async function sendEmail(msg: EmailInput): Promise<{ sent: boolean }> {
@@ -22,9 +26,13 @@ export async function sendEmail(msg: EmailInput): Promise<{ sent: boolean }> {
   const from = process.env.EMAIL_FROM;
   if (!key || !from) {
     // In production a missing key means user-facing emails silently vanish —
-    // shout so it's visible in logs/monitoring, don't whisper.
-    const log = process.env.NODE_ENV === "production" ? console.error : console.log;
-    log(`[email] SKIPPED — SENDGRID_API_KEY/EMAIL_FROM not configured → ${msg.to}: ${msg.subject}`);
+    // shout so it's visible in logs AND Sentry, don't whisper.
+    if (process.env.NODE_ENV === "production") {
+      console.error(`[email] SKIPPED — SENDGRID_API_KEY/EMAIL_FROM not configured → ${msg.to}: ${msg.subject}`);
+      Sentry.captureMessage("sendEmail skipped: SENDGRID_API_KEY/EMAIL_FROM not configured", "error");
+    } else {
+      console.log(`[email] SKIPPED — SENDGRID_API_KEY/EMAIL_FROM not configured → ${msg.to}: ${msg.subject}`);
+    }
     return { sent: false };
   }
   const fromName = process.env.EMAIL_FROM_NAME; // e.g. "Alexa"
@@ -39,6 +47,15 @@ export async function sendEmail(msg: EmailInput): Promise<{ sent: boolean }> {
         { type: "text/plain", value: msg.text },
         ...(msg.html ? [{ type: "text/html", value: msg.html }] : []),
       ],
+      ...(msg.categories?.length ? { categories: msg.categories } : {}),
+      ...(msg.listUnsubscribeUrl
+        ? {
+            headers: {
+              "List-Unsubscribe": `<${msg.listUnsubscribeUrl}>`,
+              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            },
+          }
+        : {}),
     }),
   });
   // SendGrid returns 202 Accepted on success.
