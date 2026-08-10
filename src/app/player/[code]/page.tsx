@@ -96,6 +96,7 @@ function PlayerScreen({ code }: { code: string }) {
   const [idle, setIdle] = useState(false);
   const [hud, setHud] = useState(true); // over-video info (name+countdown) in fullscreen — toggleable
   const [mCtl, setMCtl] = useState(false); // mobile tap-to-reveal overlay
+  const [ctlPing, setCtlPing] = useState(0); // bumps on overlay taps → re-arms the auto-hide timer
   const [saved, setSaved] = useState(false); // mobile "Mentés" pill
   const [seek, setSeek] = useState<{ left: number; e: string; t: string } | null>(null);
   // Playlist accordion: which block is expanded. null = follow the current block.
@@ -405,55 +406,117 @@ function PlayerScreen({ code }: { code: string }) {
     }
     return () => { disposed = true; cleanup(); setCastAvail(false); };
   }, [stage]);
-  // Element fullscreen everywhere it exists (incl. the WebKit-prefixed iPad
-  // variant); iPhone Safari has NO element-fullscreen API, so fall back to a
-  // CSS pseudo-fullscreen (.fake-fs pins the stage over the whole viewport).
+  // Fullscreen ladder, YouTube-style. Element fullscreen keeps our HUD
+  // (desktop, Android, iPadOS 16.4+, iPhone iOS 17.2+). Older iPhones have NO
+  // element-fullscreen API — there we do exactly what m.youtube.com does:
+  // native video fullscreen (webkitEnterFullscreen → AVPlayer chrome, HUD
+  // lost, but genuinely fullscreen). The CSS pseudo-fullscreen is the last
+  // resort only — it can never hide Safari's URL bar.
+  const isPhone = () => typeof window !== "undefined" && Math.min(window.screen.width, window.screen.height) <= 500;
   const enterFs = () => {
     const el = frameRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
     if (!el) return;
-    if (el.requestFullscreen) el.requestFullscreen().catch(() => setFakeFs(true));
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    else setFakeFs(true);
+    const nativeVideoFs = () => {
+      const v = getVideo();
+      try {
+        if (v && typeof v.webkitEnterFullscreen === "function") v.webkitEnterFullscreen();
+        else setFakeFs(true);
+      } catch { setFakeFs(true); }
+    };
+    if (el.requestFullscreen) {
+      el.requestFullscreen()
+        .then(() => {
+          // YouTube: fullscreen video is always landscape on a phone.
+          if (isPhone()) (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock?.("landscape").catch(() => {});
+        })
+        .catch(nativeVideoFs);
+    } else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else nativeVideoFs();
   };
   const exitFs = () => {
     const d = document as Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void };
+    try { (screen.orientation as ScreenOrientation & { unlock?: () => void }).unlock?.(); } catch { /* not locked */ }
     if (d.fullscreenElement) d.exitFullscreen();
     else if (d.webkitFullscreenElement) d.webkitExitFullscreen?.();
+    else {
+      const v = getVideo();
+      if (v?.webkitDisplayingFullscreen && typeof v.webkitExitFullscreen === "function") v.webkitExitFullscreen();
+    }
     setFakeFs(false);
   };
   const fsActive = fs || fakeFs;
   const toggleFs = () => (fsActive ? exitFs() : enterFs());
   const exit = () => router.push("/app");
 
-  // Keep the fullscreen icon (maximize ⇄ minimize) in sync with the browser state.
+  // Keep the fullscreen icon (maximize ⇄ minimize) in sync with the browser
+  // state — including the iPhone NATIVE video fullscreen, which reports via
+  // webkitbegin/endfullscreen on the <video>, not on document.
   useEffect(() => {
     const d = document as Document & { webkitFullscreenElement?: Element | null };
     const onFs = () => setFs(!!(d.fullscreenElement ?? d.webkitFullscreenElement));
     document.addEventListener("fullscreenchange", onFs);
     document.addEventListener("webkitfullscreenchange", onFs);
+    const onBegin = () => setFs(true);
+    const onEnd = () => setFs(false);
+    let v: HTMLVideoElement | null = null;
+    let iv: ReturnType<typeof setInterval> | undefined;
+    if (stage === "playing") {
+      iv = setInterval(() => {
+        v = getVideo();
+        if (v) {
+          clearInterval(iv);
+          v.addEventListener("webkitbeginfullscreen", onBegin);
+          v.addEventListener("webkitendfullscreen", onEnd);
+        }
+      }, 400);
+    }
     return () => {
+      if (iv) clearInterval(iv);
       document.removeEventListener("fullscreenchange", onFs);
       document.removeEventListener("webkitfullscreenchange", onFs);
+      v?.removeEventListener("webkitbeginfullscreen", onBegin);
+      v?.removeEventListener("webkitendfullscreen", onEnd);
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
 
-  // Rotate-to-fullscreen (YouTube behavior): on a phone, turning the device
-  // landscape mid-playback enters fullscreen; back to portrait exits. A real
-  // fullscreen request without a user gesture is often refused — the .catch
-  // inside enterFs drops to the CSS pseudo-fullscreen, which needs none.
+  // Rotate-to-fullscreen (YouTube behavior): on a phone, landscape while
+  // playing = fullscreen, portrait = exit. Checked BOTH when playback starts
+  // (the phone may already be rotated) and on every orientation change. A
+  // gestureless element-fullscreen request is refused by the browser — the
+  // ladder inside enterFs then drops to native video fullscreen (iPhone) or
+  // the CSS fallback, neither of which needs a gesture.
   useEffect(() => {
     if (stage !== "playing") { setFakeFs(false); return; }
     const mq = window.matchMedia("(orientation: landscape)");
-    const isPhone = () => Math.min(window.screen.width, window.screen.height) <= 500;
     const onTurn = () => {
       if (!isPhone()) return;
       if (mq.matches) enterFs();
       else exitFs();
     };
+    // Give autoplay a moment — native video fullscreen needs a playing <video>.
+    const t = setTimeout(() => { if (isPhone() && mq.matches) enterFs(); }, 600);
     mq.addEventListener("change", onTurn);
-    return () => mq.removeEventListener("change", onTurn);
+    return () => { clearTimeout(t); mq.removeEventListener("change", onTurn); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
+
+  // YouTube-style auto-hide: visible mobile controls fade out after 3s of
+  // inactivity while playing; they stay while paused. Any overlay tap bumps
+  // ctlPing and re-arms the timer.
+  useEffect(() => {
+    if (!mCtl || stage !== "playing" || paused) return;
+    const t = setTimeout(() => setMCtl(false), 3000);
+    return () => clearTimeout(t);
+  }, [mCtl, stage, paused, ctlPing]);
+
+  // Pseudo-fullscreen pins the stage over the page — freeze the page behind it.
+  useEffect(() => {
+    if (!fakeFs) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [fakeFs]);
 
   // When playback crosses into a new block, snap the playlist back to auto-follow it.
   useEffect(() => { setExpanded(null); }, [active]);
@@ -643,7 +706,16 @@ function PlayerScreen({ code }: { code: string }) {
 
             {/* mobile: tap-to-reveal controls */}
             {stage === "playing" && mCtl && (
-              <div className="pf-ytov" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="pf-ytov"
+                onClick={(e) => {
+                  // YouTube tap model: a tap on empty overlay area hides the
+                  // controls; taps on buttons act AND re-arm the hide timer.
+                  e.stopPropagation();
+                  if ((e.target as HTMLElement).closest("button")) setCtlPing((p) => p + 1);
+                  else setMCtl(false);
+                }}
+              >
                 <div className="pf-ytov-top">
                   <button onClick={exit} aria-label="Kilépés"><LxIcon d={lxPaths.chevronDown} size={18} /></button>
                   <div className="rt">
