@@ -17,10 +17,6 @@ export function FinishShareEntry({ data, open, onClose }: { data: FinishData; op
   // so mobile never briefly mounts DesktopHandoff (which would POST a session).
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
-  // TEMP diagnostics — remove after the finish-share block is root-caused.
-  useEffect(() => {
-    if (open) console.log("[finish-share] entry:", { open, ready, isMobile, branch: !ready ? "none (not ready)" : isMobile ? "FinishShare (camera)" : "DesktopHandoff (QR)" });
-  }, [open, ready, isMobile]);
   if (!open || !ready) return null;
   return isMobile ? <FinishShare data={data} onClose={onClose} /> : <DesktopHandoff data={data} onClose={onClose} />;
 }

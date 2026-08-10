@@ -65,13 +65,11 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
         }
         if (cancelled) { stream.getTracks().forEach((t) => t.stop()); return; }
         streamRef.current = stream;
-        console.log("[finish-share] camera stream acquired:", stream.getVideoTracks()[0]?.getSettings());
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => {});
         }
-      } catch (e) {
-        console.warn("[finish-share] getUserMedia failed:", e instanceof Error ? `${e.name}: ${e.message}` : e);
+      } catch {
         if (!cancelled) setCamErr("A kamera nem elérhető. Engedélyezd a hozzáférést, vagy tölts fel egy képet.");
       }
     })();
@@ -81,25 +79,6 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
       if (streamRef.current === stream) streamRef.current = null;
     };
   }, [stage, facing]);
-
-  // TEMP diagnostics: same occlusion probe as DesktopHandoff — on a phone the
-  // camera view (.fsh, z-120) can be mounted yet covered by the fullscreen
-  // finish screen (.fc, z-200).
-  useEffect(() => {
-    const id = setTimeout(() => {
-      const top = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
-      const fsh = document.querySelector<HTMLElement>(".fsh");
-      const fc = document.querySelector<HTMLElement>(".fc");
-      console.log("[finish-share] FinishShare occlusion probe:", {
-        topElementAtCenter: top ? `${top.tagName.toLowerCase()}.${String(top.className).split(" ")[0]}` : "none",
-        cameraViewIsTopmost: !!(top && top.closest(".fsh")),
-        coveredByFinishScreen: !!(top && top.closest(".fc")),
-        fshZIndex: fsh ? getComputedStyle(fsh).zIndex : "not in DOM",
-        fcZIndex: fc ? getComputedStyle(fc).zIndex : "not in DOM",
-      });
-    }, 400);
-    return () => clearTimeout(id);
-  }, []);
 
   function capture() {
     const v = videoRef.current;
