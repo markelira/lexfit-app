@@ -33,12 +33,12 @@ export const radius = { sm: 8, md: 14, lg: 20 };
 export const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
 
-// TODO(go-live): real company data before the first branded send (Ektv. §4 imprint).
+// Ektv. §4 imprint — source of truth: docs/legal/aszf.md §1 (keep in sync).
 export const IMPRINT = {
-  company: "LEXFIT — [üzemeltető cégnév]",
-  seat: "[székhely]",
-  regNo: "Cégjegyzékszám: [—]",
-  taxNo: "Adószám: [—]",
+  company: "AM Studios Group Kft.",
+  seat: "3532 Miskolc, Miklós utca 17. 2. em. 26. ajtó",
+  regNo: "Cégjegyzékszám: 05 09 039717",
+  taxNo: "Adószám: 33004312-1-05",
   email: "hi@lexfit.hu",
 };
 
