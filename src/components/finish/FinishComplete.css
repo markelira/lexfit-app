@@ -76,6 +76,16 @@
 .fc-foot { animation-delay: .3s; }
 .fc-badge { animation: fc-badge-in .55s cubic-bezier(.2,.8,.25,1) both; }
 
+/* Landscape phone (finished before rotating back): compact celebration —
+   drop the example marquee, keep title + stats + CTA + skip fully in view. */
+@media (max-height: 480px) {
+  .fc-inner { gap: 7px; padding: 14px 0 12px; }
+  .fc-badge { width: 40px; height: 40px; }
+  .fc-badge svg { width: 18px; height: 18px; }
+  .fc-title { font-size: 26px; }
+  .fc-eyebrow, .fex-marquee { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fc-inner > *, .fc-badge { animation: fc-fade .3s ease both; }
   .fex-track { animation: none; }

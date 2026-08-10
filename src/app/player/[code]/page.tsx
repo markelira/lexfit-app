@@ -510,6 +510,15 @@ function PlayerScreen({ code }: { code: string }) {
     return () => clearTimeout(t);
   }, [mCtl, stage, paused, ctlPing]);
 
+  // The workout ended → leave fullscreen (any rung: element, native AVPlayer,
+  // pseudo) so the finish screen actually shows. Inside native fullscreen the
+  // DOM can't render at all, and in landscape element-fullscreen the finish
+  // screen is cramped — exiting also unlocks orientation back to the sensor.
+  useEffect(() => {
+    if (stage === "finished") exitFs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
+
   // Pseudo-fullscreen pins the stage over the page — freeze the page behind it.
   useEffect(() => {
     if (!fakeFs) return;
