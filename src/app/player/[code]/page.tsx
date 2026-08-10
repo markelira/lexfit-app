@@ -76,6 +76,7 @@ function PlayerScreen({ code }: { code: string }) {
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [fs, setFs] = useState(false);
+  const [fakeFs, setFakeFs] = useState(false); // iPhone CSS pseudo-fullscreen
   const [result, setResult] = useState<{ streak: number } | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const lastSavedRef = useRef(0);
@@ -404,19 +405,55 @@ function PlayerScreen({ code }: { code: string }) {
     }
     return () => { disposed = true; cleanup(); setCastAvail(false); };
   }, [stage]);
-  const toggleFs = () => {
-    const el = frameRef.current;
-    if (!document.fullscreenElement && el?.requestFullscreen) el.requestFullscreen().catch(() => {});
-    else if (document.fullscreenElement) document.exitFullscreen();
+  // Element fullscreen everywhere it exists (incl. the WebKit-prefixed iPad
+  // variant); iPhone Safari has NO element-fullscreen API, so fall back to a
+  // CSS pseudo-fullscreen (.fake-fs pins the stage over the whole viewport).
+  const enterFs = () => {
+    const el = frameRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
+    if (!el) return;
+    if (el.requestFullscreen) el.requestFullscreen().catch(() => setFakeFs(true));
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else setFakeFs(true);
   };
+  const exitFs = () => {
+    const d = document as Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void };
+    if (d.fullscreenElement) d.exitFullscreen();
+    else if (d.webkitFullscreenElement) d.webkitExitFullscreen?.();
+    setFakeFs(false);
+  };
+  const fsActive = fs || fakeFs;
+  const toggleFs = () => (fsActive ? exitFs() : enterFs());
   const exit = () => router.push("/app");
 
   // Keep the fullscreen icon (maximize ⇄ minimize) in sync with the browser state.
   useEffect(() => {
-    const onFs = () => setFs(!!document.fullscreenElement);
+    const d = document as Document & { webkitFullscreenElement?: Element | null };
+    const onFs = () => setFs(!!(d.fullscreenElement ?? d.webkitFullscreenElement));
     document.addEventListener("fullscreenchange", onFs);
-    return () => document.removeEventListener("fullscreenchange", onFs);
+    document.addEventListener("webkitfullscreenchange", onFs);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFs);
+      document.removeEventListener("webkitfullscreenchange", onFs);
+    };
   }, []);
+
+  // Rotate-to-fullscreen (YouTube behavior): on a phone, turning the device
+  // landscape mid-playback enters fullscreen; back to portrait exits. A real
+  // fullscreen request without a user gesture is often refused — the .catch
+  // inside enterFs drops to the CSS pseudo-fullscreen, which needs none.
+  useEffect(() => {
+    if (stage !== "playing") { setFakeFs(false); return; }
+    const mq = window.matchMedia("(orientation: landscape)");
+    const isPhone = () => Math.min(window.screen.width, window.screen.height) <= 500;
+    const onTurn = () => {
+      if (!isPhone()) return;
+      if (mq.matches) enterFs();
+      else exitFs();
+    };
+    mq.addEventListener("change", onTurn);
+    return () => mq.removeEventListener("change", onTurn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
 
   // When playback crosses into a new block, snap the playlist back to auto-follow it.
   useEffect(() => { setExpanded(null); }, [active]);
@@ -567,7 +604,7 @@ function PlayerScreen({ code }: { code: string }) {
 
       <div className="pf-body">
         <div className={`pf-main${idle && !paused && !isFinished ? " idle" : ""}`}>
-          <div className={`pf-stage${hud ? "" : " hud-off"}`} ref={frameRef} onClick={() => { if (typeof window !== "undefined" && window.innerWidth <= 900) setMCtl((v) => !v); }}>
+          <div className={`pf-stage${hud ? "" : " hud-off"}${fakeFs ? " fake-fs" : ""}`} ref={frameRef} onClick={() => { if (typeof window !== "undefined" && window.innerWidth <= 900) setMCtl((v) => !v); }}>
             {pb && (
               <MuxPlayer ref={playerRef} className="pf-video" playbackId={pb.playbackId} tokens={pb.tokens}
                 startTime={resumeAt} streamType="on-demand" accentColor="#7a9b8d" autoPlay preload="auto"
@@ -626,7 +663,7 @@ function PlayerScreen({ code }: { code: string }) {
                     {blocks.map((b, i) => { const fill = Math.max(0, Math.min(1, (frac - bounds[i].start) / (bounds[i].end - bounds[i].start))); return <span key={b.name} style={{ flex: weight(i) }}><i style={{ width: `${fill * 100}%` }} /></span>; })}
                   </div>
                   <span>{fmt(totalSec)}</span>
-                  <button onClick={toggleFs} aria-label="Teljes képernyő"><LxIcon d={lxPaths.maximize} size={15} /></button>
+                  <button onClick={toggleFs} aria-label="Teljes képernyő"><LxIcon d={fsActive ? lxPaths.minimize : lxPaths.maximize} size={15} /></button>
                 </div>
               </div>
             )}
@@ -699,7 +736,7 @@ function PlayerScreen({ code }: { code: string }) {
                   </div>
                 </div>
                 <button className={`pf-ico${gearOpen ? " on" : ""}`} style={{ width: 34, height: 34 }} onClick={() => setGearOpen((v) => !v)} aria-label="Beállítások"><LxIcon d={lxPaths.settings} size={16} /></button>
-                <button className="pf-ico" style={{ width: 34, height: 34 }} onClick={toggleFs} aria-label="Teljes képernyő"><LxIcon d={fs ? lxPaths.minimize : lxPaths.maximize} size={16} /></button>
+                <button className="pf-ico" style={{ width: 34, height: 34 }} onClick={toggleFs} aria-label="Teljes képernyő"><LxIcon d={fsActive ? lxPaths.minimize : lxPaths.maximize} size={16} /></button>
               </div>
             </div>
             {gearOpen && (
