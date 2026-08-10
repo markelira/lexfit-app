@@ -129,8 +129,9 @@ export async function loadChallenges(uid: string | null): Promise<ChallengesData
     // Only published challenges reach the archive — drafts/soon/archived stay
     // admin-only (challenges have an explicit publish workflow, unlike the library).
     .filter((c) => c.status === "published")
-    // newest first (the archive is read backwards from now)
-    .sort((a, b) => (b.sortDate || "").localeCompare(a.sortDate || "") || a.order - b.order);
+    // newest first (the archive is read backwards from now); order is a legacy
+    // same-date tiebreak only — new challenges sort purely by sortDate
+    .sort((a, b) => (b.sortDate || "").localeCompare(a.sortDate || "") || (a.order ?? 0) - (b.order ?? 0));
 
   const filters: Record<string, FilterDimension> = {};
   filtersSnap.forEach((d) => {

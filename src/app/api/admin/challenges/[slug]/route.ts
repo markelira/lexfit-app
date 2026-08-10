@@ -40,21 +40,26 @@ export async function PUT(req: Request, { params }: { params: Promise<{ slug: st
     synopsis: str(b.synopsis),
     bodyPart: str(b.bodyPart),
     equipment: str(b.equipment) || null,
-    perDayMinsLabel: str(b.perDayMinsLabel) || null,
-    participantCount: numOrNull(b.participantCount),
-    fbPostUrl: str(b.fbPostUrl) || null,
     featured: b.featured === true || b.featured === "true",
-    featuredLabel: str(b.featuredLabel) || null,
-    cover: str(b.cover) || null,
     access: ACCESS.has(String(b.access)) ? b.access : "members",
     status: STATUSES.has(String(b.status)) ? b.status : "draft",
-    order: numOrNull(b.order) ?? 0,
     updatedAt: FieldValue.serverTimestamp(),
   };
 
+  // Legacy metadata the form no longer edits (napi hossz, résztvevők, FB-poszt,
+  // kiemelés címke, borító, sorrend) — patch ONLY when explicitly sent, so
+  // saving a legacy challenge never erases its archive-era values. Ordering is
+  // sortDate-driven; `order` survives purely as a same-date tiebreak on old docs.
+  if (b.perDayMinsLabel !== undefined) patch.perDayMinsLabel = str(b.perDayMinsLabel) || null;
+  if (b.participantCount !== undefined) patch.participantCount = numOrNull(b.participantCount);
+  if (b.fbPostUrl !== undefined) patch.fbPostUrl = str(b.fbPostUrl) || null;
+  if (b.featuredLabel !== undefined) patch.featuredLabel = str(b.featuredLabel) || null;
+  if (b.cover !== undefined) patch.cover = str(b.cover) || null;
+  if (b.order !== undefined) patch.order = numOrNull(b.order) ?? 0;
+
   // Length is derived from the day list; seed to 0 until days are linked.
   if (!snap.exists) {
-    Object.assign(patch, { slug, durationDays: 0, totalDays: 0, createdAt: FieldValue.serverTimestamp() });
+    Object.assign(patch, { slug, durationDays: 0, totalDays: 0, order: 0, createdAt: FieldValue.serverTimestamp() });
   }
 
   await ref.set(patch, { merge: true });

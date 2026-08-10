@@ -15,16 +15,10 @@ interface Draft {
   sortDate: string;
   bodyPart: string;
   equipment: string;
-  perDayMinsLabel: string;
   synopsis: string;
-  participantCount: string;
-  fbPostUrl: string;
   featured: boolean;
-  featuredLabel: string;
-  cover: string;
   access: string;
   status: string;
-  order: string;
 }
 
 const CONTENT_STATUS = [
@@ -52,16 +46,10 @@ export function ChallengeForm({
     sortDate: initial?.sortDate ?? "",
     bodyPart: initial?.bodyPart ?? bodyParts[0] ?? "",
     equipment: initial?.equipment ?? "eszköz nélkül",
-    perDayMinsLabel: initial?.perDayMinsLabel ?? "",
     synopsis: initial?.synopsis ?? "",
-    participantCount: initial?.participantCount != null ? String(initial.participantCount) : "",
-    fbPostUrl: initial?.fbPostUrl ?? "",
     featured: initial?.featured ?? false,
-    featuredLabel: initial?.featuredLabel ?? "",
-    cover: initial?.cover ?? "",
     access: initial?.access ?? "members",
     status: initial?.status ?? "draft",
-    order: initial?.order != null ? String(initial.order) : "0",
   }));
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
@@ -105,16 +93,10 @@ export function ChallengeForm({
           sortDate: d.sortDate,
           bodyPart: d.bodyPart,
           equipment: d.equipment,
-          perDayMinsLabel: d.perDayMinsLabel,
           synopsis: d.synopsis,
-          participantCount: d.participantCount,
-          fbPostUrl: d.fbPostUrl,
           featured: d.featured,
-          featuredLabel: d.featuredLabel,
-          cover: d.cover,
           access: d.access,
           status: d.status,
-          order: d.order,
         }),
       });
       setSaved(true);
@@ -159,7 +141,10 @@ export function ChallengeForm({
           <div className="adm-frow">
             <label className="adm-flabel">Rendezési dátum</label>
             <input type="text" value={d.sortDate} onChange={(e) => set("sortDate", e.target.value)} placeholder="2024-11" />
-            <span className="adm-fhint">Rendezhető formátum (ÉÉÉÉ-HH) — az archívum ez szerint rendez, legújabb elöl.</span>
+            <span className="adm-fhint">
+              Az archívum e szerint rendez, legújabb elöl. Formátum: ÉÉÉÉ-HH — azonos
+              hónapon belül adj meg napot is (ÉÉÉÉ-HH-NN) a sorrendhez.
+            </span>
           </div>
         </div>
 
@@ -174,8 +159,8 @@ export function ChallengeForm({
             </select>
           </div>
           <div className="adm-frow">
-            <label className="adm-flabel">Napi hossz (címke)</label>
-            <input type="text" value={d.perDayMinsLabel} onChange={(e) => set("perDayMinsLabel", e.target.value)} placeholder="napi 10–14 perc" />
+            <label className="adm-flabel">Eszköz</label>
+            <input type="text" value={d.equipment} onChange={(e) => set("equipment", e.target.value)} placeholder="eszköz nélkül" />
           </div>
         </div>
 
@@ -184,39 +169,11 @@ export function ChallengeForm({
           <textarea rows={3} value={d.synopsis} onChange={(e) => set("synopsis", e.target.value)} placeholder="Hét nap, napi 10–14 perc. A csoport ezt szavazta meg…" />
         </div>
 
-        <div className="adm-2col">
-          <div className="adm-frow">
-            <label className="adm-flabel">Eszköz</label>
-            <input type="text" value={d.equipment} onChange={(e) => set("equipment", e.target.value)} placeholder="eszköz nélkül" />
-          </div>
-          <div className="adm-frow">
-            <label className="adm-flabel">Résztvevők száma</label>
-            <input type="number" min={0} value={d.participantCount} onChange={(e) => set("participantCount", e.target.value)} placeholder="312" />
-            <span className="adm-fhint">„…-en csinálták végig a csoporttal” — múltbeli tény, nem élő szám.</span>
-          </div>
-        </div>
-
         <div className="adm-frow">
-          <label className="adm-flabel">Facebook-poszt URL</label>
-          <input type="text" value={d.fbPostUrl} onChange={(e) => set("fbPostUrl", e.target.value)} placeholder="https://facebook.com/…" />
-        </div>
-
-        <div className="adm-2col">
-          <div className="adm-frow">
-            <label className="adm-flabel">Kiemelt</label>
-            <button type="button" className={`adm-check${d.featured ? " on" : ""}`} onClick={() => set("featured", !d.featured)} style={{ alignSelf: "flex-start" }}>
-              {d.featured ? "Kiemelt ✓" : "Nem kiemelt"}
-            </button>
-          </div>
-          <div className="adm-frow">
-            <label className="adm-flabel">Kiemelés címke</label>
-            <input type="text" value={d.featuredLabel} onChange={(e) => set("featuredLabel", e.target.value)} placeholder="A CSOPORT VÁLASZTÁSA" />
-          </div>
-        </div>
-
-        <div className="adm-frow">
-          <label className="adm-flabel">Borító (URL)</label>
-          <input type="text" value={d.cover} onChange={(e) => set("cover", e.target.value)} placeholder="https://… (opcionális)" />
+          <label className="adm-flabel">Kiemelt</label>
+          <button type="button" className={`adm-check${d.featured ? " on" : ""}`} onClick={() => set("featured", !d.featured)} style={{ alignSelf: "flex-start" }}>
+            {d.featured ? "Kiemelt ✓" : "Nem kiemelt"}
+          </button>
         </div>
 
         <div className="adm-2col">
@@ -235,12 +192,6 @@ export function ChallengeForm({
               ))}
             </select>
           </div>
-        </div>
-
-        <div className="adm-frow">
-          <label className="adm-flabel">Sorrend</label>
-          <input type="number" value={d.order} onChange={(e) => set("order", e.target.value)} />
-          <span className="adm-fhint">Azonos hónapon belüli rendezéshez (kisebb = előrébb).</span>
         </div>
 
         <div className="adm-savebar">
