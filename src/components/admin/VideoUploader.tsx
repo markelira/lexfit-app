@@ -89,7 +89,13 @@ export function VideoUploader({
     setStatus("error");
     setIsError(true);
     const detail = (e as { detail?: { message?: string } })?.detail?.message;
-    setMsg(detail ? `Feltöltési hiba: ${detail}` : "Feltöltési hiba.");
+    // UpChunk reports a dropped connection as "Server responded with 0".
+    const netDrop = detail?.includes("responded with 0");
+    setMsg(
+      netDrop
+        ? "Megszakadt az internetkapcsolat a feltöltés közben. Ellenőrizd a hálózatot, majd próbáld újra."
+        : detail ? `Feltöltési hiba: ${detail}` : "Feltöltési hiba.",
+    );
   }
 
   return (
@@ -114,6 +120,8 @@ export function VideoUploader({
             endpoint={getEndpoint}
             onSuccess={onUploadSuccess}
             onUploadError={onUploadError}
+            pausable
+            dynamicChunkSize
             style={{ ["--uploader-background-color" as string]: "transparent" }}
           />
           {msg && <div className={`adm-upload-status${isError ? " error" : ""}`}>{msg}</div>}
