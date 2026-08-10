@@ -518,6 +518,40 @@ function PlayerScreen({ code }: { code: string }) {
     return () => { document.body.style.overflow = prev; };
   }, [fakeFs]);
 
+  // ── HUD inside the NATIVE fullscreen player ───────────────────────────────
+  // AVPlayer (webkitEnterFullscreen) can't show our DOM overlay, but it DOES
+  // render WebVTT captions. Mirror the HUD (exercise · countdown) into a
+  // script-created text track, switched on only while the native player is up
+  // (fs true without a document.fullscreenElement = the native path).
+  const hudTrackRef = useRef<TextTrack | null>(null);
+  const nativeFsHud = fs && !fakeFs && typeof document !== "undefined" && !document.fullscreenElement && stage === "playing";
+  useEffect(() => {
+    if (!nativeFsHud || !hud) return;
+    const v = getVideo();
+    if (!v || typeof v.addTextTrack !== "function") return;
+    if (!hudTrackRef.current) {
+      try { hudTrackRef.current = v.addTextTrack("captions", "LEXFIT", "hu"); } catch { return; }
+    }
+    const track = hudTrackRef.current;
+    if (track) track.mode = "showing";
+    return () => { if (track) track.mode = "hidden"; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativeFsHud, hud]);
+  // Re-issue the cue on every HUD tick (countdown changes once a second);
+  // replacing the cue — rather than mutating its text — forces a repaint.
+  useEffect(() => {
+    const track = hudTrackRef.current;
+    const v = getVideo();
+    if (!track || track.mode !== "showing" || !v || typeof window === "undefined" || !("VTTCue" in window)) return;
+    try {
+      Array.from(track.cues ?? []).forEach((c) => track.removeCue(c));
+      const t = v.currentTime ?? 0;
+      const text = currentMove ? `${currentMove}  ·  ${countdown}` : countdown;
+      track.addCue(new VTTCue(Math.max(0, t - 0.05), t + 2, text));
+    } catch { /* cue churn during teardown — harmless */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdown, currentMove, nativeFsHud]);
+
   // When playback crosses into a new block, snap the playlist back to auto-follow it.
   useEffect(() => { setExpanded(null); }, [active]);
 
