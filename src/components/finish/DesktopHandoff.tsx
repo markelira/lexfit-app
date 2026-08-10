@@ -33,13 +33,16 @@ export function DesktopHandoff({ data, onClose }: { data: FinishData; onClose: (
     let unsub: (() => void) | undefined;
     (async () => {
       try {
+        console.log("[finish-share] DesktopHandoff mounted, POSTing session…");
         const idToken = await auth.currentUser?.getIdToken();
+        if (!idToken) console.warn("[finish-share] no idToken — POST goes out unauthenticated (expect 401)");
         const res = await fetch("/api/finish-share/session", {
           method: "POST",
           headers: { "Content-Type": "application/json", ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) },
           body: JSON.stringify({ data }), // captured once at mount (effect runs once)
         });
         if (!active) return;
+        console.log("[finish-share] session POST:", res.status, res.ok ? "ok" : res.status === 429 ? "RATE LIMITED (30/day/uid)" : res.status === 401 ? "UNAUTHORIZED" : "failed");
         if (!res.ok) { setErr("Nem sikerült elindítani. Próbáld újra."); return; }
         const { token } = (await res.json()) as { token: string };
         tokenRef.current = token;
@@ -64,6 +67,26 @@ export function DesktopHandoff({ data, onClose }: { data: FinishData; onClose: (
       ).catch(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // TEMP diagnostics: is the modal actually the topmost thing on screen?
+  // elementFromPoint at the viewport center tells us who really won the
+  // stacking fight — if it resolves inside .fc (the fullscreen finish screen)
+  // the modal is mounted but covered.
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const top = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+      const dho = document.querySelector<HTMLElement>(".dho");
+      const fc = document.querySelector<HTMLElement>(".fc");
+      console.log("[finish-share] occlusion probe:", {
+        topElementAtCenter: top ? `${top.tagName.toLowerCase()}.${String(top.className).split(" ")[0]}` : "none",
+        modalIsTopmost: !!(top && top.closest(".dho")),
+        coveredByFinishScreen: !!(top && top.closest(".fc")),
+        dhoZIndex: dho ? getComputedStyle(dho).zIndex : "not in DOM",
+        fcZIndex: fc ? getComputedStyle(fc).zIndex : "not in DOM",
+      });
+    }, 400);
+    return () => clearTimeout(id);
   }, []);
 
   return (

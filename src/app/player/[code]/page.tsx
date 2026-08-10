@@ -683,7 +683,7 @@ function PlayerScreen({ code }: { code: string }) {
                 title={video.title}
                 mins={video.mins}
                 streak={result?.streak ?? 1}
-                onShare={() => setShareOpen(true)}
+                onShare={() => { console.log("[finish-share] CTA clicked → shareOpen=true; finishData:", !!finishData); setShareOpen(true); }}
                 onSkip={exit}
                 next={nextSess ? {
                   title: nextSess.title,
