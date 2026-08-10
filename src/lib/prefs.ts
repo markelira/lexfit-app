@@ -30,8 +30,12 @@ export const DEFAULT_PREFS: Prefs = {
     restDayKeepsStreak: true,
   },
   reminders: {
-    workout: { enabled: true, time: "07:15", weekdays: [1, 2, 4, 5, 6] },
+    // Workout reminders are a real OPT-IN (GDPR/launch-plan fix): seeded OFF,
+    // switched on by the FirstEntry card ("Beállítanál egy emlékeztetőt?") or
+    // the Beállítások toggle. Existing docs with an explicit true are untouched.
+    workout: { enabled: false, time: "07:15", weekdays: [1, 2, 4, 5, 6] },
     streakRisk: true,
+    weeklyRecap: true,
     community: false,
     newContent: false,
   },
@@ -73,7 +77,9 @@ function deriveFromOnboarding(onb: Record<string, unknown> | null): Prefs {
   return {
     ...DEFAULT_PREFS,
     plan: { ...DEFAULT_PREFS.plan, daysPerWeek: days, weekdays },
-    reminders: { ...DEFAULT_PREFS.reminders, workout: { enabled: true, time, weekdays } },
+    // enabled stays FALSE at seed time — the FirstEntry card is the opt-in; the
+    // onboarding answers only pre-fill the time + days it will use once asked.
+    reminders: { ...DEFAULT_PREFS.reminders, workout: { enabled: false, time, weekdays } },
     playback: { ...DEFAULT_PREFS.playback, quietDefault },
   };
 }
@@ -118,6 +124,7 @@ export type PrefsPatch = {
   reminders?: {
     workout?: Partial<Prefs["reminders"]["workout"]>;
     streakRisk?: boolean;
+    weeklyRecap?: boolean;
     community?: boolean;
     newContent?: boolean;
   };

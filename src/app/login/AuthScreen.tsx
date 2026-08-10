@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import {
   browserLocalPersistence,
   browserSessionPersistence,
-  sendPasswordResetEmail,
   setPersistence,
   updateProfile,
 } from "firebase/auth";
@@ -87,8 +86,21 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
     if (loading || !user) return;
     let active = true;
     (async () => {
-      await ensureUserDoc(user, pendingRef.current ?? undefined);
+      const created = await ensureUserDoc(user, pendingRef.current ?? undefined);
       pendingRef.current = null;
+      if (created) {
+        // Fire-and-forget: welcome + (password accounts) branded verification
+        // email. Server-gated on account freshness + milestone docs.
+        user
+          .getIdToken()
+          .then((t) =>
+            fetch("/api/auth/post-register", {
+              method: "POST",
+              headers: { Authorization: `Bearer ${t}` },
+            }),
+          )
+          .catch(() => {});
+      }
       if (active) await routeAfterAuth();
     })();
     return () => {
@@ -179,14 +191,15 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
       return;
     }
     try {
-      await sendPasswordResetEmail(auth, email.trim());
-    } catch (err) {
-      const code = (err as { code?: string })?.code ?? "";
-      // Don't leak whether the address exists — only surface real input errors.
-      if (code === "auth/invalid-email" || code === "auth/too-many-requests") {
-        setFormErr(authErrorHu(err));
-        return;
-      }
+      // Branded reset email via the server (Admin SDK link + SendGrid). The
+      // endpoint answers generically — account existence is never leaked.
+      await fetch("/api/auth/reset-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+    } catch {
+      // Network failure — the generic notice below still applies.
     }
     setNotice("Ha létezik fiók ezzel a címmel, elküldtük a jelszó-visszaállító linket.");
   }

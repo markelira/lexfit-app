@@ -4,7 +4,6 @@ import {
   GoogleAuthProvider,
   OAuthProvider,
   createUserWithEmailAndPassword,
-  sendEmailVerification,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -62,10 +61,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function signUpWithEmail(email: string, password: string) {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    // Non-blocking verification email (P5.4 decision): typo'd addresses get
-    // caught, but access is never gated on it — a failure here is invisible.
-    sendEmailVerification(cred.user).catch(() => {});
+    // The verification email (P5.4: informational, never an access gate) is now
+    // our branded one, sent server-side by /api/auth/post-register — the
+    // register flows call it right after ensureUserDoc creates the user doc.
+    await createUserWithEmailAndPassword(auth, email, password);
   }
 
   async function signOutUser() {

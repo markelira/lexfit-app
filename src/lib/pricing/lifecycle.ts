@@ -5,8 +5,7 @@ import { subscriptionRef } from "./subscription";
 import { priceIdForRole } from "./checkout-server";
 import { DAY_MS, type PauseMonths } from "./config";
 import { logEvent } from "./events";
-import { sendEmail } from "@/lib/email";
-import { pauseResumingSoon } from "./templates";
+import { sendPauseResuming } from "@/lib/mailer";
 import type { SubscriptionDoc } from "./types";
 
 async function loadSub(uid: string): Promise<SubscriptionDoc | undefined> {
@@ -119,8 +118,7 @@ export async function resumeSubscription(uid: string, opts?: { email?: string | 
 
   const to = opts?.email ?? null;
   if (to) {
-    const { subject, text } = pauseResumingSoon();
-    await sendEmail({ to, subject, text }).catch((e) => console.error("[resume email]", e));
+    await sendPauseResuming(to).catch((e) => console.error("[resume email]", e));
   }
 }
 

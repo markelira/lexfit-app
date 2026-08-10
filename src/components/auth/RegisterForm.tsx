@@ -53,8 +53,21 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
     if (!user) return;
     let active = true;
     (async () => {
-      await ensureUserDoc(user, pendingRef.current ?? undefined);
+      const created = await ensureUserDoc(user, pendingRef.current ?? undefined);
       pendingRef.current = null;
+      if (created) {
+        // Fire-and-forget: welcome + (password accounts) branded verification
+        // email. Server-gated on account freshness + milestone docs.
+        user
+          .getIdToken()
+          .then((t) =>
+            fetch("/api/auth/post-register", {
+              method: "POST",
+              headers: { Authorization: `Bearer ${t}` },
+            }),
+          )
+          .catch(() => {});
+      }
       if (active) await attachAndContinue();
     })();
     return () => {

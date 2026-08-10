@@ -10,8 +10,7 @@ import {
 } from "./earning";
 import { EARNING, GRAND_SLAM_REDEEM_LOCK_MS } from "./config";
 import { logEvent } from "./events";
-import { sendEmail } from "@/lib/email";
-import { earnedUnlocked } from "./templates";
+import { sendEarnedUnlocked } from "@/lib/mailer";
 import type { OfferDoc, SubscriptionDoc } from "./types";
 
 const EARNED = "EARNED_ANNUAL" as const;
@@ -81,10 +80,7 @@ export async function maybeUnlockEarnedAnnual(
 
   await logEvent("earned_unlocked", { uid, props: { expiresAt: offer.expiresAt } });
   if (opts?.email) {
-    const { subject, text } = earnedUnlocked();
-    await sendEmail({ to: opts.email, subject, text }).catch((e) =>
-      console.error("[earned email]", e),
-    );
+    await sendEarnedUnlocked(opts.email).catch((e) => console.error("[earned email]", e));
   }
   return offer;
 }

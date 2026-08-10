@@ -2,7 +2,7 @@ import "server-only";
 import type Stripe from "stripe";
 import { adminDb } from "@/lib/firebase-admin";
 import { getStripe, uidForCustomer } from "@/lib/stripe";
-import { COLLECTIONS, webhookEventDocId } from "@/lib/pricing/keys";
+import { COLLECTIONS, milestoneDocId, webhookEventDocId } from "@/lib/pricing/keys";
 import { ROLE_BY_LOOKUP_KEY } from "@/lib/pricing/config";
 import {
   ensureWeeklySchedule,
@@ -12,8 +12,7 @@ import { markOfferRedeemed } from "@/lib/pricing/earning-server";
 import { logEvent } from "@/lib/pricing/events";
 import { issueInvoice, type InvoiceParty } from "@/lib/pricing/invoice";
 import { budapestDay } from "@/lib/pricing/keys";
-import { dunningDay0 } from "@/lib/pricing/templates";
-import { sendEmail } from "@/lib/email";
+import { planDisplay, sendDunningDay0, sendSubscriptionStarted } from "@/lib/mailer";
 import { getAuth } from "firebase-admin/auth";
 import { adminApp } from "@/lib/firebase-admin";
 import {
@@ -84,11 +83,40 @@ async function maybeDunning(event: Stripe.Event): Promise<void> {
   const payUrl = inv.hosted_invoice_url ?? "";
   const email = await emailForUid(uid);
   if (email && payUrl) {
-    const { subject, text } = dunningDay0(payUrl);
-    await sendEmail({ to: email, subject, text }).catch((e) => console.error("[dunning day0]", e));
+    await sendDunningDay0(email, payUrl).catch((e) => console.error("[dunning day0]", e));
   }
   await ref.set({ dunningDay0Sent: true }, { merge: true });
   await logEvent("dunning_started", { uid });
+}
+
+/**
+ * "Elindult az előfizetésed" — the subscription-started / payment-confirmed
+ * email, once per checkout session (milestone-keyed on the session id, so
+ * Stripe redeliveries and plan renewals never re-fire it). Best-effort: a send
+ * failure must not 500 the webhook. Billingo sends the legal invoice separately.
+ */
+async function maybeSubscriptionStarted(
+  event: Stripe.Event,
+  write: PendingWrite,
+): Promise<void> {
+  if (event.type !== "checkout.session.completed" || !write) return;
+  const session = event.data.object as Stripe.Checkout.Session;
+  const mRef = adminDb
+    .collection(COLLECTIONS.milestones)
+    .doc(milestoneDocId(write.uid, `sub_started_${session.id}`));
+  if ((await mRef.get()).exists) return;
+
+  const display = planDisplay(
+    write.data.priceLookupKey,
+    write.data.currentPeriodEnd ?? write.data.accessUntil,
+  );
+  const email = await emailForUid(write.uid);
+  if (display && email) {
+    await sendSubscriptionStarted(email, display).catch((e) =>
+      console.error("[sub started email]", e),
+    );
+  }
+  await mRef.set({ userId: write.uid, kind: "sub_started", sessionId: session.id, firedAt: Date.now() });
 }
 
 /**
@@ -300,6 +328,8 @@ export async function POST(req: Request) {
     await maybeIssueInvoice(event);
     // F5.1: day-0 dunning email (gated once per episode).
     await maybeDunning(event);
+    // "Elindult az előfizetésed" (gated once per checkout session).
+    await maybeSubscriptionStarted(event, write);
   } catch (e) {
     // Non-2xx tells Stripe to retry; the dedup record is only written on success.
     return new Response(`handler error: ${e instanceof Error ? e.message : ""}`, {

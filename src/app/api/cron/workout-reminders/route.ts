@@ -4,8 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { adminApp, adminDb } from "@/lib/firebase-admin";
 import { COLLECTIONS, milestoneDocId } from "@/lib/pricing/keys";
-import { sendEmail } from "@/lib/email";
-import { streakRiskEmail, workoutReminderEmail } from "@/lib/notify-templates";
+import { sendStreakRisk, sendWorkoutReminder } from "@/lib/mailer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -84,8 +83,8 @@ export async function GET(req: Request) {
     const email = await getAuth(adminApp).getUser(uid).then((u) => u.email).catch(() => null);
     if (!email) continue;
 
-    const tmpl = streakOnly ? streakRiskEmail(progress?.streak ?? 0) : workoutReminderEmail();
-    await sendEmail({ to: email, ...tmpl });
+    if (streakOnly) await sendStreakRisk(email, uid, progress?.streak ?? 0);
+    else await sendWorkoutReminder(email, uid);
     await mRef.set({ kind: streakOnly ? "streak_risk" : "workout_reminder", day, sentAt: FieldValue.serverTimestamp() });
     sent += 1;
     console.log(`[workout-reminders] ${streakOnly ? "streak" : "daily"} → ${uid}`);

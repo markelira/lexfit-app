@@ -1,10 +1,13 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 import { verifyRequest } from "@/lib/auth-server";
 import { allowRequest, HOUR_MS } from "@/lib/rate-limit";
-import { adminDb } from "@/lib/firebase-admin";
+import { adminApp, adminDb } from "@/lib/firebase-admin";
 import { computeStreak } from "@/lib/streak";
+import { COLLECTIONS, milestoneDocId } from "@/lib/pricing/keys";
+import { nextTrainingDayHu, sendFirstWorkout } from "@/lib/mailer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -289,6 +292,29 @@ export async function POST(req: Request) {
       update[`resumeAt.${c.code}`] = FieldValue.delete();
     }
     await ref.update(update);
+  }
+
+  // "Az első megvan" — the activation-milestone email, fired the first time a
+  // completion ever lands for this user (§4d/17). Best-effort + milestone-
+  // gated: a send failure or a double sync can never break or repeat it.
+  const hadCompletionsBefore =
+    !firstSync && (((cur.completed as Completion[] | undefined)?.length ?? 0) > 0);
+  if (!hadCompletionsBefore && baseCompleted.length > 0) {
+    void (async () => {
+      const mRef = adminDb
+        .collection(COLLECTIONS.milestones)
+        .doc(milestoneDocId(uid, "first_workout_email_sent"));
+      if ((await mRef.get()).exists) return;
+      const email = (await getAuth(adminApp).getUser(uid).catch(() => null))?.email;
+      if (!email) return;
+      const todayWeekday = ((new Date(todayStr).getDay() + 6) % 7) + 1; // 1=Mon … 7=Sun
+      const nextDay = nextTrainingDayHu(
+        ((prefsPlan.weekdays ?? []) as number[]),
+        todayWeekday,
+      );
+      await sendFirstWorkout(email, uid, nextDay);
+      await mRef.set({ userId: uid, kind: "first_workout_email_sent", firedAt: Date.now() });
+    })().catch((e) => console.error("[first workout email]", e));
   }
 
   return NextResponse.json({

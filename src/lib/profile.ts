@@ -38,6 +38,8 @@ export interface Prefs {
     // devices; the setting itself stays editable in Beállítások.
     workout: { enabled: boolean; time: string /* "HH:MM" */; weekdays: number[]; prompted?: boolean };
     streakRisk: boolean;
+    /** Monday "A heted, ahogy volt" summary email (default on; service summary). */
+    weeklyRecap: boolean;
     community: boolean;
     newContent: boolean;
   };

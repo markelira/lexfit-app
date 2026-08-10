@@ -8,7 +8,9 @@ import {
   setCancelReason,
   LifecycleError,
 } from "@/lib/pricing/lifecycle";
-import { PAUSE_MONTHS_ALLOWED, type PauseMonths } from "@/lib/pricing/config";
+import { PAUSE_MONTHS_ALLOWED, PRICES, type PauseMonths } from "@/lib/pricing/config";
+import { formatHuf } from "@/lib/pricing/display";
+import { sendCancelConfirm } from "@/lib/mailer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,10 +45,25 @@ export async function POST(req: Request) {
       }
       case "downgrade": {
         const effectiveAt = await downgradeToWeekly(token.uid);
+        // Confirmation email — best-effort, the downgrade already happened.
+        if (token.email) {
+          await sendCancelConfirm(token.email, {
+            variant: "downgrade",
+            accessUntilMs: effectiveAt,
+            newPlanLine: `Heti — ${formatHuf(PRICES.week_std.amountHuf)} / hét`,
+          }).catch((e) => console.error("[downgrade email]", e));
+        }
         return NextResponse.json({ ok: true, effectiveAt });
       }
       case "cancel": {
         const accessUntil = await cancelAtPeriodEnd(token.uid);
+        // Confirmation email — best-effort, the cancel already happened.
+        if (token.email) {
+          await sendCancelConfirm(token.email, {
+            variant: "cancel",
+            accessUntilMs: accessUntil,
+          }).catch((e) => console.error("[cancel email]", e));
+        }
         return NextResponse.json({ ok: true, accessUntil });
       }
       case "reason": {
