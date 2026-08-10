@@ -125,6 +125,12 @@ plan's "igazodj a meglévő stackhez").
 2. **Stripe (live):** switch to live keys in Vercel; run `npm run seed:stripe`
    against live to create the 11 prices; set the live webhook secret; enable
    **Smart Retries** + failed-payment settings in the Stripe dashboard.
+   Then run `node --env-file=.env.local scripts/stripe-register-payment-domains.mjs`
+   with the LIVE key — payment method domains are per-mode, and Apple Pay /
+   Google Pay only appear in the embedded Checkout on a registered+verified
+   domain (test mode is already registered). Live validation requires
+   `public/.well-known/apple-developer-merchantid-domain-association` to be
+   deployed (it's in the repo — served automatically).
 3. **SendGrid:** ✅ configured — key valid, verified sender `hello@szavazzmagadra.hu`
    (name "Alexa"). `SENDGRID_API_KEY` / `EMAIL_FROM` / `EMAIL_FROM_NAME` in
    `.env.local`; add all three to Vercel. (Consider a mail-send-restricted key —

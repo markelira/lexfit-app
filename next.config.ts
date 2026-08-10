@@ -17,8 +17,14 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
-          // Camera stays self-only (Finish Share selfie); the rest is unused.
-          { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(), payment=(self)" },
+          // Camera stays self-only (Finish Share selfie). Payment is delegated
+          // to Stripe's origins — embedded Checkout renders in a Stripe iframe,
+          // and Apple Pay / Google Pay need the Payment Request API there.
+          {
+            key: "Permissions-Policy",
+            value:
+              'camera=(self), microphone=(), geolocation=(), payment=(self "https://js.stripe.com" "https://checkout.stripe.com")',
+          },
         ],
       },
     ];
