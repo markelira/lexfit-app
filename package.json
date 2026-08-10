@@ -20,7 +20,8 @@
     "test:pricing": "node --import tsx scripts/pricing-selftest.ts",
     "test:funnel": "node --import tsx scripts/funnel-selftest.ts",
     "test:onboarding-draft": "node --import tsx scripts/onboarding-draft-selftest.ts",
-    "healthcheck": "node --env-file=.env.local scripts/firebase-healthcheck.mjs"
+    "healthcheck": "node --env-file=.env.local scripts/firebase-healthcheck.mjs",
+    "email:dev": "email dev --dir emails --port 3001"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -40,10 +41,12 @@
     "qrcode": "^1.5.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-email": "6.9.2",
     "server-only": "^0.0.1",
     "stripe": "^22.3.0"
   },
   "devDependencies": {
+    "@react-email/ui": "6.9.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
