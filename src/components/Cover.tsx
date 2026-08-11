@@ -1,12 +1,12 @@
 import { catWord, cardGrad } from "@/lib/categories";
 
-// The shared generated cover — the heart of the card system. Every card variant
+// The shared generated cover - the heart of the card system. Every card variant
 // sits on this. Layers, bottom → top:
 //   1. category gradient (from `theme`)
 //   2. optional trainer underlayer (blended into the category color, edges dissolve)
 //   3. decorative ring
 //   4. centered category lockup: eyebrow `LEXFIT · <code>` → big full word → underline
-//   5. `children` — variant overlays (program lockup, duration chip, title band, tags)
+//   5. `children` - variant overlays (program lockup, duration chip, title band, tags)
 //
 // There is NO per-video artwork: a cover is fully determined by data. The trainer
 // image is a PROP (production binds it to a per-program/per-trainer hero field);
@@ -25,7 +25,7 @@ export function Cover({
   trainer?: string | null;
   focal?: string;
   className?: string;
-  /** Background override — program-member covers pass their program's brand
+  /** Background override - program-member covers pass their program's brand
    *  gradient (programGrad); without it the category gradient applies. */
   grad?: string;
   children?: React.ReactNode;

@@ -1,8 +1,8 @@
-// LEXFIT — kiérdemlési motor (F3), PURE logic. Unit-tested; no I/O.
+// LEXFIT - kiérdemlési motor (F3), PURE logic. Unit-tested; no I/O.
 //
 // Two things are DELIBERATELY separate here (and in earning-server.ts):
-//   • the check-in (napi pipa) — a community mechanic that works for EVERYONE;
-//   • the offer engine — which only runs for weekly/monthly subscribers.
+//   • the check-in (napi pipa) - a community mechanic that works for EVERYONE;
+//   • the offer engine - which only runs for weekly/monthly subscribers.
 // Keeping them apart is why an annual/one-off buyer can still check in daily but
 // never gets a Grand Slam offer (there's nothing to upsell).
 
@@ -13,7 +13,7 @@ import type { OfferDoc, Plan, SubscriptionDoc } from "./types";
 /**
  * The kiérdemlési window: the first subscription day + the following days, as
  * `windowDays` Budapest calendar days. **Day 0 is the purchase's Budapest day**
- * and counts as the first day — so a 7-day window is [day0 .. day0+6].
+ * and counts as the first day - so a 7-day window is [day0 .. day0+6].
  */
 export function earningWindowDays(
   startedAtMs: number,

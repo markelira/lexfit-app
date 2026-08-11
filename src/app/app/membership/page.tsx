@@ -125,7 +125,7 @@ function Membership() {
         <h1 className={styles.title}>Meddig szünetelteted?</h1>
         <p className={styles.sub}>
           A szünet alatt nem terhelünk, és a hozzáférés is pihen. A kifizetett idődből semmi
-          nem vész el — ott folytatod, ahol abbahagytad.
+          nem vész el - ott folytatod, ahol abbahagytad.
         </p>
         <div className={styles.segmented}>
           {[1, 2, 3].map((m) => (
@@ -164,7 +164,7 @@ function Membership() {
         <h1 className={styles.title}>Váltás heti tagságra</h1>
         <p className={styles.sub}>
           A mostani, már kifizetett hónapod végéig minden marad. Onnantól heti{" "}
-          {formatHuf(PRICES.week_std.amountHuf)}, automatikusan megújul — bármikor lemondhatod.
+          {formatHuf(PRICES.week_std.amountHuf)}, automatikusan megújul - bármikor lemondhatod.
         </p>
         <button
           className={styles.primary}
@@ -172,7 +172,7 @@ function Membership() {
           onClick={() =>
             run(async () => {
               const at = await downgradeSubscription();
-              setDoneMsg(`Rendben — ${fmtDate(at)}-tól heti tagságon folytatod.`);
+              setDoneMsg(`Rendben - ${fmtDate(at)}-tól heti tagságon folytatod.`);
               setView("done");
             })
           }
@@ -227,7 +227,7 @@ function Membership() {
         <p className={styles.sub}>A hozzáférésed {fmtDate(accessUntil)}-ig aktív.</p>
       )}
       {!recurring ? (
-        <p className={styles.sub}>Egyszeri hozzáférésed van — nincs mit lemondani, a végén magától lejár.</p>
+        <p className={styles.sub}>Egyszeri hozzáférésed van - nincs mit lemondani, a végén magától lejár.</p>
       ) : (
         <div className={styles.options}>
           <OptionCard
@@ -239,7 +239,7 @@ function Membership() {
           {sub?.plan === "MONTH" && (
             <OptionCard
               title="Kisebb csomagra váltok"
-              body="Havi helyett heti — a mostani hónapod végétől."
+              body="Havi helyett heti - a mostani hónapod végétől."
               cta="Váltás hetire"
               onClick={() => setView("downgrade")}
             />
@@ -256,7 +256,7 @@ function Membership() {
   );
 }
 
-/** All option cards are visually identical — no emphasized "stay" choice (J3). */
+/** All option cards are visually identical - no emphasized "stay" choice (J3). */
 function OptionCard({
   title,
   body,

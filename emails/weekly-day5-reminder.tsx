@@ -1,4 +1,4 @@
-// §4b/5 — Intro step-up reminder (F2.2, day 5 of the 490 Ft intro week).
+// §4b/5 - Intro step-up reminder (F2.2, day 5 of the 490 Ft intro week).
 // Copy carried verbatim from src/lib/pricing/templates.ts weeklyDay5Reminder().
 // The legally load-bearing renewal email: price, auto-renew, one-click cancel.
 
@@ -12,7 +12,7 @@ export const subject = "Két nap múlva indul a rendes heted";
 
 export default function WeeklyDay5Reminder({ stdPrice }: { stdPrice: string }) {
   return (
-    <EmailLayout preview={`Onnantól ${stdPrice}/hét, automatikusan megújul — vagy egy kattintás, és lemondod.`}>
+    <EmailLayout preview={`Onnantól ${stdPrice}/hét, automatikusan megújul - vagy egy kattintás, és lemondod.`}>
       <Text style={styles.eyebrow}>Előfizetés</Text>
       <Text style={styles.h1}>Két nap múlva indul a rendes heted</Text>
       <Text style={styles.body}>

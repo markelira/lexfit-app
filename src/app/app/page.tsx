@@ -83,7 +83,7 @@ export default function KezdolapPage() {
   }, [reload, user]);
 
   // First-entry reminder card (40 §40.9 / P7.2). P0.6 = email channel, so
-  // "Beállítom" only writes the pref — no OS permission prompt. Both answers set
+  // "Beállítom" only writes the pref - no OS permission prompt. Both answers set
   // `prompted` so the card never returns; the toggle stays in Beállítások.
   const answerReminder = useCallback(
     async (enabled: boolean) => {
@@ -187,14 +187,14 @@ export default function KezdolapPage() {
 
   const todayVideo = todayCode ? (data.byCode[todayCode] as WorkoutItem | undefined) : undefined;
 
-  // ── rows (exact order — §3.3) ──
-  // 1 · Folytatod — in-progress resume entries, most recent first
+  // ── rows (exact order - §3.3) ──
+  // 1 · Folytatod - in-progress resume entries, most recent first
   const resumeCodes = Object.keys(resumeMap)
     .filter((c) => resumeMap[c] > 0 && videoByCode[c])
     .sort((a, b) => (resumeAt[b] ?? 0) - (resumeAt[a] ?? 0)); // most recent first (§3.3)
   const rowResume = resumeCodes.map((c) => videoByCode[c]);
 
-  // 2 · A heted — the next `daysPerWeek` upcoming workouts from where you are,
+  // 2 · A heted - the next `daysPerWeek` upcoming workouts from where you are,
   // at YOUR chosen cadence (not an authored week).
   const rowWeek = joined ? playlist.slice(currentIndex, currentIndex + daysPerWeek) : [];
 
@@ -204,7 +204,7 @@ export default function KezdolapPage() {
   // 4 · Ha csak 15 perced van
   const rowShort = libVideos.filter((v) => v.mins <= 15 && v.kind === "workout");
 
-  // 5 · Szavazz Magadra · kihívások — in-progress first (C-RULE 06: challenges
+  // 5 · Szavazz Magadra · kihívások - in-progress first (C-RULE 06: challenges
   // live in the rows, never the hero), then the rest newest-first for discovery.
   const chInProgress = challenges.filter((c) => c.state === "folyamatban");
   const chSeen = new Set(chInProgress.map((c) => c.slug));
@@ -293,7 +293,7 @@ export default function KezdolapPage() {
   );
 }
 
-/* ════════ Billboard — today's workout (§3.1) ════════ */
+/* ════════ Billboard - today's workout (§3.1) ════════ */
 function Billboard({
   program, joined, name, step, total, today, onPlayToday, onSecondary, onJoin,
 }: {
@@ -375,7 +375,7 @@ const WEEK_DAYS: [string, string][] = [
 
 /**
  * The weekly plan strip. Renders straight from the shared weekly collector
- * (lib/week-progress) so it is identical to the Haladásom week card — same
+ * (lib/week-progress) so it is identical to the Haladásom week card - same
  * training days (the user's plan), same "done" (dated completions incl. the
  * optimistic bridge), same real calendar week and target.
  */
@@ -422,7 +422,7 @@ function WeekStrip({ week }: { week: WeekProgress }) {
   );
 }
 
-/* ════════ Home row — heading + right link + horizontal scroll ════════ */
+/* ════════ Home row - heading + right link + horizontal scroll ════════ */
 function HomeRow({
   title, allLabel, onAll, cards,
 }: {

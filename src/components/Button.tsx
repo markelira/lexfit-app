@@ -37,7 +37,7 @@ export function Button({
   loading?: boolean;
   fullWidth?: boolean;
   onDark?: boolean; // primary inverts to white-fill on dark surfaces (hero, player)
-  solid?: boolean; // destructive filled — confirm dialog only
+  solid?: boolean; // destructive filled - confirm dialog only
   children?: React.ReactNode;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const isz = LABEL_ICON[size];
@@ -57,7 +57,7 @@ export function Button({
   );
 }
 
-/** Icon-only button — circular (actions) or square (toolbars). Always labelled. */
+/** Icon-only button - circular (actions) or square (toolbars). Always labelled. */
 export function IconButton({
   size = "m",
   d,

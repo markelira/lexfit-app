@@ -1,17 +1,17 @@
-// Email-safe brand tokens — hex mirror of src/app/lexfit-tokens.css (OKLCH is not
+// Email-safe brand tokens - hex mirror of src/app/lexfit-tokens.css (OKLCH is not
 // safe in mail clients; authoritative hex mapping: docs/design_handoff_eukaliptusz).
 // Rule carried over from the design handoff: NEVER put non-ink text on the accent
-// green (white on #7a9b8d fails contrast) — CTAs are ink-filled, like the app.
+// green (white on #7a9b8d fails contrast) - CTAs are ink-filled, like the app.
 
 export const color = {
-  accent: "#7a9b8d", // Eukaliptusz — decorative accents only
-  accent2: "#496c5e", // deep accent — the FIT half of the wordmark
+  accent: "#7a9b8d", // Eukaliptusz - decorative accents only
+  accent2: "#496c5e", // deep accent - the FIT half of the wordmark
   accentSoft: "#e1f1ea", // tinted panels
   accentInk: "#355c4d", // accent-colored TEXT on white/soft (passes contrast)
   ink: "#18201d",
   ink2: "#44544d",
   ink3: "#5c6e66",
-  bg: "#f1f6f4", // page — never white
+  bg: "#f1f6f4", // page - never white
   surface: "#ffffff",
   surface2: "#e8efec",
   line: "#d8e0dd",
@@ -23,6 +23,13 @@ export const color = {
 
 // Poppins loads in Apple Mail & friends via the <link> in EmailLayout; the
 // Helvetica fallback IS the baseline (Gmail/Outlook never load web fonts).
+//
+// DELIBERATE SECOND SOURCE OF TRUTH. Every other font-family in the codebase
+// resolves through `--font` / `--mono` (declared once on :root in
+// src/app/lexfit-tokens.css). Email cannot: clients strip custom properties and
+// next/font's self-hosted faces aren't reachable from a mail client, so the stack
+// has to be spelled out literally here.
+// → If the app typeface ever changes, THIS FILE MUST BE UPDATED BY HAND.
 export const font = {
   sans: "'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif",
   mono: "'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace",
@@ -33,7 +40,7 @@ export const radius = { sm: 8, md: 14, lg: 20 };
 export const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
 
-// Ektv. §4 imprint — source of truth: docs/legal/aszf.md §1 (keep in sync).
+// Ektv. §4 imprint - source of truth: docs/legal/aszf.md §1 (keep in sync).
 export const IMPRINT = {
   company: "AM Studios Group Kft.",
   seat: "3532 Miskolc, Miklós utca 17. 2. em. 26. ajtó",
@@ -42,7 +49,7 @@ export const IMPRINT = {
   email: "hi@lexfit.hu",
 };
 
-// ---- shared text styles (inline — Gmail strips <style> in places) ----
+// ---- shared text styles (inline - Gmail strips <style> in places) ----
 import type { CSSProperties } from "react";
 
 export const styles = {

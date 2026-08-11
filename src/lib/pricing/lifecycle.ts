@@ -22,7 +22,7 @@ export class LifecycleError extends Error {}
 
 /**
  * A weekly-intro (or earned-annual) subscription is managed by a Stripe
- * subscription schedule until its phases complete — and Stripe forbids
+ * subscription schedule until its phases complete - and Stripe forbids
  * canceling or setting cancel behavior on the subscription directly while a
  * schedule manages it ("updating any cancelation behavior directly is not
  * allowed"). Releasing the schedule detaches it and leaves the subscription in
@@ -43,9 +43,9 @@ export async function releaseScheduleIfManaged(
 }
 
 /**
- * F2.3 pause — stop billing AND access. `pause_collection: void` halts invoicing;
+ * F2.3 pause - stop billing AND access. `pause_collection: void` halts invoicing;
  * the PAUSED status hard-denies access (hasAccessFromData). The remaining paid
- * time is banked (`pauseRemainingMs`) so resume restores exactly what was left —
+ * time is banked (`pauseRemainingMs`) so resume restores exactly what was left -
  * the period does not burn down while paused.
  */
 export async function pauseSubscription(uid: string, months: PauseMonths): Promise<void> {
@@ -60,7 +60,7 @@ export async function pauseSubscription(uid: string, months: PauseMonths): Promi
   // If still in the intro step-up window, release the managing schedule so the
   // pause/resume updates (pause_collection, then trial_end on resume) aren't
   // rejected. Trade-off: a sub paused during intro week resumes on the intro
-  // price instead of stepping up — rare, user-favorable; refine post-launch.
+  // price instead of stepping up - rare, user-favorable; refine post-launch.
   await releaseScheduleIfManaged(sub.stripeSubscriptionId);
   await getStripe().subscriptions.update(sub.stripeSubscriptionId, {
     pause_collection: { behavior: "void" },
@@ -82,7 +82,7 @@ export async function pauseSubscription(uid: string, months: PauseMonths): Promi
 /**
  * Resume a paused subscription. Restores the banked paid time via `trial_end`
  * (no charge until it elapses), and accumulates the ACTUAL paused days into
- * `pausedDaysTotal` — actual, not the requested months, because an early resume
+ * `pausedDaysTotal` - actual, not the requested months, because an early resume
  * (F5.2) makes them differ. This is the tenure input for the F4.3 founder lock.
  */
 export async function resumeSubscription(uid: string, opts?: { email?: string | null }): Promise<void> {
@@ -123,9 +123,9 @@ export async function resumeSubscription(uid: string, opts?: { email?: string | 
 }
 
 /**
- * F2.3 downgrade — monthly → weekly standard, at the PERIOD BOUNDARY, no
+ * F2.3 downgrade - monthly → weekly standard, at the PERIOD BOUNDARY, no
  * proration. The user stays monthly through the already-paid month, then moves
- * to the weekly standard price (1 990, never the intro — the once-per-user guard
+ * to the weekly standard price (1 990, never the intro - the once-per-user guard
  * holds). Implemented as a subscription schedule.
  */
 export async function downgradeToWeekly(uid: string): Promise<number> {
@@ -163,7 +163,7 @@ export async function downgradeToWeekly(uid: string): Promise<number> {
 }
 
 /**
- * F2.3 final cancel — one action. Access continues until the period end (J1
+ * F2.3 final cancel - one action. Access continues until the period end (J1
  * transparency), then Stripe deletes the sub and the webhook flips to EXPIRED.
  * Returns the access-until date for the UI to display.
  */

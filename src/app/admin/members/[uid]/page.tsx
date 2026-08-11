@@ -17,12 +17,12 @@ interface Detail {
 }
 
 const label = (opts: readonly ChoiceOption[], v: unknown) =>
-  v == null || v === "" ? "—" : opts.find((o) => String(o.v) === String(v))?.b ?? String(v);
+  v == null || v === "" ? "-" : opts.find((o) => String(o.v) === String(v))?.b ?? String(v);
 const many = (opts: readonly ChoiceOption[], v: unknown) =>
-  Array.isArray(v) && v.length ? v.map((x) => label(opts, x)).join(", ") : "—";
-const str = (v: unknown) => (v == null || v === "" ? "—" : String(v));
+  Array.isArray(v) && v.length ? v.map((x) => label(opts, x)).join(", ") : "-";
+const str = (v: unknown) => (v == null || v === "" ? "-" : String(v));
 const fmt = (v: unknown) => {
-  if (!v) return "—";
+  if (!v) return "-";
   const s = String(v);
   const d = new Date(s);
   return isNaN(d.getTime()) ? s : new Intl.DateTimeFormat("hu-HU", { year: "numeric", month: "short", day: "numeric" }).format(d);
@@ -53,7 +53,7 @@ export default function MemberDetailPage() {
             <Link href="/admin/members" style={{ color: "var(--ink-3)" }}>Tagok</Link> · tag
           </div>
           <h1 className="adm-h1">{(p.displayName as string) ?? (p.email as string) ?? uid}</h1>
-          <p className="adm-sub">Tag adatai — csak megtekintés.</p>
+          <p className="adm-sub">Tag adatai - csak megtekintés.</p>
         </div>
       </div>
 
@@ -91,7 +91,7 @@ export default function MemberDetailPage() {
                   >
                     {stripeId}
                   </a>
-                ) : "—"}
+                ) : "-"}
               </dd>
             </dl>
           </div>
@@ -105,8 +105,8 @@ export default function MemberDetailPage() {
               <dt>Figyelem</dt><dd>{many(STEP_OPTIONS.env, onb.env)}</dd>
               <dt>Kor</dt><dd>{str(onb.age)}</dd>
               <dt>Életszakasz</dt><dd>{label(LIFESTAGE, onb.lifestage)}</dd>
-              <dt>Magasság</dt><dd>{onb.height ? `${onb.height} cm` : "—"}</dd>
-              <dt>Súly</dt><dd>{onb.weight ? `${onb.weight} kg` : "—"}</dd>
+              <dt>Magasság</dt><dd>{onb.height ? `${onb.height} cm` : "-"}</dd>
+              <dt>Súly</dt><dd>{onb.weight ? `${onb.weight} kg` : "-"}</dd>
               <dt>Heti napok</dt><dd>{str(onb.days)}</dd>
               <dt>Mikor</dt><dd>{label(STEP_OPTIONS.time, onb.time)}</dd>
               <dt>Miért</dt><dd>{str(onb.why ?? onb.motiv)}</dd>

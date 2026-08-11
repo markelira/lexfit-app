@@ -34,7 +34,7 @@ export async function getOrCreateCustomer(
 }
 
 /**
- * THE entitlement check — reads exactly one document and defers the decision to
+ * THE entitlement check - reads exactly one document and defers the decision to
  * the pure rule. This is the only function anything (Mux gating, UI, cron)
  * should call to ask "can this user stream?".
  */
@@ -45,7 +45,7 @@ export async function hasAccess(uid: string): Promise<boolean> {
 
 // ── Stripe → Firestore mappers (PURE) ──────────────────────────────────────
 // These do no I/O so the webhook can call them BEFORE opening its Firestore
-// transaction (external calls must not run inside a transaction — it may retry).
+// transaction (external calls must not run inside a transaction - it may retry).
 
 function mapStatus(s: Stripe.Subscription.Status): SubStatus {
   switch (s) {
@@ -80,12 +80,12 @@ export function buildSubscriptionData(sub: Stripe.Subscription): SubscriptionDoc
   const periodStartMs = secToMs(item?.current_period_start);
   let status = mapStatus(sub.status);
 
-  // pause_collection is the source of truth for PAUSED — Stripe leaves the
+  // pause_collection is the source of truth for PAUSED - Stripe leaves the
   // status "active" while paused, so derive it here (keeps webhook-driven writes
   // from clobbering a paused sub back to ACTIVE).
   if (sub.pause_collection) status = "PAUSED";
   // cancel_at_period_end: Stripe keeps status "active" until the period ends, but
-  // the user has cancelled — reflect CANCELED while access runs out at period end.
+  // the user has cancelled - reflect CANCELED while access runs out at period end.
   else if (status === "ACTIVE" && sub.cancel_at_period_end) status = "CANCELED";
 
   // Access lever: normally the paid-through period end; during dunning we extend
@@ -111,7 +111,7 @@ export function buildSubscriptionData(sub: Stripe.Subscription): SubscriptionDoc
 }
 
 /** Map a completed one-off purchase into the subscription doc. There is no
- *  recurring period — accessUntil = now + the product's access days. The payment
+ *  recurring period - accessUntil = now + the product's access days. The payment
  *  intent + amount are stored so a within-14-day withdrawal can refund pro-rata. */
 export function buildOneOffData(
   role: "week_oneoff" | "month_oneoff",

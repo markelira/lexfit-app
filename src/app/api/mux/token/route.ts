@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
   const params = new URL(req.url).searchParams;
   const code = params.get("code");
-  // Kihívások day videos live in challengeVideos/ — same signed-playback gating.
+  // Kihívások day videos live in challengeVideos/ - same signed-playback gating.
   const collection = params.get("type") === "challenge" ? "challengeVideos" : "videos";
   if (!code) return NextResponse.json({ error: "missing code" }, { status: 400 });
 
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
   const snap = await adminDb.collection(collection).doc(code).get();
   const data = snap.data();
   // Draft/soon/archived content must not stream, even for entitled users who
-  // guess a code. (Docs without a status field predate the admin CMS — allow.)
+  // guess a code. (Docs without a status field predate the admin CMS - allow.)
   if (data?.status !== undefined && data.status !== "published") {
     return NextResponse.json({ error: "no video attached" }, { status: 404 });
   }

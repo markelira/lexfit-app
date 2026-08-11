@@ -90,9 +90,9 @@ export function ChallengeVideoForm({
     .sort((a, b) => a - b);
   const durationLabel = (startText: string): string => {
     const s = clockToSec(startText);
-    if (s == null) return "—";
+    if (s == null) return "-";
     const end = blockStarts.find((x) => x > s) ?? muxDuration;
-    return end != null && end > s ? secToClock(end - s) : "—";
+    return end != null && end > s ? secToClock(end - s) : "-";
   };
 
   async function save() {
@@ -156,13 +156,13 @@ export function ChallengeVideoForm({
             </label>
             <input type="text" value={d.code} disabled={!codeEditable} onChange={(e) => set("code", e.target.value)} placeholder="SZM24-1" />
             <span className="adm-fhint">
-              {codeEditable ? "A videó azonosítója. A feltöltéshez add meg először." : "A kód a dokumentum azonosítója — rögzítve."}
+              {codeEditable ? "A videó azonosítója. A feltöltéshez add meg először." : "A kód a dokumentum azonosítója - rögzítve."}
             </span>
           </div>
           <div className="adm-frow">
             <label className="adm-flabel">Testrész</label>
             <select value={d.bodyPart} onChange={(e) => set("bodyPart", e.target.value)}>
-              {bodyParts.length === 0 && <option value="">—</option>}
+              {bodyParts.length === 0 && <option value="">-</option>}
               {bodyParts.map((o) => (
                 <option key={o} value={o}>{o}</option>
               ))}
@@ -170,11 +170,11 @@ export function ChallengeVideoForm({
           </div>
         </div>
 
-        {/* Video upload — writes to challengeVideos/ via the challenge Mux pipeline. */}
+        {/* Video upload - writes to challengeVideos/ via the challenge Mux pipeline. */}
         {create && !validCode ? (
           <div className="adm-upload">
             <div className="adm-upload-hd">Videó (9:16)</div>
-            <div className="adm-upload-sub">Adj meg egy érvényes kódot fent — utána itt feltöltheted a függőleges videót a Muxba.</div>
+            <div className="adm-upload-sub">Adj meg egy érvényes kódot fent - utána itt feltöltheted a függőleges videót a Muxba.</div>
           </div>
         ) : (
           <VideoUploader
@@ -221,7 +221,7 @@ export function ChallengeVideoForm({
         <div className="adm-frow">
           <label className="adm-flabel">Blokkok (opcionális)</label>
           <span className="adm-fhint">
-            A nap felépítése. Add meg minden blokk <b>kezdési idejét</b> (perc:mp) — a hossz a következő blokkig
+            A nap felépítése. Add meg minden blokk <b>kezdési idejét</b> (perc:mp) - a hossz a következő blokkig
             számolódik. Gyakorlatokhoz is megadható időbélyeg (a lejátszóban ráugorhatóvá válik).
           </span>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
@@ -236,7 +236,7 @@ export function ChallengeVideoForm({
                 <div className="adm-exlist">
                   {b.items.map((ex, ii) => (
                     <div className="adm-exrow" key={ii}>
-                      <input type="text" className="mins" value={ex.startText} onChange={(e) => setItem(i, ii, { startText: e.target.value })} placeholder="—:—" title="Gyakorlat kezdése (opcionális)" />
+                      <input type="text" className="mins" value={ex.startText} onChange={(e) => setItem(i, ii, { startText: e.target.value })} placeholder="-:-" title="Gyakorlat kezdése (opcionális)" />
                       <input type="text" value={ex.name} onChange={(e) => setItem(i, ii, { name: e.target.value })} placeholder="Gyakorlat neve" />
                       <button className="adm-iconbtn danger" onClick={() => removeItem(i, ii)} title="Gyakorlat törlése">✕</button>
                     </div>

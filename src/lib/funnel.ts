@@ -1,6 +1,6 @@
 // The funnel routing machine (40 §40.8). One pure function, used by every route
 // guard, so the onboarding → auth → checkout → app order can never loop or
-// re-interrogate a paying user. The truth table below IS §40.8 — change it here
+// re-interrogate a paying user. The truth table below IS §40.8 - change it here
 // and nowhere else. Unit-tested in scripts/funnel-selftest.ts (5 states × 4
 // routes = 20 assertions).
 
@@ -15,7 +15,7 @@ export type FunnelRoute = "/onboarding" | "/register" | "/subscribe" | "/app";
 
 // null → the requested route is allowed (stay). A string → redirect there.
 const TABLE: Record<FunnelState, Record<FunnelRoute, string | null>> = {
-  // anon / anon_draft differ only in whether /onboarding resumes — both render it.
+  // anon / anon_draft differ only in whether /onboarding resumes - both render it.
   anon: {
     "/onboarding": null,
     "/register": null,
@@ -37,7 +37,7 @@ const TABLE: Record<FunnelState, Record<FunnelRoute, string | null>> = {
     "/subscribe": null,
     "/app": "/onboarding",
   },
-  // Onboarded, unpaid: the only thing left is checkout — every route funnels there.
+  // Onboarded, unpaid: the only thing left is checkout - every route funnels there.
   auth_unpaid: {
     "/onboarding": "/subscribe",
     "/register": "/subscribe",

@@ -1,4 +1,4 @@
-// Finish-share overlays — the 5 directions from docs/LEXFIT Overlay Alternatives
+// Finish-share overlays - the 5 directions from docs/LEXFIT Overlay Alternatives
 // Adatok.html, encoded at their EXACT reference geometry. The reference frame is
 // 284 × 505 px (= 9:16). All positions/sizes below are in that 284-wide space;
 // the renderer scales the whole layer to the real photo width, so the proportions
@@ -19,12 +19,12 @@ export const OVERLAY_NAME: Record<OverlayDir, string> = {
   E: "Gerinc",
 };
 
-// The interchangeable "lead" (hero) metric — the first slot / C's big number.
+// The interchangeable "lead" (hero) metric - the first slot / C's big number.
 export type LeadKey = "reps" | "exercises" | "workoutNo";
 
 // ── Raw workout data the overlay personalizes from (see docs/finish-share-plan.md) ──
 export interface FinishData {
-  reps?: number | null;     // total reps — only when authored (Phase 5); else undefined
+  reps?: number | null;     // total reps - only when authored (Phase 5); else undefined
   exercises?: number;       // derivable exercise count (blocks.items)
   workoutNo?: number;       // progress.doneCount (+1)
   mins: number;             // video.mins
@@ -55,7 +55,7 @@ export function availableLeads(d: FinishData): LeadKey[] {
   return out;
 }
 
-/** The lead "result" number — the user's chosen metric if set + available,
+/** The lead "result" number - the user's chosen metric if set + available,
  *  else auto: reps → exercise count → workout #. */
 export function resultLead(d: FinishData): Slot {
   if (d.lead) { const s = LEAD_SLOT[d.lead](d); if (s) return s; }
@@ -81,11 +81,11 @@ export function posterContent(d: FinishData) {
 }
 
 // ── Per-template character limits (the reference's guardrail: route data to a
-//    template that fits rather than shrinking it). NOT YET ENFORCED — today's
+//    template that fits rather than shrinking it). NOT YET ENFORCED - today's
 //    values (reps/exercise-count/workout-#/"NN perc"/"NN. nap") are all within
 //    every limit, so overflow can't occur. Wire this into the data-swap +
 //    template routing when longer data types land (total-minutes, workout name,
-//    milestones) — see docs/finish-share-plan.md P5. ──
+//    milestones) - see docs/finish-share-plan.md P5. ──
 export const CHAR_LIMITS: Record<OverlayDir, { label?: number; value?: number; big?: number }> = {
   A: { label: 12, value: 11 },
   E: { label: 12, value: 11 },

@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { FinishShare } from "@/components/finish/FinishShare";
 import type { FinishData } from "@/lib/finish-overlays";
 
-// Public (no auth) — opened on the phone via the desktop handoff QR. The token
+// Public (no auth) - opened on the phone via the desktop handoff QR. The token
 // carries the workout data; the selfie is taken + shared entirely on this device.
 export default function FinishTokenPage() {
   const params = useParams();

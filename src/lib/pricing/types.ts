@@ -1,4 +1,4 @@
-// LEXFIT pricing — domain types + THE entitlement rule.
+// LEXFIT pricing - domain types + THE entitlement rule.
 //
 // Pure (no firebase, no server-only): imported by client billing UI, server
 // routes, and tests alike, so everyone decides "does this user have access?"
@@ -18,11 +18,11 @@ export type OfferType =
   | "WINBACK"
   | "ANNUAL_NUDGE";
 
-/** Access tier — the model is multi-tier-ready for a future "Belső Kör" level. */
+/** Access tier - the model is multi-tier-ready for a future "Belső Kör" level. */
 export type Tier = "standard" | "inner_circle";
 
 /**
- * `subscriptions/{uid}` — the ONE document that governs access.
+ * `subscriptions/{uid}` - the ONE document that governs access.
  *
  * Timestamps are epoch **milliseconds** (comparable to `Date.now()` with no
  * conversion). `accessUntil` is the single lever `hasAccess` reads; every flow
@@ -38,9 +38,9 @@ export interface SubscriptionDoc {
   priceLookupKey?: string | null;
   isGrandfathered?: boolean;
   founderLockApplied?: boolean;
-  /** The 490 Ft weekly intro is once per user — set true once consumed. */
+  /** The 490 Ft weekly intro is once per user - set true once consumed. */
   weekIntroUsed?: boolean;
-  /** Total days spent paused — F4.3 founder-lock tenure is shifted by this. */
+  /** Total days spent paused - F4.3 founder-lock tenure is shifted by this. */
   pausedDaysTotal?: number;
   /** Pause bookkeeping (F2.3). Set while PAUSED, cleared on resume. */
   pausedAt?: number | null; // epoch ms the pause began
@@ -53,8 +53,8 @@ export interface SubscriptionDoc {
   dunningDay0Sent?: boolean;
   dunningDay3Sent?: boolean;
   currentPeriodEnd?: number | null; // epoch ms
-  currentPeriodStart?: number | null; // epoch ms — for pro-rata withdrawal
-  accessUntil?: number | null; // epoch ms — SOLE driver of hasAccess
+  currentPeriodStart?: number | null; // epoch ms - for pro-rata withdrawal
+  accessUntil?: number | null; // epoch ms - SOLE driver of hasAccess
   lastPaymentIntent?: string | null; // Stripe PI of the latest charge (refunds)
   amountPaid?: number | null; // minor units of the latest charge (pro-rata base)
   startedAt?: number | null; // epoch ms
@@ -64,7 +64,7 @@ export interface SubscriptionDoc {
 }
 
 /**
- * `offers/{uid}_{OfferType}` — a kiérdemelt/nudge offer. The doc ID enforces
+ * `offers/{uid}_{OfferType}` - a kiérdemelt/nudge offer. The doc ID enforces
  * once-per-user-per-type. State is a strict progression: unlocked → (redeeming)
  * → redeemed, OR unlocked → voided (expired, FINAL). Timestamps are epoch ms.
  */
@@ -80,7 +80,7 @@ export interface OfferDoc {
 }
 
 /**
- * THE entitlement rule. Pure, single-doc, unit-testable — the one place access
+ * THE entitlement rule. Pure, single-doc, unit-testable - the one place access
  * is decided. Do not re-implement this check against Stripe status, check-ins,
  * or any other collection; call this with the subscription doc and current time.
  *

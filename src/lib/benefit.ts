@@ -2,9 +2,9 @@
 // EFFECT (from the signals that vary within a category: format / types / level).
 //
 // Layered so it works now and sharpens as content is authored:
-//   1. video.subtitle  — authored free text (hero / special cards)
-//   2. video.focus[]   — controlled outcome tags (editable `filters/focus`)
-//   3. derived default — theme × intensity-bucket matrix (below), zero authoring
+//   1. video.subtitle  - authored free text (hero / special cards)
+//   2. video.focus[]   - controlled outcome tags (editable `filters/focus`)
+//   3. derived default - theme × intensity-bucket matrix (below), zero authoring
 //
 // The derived layer intentionally keys on format/types/level so two workouts in the
 // SAME category surface DIFFERENT benefits.

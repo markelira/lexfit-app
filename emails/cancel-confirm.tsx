@@ -1,4 +1,4 @@
-// §4b/9 — Cancellation / downgrade confirmed. Trigger: /api/subscription/manage
+// §4b/9 - Cancellation / downgrade confirmed. Trigger: /api/subscription/manage
 // (cancel or downgrade action). Top chargeback-prevention email: exact end date,
 // no-further-charges statement, progress stays. Never a guilt-trip, never a pitch.
 
@@ -19,15 +19,15 @@ export default function CancelConfirm({
   variant: "cancel" | "downgrade";
   /** The date access (or the current plan) runs until. */
   accessUntil: string;
-  /** Downgrade only: e.g. "Heti — 1 990 Ft / hét". */
+  /** Downgrade only: e.g. "Heti - 1 990 Ft / hét". */
   newPlanLine?: string;
 }) {
   return (
     <EmailLayout
       preview={
         variant === "cancel"
-          ? "Nem vonunk le többet — és minden haladásod megmarad."
-          : "Az időszak végén automatikusan átváltunk — semmit nem kell tenned."
+          ? "Nem vonunk le többet - és minden haladásod megmarad."
+          : "Az időszak végén automatikusan átváltunk - semmit nem kell tenned."
       }
     >
       <Text style={styles.eyebrow}>Előfizetés</Text>
@@ -36,12 +36,12 @@ export default function CancelConfirm({
         <>
           <Text style={styles.body}>
             Ahogy kérted: több terhelés nem lesz. A hozzáférésed a kifizetett
-            időszak végéig megmarad, és minden haladásod — a sorozatod, a
-            végigcsinált edzéseid, a fotóid — megőrizzük.
+            időszak végéig megmarad, és minden haladásod - a sorozatod, a
+            végigcsinált edzéseid, a fotóid - megőrizzük.
           </Text>
           <Text style={styles.body}>
             Ha egyszer visszajönnél, pontosan ott folytatod, ahol abbahagytad.
-            Addig is: amit eddig megcsináltál, az megvan — azt senki nem veszi
+            Addig is: amit eddig megcsináltál, az megvan - azt senki nem veszi
             el.
           </Text>
           <Facts
@@ -55,7 +55,7 @@ export default function CancelConfirm({
         <>
           <Text style={styles.body}>
             Ahogy kérted: a mostani időszakod végén automatikusan átváltunk az
-            új csomagra — addig minden marad a régiben, tenned semmit nem kell.
+            új csomagra - addig minden marad a régiben, tenned semmit nem kell.
           </Text>
           <Facts
             rows={[

@@ -7,7 +7,7 @@ import { adminDb } from "@/lib/firebase-admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Admin-only: settings/challenges (fbGroupUrl — the Kihívások community link).
+/** Admin-only: settings/challenges (fbGroupUrl - the Kihívások community link).
  *  Previously unauthorable on prod: nothing ever created this doc. */
 export async function PUT(req: Request) {
   const token = await verifyRequest(req);

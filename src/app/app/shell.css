@@ -1,4 +1,4 @@
-/* LEXFIT app shell — global top bar + glass sidebar + mobile bottom tab bar.
+/* LEXFIT app shell - global top bar + glass sidebar + mobile bottom tab bar.
    Redesign per docs/design_handoff_dashboard (Kezdőlap). Scoped under .lx. */
 
 .lx-shell {
@@ -16,7 +16,7 @@
 }
 
 /* While the app shell is on screen, the DOCUMENT behind it must match its
-   neutral chrome — otherwise the green marketing --bg peeks out above the
+   neutral chrome - otherwise the green marketing --bg peeks out above the
    sticky top bar on overscroll/rubber-band. (#f5f5f5 = --wf-chrome; the token
    itself is scoped to .lx-shell, out of reach of html/body.) */
 html:has(.lx-shell),
@@ -24,7 +24,7 @@ body:has(.lx-shell) {
   background: #f5f5f5;
 }
 
-/* ══════════════════ TOP BAR (new — RULE 03, every route) ══════════════════ */
+/* ══════════════════ TOP BAR (new - RULE 03, every route) ══════════════════ */
 .lx .lxtb {
   position: sticky;
   top: 0;
@@ -153,7 +153,7 @@ body:has(.lx-shell) {
 }
 .lx .sp-recent button:hover { background: var(--surface-2); }
 .lx .sp-recent svg { color: var(--ink-3); flex: none; }
-/* result grid — the workout cards (EREDMÉNY-RÁCS). minmax(0,1fr) lets the tracks
+/* result grid - the workout cards (EREDMÉNY-RÁCS). minmax(0,1fr) lets the tracks
    shrink below the cards' intrinsic width so both columns fit inside the panel. */
 .lx .sp-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 2px 2px 4px; }
 .lx .sp-all {
@@ -228,7 +228,7 @@ body:has(.lx-shell) {
   border: 1px solid var(--wf-line);
   color: var(--ink);
 }
-/* Warm flame — the engraved streak colour (wireframe --warn), kept warm rather than
+/* Warm flame - the engraved streak colour (wireframe --warn), kept warm rather than
    tinted to the accent so it reads as a streak at a glance. */
 .lx .lxtb-streak svg { color: #b4652a; }
 .lx .lxtb-streak .fire { font-size: 12px; line-height: 1; }
@@ -271,7 +271,7 @@ body:has(.lx-shell) {
 }
 @keyframes lxtbMenu { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
-/* shared avatar-menu rows — desktop dropdown + mobile bottom sheet (30 §30.2) */
+/* shared avatar-menu rows - desktop dropdown + mobile bottom sheet (30 §30.2) */
 .lx .lxam-head { display: flex; align-items: center; gap: 11px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
 .lx .lxam-ava { width: 38px; height: 38px; border-radius: 50%; flex: none; background: var(--accent-soft); color: var(--accent-ink); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; overflow: hidden; }
 .lx .lxam-ava img { width: 100%; height: 100%; object-fit: cover; }
@@ -355,7 +355,7 @@ body:has(.lx-shell) {
   box-shadow: 0 0 8px -1px oklch(0.5 0.046 168 / 0.6);
 }
 
-/* Alexa · segítség — quiet secondary block pinned to the bottom of the rail */
+/* Alexa · segítség - quiet secondary block pinned to the bottom of the rail */
 .lx .lx-help {
   margin-top: auto;
   display: flex;

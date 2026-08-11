@@ -17,7 +17,7 @@ export default function AdminFiltersPage() {
   const [failed, setFailed] = useState(false);
 
   // Firestore docs win; on empty prod the canonical defaults render so the
-  // taxonomy can be authored at all — the first save creates the docs.
+  // taxonomy can be authored at all - the first save creates the docs.
   useEffect(() => {
     getDocs(collection(db, "filters"))
       .then((snap) => {
@@ -144,7 +144,7 @@ function DimensionEditor({ dim, endpoint = "/api/admin/filters" }: { dim: Filter
 
       {dim.key === "dur" ? (
         <div className="adm-warn">
-          ⚠️ Az időtartam-sávok az app logikájához (durBucket) kötöttek — átnevezésük elrontja a szűrést. Csak
+          ⚠️ Az időtartam-sávok az app logikájához (durBucket) kötöttek - átnevezésük elrontja a szűrést. Csak
           fejlesztői egyeztetéssel módosítsd.
         </div>
       ) : structural ? (

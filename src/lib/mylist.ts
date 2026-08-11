@@ -3,7 +3,7 @@
 import { arrayRemove, arrayUnion, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-// users/{uid}/myList/saved → { codes: string[] } — replaces the prototype's
+// users/{uid}/myList/saved → { codes: string[] } - replaces the prototype's
 // localStorage lx_mylist.
 const ref = (uid: string) => doc(db, "users", uid, "myList", "saved");
 

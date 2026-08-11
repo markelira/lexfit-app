@@ -47,7 +47,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ slug: st
   };
 
   // Legacy metadata the form no longer edits (napi hossz, résztvevők, FB-poszt,
-  // kiemelés címke, borító, sorrend) — patch ONLY when explicitly sent, so
+  // kiemelés címke, borító, sorrend) - patch ONLY when explicitly sent, so
   // saving a legacy challenge never erases its archive-era values. Ordering is
   // sortDate-driven; `order` survives purely as a same-date tiebreak on old docs.
   if (b.perDayMinsLabel !== undefined) patch.perDayMinsLabel = str(b.perDayMinsLabel) || null;

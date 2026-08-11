@@ -5,7 +5,7 @@ import { lxPaths } from "@/lib/icons";
 import { PRICES } from "@/lib/pricing/config";
 import { formatHuf, perWeekHuf, annualSavingsPct } from "@/lib/pricing/display";
 
-// Shared "A teljes LEXFIT" paywall pieces — used by the onboarding funnel (plan +
+// Shared "A teljes LEXFIT" paywall pieces - used by the onboarding funnel (plan +
 // pay steps) AND by /subscribe, so the paywall is one design everywhere.
 // docs/onboarding-left-panels.md · docs/LEXFIT Elofizetes iOS.html
 
@@ -21,7 +21,7 @@ export interface PayPlan {
 
 // USPs: [0] is the hero (full-width, emphasised); [1..] are the 2-col chip grid.
 export const PAYWALL_FEATURES: { icon: string | string[]; title: string; sub: string }[] = [
-  { icon: lxPaths.calendarCheck, title: "Vezetett programok", sub: "Foundation és több — végigvezetve, a te tempódban" },
+  { icon: lxPaths.calendarCheck, title: "Vezetett programok", sub: "Foundation és több - végigvezetve, a te tempódban" },
   { icon: lxPaths.layoutGrid, title: "Teljes videótár", sub: "200+ edzés" },
   { icon: lxPaths.users, title: "Heti kihívások", sub: "Szavazz Magadra" },
   { icon: lxPaths.chartColumn, title: "Haladáskövetés", sub: "hétről hétre" },

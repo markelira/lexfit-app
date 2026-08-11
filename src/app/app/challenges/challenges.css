@@ -1,4 +1,4 @@
-/* Kihívások — the Szavazz Magadra archive. A second library that inherits the
+/* Kihívások - the Szavazz Magadra archive. A second library that inherits the
    Videótár grammar (rows → grid on intent), but its unit is a 9:16-leaning
    portrait series card. Uses the app's existing brand tokens throughout. */
 
@@ -77,7 +77,7 @@
 .ch-empty .s { font-size: 13px; color: var(--ink-2); margin: 0; }
 .ch-empty .acts { margin-top: 6px; }
 
-/* ── The Facebook link-out (honest, last — not a banner) ── */
+/* ── The Facebook link-out (honest, last - not a banner) ── */
 .ch-fb {
   display: flex; align-items: center; gap: 12px; margin-top: 6px;
   border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); padding: 15px 18px;
@@ -92,7 +92,7 @@
 }
 .ch-fb-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
 
-/* The series card (.chc*) styles live with the component — ChallengeCard.css —
+/* The series card (.chc*) styles live with the component - ChallengeCard.css -
    so the card renders correctly anywhere it's used (archive + Kezdőlap row). */
 
 @media (max-width: 640px) {
@@ -139,7 +139,7 @@
 .chp-acts { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
 .chp-progtext { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--ink-3); }
 
-/* Numbered day list — ordered, never gated. */
+/* Numbered day list - ordered, never gated. */
 .chp-days { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); }
 .chp-day {
   display: flex; align-items: center; gap: 13px; padding: 11px 16px; min-height: 60px;

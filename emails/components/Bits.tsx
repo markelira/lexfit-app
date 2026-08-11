@@ -4,7 +4,7 @@ import * as React from "react";
 import { Button, Column, Row, Section, Text } from "react-email";
 import { color, font, radius, styles } from "../tokens";
 
-/** Primary CTA — ink fill + light text (the app's primary button; never white-on-green). */
+/** Primary CTA - ink fill + light text (the app's primary button; never white-on-green). */
 export function Cta({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Section style={{ textAlign: "center", padding: "10px 0 4px" }}>
@@ -27,7 +27,7 @@ export function Cta({ href, children }: { href: string; children: React.ReactNod
   );
 }
 
-/** Tinted accent panel — the one place the green appears as a surface. */
+/** Tinted accent panel - the one place the green appears as a surface. */
 export function Panel({ children }: { children: React.ReactNode }) {
   return (
     <Section
@@ -105,7 +105,7 @@ export function Facts({ rows }: { rows: { label: string; value: string }[] }) {
 
 export type DayState = "done" | "rest" | "missed" | "today" | "upcoming";
 
-/** Weekly recap day dots — H K Sz Cs P Szo V. */
+/** Weekly recap day dots - H K Sz Cs P Szo V. */
 export function WeekDots({
   days = [],
 }: {
@@ -154,5 +154,5 @@ export function WeekDots({
 
 /** Alexa's sign-off. */
 export function Sign() {
-  return <Text style={styles.sign}>— Alexa</Text>;
+  return <Text style={styles.sign}>- Alexa</Text>;
 }

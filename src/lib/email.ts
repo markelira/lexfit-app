@@ -1,14 +1,14 @@
 import "server-only";
 import * as Sentry from "@sentry/nextjs";
 
-// Transactional email — SendGrid v3 Mail Send API via fetch (no SDK dependency).
+// Transactional email - SendGrid v3 Mail Send API via fetch (no SDK dependency).
 // Set SENDGRID_API_KEY and EMAIL_FROM (EMAIL_FROM must be a verified SendGrid
 // sender, else sends 403). Without a key (local dev) sends are logged & skipped
 // so flows still work without a provider.
 //
 // `categories` tag the send in SendGrid stats (auth/billing/habit/recap/
 // marketing) so spam-complaint spikes are attributable per stream.
-// `listUnsubscribeUrl` adds the RFC 8058 one-click headers — REQUIRED on every
+// `listUnsubscribeUrl` adds the RFC 8058 one-click headers - REQUIRED on every
 // non-transactional send (Grtv. opt-out applies at any volume); never set it on
 // transactional mail.
 
@@ -25,13 +25,13 @@ export async function sendEmail(msg: EmailInput): Promise<{ sent: boolean }> {
   const key = process.env.SENDGRID_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!key || !from) {
-    // In production a missing key means user-facing emails silently vanish —
+    // In production a missing key means user-facing emails silently vanish -
     // shout so it's visible in logs AND Sentry, don't whisper.
     if (process.env.NODE_ENV === "production") {
-      console.error(`[email] SKIPPED — SENDGRID_API_KEY/EMAIL_FROM not configured → ${msg.to}: ${msg.subject}`);
+      console.error(`[email] SKIPPED - SENDGRID_API_KEY/EMAIL_FROM not configured → ${msg.to}: ${msg.subject}`);
       Sentry.captureMessage("sendEmail skipped: SENDGRID_API_KEY/EMAIL_FROM not configured", "error");
     } else {
-      console.log(`[email] SKIPPED — SENDGRID_API_KEY/EMAIL_FROM not configured → ${msg.to}: ${msg.subject}`);
+      console.log(`[email] SKIPPED - SENDGRID_API_KEY/EMAIL_FROM not configured → ${msg.to}: ${msg.subject}`);
     }
     return { sent: false };
   }

@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 // The shared left-hand brand panel for the auth/onboarding split-screen. One
-// component so /login and the /register wizard render an IDENTICAL panel — moving
+// component so /login and the /register wizard render an IDENTICAL panel - moving
 // between them never feels like a new page. Markup + classes match auth.css
 // (`.authx-brand`). Copy is the reframed, no-fixed-length marketing (pending the
 // full rewrite); keep it identical to the funnel's messaging.

@@ -12,25 +12,18 @@ import { Button } from "@/components/Button";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { MobileWorkoutSheet, type SheetVideo } from "@/components/MobileWorkoutSheet";
 import { useIsMobile } from "@/lib/useIsMobile";
-import { ProgramMark } from "@/components/ProgramMark";
+import { ProgramBanner, bannerChips, bannerEyebrow, CATEGORY_WORD } from "@/components/ProgramBanner";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
-import { programVisual } from "@/lib/programs";
 import { loadLibrary, type LibVideo } from "@/lib/library";
 import { ProgramsSkeleton } from "@/components/Skeletons";
 import { loadProgramIndex, programPosition, type ProgramEntry, type ProgramIndex } from "@/lib/program-index";
 
-// Programok — Netflix/Apple TV catalog in the Kezdőlap's visual grammar: every
+// Programok - Netflix/Apple TV catalog in the Kezdőlap's visual grammar: every
 // published program gets its own full-width billboard band (colorless identity:
 // same green art for all, differentiated by word + geometric mark) with its
 // playlist beneath as a horizontal WorkoutCard rail. Position is derived from
 // the global per-video completions (lib/program-index).
-
-const CATEGORY_WORD: Record<string, string> = {
-  Program: "PROGRAM",
-  Sorozat: "SOROZAT",
-  Kihívás: "KIHÍVÁS",
-};
 
 export default function ProgramsPage() {
   const { user } = useAuth();
@@ -140,56 +133,35 @@ function ProgramBand({
   onOpen: () => void;
 }) {
   const name = p.hu || p.title;
-  const pv = programVisual(p.slug, name);
   const total = p.totalSessions || videos.length;
   const pos = programPosition(videos.map((v) => v.code), completedCodes);
   const nextVideo = videos[pos.currentIndex];
   const started = pos.doneCount > 0;
 
-  const eyebrow = [
+  const eyebrow = bannerEyebrow([
     CATEGORY_WORD[p.category] ?? p.category?.toUpperCase() ?? "PROGRAM",
     total > 0 ? `${total} EDZÉS` : "HAMAROSAN",
     pos.completed ? "KÉSZ 🎉" : started ? `${pos.doneCount}/${total} KÉSZ` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
-  const chips = [
-    p.level ? p.level.toUpperCase() : null,
-    p.defaultMins ? `~${p.defaultMins} PERC / EDZÉS` : null,
-    !p.equipment || /nincs/i.test(p.equipment) ? "ESZKÖZ NÉLKÜL" : p.equipment.toUpperCase(),
-  ].filter(Boolean) as string[];
+  ]);
 
   return (
     <section className="pgs">
-      <div className="pgs-hero" style={{ "--pgs-h": p.hue } as React.CSSProperties}>
-        <span className="pgs-ring" aria-hidden="true" />
-        <span className="pgs-word" aria-hidden="true">{p.title.toUpperCase()}</span>
-        <span className="pgs-scrim" aria-hidden="true" />
-
-        <div className="pgs-content">
-          <span className="pgs-lock">
-            <span className="mk"><ProgramMark shape={pv.icon} size={13} /></span>
-            <span className="nm">{pv.name}</span>
-          </span>
-          <div className="pgs-eyebrow">{eyebrow}</div>
-          <h2 className="pgs-title">{name}</h2>
-          {p.synopsis && <p className="pgs-syn">{p.synopsis}</p>}
-          {chips.length > 0 && (
-            <div className="pgs-chips">
-              {chips.map((c) => <span className="pgs-chip" key={c}>{c}</span>)}
-            </div>
-          )}
-          <div className="pgs-ctas">
-            {nextVideo && !pos.completed && (
-              <Button size="l" variant="primary" onDark iconLeft={lxPaths.play} onClick={() => onPlay(nextVideo.code)}>
-                {started ? `Folytatom · ${pos.currentIndex + 1}. edzés` : "Kezdd el"}
-              </Button>
-            )}
-            <Button size="l" variant="secondary" onDark onClick={onOpen}>A program megnyitása</Button>
-          </div>
-        </div>
-      </div>
+      <ProgramBanner
+        slug={p.slug}
+        title={p.title}
+        name={name}
+        hue={p.hue}
+        eyebrow={eyebrow}
+        synopsis={p.synopsis}
+        chips={bannerChips(p)}
+      >
+        {nextVideo && !pos.completed && (
+          <Button size="l" variant="primary" onDark iconLeft={lxPaths.play} onClick={() => onPlay(nextVideo.code)}>
+            {started ? `Folytatom · ${pos.currentIndex + 1}. edzés` : "Kezdd el"}
+          </Button>
+        )}
+        <Button size="l" variant="secondary" onDark onClick={onOpen}>A program megnyitása</Button>
+      </ProgramBanner>
 
       {videos.length > 0 && (
         <section className="hrow-sec">

@@ -26,7 +26,7 @@ function invoiceRefundTarget(inv: Stripe.Invoice): Stripe.RefundCreateParams | n
 }
 
 /**
- * F1.3 — right of withdrawal (J2). Refunds the UNUSED portion of each actually
+ * F1.3 - right of withdrawal (J2). Refunds the UNUSED portion of each actually
  * paid invoice (so the weekly 490→1990 two-price first period is correct), then
  * closes access immediately, emits `withdrawal_requested` (F6 guardrail) and
  * notifies the admin.
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
 
   try {
     if (sub.stripeSubscriptionId) {
-      // Release the managing schedule FIRST — before any money moves. Weekly-
+      // Release the managing schedule FIRST - before any money moves. Weekly-
       // intro subs are schedule-managed (490→1990 step-up) and Stripe rejects a
       // direct cancel while that's true. Doing it up front means the operation
       // most likely to fail happens before refunds, so a failure can't orphan a
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
   await ref.set(
     {
       status: "CANCELED",
-      accessUntil: now, // access ends now — the unused portion was refunded
+      accessUntil: now, // access ends now - the unused portion was refunded
       canceledAt: now,
       cancelReason: "withdrawal",
       updatedAt: now,
@@ -126,7 +126,7 @@ export async function POST(req: Request) {
   });
 
   // 45/2014. Korm. r. 12. §: confirm receipt of the withdrawal on a durable
-  // medium. Best-effort — the refund already happened; a send failure must not
+  // medium. Best-effort - the refund already happened; a send failure must not
   // fail the request.
   if (token.email) {
     try {

@@ -1,4 +1,4 @@
-// §4a/1 — Welcome. Trigger: first ensureUserDoc() (milestone doc "welcome").
+// §4a/1 - Welcome. Trigger: first ensureUserDoc() (milestone doc "welcome").
 // One job: get them to the first workout. No feature tour, no pricing.
 
 import * as React from "react";
@@ -12,13 +12,13 @@ export const subject = "Üdvözöllek a LEXFIT-ben 💚";
 export default function Welcome({ name }: { name?: string | null }) {
   return (
     <EmailLayout
-      preview="Alexa vagyok. Egy terv, egy matrac — és nem egyedül csinálod."
+      preview="Alexa vagyok. Egy terv, egy matrac - és nem egyedül csinálod."
       reason="Ezt az emailt azért kaptad, mert fiókot hoztál létre a LEXFIT-ben."
     >
       <Text style={styles.eyebrow}>Üdvözlünk</Text>
       <Text style={styles.h1}>{name ? `Szia, ${name}!` : "Szia!"} Örülök, hogy itt vagy.</Text>
       <Text style={styles.body}>
-        Alexa vagyok. Innentől nem egyedül csinálod — 20–30 perc, egy matrac, és
+        Alexa vagyok. Innentől nem egyedül csinálod - 20–30 perc, egy matrac, és
         egy terv, amit te állítottál össze.
       </Text>
       <Text style={styles.body}>

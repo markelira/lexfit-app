@@ -2,7 +2,7 @@ import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 // One-click unsubscribe tokens (RFC 8058). The URL lands on
-// /api/email/unsubscribe which flips the matching pref via the Admin SDK — no
+// /api/email/unsubscribe which flips the matching pref via the Admin SDK - no
 // login required, which is the point: mail clients POST it headlessly.
 // HMAC-signed with CRON_SECRET so nobody can unsubscribe someone else by
 // guessing uids. Tokens are deliberately non-expiring: an unsubscribe link in a

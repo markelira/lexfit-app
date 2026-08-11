@@ -10,7 +10,7 @@ import { getPlaybackTokens, type PlaybackResponse } from "@/lib/playback";
 // back to the cover (pb=null) on any playback error or missing/forbidden asset.
 // The consumer renders a <MuxPlayer ref={playerRef} muted={muted} autoPlay …/>
 // when `pb` is set, and shows its cover art underneath until `videoReady`.
-export function usePreviewClip(code: string) {
+export function usePreviewClip(code: string, enabled = true) {
   const [pb, setPb] = useState<PlaybackResponse | null>(null);
   const [videoReady, setVideoReady] = useState(false);
   const [muted, setMuted] = useState(true);
@@ -19,26 +19,29 @@ export function usePreviewClip(code: string) {
   const playerRef = useRef<any>(null);
   const ended = sec >= 60;
 
-  // (Pre)load the clip on mount / when the code changes.
+  // (Pre)load the clip on mount / when the code changes. `enabled: false` is the
+  // public landing page, where /api/mux/token requires auth + entitlement - there
+  // is no clip to get, so we never ask and never run the countdown.
   useEffect(() => {
     let active = true;
     setPb(null);
     setVideoReady(false);
     setSec(0);
     setMuted(true);
+    if (!enabled) return;
     getPlaybackTokens(code).then(
       (d) => { if (active) setPb(d); },
       () => {},
     );
     return () => { active = false; };
-  }, [code]);
+  }, [code, enabled]);
 
   // Cover-only fallback countdown (no preview video).
   useEffect(() => {
-    if (pb || ended) return;
+    if (pb || ended || !enabled) return;
     const t = setInterval(() => setSec((s) => Math.min(60, s + 1)), 1000);
     return () => clearInterval(t);
-  }, [pb, ended, code]);
+  }, [pb, ended, code, enabled]);
 
   // Real playback: drive the countdown, reveal once playing, cap at 60s, fall back on error.
   useEffect(() => {

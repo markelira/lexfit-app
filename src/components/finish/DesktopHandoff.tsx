@@ -11,8 +11,8 @@ import type { FinishData } from "@/lib/finish-overlays";
 type Status = "pending" | "opened" | "shared";
 const STATUS_TEXT: Record<Status, string> = {
   pending: "Olvasd be a telefonoddal, és készítsd el a szelfit ott.",
-  opened: "Megnyitva a telefonon — készítsd el a szelfit…",
-  shared: "Kész ✓ — megosztva a telefonodról.",
+  opened: "Megnyitva a telefonon - készítsd el a szelfit…",
+  shared: "Kész ✓ - megosztva a telefonodról.",
 };
 
 /**
@@ -27,7 +27,7 @@ export function DesktopHandoff({ data, onClose }: { data: FinishData; onClose: (
   const tokenRef = useRef<string | null>(null);
 
   // Mount once: create ONE session + subscribe for its lifetime. Not keyed on
-  // `data` (whose identity churns) — that would tear down the listener.
+  // `data` (whose identity churns) - that would tear down the listener.
   useEffect(() => {
     let active = true;
     let unsub: (() => void) | undefined;
@@ -71,7 +71,7 @@ export function DesktopHandoff({ data, onClose }: { data: FinishData; onClose: (
       <div className="dho-card">
         <button className="dho-x" onClick={onClose} aria-label="Bezárás"><LxIcon d={lxPaths.close} size={18} /></button>
         <div className="dho-h">Fejezd be a telefonodon</div>
-        <p className="dho-s">Egy szelfit a laptop kamerájával nem érdemes — olvasd be ezt a kódot a telefonoddal, és ott készítsd el, az edzésadataiddal.</p>
+        <p className="dho-s">Egy szelfit a laptop kamerájával nem érdemes - olvasd be ezt a kódot a telefonoddal, és ott készítsd el, az edzésadataiddal.</p>
 
         <div className="dho-qr">
           {err ? <div className="dho-err">{err}</div>
@@ -88,7 +88,7 @@ export function DesktopHandoff({ data, onClose }: { data: FinishData; onClose: (
       </div>
 
       <style>{`
-        /* Above .fc (the fullscreen finish screen, z-200) — see FinishComplete.css. */
+        /* Above .fc (the fullscreen finish screen, z-200) - see FinishComplete.css. */
         .dho { position: fixed; inset: 0; z-index: 210; display: flex; align-items: center; justify-content: center;
           background: rgba(10,10,12,.62); backdrop-filter: blur(3px); padding: 24px; }
         .dho-card { position: relative; width: 100%; max-width: 380px; background: var(--surface, #fff); border-radius: 20px;

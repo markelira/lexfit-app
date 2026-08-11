@@ -25,7 +25,7 @@ export function exerciseName(it: VideoExerciseItem): string {
  *  1. a block keeps its authored start when present;
  *  2. a missing start becomes the block's FIRST stamped exercise's start;
  *  3. the first block, still missing, becomes 0:00 (the natural author intent).
- * Blocks that remain unstamped after these rules stay as they are — callers keep
+ * Blocks that remain unstamped after these rules stay as they are - callers keep
  * their fallback path, but with these rules a fully-exercise-stamped video always
  * ends up fully block-stamped.
  */

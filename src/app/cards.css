@@ -1,4 +1,4 @@
-/* LEXFIT — N-card (Netflix card) + detail modal. Ported from lexfit-app.css. */
+/* LEXFIT - N-card (Netflix card) + detail modal. Ported from lexfit-app.css. */
 
 .lx .ncard { position: relative; display: block; width: 100%; text-align: left; padding: 0; border: none; background: none; cursor: pointer; }
 .lx .ncard:hover { z-index: 6; }
@@ -11,7 +11,7 @@
 .lx .ncard-lockup .wd { font-weight: 900; font-size: 20px; letter-spacing: -0.03em; line-height: 1.02; color: oklch(1 0 168 / 0.96);
   max-width: 86%; margin: 0 auto; padding: 0 8px; white-space: normal; text-wrap: balance; }
 .lx .ncard-lockup .un { width: 20px; height: 2.5px; border-radius: 2px; background: oklch(1 0 168 / 0.55); margin: 6px auto 0; }
-/* trainer underlayer — her tones pick up the category color, the room dissolves at the edges */
+/* trainer underlayer - her tones pick up the category color, the room dissolves at the edges */
 .lx .ncard-photo { position: absolute; inset: 0; z-index: 0; pointer-events: none; background-size: cover; background-position: 64% 18%;
   mix-blend-mode: luminosity; opacity: 0.42;
   -webkit-mask-image: radial-gradient(125% 105% at 66% 34%, #000 40%, transparent 82%);
@@ -43,7 +43,10 @@
 /* ── detail modal ── */
 .lx.nmod-backdrop { position: fixed; inset: 0; z-index: 60; overflow-y: auto; background: oklch(0.22 0.03 168 / 0.55); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); display: flex; align-items: flex-start; justify-content: center; padding: 4vh 20px 6vh; animation: nmodFade 0.2s ease both; }
 @keyframes nmodFade { from { opacity: 0; } to { opacity: 1; } }
-.lx .nmod { width: min(760px, 100%); border-radius: 20px; overflow: hidden; position: relative; background: oklch(0.985 0.004 168); box-shadow: 0 40px 100px -20px oklch(0.1 0.02 168 / 0.6); animation: nmodIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) both; }
+/* transform-origin defaults to the top-centre; a caller that knows which element was
+   tapped can pass --nmod-ox/--nmod-oy so the panel grows out of it (spatial
+   consistency - things should emerge from where they came from). */
+.lx .nmod { width: min(760px, 100%); border-radius: 20px; overflow: hidden; position: relative; background: oklch(0.985 0.004 168); box-shadow: 0 40px 100px -20px oklch(0.1 0.02 168 / 0.6); transform-origin: var(--nmod-ox, 50%) var(--nmod-oy, 0%); animation: nmodIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) both; }
 @keyframes nmodIn { from { opacity: 0; transform: translateY(16px) scale(0.95); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .lx .nmod, .lx.nmod-backdrop { animation: none; } }
 .lx .nmod-hero { position: relative; aspect-ratio: 16 / 8.2; overflow: hidden; }
@@ -62,12 +65,12 @@
   -webkit-mask-image: radial-gradient(120% 120% at 64% 30%, #000 42%, transparent 84%);
   mask-image: radial-gradient(120% 120% at 64% 30%, #000 42%, transparent 84%); }
 .lx .nmod-hero .nmod-kb { z-index: 0; }
-/* preview video — replaces the cover thumbnail once it's actually playing; sits above
+/* preview video - replaces the cover thumbnail once it's actually playing; sits above
    the cover art but below the vignette + controls/badges. */
 .lx .nmod-video { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 0.35s ease; background: #000; }
 .lx .nmod-video.on { opacity: 1; }
 .lx .nmod-video mux-player { width: 100%; height: 100%; display: block; --controls: none; --media-object-fit: cover; }
-/* preview countdown badge — moved to top-right so the program lockup owns the top-left */
+/* preview countdown badge - moved to top-right so the program lockup owns the top-left */
 .lx .nmod-prevbadge { position: absolute; top: 16px; right: 60px; z-index: 3; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: white; background: oklch(0 0 168 / 0.32); padding: 4px 10px; border-radius: 999px; font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .lx .nmod-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: oklch(1 0 168 / 0.82); margin-bottom: 6px; }
 .lx .nmod-herobottom { position: absolute; left: 22px; right: 22px; bottom: 16px; z-index: 3; }
@@ -90,7 +93,36 @@
 .lx .nmod-secthd { font-size: 14.5px; font-weight: 700; margin: 18px 0 10px; }
 .lx .nmod-blocks { display: flex; flex-direction: column; gap: 7px; }
 .lx .nmod-block { display: flex; align-items: center; gap: 11px; }
-.lx .nmod-block .bn { width: 148px; flex-shrink: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The name was clamped to 148px with an ellipsis, so "Hát és lapocka aktiválás"
+   and "Tartás-aktiváció finisher" were unreadable. It wraps now and the bar takes
+   what's left - the block's identity matters more than a perfectly even bar column. */
+.lx .nmod-block .bn {
+  flex: 1 1 42%; min-width: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-2);
+  line-height: 1.3; text-wrap: pretty;
+}
+
+/* Expandable block: reveals the exercises it contains. */
+.lx .nmod-blockx { border-radius: 8px; }
+.lx .nmod-blockx > summary {
+  list-style: none; cursor: pointer; padding: 3px 6px; margin: -3px -6px;
+  border-radius: 8px; transition: background .15s ease;
+}
+.lx .nmod-blockx > summary::-webkit-details-marker { display: none; }
+.lx .nmod-blockx > summary:hover { background: var(--surface-2); }
+.lx .nmod-blockx > summary:active { background: var(--surface-2); }
+.lx .nmod-blockx > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.lx .nmod-block .bchev { flex: none; display: flex; color: var(--ink-3); transform: rotate(90deg); transition: transform .22s cubic-bezier(.22,1,.36,1); }
+.lx .nmod-blockx[open] > summary .bchev { transform: rotate(-90deg); }
+.lx .nmod-ex {
+  list-style: none; margin: 6px 0 10px; padding: 0 0 0 4px;
+  display: flex; flex-direction: column; gap: 5px;
+  border-left: 2px solid var(--line); margin-left: 6px; padding-left: 12px;
+}
+.lx .nmod-ex li { display: flex; gap: 8px; align-items: baseline; font-size: 12.5px; color: var(--ink-2); line-height: 1.35; }
+.lx .nmod-ex .exn { flex: none; font-family: var(--mono); font-size: 10px; color: var(--ink-3); min-width: 14px; }
+@media (prefers-reduced-motion: reduce) {
+  .lx .nmod-block .bchev, .lx .nmod-blockx > summary { transition: none; }
+}
 .lx .nmod-block .bbar { flex: 1; height: 16px; }
 .lx .nmod-block .bbar > i { display: flex; align-items: center; height: 100%; border-radius: 6px; min-width: 22px; }
 .lx .nmod-block .bbar em { display: block; width: 4px; height: 8px; border-radius: 2px; margin-left: 5px; }

@@ -35,7 +35,7 @@ export async function getPhotos(uid: string): Promise<Partial<Record<Milestone, 
       try {
         out[data.milestone] = await getDownloadURL(ref(storage, data.storagePath));
       } catch {
-        /* file missing — ignore */
+        /* file missing - ignore */
       }
     }),
   );

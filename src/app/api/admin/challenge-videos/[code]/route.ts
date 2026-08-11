@@ -48,7 +48,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ code: st
     updatedAt: FieldValue.serverTimestamp(),
   };
 
-  // Initialize Mux/default fields on CREATE only — never clobber them on update.
+  // Initialize Mux/default fields on CREATE only - never clobber them on update.
   if (!snap.exists) {
     Object.assign(patch, {
       code,
@@ -67,7 +67,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ code: st
   return NextResponse.json({ ok: true, code });
 }
 
-/** Admin-only: delete a challenge video — blocked while any challenge day links it. */
+/** Admin-only: delete a challenge video - blocked while any challenge day links it. */
 export async function DELETE(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const token = await verifyRequest(req);
   if (!token || !isAdmin(token)) return NextResponse.json({ error: "forbidden" }, { status: 403 });

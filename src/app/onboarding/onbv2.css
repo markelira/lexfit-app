@@ -1,5 +1,5 @@
 /* ───────────────────────────────────────────────────────────────────────
-   LEXFIT onboarding funnel — v2 (40 §40). Token-driven translation of the
+   LEXFIT onboarding funnel - v2 (40 §40). Token-driven translation of the
    greyscale wireframe (40 §40.10): token radii only, 1px SOLID --line, surface
    tokens (no glass literals), LxIcon, mono ≥ 10px. Green/Eukaliptusz palette
    (P0.2). Scoped under .lx; step classes are .fnl-* (no collision with the
@@ -31,7 +31,7 @@
 }
 
 .lx .tabular { font-variant-numeric: tabular-nums; }
-/* Visually hidden, still announced — the polite step-change live region (40 §40.12). */
+/* Visually hidden, still announced - the polite step-change live region (40 §40.12). */
 .lx .fnl-sr {
   position: absolute;
   width: 1px;
@@ -52,7 +52,7 @@
   color: var(--accent-ink);
 }
 
-/* ── Brand panel (40 §40.6 — static, identical to auth, never moves) ── */
+/* ── Brand panel (40 §40.6 - static, identical to auth, never moves) ── */
 .lx .fnl-aside {
   width: 384px;
   flex-shrink: 0;
@@ -191,7 +191,7 @@
 .lx .fnl-back:active { transform: scale(0.9); }
 .lx .fnl-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .lx .fnl-back-spacer { width: 34px; }
-/* "Később" — exit the funnel from the pay step (draft is kept). */
+/* "Később" - exit the funnel from the pay step (draft is kept). */
 .lx .fnl-later { margin-left: auto; background: none; border: none; padding: 6px 4px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--ink-3); }
 .lx .fnl-later:hover { color: var(--ink); }
 .lx .fnl-later:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
@@ -484,7 +484,7 @@
 .lx .fnl-workout .wtitle { padding: 12px 14px; font-size: 13px; font-weight: 700; }
 
 /* ── Reused profile primitives (styles duplicated so they work off the
-      profile route — WeekStrip §30.3.3, DayPills §30.9). Kept in sync. ── */
+      profile route - WeekStrip §30.3.3, DayPills §30.9). Kept in sync. ── */
 .lx .fnl .pf-weekstrip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .lx .fnl .pf-weekstrip .col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .lx .fnl .pf-weekstrip .dl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.03em; color: var(--ink-3); }
@@ -507,7 +507,7 @@
   .lx .fnl-opt, .lx .fnl-cta, .lx .fnl-prog .seg, .lx .fnl-back { transition: none; }
 }
 
-/* ── Mobile (40 §40.6 — no brand panel, mark only) ── */
+/* ── Mobile (40 §40.6 - no brand panel, mark only) ── */
 @media (max-width: 840px) {
   .lx .fnl-shell { min-height: 100dvh; }
   .lx .fnl-aside { display: none; }
@@ -519,7 +519,7 @@
   .lx .welcome-hd { font-size: 30px; }
 }
 
-/* ── Plan picker (E1) — PlanCard radios + one-off links in the funnel shell. ── */
+/* ── Plan picker (E1) - PlanCard radios + one-off links in the funnel shell. ── */
 .lx .fnl-plans { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
 .lx .fnl-plan {
   position: relative;
@@ -580,7 +580,7 @@
 .lx .fnl-oneoff.on { color: var(--accent-ink); text-decoration: underline; }
 .lx .fnl-oneoff:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
 
-/* ── Account step — RegisterForm (E1.2), funnel-styled. ── */
+/* ── Account step - RegisterForm (E1.2), funnel-styled. ── */
 .lx .fnl-authform { margin-top: var(--sp-4); }
 .lx .fnl-sso-row { display: flex; flex-direction: column; gap: var(--sp-2); }
 .lx .fnl-sso {
@@ -625,7 +625,7 @@
 .lx .fnl-legal { font-size: 11px; color: var(--ink-3); text-align: center; line-height: 1.5; margin-top: var(--sp-3); }
 .lx .fnl-legal a { color: var(--accent-ink); }
 
-/* ── Pay step — embedded Stripe Checkout (E2). ── */
+/* ── Pay step - embedded Stripe Checkout (E2). ── */
 .lx .fnl-pay { margin-top: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-3); }
 .lx .fnl-paysum {
   display: flex; flex-direction: column; gap: 3px;
@@ -638,7 +638,7 @@
 .lx .fnl-payedit { position: absolute; top: 12px; right: 14px; background: none; border: none; padding: 0; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--accent-2); }
 .lx .fnl-payedit:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* Pay-step plan selector — same summary-card style, now selectable so the user
+/* Pay-step plan selector - same summary-card style, now selectable so the user
    can switch plan without going back. */
 .lx .fnl-payopts { display: flex; flex-direction: column; gap: var(--sp-2); }
 .lx .fnl-payopt {
@@ -669,7 +669,7 @@
 .lx .fnl-authtoggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   NORMATIVE onboarding geometry — docs/design_handoff_onboarding_layout
+   NORMATIVE onboarding geometry - docs/design_handoff_onboarding_layout
    "Fix the geometry, keep the look." Scoped to .fnl-wiz. Keeps the sage
    brand gradient (auth.css) + dark-ink CTA; corrects the 8 layout defects.
    ═══════════════════════════════════════════════════════════════════════ */
@@ -679,7 +679,7 @@
 .lx.authx.fnl-wiz { min-height: 0; }
 .fnl-wiz .authx-shell { height: 100dvh; grid-template-columns: 1fr 1fr; overflow: hidden; }
 
-/* Left brand pane — mark top / hero centred / founder bottom (defect 03) */
+/* Left brand pane - mark top / hero centred / founder bottom (defect 03) */
 .fnl-wiz .authx-brand { order: 1; padding: 44px 52px 40px; }
 .fnl-wiz .bbody { margin: auto 0; padding: 0; max-width: 460px; }
 .fnl-wiz .bquote { font-size: 48px; line-height: 1.05; letter-spacing: -0.035em; font-weight: 300; }
@@ -712,21 +712,21 @@
 .fnl-wiz .fnl-top,
 .fnl-wiz .fnl-scroll,
 .fnl-wiz .fnl-foot { max-width: none; margin-inline: 0; width: auto; }
-/* Header row — 40px on EVERY step (title lands on one y; defect 05) */
+/* Header row - 40px on EVERY step (title lands on one y; defect 05) */
 .fnl-wiz .fnl-top { flex: none; height: 40px; padding: 0; gap: 16px; }
 .fnl-wiz .fnl-back { width: 40px; height: 40px; margin-left: 0; border-radius: 10px; }
-/* Body — only scroll region; title 32px below the header */
+/* Body - only scroll region; title 32px below the header */
 .fnl-wiz .fnl-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 32px 0 0; gap: 12px; }
-/* Action bar — grows down from its border-top; body absorbs (defect 02) */
+/* Action bar - grows down from its border-top; body absorbs (defect 02) */
 .fnl-wiz .fnl-foot { flex: none; margin-top: 28px; padding: 20px 0 0; border-top: 1px solid var(--line); gap: 12px; }
 
-/* Fixed type scale — no vw/clamp (defect 06) */
+/* Fixed type scale - no vw/clamp (defect 06) */
 .fnl-wiz .fnl-q { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
 .fnl-wiz .fnl-sub { font-size: 15px; line-height: 1.5; max-width: 40ch; color: var(--ink-2); }
 .fnl-wiz .welcome-hd { font-size: 34px; font-weight: 800; }
 .fnl-wiz .fnl-reveal .reveal-hd { font-size: 30px; font-weight: 800; }
 
-/* Option rows — inherit the 480 axis; description clamps to 2 lines (defect 07) */
+/* Option rows - inherit the 480 axis; description clamps to 2 lines (defect 07) */
 .fnl-wiz .fnl-opts { gap: 10px; }
 .fnl-wiz .fnl-opt { min-height: 68px; padding: 14px 16px; border-radius: 14px; }
 .fnl-wiz .fnl-opt .ic { width: 40px; height: 40px; border-radius: 10px; }
@@ -804,7 +804,7 @@
 .lx .fnl-day:hover .dot { border-color: var(--accent); }
 .lx .fnl-day:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
 
-/* ── Reveal composition — every answer echoed back (docs research). ── */
+/* ── Reveal composition - every answer echoed back (docs research). ── */
 
 /* The user's own "why", quoted back (the emotional anchor). */
 .lx .fnl-quote {
@@ -818,7 +818,7 @@
 .lx .fnl-quote blockquote { margin: 4px 0 0; font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.4; text-wrap: pretty; }
 .lx .fnl-quote figcaption { margin-top: 6px; font-size: 12px; color: var(--ink-2); }
 
-/* Summary chips — one pill per answer (focus/level/days/time/safety). */
+/* Summary chips - one pill per answer (focus/level/days/time/safety). */
 .lx .fnl-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .lx .fnl-chip {
   font-size: 12px; font-weight: 600; color: var(--ink-2);
@@ -835,7 +835,7 @@
 /* One honest social-proof line, closing the reveal. */
 .lx .reveal-social { margin-top: var(--sp-5); font-size: 11px; letter-spacing: 0.04em; color: var(--ink-3); text-align: center; }
 
-/* Pay step — repeat the goal outcome above checkout (research). */
+/* Pay step - repeat the goal outcome above checkout (research). */
 .lx .fnl-paygoal {
   margin-top: var(--sp-3);
   padding: 12px 14px;
@@ -850,17 +850,17 @@
 .lx .fnl-paygoal strong { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
 
 /* ════════════════════════════════════════════════════════════════════════
-   Reveal v2 — Apple-Fitness style (skill: apple-design). The week ring is the
+   Reveal v2 - Apple-Fitness style (skill: apple-design). The week ring is the
    one bold signature; everything else stays quiet. Motion is transform/opacity
    only, materializes rather than fades, and reduced-motion cross-fades.
    ════════════════════════════════════════════════════════════════════════ */
 
-/* Hero — centred ring + legend + goal headline (Apple "summary" composition). */
+/* Hero - centred ring + legend + goal headline (Apple "summary" composition). */
 .lx .rv-hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: var(--sp-2); }
 .lx .rv-hero .eyebrow { margin-bottom: var(--sp-5); }
 .lx .rv-hero .reveal-hd { margin-top: var(--sp-5); max-width: 15ch; letter-spacing: -0.02em; }
 
-/* The activity ring — the signature. Draws on mount; count materializes after. */
+/* The activity ring - the signature. Draws on mount; count materializes after. */
 .lx .wr { position: relative; }
 .lx .wr svg { display: block; }
 .lx .wr-track { stroke: var(--surface-2); }
@@ -871,15 +871,15 @@
 .lx .wr-n { font-size: 46px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--ink); }
 .lx .wr-l { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 
-/* Weekday legend — which days are training (Mon-first). */
+/* Weekday legend - which days are training (Mon-first). */
 .lx .rv-legend { display: flex; gap: 6px; margin-top: var(--sp-4); }
 .lx .rv-ld { min-width: 24px; height: 24px; padding: 0 5px; display: grid; place-items: center; border-radius: 999px; font-size: 11px; font-weight: 600; color: var(--ink-3); background: var(--surface-2); }
 .lx .rv-ld.on { background: var(--accent-2); color: #fff; }
 
-/* Alexa's obstacle reassurance — coach voice, quiet and centred. */
+/* Alexa's obstacle reassurance - coach voice, quiet and centred. */
 .lx .rv-coach { margin-top: var(--sp-5); font-size: 13.5px; line-height: 1.5; color: var(--ink-2); text-align: center; text-wrap: pretty; }
 
-/* Plan summary — stat tiles + honest computed pace footer (Apple summary card). */
+/* Plan summary - stat tiles + honest computed pace footer (Apple summary card). */
 .lx .rv-card { margin-top: var(--sp-5); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
 .lx .rv-stats { display: grid; grid-template-columns: 1fr 1fr; }
 .lx .rv-stat { padding: var(--sp-4); display: flex; flex-direction: column; gap: 5px; border-bottom: 1px solid var(--line); }
@@ -891,7 +891,7 @@
 .lx .rv-pace strong { font-size: 14px; font-weight: 700; color: var(--ink); }
 .lx .rv-pace span { font-size: 11.5px; color: var(--ink-2); line-height: 1.45; }
 
-/* The first-workout card reads as the "thickest" surface — deliberate depth. */
+/* The first-workout card reads as the "thickest" surface - deliberate depth. */
 .lx .fnl-reveal .fnl-workout { border-radius: var(--r-lg); box-shadow: 0 12px 30px -16px rgba(24, 32, 29, 0.30); }
 
 /* Materialize the reveal in a staggered sequence (transform/opacity only). */
@@ -906,7 +906,7 @@
 .lx .rv2 > *:nth-child(7) { animation-delay: 390ms; }
 @keyframes rvIn { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: none; } }
 
-/* The "building your plan" moment — centred, honest, reflects real inputs. */
+/* The "building your plan" moment - centred, honest, reflects real inputs. */
 .lx .fnl-building { justify-content: center; }
 .lx .fnl-buildwrap { margin: auto; display: flex; flex-direction: column; align-items: center; gap: var(--sp-5); padding: var(--sp-6); text-align: center; }
 .lx .fnl-buildstatus { min-height: 20px; }
@@ -915,7 +915,7 @@
 .lx .fnl-buildbar { width: 168px; height: 4px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
 .lx .fnl-buildbar > span { display: block; height: 100%; width: var(--p, 0%); background: var(--accent-2); border-radius: 999px; transition: width 480ms cubic-bezier(0.22, 1, 0.36, 1); }
 
-/* Press feedback on the primary CTA (skill §1 — respond on press). */
+/* Press feedback on the primary CTA (skill §1 - respond on press). */
 .lx .fnl-cta { transition: transform var(--dur-fast) ease, background var(--dur-base) ease; }
 .lx .fnl-cta:active { transform: scale(0.985); }
 
@@ -929,7 +929,7 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   Step-aware BrandPanel — image-led, Apple style (skill: apple-design). A
+   Step-aware BrandPanel - image-led, Apple style (skill: apple-design). A
    full-bleed photo per step, a dark bottom scrim, wordmark top, one short
    caption. Photos: public/onboarding/{key}.jpg. docs/onboarding-left-panels.md
    ════════════════════════════════════════════════════════════════════════ */
@@ -947,11 +947,11 @@
   background: linear-gradient(to top, rgba(14, 18, 16, 0.92) 0%, rgba(14, 18, 16, 0.55) 24%, rgba(14, 18, 16, 0) 52%);
 }
 
-/* Wordmark — constant, white, over the image (stays put across steps). */
+/* Wordmark - constant, white, over the image (stays put across steps). */
 .lx .authx-brand.bp-img .bp-mark { position: absolute; top: 46px; left: 56px; z-index: 4; color: #fff; }
 .lx .authx-brand.bp-img .bp-mark .wm { color: #fff; }
 
-/* Caption — bottom-left, one line (or a slogan). */
+/* Caption - bottom-left, one line (or a slogan). */
 .lx .bp-cap { position: absolute; left: 56px; right: 56px; bottom: 54px; z-index: 4; color: #fff; }
 .lx .bp-cap .bp-eyebrow { display: block; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255, 255, 255, 0.82); margin-bottom: 14px; }
 .lx .bp-cap .bp-line { display: block; font-size: clamp(22px, 2.2vw, 30px); font-weight: 600; line-height: 1.22; letter-spacing: -0.02em; text-wrap: balance; text-shadow: 0 1px 24px rgba(0, 0, 0, 0.3); }
@@ -959,7 +959,7 @@
 .lx .bp-cap .bp-slogan b { font-weight: 700; }
 .lx .bp-cap .bp-by { font-weight: 400; opacity: 0.72; font-size: 0.58em; letter-spacing: 0.02em; }
 
-/* Mobile: the panel collapses under the content — show it as a photo banner. */
+/* Mobile: the panel collapses under the content - show it as a photo banner. */
 @media (max-width: 768px) {
   .lx .authx-brand.bp-img { min-height: 240px; }
   .lx .authx-brand.bp-img .bp-mark { top: 22px; left: 24px; }
@@ -972,20 +972,20 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   Subscription offer ("A teljes LEXFIT") — iOS-paywall reference
+   Subscription offer ("A teljes LEXFIT") - iOS-paywall reference
    (docs/LEXFIT Elofizetes iOS.html). Features + selectable plan rows + a green
    pay CTA with the selected price. Tint = --accent-2.
    ════════════════════════════════════════════════════════════════════════ */
 .lx .pw-scroll { text-align: center; padding-top: 8px; }
 
-/* Header — mark + title + sub, centred. */
+/* Header - mark + title + sub, centred. */
 .lx .pw-head { display: flex; flex-direction: column; align-items: center; }
 .lx .pw-mark { display: inline-flex; align-items: center; justify-content: center; background: var(--accent-2); box-shadow: 0 8px 20px -8px rgba(24, 32, 29, 0.5); }
 .lx .pw-title { font-size: 23px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); margin-top: 4px; }
 .lx .pw-title:focus { outline: none; }
 .lx .pw-sub { font-size: 13.5px; color: var(--ink-2); letter-spacing: -0.01em; margin-top: 3px; max-width: 290px; }
 
-/* Features — one emphasised hero row + a 2-column chip grid (apple-design:
+/* Features - one emphasised hero row + a 2-column chip grid (apple-design:
    hierarchy over a flat cramped list). Left-aligned. */
 .lx .pw-feats { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; text-align: left; }
 .lx .pw-hero { display: flex; align-items: center; gap: 13px; background: var(--accent-soft); border-radius: 14px; padding: 13px 15px; }
@@ -999,7 +999,7 @@
 .lx .pw-ftx b { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); line-height: 1.2; }
 .lx .pw-ftx span { font-size: 11.5px; color: var(--ink-2); line-height: 1.2; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Plan rows — selectable cards with radio + optional badge. */
+/* Plan rows - selectable cards with radio + optional badge. */
 .lx .pw-plans { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
 .lx .pw-plan {
   position: relative; display: flex; align-items: center; gap: 12px;

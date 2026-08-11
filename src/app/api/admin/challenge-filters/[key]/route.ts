@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** Admin-only: upsert a Kihívások taxonomy dimension (challengeFilters/{key}).
- *  Creates the doc when missing — previously unauthorable on empty prod. */
+ *  Creates the doc when missing - previously unauthorable on empty prod. */
 export async function PUT(req: Request, { params }: { params: Promise<{ key: string }> }) {
   const token = await verifyRequest(req);
   if (!token || !isAdmin(token)) {

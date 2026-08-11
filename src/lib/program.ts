@@ -64,7 +64,7 @@ export async function loadProgram(slug: string, uid: string): Promise<ProgramDat
   const videoByCode: Record<string, Video> = {};
   videosSnap.forEach((d) => {
     const v = { code: d.id, ...(d.data() as Omit<Video, "code">) };
-    // Draft videos drop out of the playlist entirely — they can't stream anyway
+    // Draft videos drop out of the playlist entirely - they can't stream anyway
     // (the Mux token route 404s them), so showing a dead card would be worse.
     if (isPublishedVideo(v)) videoByCode[d.id] = v;
   });

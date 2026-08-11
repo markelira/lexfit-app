@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
@@ -14,6 +14,16 @@ const poppins = Poppins({
   display: "swap",
 });
 
+// `viewportFit: "cover"` is what makes env(safe-area-inset-*) return anything but 0.
+// Without it the five existing safe-area declarations (lexfit-tokens.css, app/shell.css)
+// silently evaluate to +0px, and the bottom tab bar sits under the home indicator on
+// every notched iPhone. Zoom is deliberately NOT locked.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   subsets: ["latin"],
@@ -24,7 +34,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu"),
   title: "LEXFIT",
-  description: "LEXFIT — vezetett otthoni edzésprogram.",
+  description: "LEXFIT - vezetett otthoni edzésprogram.",
   // Google Search Console ownership proof (URL-prefix property). Unset = no tag.
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }

@@ -7,7 +7,7 @@ import { challengeCatOf, challengeGrad } from "@/lib/categories";
 import type { ChallengeCardData } from "@/lib/challenges";
 
 /**
- * The Kihívások series card — a 9:16-leaning portrait poster that reads as a
+ * The Kihívások series card - a 9:16-leaning portrait poster that reads as a
  * multi-day commitment at thumbnail size: a stack mark + part count (top-left),
  * an engraved day badge (bottom-right), a progress bar across the whole series,
  * an optional ribbon, and a state line that appears only when there's state.

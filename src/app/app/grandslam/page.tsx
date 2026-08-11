@@ -49,7 +49,7 @@ function GrandSlam() {
 
   if (state === undefined) return <Loader label="Ajánlat…" />;
 
-  // Quiet, final "gone" state — no drama, no "lemaradtál!" (J4).
+  // Quiet, final "gone" state - no drama, no "lemaradtál!" (J4).
   const expired = !state || !state.redeemable || remaining <= 0;
   if (expired) {
     return (
@@ -121,7 +121,7 @@ function GrandSlam() {
           {/* J1/J4: the step-up is written out, in plain sight. */}
           <p className={styles.stepup}>
             Az első év {formatHuf(EARNED)}, utána évente {formatHuf(STD)}, automatikusan
-            megújul — bármikor egy kattintással lemondhatod.
+            megújul - bármikor egy kattintással lemondhatod.
           </p>
           {error && <p className={styles.error}>{error}</p>}
         </main>

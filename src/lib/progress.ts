@@ -24,12 +24,12 @@ export interface ProgressState {
   completed: { code: string; at: string; atTime?: string }[]; // at = YYYY-MM-DD, atTime = HH:MM
   resume: Record<string, number>; // code → seconds
   resumeAt?: Record<string, number>; // code → epoch ms of last resume write (recency)
-  // Non-scale wins ("Amit észrevettél") — the user's own words, dated by program week.
+  // Non-scale wins ("Amit észrevettél") - the user's own words, dated by program week.
   observations?: { text: string; week: number; at: string }[];
   // Visszamérés benchmark results, keyed by program week (e.g. "1" baseline, "4" retest).
   benchmark?: Record<string, { rounds: number; at: string }>;
   // Watched seconds bucketed by calendar day (YYYY-MM-DD, Europe/Budapest).
-  // Written ONLY by the server-side Mux Data sync (/api/progress/sync) — the
+  // Written ONLY by the server-side Mux Data sync (/api/progress/sync) - the
   // player no longer accumulates watch time client-side.
   watchByDay?: Record<string, number>;
   // Monday-first weekday indices of the program's scheduled workout days,
@@ -106,7 +106,7 @@ const SYNC_THROTTLE_MS = 15 * 60 * 1000;
 /**
  * Ask the server to pull this user's finished Mux views and fold them into the
  * progress doc (watchByDay buckets, completions, streak, currentIndex). Runs on
- * app-shell load, throttled — `force` bypasses the throttle (Haladásom always
+ * app-shell load, throttled - `force` bypasses the throttle (Haladásom always
  * forces; a pending completion marker also forces). Best-effort by design: the
  * UI reads whatever is in Firestore either way.
  */

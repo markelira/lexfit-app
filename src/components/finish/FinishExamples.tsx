@@ -2,13 +2,18 @@
 
 import { FinishOverlay } from "@/components/finish/FinishOverlay";
 import type { FinishData, OverlayDir } from "@/lib/finish-overlays";
+import "./FinishExamples.css";
 
 // Example finish-cards showing how the share overlay looks. The photos are
-// consented (owner-confirmed 2026-08-08); the overlay STATS are illustrative
-// sample values, so every card is explicitly labelled "minta" — never present
-// these numbers as real member results.
+// consented (owner-confirmed 2026-08-08). The overlay STATS below are INVENTED
+// sample values.
+//
+// The per-card "minta" label was removed on owner instruction (2026-08-11), and
+// the section-level qualifier ("a kártyákon lévő számok mintaadatok") was removed
+// earlier the same day. Nothing on the page now tells a visitor these numbers are
+// not real member results. If that is ever revisited, this is the file to change.
 interface Example { name: string; img: string; dir: OverlayDir; data: FinishData; scrim: boolean; pos: string }
-// A different overlay per card — the real FinishOverlay directions (no vertical
+// A different overlay per card - the real FinishOverlay directions (no vertical
 // spine), each placed on a workable zone of its photo. Scrim on the brighter
 // shots keeps the pure-white type legible.
 const EXAMPLES: Example[] = [
@@ -18,6 +23,7 @@ const EXAMPLES: Example[] = [
   { name: "Ádám", img: "/finish-examples/adam.jpg", dir: "F", scrim: true, pos: "50% 44%", data: { mins: 31, streak: 9, exercises: 11 } },
   { name: "Lilla", img: "/finish-examples/lilla.jpg", dir: "B", scrim: true, pos: "50% 38%", data: { mins: 22, streak: 34, exercises: 9 } },
   { name: "Alexa", img: "/finish-examples/alexa.jpg", dir: "A", scrim: true, pos: "50% 30%", data: { mins: 28, streak: 18, exercises: 13 } },
+  { name: "Ákos", img: "/finish-examples/akos.jpg", dir: "A", scrim: true, pos: "48% 32%", data: { mins: 24, streak: 5, exercises: 10 } },
 ];
 
 // Duplicated so the marquee loops seamlessly (translateX(-50%) = exactly one set).
@@ -37,14 +43,14 @@ export function FinishExamples({ onPick }: { onPick: () => void }) {
             onClick={onPick}
             aria-hidden={i >= EXAMPLES.length}
             tabIndex={i >= EXAMPLES.length ? -1 : 0}
-            aria-label={`Minta megosztókép (${e.name}) — készíts sajátot`}
+            aria-label={`Megosztókép (${e.name}) - készíts sajátot`}
           >
             <div className="fex-frame">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={e.img} alt="" style={{ objectPosition: e.pos }} loading="lazy" />
               <FinishOverlay dir={e.dir} data={e.data} scrim={e.scrim} />
             </div>
-            <span className="fex-name">{e.name} · minta</span>
+            <span className="fex-name">{e.name}</span>
           </button>
         ))}
       </div>

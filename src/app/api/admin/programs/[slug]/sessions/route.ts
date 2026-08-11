@@ -8,9 +8,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Admin-only: replace a program's playlist — an ordered list of video codes.
+ * Admin-only: replace a program's playlist - an ordered list of video codes.
  * The playlist IS the structure: `order` is the sequence, `phaseIdx` groups it,
- * `retest` marks a visszamérés. No week/weekday is authored — the user's chosen
+ * `retest` marks a visszamérés. No week/weekday is authored - the user's chosen
  * cadence (prefs.plan.daysPerWeek / weekdays) schedules the pool.
  *
  * Each session may carry an explicit `phaseIdx` and `retest`. When `phaseIdx`

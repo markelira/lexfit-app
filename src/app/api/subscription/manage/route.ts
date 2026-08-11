@@ -16,7 +16,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * F2.3 cancel-flow actions — the J3-compliant replacement for the Stripe
+ * F2.3 cancel-flow actions - the J3-compliant replacement for the Stripe
  * Customer Portal cancel. One endpoint, `action`-dispatched:
  *   pause     { months: 1|2|3 }  → pause billing + access, bank remaining time
  *   downgrade                    → monthly → weekly std at period end (no proration)
@@ -45,19 +45,19 @@ export async function POST(req: Request) {
       }
       case "downgrade": {
         const effectiveAt = await downgradeToWeekly(token.uid);
-        // Confirmation email — best-effort, the downgrade already happened.
+        // Confirmation email - best-effort, the downgrade already happened.
         if (token.email) {
           await sendCancelConfirm(token.email, {
             variant: "downgrade",
             accessUntilMs: effectiveAt,
-            newPlanLine: `Heti — ${formatHuf(PRICES.week_std.amountHuf)} / hét`,
+            newPlanLine: `Heti - ${formatHuf(PRICES.week_std.amountHuf)} / hét`,
           }).catch((e) => console.error("[downgrade email]", e));
         }
         return NextResponse.json({ ok: true, effectiveAt });
       }
       case "cancel": {
         const accessUntil = await cancelAtPeriodEnd(token.uid);
-        // Confirmation email — best-effort, the cancel already happened.
+        // Confirmation email - best-effort, the cancel already happened.
         if (token.email) {
           await sendCancelConfirm(token.email, {
             variant: "cancel",

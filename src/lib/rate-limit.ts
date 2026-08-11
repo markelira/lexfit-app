@@ -3,7 +3,7 @@ import { adminDb } from "@/lib/firebase-admin";
 
 /**
  * Per-uid fixed-window rate limit backed by a server-only Firestore doc
- * (rateLimits/{scope}_{uid}) — same approach as the account-export limiter.
+ * (rateLimits/{scope}_{uid}) - same approach as the account-export limiter.
  * The collection is unreachable by clients (default-deny rules). Fail-open:
  * a limiter hiccup must never take a product flow down.
  */

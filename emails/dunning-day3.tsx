@@ -1,4 +1,4 @@
-// §4b/8 — Dunning day 3. Trigger: daily cron, 3 days into PAST_DUE.
+// §4b/8 - Dunning day 3. Trigger: daily cron, 3 days into PAST_DUE.
 // Copy carried verbatim from src/lib/pricing/templates.ts dunningDay3().
 
 import * as React from "react";
@@ -11,7 +11,7 @@ export const subject = "Emlékeztető: frissítsd a kártyád";
 
 export default function DunningDay3({ payUrl }: { payUrl: string }) {
   return (
-    <EmailLayout preview="Pár napig még megtartjuk a hozzáférésed — egy perc az egész.">
+    <EmailLayout preview="Pár napig még megtartjuk a hozzáférésed - egy perc az egész.">
       <Text style={styles.eyebrow}>Fizetés</Text>
       <Text style={styles.h1}>Emlékeztető: frissítsd a kártyád</Text>
       <Text style={styles.body}>

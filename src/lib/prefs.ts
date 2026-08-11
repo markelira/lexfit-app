@@ -6,7 +6,7 @@ import { getOnboarding } from "@/lib/user";
 import { WEEK } from "@/lib/onboarding-data";
 import type { Prefs, PlanPrefs } from "@/lib/profile";
 
-// users/{uid}/settings/prefs — one merge-written doc, so a single onSnapshot covers
+// users/{uid}/settings/prefs - one merge-written doc, so a single onSnapshot covers
 // every toggle. Seeded once (idempotently) from onboarding on first read; we NEVER
 // render a default without persisting it, or the reminder cron and the UI would
 // disagree about what the user chose. (31 §P3.2)
@@ -17,7 +17,7 @@ const prefsRef = (uid: string) => doc(db, "users", uid, "settings", "prefs");
 const WORK_WEEKDAYS = WEEK.map((w, i) => (w.work ? i + 1 : 0)).filter((n) => n > 0);
 const REST_WEEKDAYS = WEEK.map((w, i) => (!w.work ? i + 1 : 0)).filter((n) => n > 0);
 
-// onboarding `time` is time-of-DAY (reggel/napközben/este), not a duration — it
+// onboarding `time` is time-of-DAY (reggel/napközben/este), not a duration - it
 // seeds the reminder hour, not the session length (which onboarding never asks).
 const REMINDER_HOUR: Record<string, string> = { reggel: "07:15", napkozben: "12:30", este: "18:00" };
 
@@ -77,7 +77,7 @@ function deriveFromOnboarding(onb: Record<string, unknown> | null): Prefs {
   return {
     ...DEFAULT_PREFS,
     plan: { ...DEFAULT_PREFS.plan, daysPerWeek: days, weekdays },
-    // enabled stays FALSE at seed time — the FirstEntry card is the opt-in; the
+    // enabled stays FALSE at seed time - the FirstEntry card is the opt-in; the
     // onboarding answers only pre-fill the time + days it will use once asked.
     reminders: { ...DEFAULT_PREFS.reminders, workout: { enabled: false, time, weekdays } },
     playback: { ...DEFAULT_PREFS.playback, quietDefault },
@@ -117,7 +117,7 @@ export function watchPrefs(uid: string, cb: (p: Prefs) => void): () => void {
   });
 }
 
-// A partial patch — nested maps deep-merge in Firestore under setDoc({merge:true});
+// A partial patch - nested maps deep-merge in Firestore under setDoc({merge:true});
 // arrays (weekdays, equipment) replace wholesale, which is what we want.
 export type PrefsPatch = {
   plan?: Partial<PlanPrefs>;

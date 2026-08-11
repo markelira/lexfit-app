@@ -1,4 +1,4 @@
-/* LEXFIT auth (/login · /register) — split-screen: light eucalyptus brand panel
+/* LEXFIT auth (/login · /register) - split-screen: light eucalyptus brand panel
    + white auth column with a segmented Login/Register toggle. Ported from the
    Eukaliptusz design handoff (docs/design_handoff_auth).
 
@@ -96,8 +96,8 @@
 
 /* ── RIGHT · auth column ── */
 .authx-auth { order: 2; display: flex; align-items: center; justify-content: center; padding: 44px 40px; background: var(--surface); }
-/* Named .authx-card (not .card) so the global `.lx .card` glass panel — fill,
-   border, blur, shadow — never leaks in; the card is plain, same white as the
+/* Named .authx-card (not .card) so the global `.lx .card` glass panel - fill,
+   border, blur, shadow - never leaks in; the card is plain, same white as the
    right column. */
 .authx .authx-card { width: 100%; max-width: 432px; }
 .authx .topline { display: flex; justify-content: flex-end; font-size: 13.5px; color: var(--ink-2); margin-bottom: 34px; }
@@ -202,7 +202,7 @@
   .authx .submit:hover:not(:disabled) { transform: none; }
 }
 
-/* Onboarding-attach failure (40 §40.12 / P3.5) — retry in place, no trip back
+/* Onboarding-attach failure (40 §40.12 / P3.5) - retry in place, no trip back
    through the questions. */
 .authx .attach-retry {
   min-height: 100dvh;

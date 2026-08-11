@@ -13,8 +13,8 @@ import { addDays, computeStreak, ymd } from "@/lib/streak";
 import type { ProfileData, WeekCellState } from "@/lib/profile";
 
 // loadProfile composes what already exists into ONE typed read model in a single
-// round of reads — no per-component Firestore queries. (31 §P3.1)
-// NB: reconciled with the Mux refactor — "perc mozgás" is the watchByDay sum (not a
+// round of reads - no per-component Firestore queries. (31 §P3.1)
+// NB: reconciled with the Mux refactor - "perc mozgás" is the watchByDay sum (not a
 // separate minutes ledger; §P3.4 is moot), and streak is computeStreak, not a
 // stored value. There is no markComplete anymore.
 
@@ -81,7 +81,7 @@ export async function loadProfile(uid: string): Promise<ProfileData> {
   const u = (userSnap.exists() ? userSnap.data() : {}) as Record<string, unknown>;
   const authUser = auth.currentUser;
 
-  // identity — users/{uid} first, Auth as fallback (P4.1); first name only
+  // identity - users/{uid} first, Auth as fallback (P4.1); first name only
   const full = String((u.displayName as string) ?? authUser?.displayName ?? "");
   const email = (u.email as string) ?? authUser?.email ?? null;
   const name = full.trim().split(/\s+/)[0] || (email ? email.split("@")[0] : "");
@@ -94,7 +94,7 @@ export async function loadProfile(uid: string): Promise<ProfileData> {
       ? (fnd!.playlist.find((w) => w.retest && w.order >= currentIndex)!.order + 1)
       : null;
 
-  // stats — watchByDay sum is "perc mozgás"; streak recomputed rest-day-aware
+  // stats - watchByDay sum is "perc mozgás"; streak recomputed rest-day-aware
   const completed = progress?.completed ?? [];
   const dates = completed.map((c) => String(c.at));
   const workoutIdx = new Set<number>(progress?.workoutDays ?? prefs.plan.weekdays);

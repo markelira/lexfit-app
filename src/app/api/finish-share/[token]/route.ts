@@ -6,7 +6,7 @@ import { adminDb } from "@/lib/firebase-admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Public GET/POST (no auth) — the phone opened via the QR token; the token is the
+// Public GET/POST (no auth) - the phone opened via the QR token; the token is the
 // only credential and exposes non-PII workout stats + lets the phone report
 // status. DELETE is authed (the desktop cleans up its own session).
 // NOTE: a Firestore TTL policy on `expiresAt` is the durable backstop for
@@ -25,7 +25,7 @@ async function loadSession(token: string) {
   return { ref, data: snap.data() as Record<string, unknown> };
 }
 
-/** GET — return the workout data for the phone to render; mark the session opened. */
+/** GET - return the workout data for the phone to render; mark the session opened. */
 export async function GET(_req: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const s = await loadSession(token);
@@ -34,7 +34,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ token: 
   return NextResponse.json({ data: s.data.data ?? {} });
 }
 
-/** POST — the phone reports progress ("opened" | "shared"). */
+/** POST - the phone reports progress ("opened" | "shared"). */
 export async function POST(req: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const body = (await req.json().catch(() => ({}))) as { status?: string };
@@ -47,7 +47,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
   return NextResponse.json({ ok: true });
 }
 
-/** DELETE — the desktop cleans up its own session (auth required; must own it). */
+/** DELETE - the desktop cleans up its own session (auth required; must own it). */
 export async function DELETE(req: Request, { params }: { params: Promise<{ token: string }> }) {
   const auth = await verifyRequest(req);
   if (!auth) return NextResponse.json({ error: "unauthorized" }, { status: 401 });

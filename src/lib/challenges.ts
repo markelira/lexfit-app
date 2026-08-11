@@ -16,8 +16,8 @@ export interface ChallengeCardData extends Challenge {
   doneCount: number;               // days completed by this user
   state: ChallengeState;           // elkezdetlen | folyamatban | kesz
   progressFrac: number;            // 0..1 across the whole series (card progress bar)
-  // NB: the resume target ("Folytatás — N. nap") is intentionally NOT computed
-  // here — the card lacks the ordered day list, and days can be done out of
+  // NB: the resume target ("Folytatás - N. nap") is intentionally NOT computed
+  // here - the card lacks the ordered day list, and days can be done out of
   // order (ordered, never gated), so doneCount+1 would point at the wrong day.
   // The detail page (loadChallenge → nextOrder = first incomplete) owns resume.
   completedAt: unknown | null;
@@ -51,7 +51,7 @@ export const daysBucket = (days: number) =>
   days <= 5 ? "≤5 nap" : days <= 7 ? "6–7 nap" : days <= 10 ? "8–10 nap" : "11–14 nap";
 
 /** A challenge is in progress once ≥1 day is done OR a day has been started
- *  (a saved resume position) — so "Folytatod" catches a started-but-unfinished
+ *  (a saved resume position) - so "Folytatod" catches a started-but-unfinished
  *  challenge, not only ones with a completed day. */
 export const challengeState = (doneCount: number, totalDays: number, started = false): ChallengeState =>
   doneCount > 0 && totalDays > 0 && doneCount >= totalDays ? "kesz"
@@ -126,11 +126,11 @@ export async function loadChallenges(uid: string | null): Promise<ChallengesData
 
   const challenges = challengesSnap.docs
     .map((d) => cardFrom({ slug: d.id, ...(d.data() as Omit<Challenge, "slug">) }, progressBySlug[d.id]))
-    // Only published challenges reach the archive — drafts/soon/archived stay
+    // Only published challenges reach the archive - drafts/soon/archived stay
     // admin-only (challenges have an explicit publish workflow, unlike the library).
     .filter((c) => c.status === "published")
     // newest first (the archive is read backwards from now); order is a legacy
-    // same-date tiebreak only — new challenges sort purely by sortDate
+    // same-date tiebreak only - new challenges sort purely by sortDate
     .sort((a, b) => (b.sortDate || "").localeCompare(a.sortDate || "") || (a.order ?? 0) - (b.order ?? 0));
 
   const filters: Record<string, FilterDimension> = {};

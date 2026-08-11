@@ -9,7 +9,7 @@ import type { FinishData } from "@/lib/finish-overlays";
 /**
  * Device-aware entry to the finish-share flow. On a phone the selfie is taken
  * inline (FinishShare). On desktop it's handed off to the phone via QR
- * (DesktopHandoff) — you can't take a good selfie on a laptop.
+ * (DesktopHandoff) - you can't take a good selfie on a laptop.
  */
 export function FinishShareEntry({ data, open, onClose }: { data: FinishData; open: boolean; onClose: () => void }) {
   const isMobile = useIsMobile();

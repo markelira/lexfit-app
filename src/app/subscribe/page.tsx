@@ -11,7 +11,7 @@ import { BrandPanel } from "@/components/onboarding/BrandPanel";
 import { PaywallOffer, PAYWALL_PLANS } from "@/components/onboarding/paywall";
 import { EmbeddedPay } from "@/components/onboarding/EmbeddedPay";
 
-// The unpaid-user paywall — now the SAME "A teljes LEXFIT" offer as the onboarding
+// The unpaid-user paywall - now the SAME "A teljes LEXFIT" offer as the onboarding
 // funnel (split-screen shell + brand panel + selectable plans + embedded Stripe),
 // so there is one paywall design everywhere. Exit = log out (owner decision).
 // paidDestination() routes every unpaid user here; on success Stripe returns to
@@ -38,13 +38,13 @@ function SubscribeScreen() {
 
   const subscribed = useMemo(() => isSubscribed(sub ?? null), [sub]);
 
-  // Subscribed users don't belong on the paywall — send them into the app.
+  // Subscribed users don't belong on the paywall - send them into the app.
   useEffect(() => {
     if (subscribed) router.replace("/app");
   }, [subscribed, router]);
 
   async function logout() {
-    try { await signOutUser(); } catch { /* ignore — still leave */ }
+    try { await signOutUser(); } catch { /* ignore - still leave */ }
     router.replace("/login");
   }
 
@@ -63,7 +63,7 @@ function SubscribeScreen() {
               <PaywallOffer />
               {canceled && (
                 <p className="pw-fine" role="status">
-                  Nem történt fizetés — a terved megvan, bármikor folytathatod.
+                  Nem történt fizetés - a terved megvan, bármikor folytathatod.
                 </p>
               )}
               <EmbeddedPay plans={PAYWALL_PLANS} role={role} onRoleChange={setRole} />

@@ -18,7 +18,7 @@ export interface SheetVideo {
   blocks?: VideoBlock[];
 }
 
-const WHISPER = `„Ha egy perc túl sok, hagyd ki a felét — a lényeg, hogy itt vagy.”`;
+const WHISPER = `„Ha egy perc túl sok, hagyd ki a felét - a lényeg, hogy itt vagy.”`;
 
 // Derive the "Mit fogsz csinálni" segments. Real blocks if authored, else a sensible
 // warm-up / main / cool-down split from the total minutes.
@@ -49,7 +49,7 @@ export function MobileWorkoutSheet({
   onPlay: (code: string) => void;
   onToggleSave: (code: string) => void;
   onClose: () => void;
-  /** Program brand hue — overrides the category gradient on the art band. */
+  /** Program brand hue - overrides the category gradient on the art band. */
   programHue?: number | null;
 }) {
   if (!v) return null;

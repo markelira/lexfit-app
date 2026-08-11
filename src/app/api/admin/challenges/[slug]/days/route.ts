@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Admin-only: replace a challenge's day list (ordered challengeVideo codes). The
- * list is FLAT — day N is just position N (no weeks/phases). durationDays and
+ * list is FLAT - day N is just position N (no weeks/phases). durationDays and
  * totalDays are both set to the day count so the card badge always matches the
  * actual list. Body shape matches SessionsBuilder: { sessions: [{ videoCode }] }.
  */

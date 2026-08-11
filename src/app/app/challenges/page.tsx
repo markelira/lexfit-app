@@ -116,7 +116,7 @@ export default function ChallengesPage() {
       const term = q.trim().toLowerCase();
       r = r.filter((c) => `${c.title} ${c.bodyPart} ${c.monthLabel}`.toLowerCase().includes(term));
     }
-    // "newest" — loadChallenges already returns newest-first; only re-sort for shortest.
+    // "newest" - loadChallenges already returns newest-first; only re-sort for shortest.
     return sort === "shortest" ? [...r].sort((a, b) => a.durationDays - b.durationDays) : r;
   }, [data, active, q, searching, sort]);
 
@@ -232,7 +232,7 @@ export default function ChallengesPage() {
     <div className="ch-fb">
       <LxIcon d={lxPaths.users} size={18} />
       <div className="tx">
-        <b>A szavazás a Facebook-csoportban zajlik.</b> Ott döntjük el, mi legyen a következő heti kihívás — itt pedig bármikor újra elővehető az összes eddigi.
+        <b>A szavazás a Facebook-csoportban zajlik.</b> Ott döntjük el, mi legyen a következő heti kihívás - itt pedig bármikor újra elővehető az összes eddigi.
       </div>
       <a className="ch-fb-btn" href={data.fbGroupUrl} target="_blank" rel="noopener noreferrer">Ugrás a csoportba</a>
     </div>

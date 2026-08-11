@@ -16,7 +16,7 @@ export interface LibraryData {
   filters: Record<string, FilterDimension>;
 }
 
-/** Draft/soon/archived videos never surface to users — same rule as the Mux
+/** Draft/soon/archived videos never surface to users - same rule as the Mux
  *  token route (which 404s them): docs without a status predate the CMS → allow. */
 export const isPublishedVideo = (v: { status?: string }) =>
   v.status === undefined || v.status === "published";

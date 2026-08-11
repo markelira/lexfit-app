@@ -1,4 +1,4 @@
-/* LEXFIT app landing — MadFit structure, LEXFIT palette + type.
+/* LEXFIT app landing - MadFit structure, LEXFIT palette + type.
    Ported 1:1 from docs/design_handoff_lexfit_landing/lexfit-landing.css.
    EVERYTHING is scoped under `.lxl` so the landing's generic class names
    (.body, .hero, .wrap, .panel, .pill …) never leak into the app screens,
@@ -6,7 +6,7 @@
    (Poppins 300–900 + IBM Plex Mono) via the --font/--mono variables. */
 
 .lxl {
-  /* landing-local tokens — brand colors mirror lexfit-tokens.css; the surface
+  /* landing-local tokens - brand colors mirror lexfit-tokens.css; the surface
      tokens (--cream/--sage/--navy/--panel/--col) are landing-only. */
   --accent: oklch(0.660 0.042 168);        /* #7a9b8d */
   --accent-2: oklch(0.500 0.046 168);    /* #496c5e */
@@ -14,24 +14,44 @@
   --cat-felso: oklch(0.450 0.030 150);   /* plum */
   --cat-cardio: oklch(0.560 0.085 72);   /* coral */
   --cat-teljes: oklch(0.520 0.058 42);  /* deep rose */
-  --cat-also: oklch(0.660 0.042 168);      /* alsótest — brand rose */
-  --cat-mobility: oklch(0.755 0.032 225);/* mobility — sage green */
+  --cat-also: oklch(0.660 0.042 168);      /* alsótest - brand rose */
+  --cat-mobility: oklch(0.755 0.032 225);/* mobility - sage green */
   --cream: #f1f6f4;
   --sage: #7a9b8d;
   --sage-2: #7a9b8d;
   --panel: #e1f1ea;
   --navy: #18201d;
-  --font: var(--font-poppins), "Poppins", "Helvetica Neue", sans-serif;
-  --mono: var(--font-plex-mono), "IBM Plex Mono", monospace;
+  /* --font / --mono are NOT redefined here. They are declared once on :root in
+     lexfit-tokens.css (loaded app-wide via globals.css in the root layout) and
+     inherit into .lxl. A second identical definition meant a typeface change had
+     two places to edit and one to forget. */
   --col: 1200px;
 
-  /* motion system — one curve / distance / duration for the whole page */
+  /* ---- text colour ramp (docs/landing-analysis/13-lexfit-type-spec.md §7) ----
+     Was 24 ad-hoc alpha steps - 10 on cream, 14 on dark - none of which anybody
+     chose; .70 vs .72 is not a decision. Four roles per ground is what the page
+     actually distinguishes. Kept as alphas of --ink for now so nothing shifts
+     visibly; swapping --tx-2/--tx-3 to the solid --ink-2/--ink-3 tokens that
+     lexfit-tokens.css already ships is a follow-up that needs a contrast pass. */
+  --tx-1: var(--ink);                      /* headings, emphasis */
+  --tx-2: oklch(from var(--ink) l c h / .82);  /* body copy */
+  --tx-3: oklch(from var(--ink) l c h / .66);  /* meta, labels, chips */
+  --tx-4: oklch(from var(--ink) l c h / .50);  /* fine print */
+  --tx-d1: #fff;                           /* same four, on navy/photo grounds */
+  --tx-d2: oklch(1 0 168 / .82);
+  --tx-d3: oklch(1 0 168 / .66);
+  --tx-d4: oklch(1 0 168 / .50);
+
+  /* motion system - one curve / distance / duration for the whole page */
   --ease-out: cubic-bezier(.22, 1, .36, 1);
   --rise-y: 18px;
   --rise-dur: .62s;
   --rise-step: 80ms;
 
   font-family: var(--font);
+  /* Declared so nothing inherits the UA default. Every display element below sets
+     its own leading in px per the derived rule; this is the running-text floor. */
+  line-height: 1.5;
   background: var(--cream);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
@@ -45,38 +65,17 @@
 .lxl h1, .lxl h2, .lxl h3, .lxl p { margin: 0; }
 .lxl button { font-family: inherit; }
 
-/* ---- image placeholder (replaces prototype <image-slot>) ---- */
-.lxl .ph {
-  position: relative; overflow: hidden; width: 100%; height: 100%;
-  background: var(--cream);
-  background-image: repeating-linear-gradient(135deg,
-    oklch(0.93 0.02 168) 0 10px, oklch(0.955 0.014 168) 10px 20px);
-  display: flex; align-items: center; justify-content: center;
-}
-.lxl .ph.abs { position: absolute; inset: 0; }
-.lxl .ph.dark {
-  background: var(--navy);
-  background-image: repeating-linear-gradient(135deg,
-    oklch(0.32 0.025 168) 0 10px, oklch(0.355 0.026 168) 10px 20px);
-}
-.lxl .ph span {
-  font-family: var(--mono); font-size: 11px; letter-spacing: .02em;
-  color: oklch(.235 .014 168/.7); background: oklch(1 0 168/.85);
-  padding: 4px 9px; border-radius: 6px; text-align: center; max-width: 82%;
-}
-.lxl .ph.dark span { background: oklch(.26 0.022 168/.85); color: oklch(1 0 168/.72); }
-
 /* ---- type helpers ---- */
-.lxl .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); opacity: .75; }
-.lxl .h-thin { font-weight: 300; font-size: clamp(30px,3.4vw,46px); line-height: 1.04; letter-spacing: -.022em; text-transform: lowercase; margin: 0; }
-.lxl .h-bold { font-weight: 600; font-size: clamp(26px,2.6vw,34px); line-height: 1.08; letter-spacing: -.028em; margin: .2em 0 0; }
-.lxl .body { font-size: 16px; line-height: 1.58; color: oklch(.235 .014 168/.82); text-wrap: pretty; }
-.lxl .cap-title { font-weight: 500; font-size: clamp(20px,2vw,23px); letter-spacing: -.02em; text-align: center; margin: 0; }
-.lxl .cap-body { font-size: 15px; line-height: 1.55; color: oklch(.235 .014 168/.7); text-align: center; max-width: 660px; margin: 14px auto 0; text-wrap: pretty; }
+.lxl .eyebrow { font-family: var(--mono); font-size: 11px; line-height: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--tx-3); }
+.lxl .h-thin { font-weight: 300; font-size: 46px; line-height: 56px; letter-spacing: -.018em; text-transform: lowercase; margin: 0; }
+.lxl .h-bold { font-weight: 600; font-size: 34px; line-height: 42px; letter-spacing: -.015em; margin: .2em 0 0; }
+.lxl .body { font-size: 16px; line-height: 26px; color: var(--tx-2); text-wrap: pretty; }
+.lxl .cap-title { font-weight: 600; font-size: 23px; line-height: 30px; letter-spacing: -.012em; text-align: center; margin: 0; }
+.lxl .cap-body { font-size: 15px; line-height: 25px; color: var(--tx-3); text-align: center; max-width: 660px; margin: 14px auto 0; text-wrap: pretty; }
 
 /* ---- buttons ---- */
 /* Marketing CTAs, brought into the button system: flat, 8px radius, colour-only
-   hover, 1px press, focus ring — no pill/shadow/lift. Matches the app buttons. */
+   hover, 1px press, focus ring - no pill/shadow/lift. Matches the app buttons. */
 .lxl .pill { display: inline-flex; align-items: center; justify-content: center; gap: var(--btn-gap);
   font-family: var(--font); font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
   border-radius: var(--r-sm); cursor: pointer; padding: 15px 30px; border: 1px solid transparent; text-decoration: none;
@@ -89,7 +88,15 @@
 .lxl .pill-outline:hover { background: var(--ink); color: #fff; }
 .lxl .pill-sage { background: var(--sage); color: var(--ink); border-color: var(--sage); }
 .lxl .pill-sage:hover { filter: brightness(0.97); color: var(--ink); }
+/* Was an 18px-tall inline link - the only remaining WCAG 2.5.8 failure. */
+.lxl .hero-cta2 { display: inline-flex; align-items: center; min-height: 44px; }
 .lxl .hero-cta2:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Nav links measured 33px tall - under the 44px HIG target. Padding only; the
+   type and rhythm are unchanged. */
+.lxl .hero-nav .links a, .lxl .stickynav .links a {
+  display: inline-flex; align-items: center; min-height: 44px;
+}
 
 /* ---- section band + panel ---- */
 .lxl .band-cream { background: var(--cream); }
@@ -111,8 +118,36 @@
   transform: rotate(8deg); pointer-events: none; }
 .lxl .panel-pad { padding: 64px; }
 .lxl .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 1; }
-.lxl .panel-media { display: flex; justify-content: center; }
+/* `min-width: 0` — as a grid item its default `auto` min resolves to min-content,
+   which is the 280px phone frame, so at 320px the column could not shrink and ran
+   19px past the screen. Third instance of this same default in one page. */
+.lxl .panel-media { display: flex; justify-content: center; min-width: 0; }
 .lxl .frame { position: relative; overflow: hidden; }
+
+/* ---- §3 phone frame: the looping player recording ------------------------
+   The device edge and shadow are what make this read as a phone on the panel
+   rather than a video pasted onto it - the same treatment §2's screenshots get. */
+.lxl .phone-frame {
+  /* The width is set inline (280px) so the aspect-ratio has something to work
+     from; this caps it on SE-class screens, where 280 + the wrap and panel
+     padding ran 19px past the viewport. */
+  max-width: 100%;
+  background: #000;
+  box-shadow: 0 26px 60px -28px oklch(0 0 168/.55), 0 0 0 1px oklch(0 0 168/.08);
+}
+.lxl .phv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Reduced motion only: playback is opt-in, so the affordance has to be visible
+   and reachable - 44px minimum, centred over the poster. */
+.lxl .phv-play {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 20px; border: none; border-radius: 999px;
+  background: oklch(1 0 168/.92); color: var(--ink);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px -10px oklch(0 0 168/.5);
+}
+.lxl .phv-play:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 /* ---- text-with-icon block ---- */
 .lxl .ticon { display: flex; flex-direction: column; }
@@ -129,32 +164,74 @@
 .lxl .device .screen { position: relative; border-radius: 34px; overflow: hidden; background: #0c0c10; aspect-ratio: 9/19.5; width: 280px; }
 .lxl .device .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 92px; height: 26px; background: #101014; border-radius: 99px; z-index: 3; }
 
-/* ---- carousels ---- */
-.lxl .carousel { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; padding: 6px 40px; scrollbar-width: none; }
-.lxl .carousel::-webkit-scrollbar { display: none; }
-.lxl .carousel > * { flex: 0 0 auto; scroll-snap-align: center; }
 
 /* ---- hero · premium light ---- */
-.lxl .hero { position: relative; background: var(--sage); border-radius: 28px; overflow: hidden; padding: 34px 0 96px; margin: 16px 16px 0; }
-.lxl .hero-aura { position: absolute; width: 900px; height: 900px; left: 50%; top: 62%; transform: translate(-50%,-50%); border-radius: 50%; background: radial-gradient(circle, oklch(1 0 0/.34), transparent 60%); filter: blur(40px); animation: lxl-heroBreathe 7s ease-in-out infinite; pointer-events: none; }
-@keyframes lxl-heroBreathe { 0%,100% { opacity: .7; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 1; transform: translate(-50%,-50%) scale(1.08); } }
+/* ── HERO ── full-bleed photo, viewport height, no motion ───────────────────
+   The photo IS the band. Copy sits on it over a scrim rather than beside it.
+   `100svh` (not vh) so mobile browser chrome doesn't push the CTA off-screen;
+   the 16px card margin is subtracted so the hero ends exactly at the fold. */
+.lxl .hero {
+  /* Equal 16px inset on all four sides - the card was `16px 16px 0`, so the bottom
+     ran into the next band and the panel read as unfinished. The viewport target
+     now subtracts BOTH insets so the hero still ends exactly at the fold. */
+  position: relative; overflow: hidden; border-radius: 28px; margin: 16px;
+  min-height: calc(100svh - 32px);
+  display: flex; flex-direction: column;
+  background: var(--sage);            /* holds the ground while the photo decodes */
+  padding: 34px 0 48px;
+}
+.lxl .hero-inner { position: relative; z-index: 2; display: flex; flex-direction: column; flex: 1; }
 .lxl .hero-nav { display: flex; align-items: center; justify-content: space-between; color: var(--ink); position: relative; z-index: 2; }
 .lxl .hero-nav .links { display: flex; gap: 26px; font-family: var(--mono); font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
 .lxl .hero-nav .links a { color: oklch(from var(--ink) l c h / .7); transition: color .2s; }
 .lxl .hero-nav .links a:hover { color: var(--ink); }
-.lxl .hero-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: oklch(from var(--ink) l c h / .85); margin-bottom: 16px; }
-.lxl .wordmark { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 24px; letter-spacing: .02em; }
-.lxl .hero-body { display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 30px; margin-top: 70px; position: relative; z-index: 2; }
+/* Contrast-audited: was 4.35:1 at 11px (AA needs 4.5). */
+.lxl .hero-eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink); margin-bottom: 16px; }
+.lxl .wordmark { display: inline-flex; align-items: center; gap: .34em; font-weight: 800; font-size: 24px; line-height: 31px; letter-spacing: .02em; }
+/* The mark sizes itself in `em`, so one rule serves all three lockups - sticky nav
+   (19px), hero (24px) and footer (26px) - and they stay in proportion without any
+   per-instance numbers. The gap moved from a fixed 10px to `.34em` for the same
+   reason: at 19px a 10px gap is half again as wide as it looks at 26px. */
+.lxl .wordmark .lexmark {
+  /* Bare mark, no tile - it paints in `currentColor`, so it simply takes the
+     wordmark's own ink on every ground it appears on. 0.88 × 0.797em holds the
+     glyph's 680:616 ratio and lands just above Poppins' cap height at 24px. */
+  flex: none; display: block; width: .88em; height: .797em;
+}
+.lxl .wordmark .lexmark svg { width: 100%; height: 100%; display: block; }
+/* Side by side again - the photo is an object, not a ground. The band is a full
+   viewport now, so the photo takes the row's height rather than a fixed 566px,
+   and the row is vertically centred in whatever space is left under the nav. */
+.lxl .hero-body {
+  display: grid; grid-template-columns: 1.02fr .98fr; align-items: center; gap: 48px;
+  flex: 1; min-height: 0; margin-top: 48px;
+}
+.lxl .hero-copy { max-width: 560px; }
+.lxl .hero-device {
+  /* `align-self: center` (not stretch) so the photo sits on the SAME vertical
+     centre line as the copy column - stretch pinned it to the top of the row and
+     the two columns read as misaligned. The height is explicit because a centred
+     grid item cannot derive one from the track. */
+  position: relative; justify-self: center; align-self: center;
+  width: min(420px, 100%); height: min(620px, 68svh);
+  border-radius: 24px; overflow: hidden;
+}
+.lxl .hero-device img { transform: scaleX(-1); }
 .lxl .hero-copy { text-align: left; color: var(--ink); }
-.lxl .hero-copy h1 { font-weight: 300; font-size: clamp(44px,5.6vw,84px); line-height: 1; letter-spacing: -.02em; text-transform: uppercase; margin: 0; }
-.lxl .hero-copy h1 b { font-weight: 700; color: var(--ink); }
+.lxl .hero-copy h1 { font-weight: 300; font-size: 80px; line-height: 94px; letter-spacing: -.028em; text-transform: uppercase; margin: 0; }
+.lxl .hero-copy h1 b { font-weight: 600; color: var(--ink); }
 .lxl .hero-copy .body { color: oklch(from var(--ink) l c h / .82); margin: 24px 0 0; max-width: 440px; font-size: 16px; }
 .lxl .hero-row { display: flex; align-items: center; gap: 22px; margin-top: 34px; }
 .lxl .hero-cta2 { background: none; border: none; cursor: pointer; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: oklch(from var(--ink) l c h / .78); }
 .lxl .hero-cta2:hover { color: var(--ink); }
-.lxl .hero-trust { font-family: var(--mono); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: oklch(from var(--ink) l c h / .78); margin-top: 38px; }
-.lxl .hero-device { position: relative; justify-self: center; width: 320px; height: 566px; border-radius: 24px; overflow: hidden; animation: lxl-heroFloat 6s ease-in-out infinite; }
-@keyframes lxl-heroFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+/* Contrast-audited: was 3.85:1. Carries the credibility line, so it has to be read. */
+.lxl .hero-trust { font-family: var(--mono); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: oklch(from var(--ink) l c h / .95); margin-top: 38px; }
+
+/* Mirrored so she faces INTO the copy rather than out of the frame - the eye
+   follows a subject's gaze, and pointing it at the headline keeps attention on
+   the page. Applied to the <img>, not the container, so the float animation and
+   the border radius are unaffected. */
+
 
 /* ---- app-intro ---- */
 .lxl .app-intro { max-width: 470px; }
@@ -172,15 +249,17 @@
 .lxl .cf-meta b { display: block; font-size: 18px; font-weight: 600; letter-spacing: -.01em; margin-top: 6px; text-wrap: balance; }
 .lxl .cf-meta .cf-min { font-family: var(--mono); font-size: 11px; letter-spacing: .05em; color: oklch(1 0 168/.78); margin-top: 6px; display: block; }
 
-/* ---- foundation starter — cinematic journey ---- */
+/* ---- foundation starter - cinematic journey ---- */
 .lxl .starter-head { text-align: center; max-width: 720px; margin: 0 auto; }
 .lxl .starter-badge { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 999px; padding: 8px 16px; box-shadow: 0 12px 28px -14px var(--accent-2); }
 .lxl .starter-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #fff; }
-.lxl .starter-title { font-weight: 600; font-size: clamp(32px,4.4vw,54px); line-height: 1.02; letter-spacing: -.03em; margin: 18px 0 0; color: var(--ink); text-wrap: balance; }
-.lxl .starter-head .cap-body { margin-top: 16px; }
+.lxl .starter-title { font-weight: 600; font-size: 54px; line-height: 65px; letter-spacing: -.022em; margin: 18px 0 0; color: var(--ink); text-wrap: balance; }
+.lxl .starter-head .cap-body { margin-top: 14px; }
 .lxl .starter-facts { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
 .lxl .starter-facts span { font-family: var(--mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: oklch(.235 .014 168/.66); background: #fff; border: 1px solid oklch(0 0 168/.07); border-radius: 999px; padding: 8px 15px; }
-.lxl .journey { position: relative; margin-top: 40px; border-radius: 28px; overflow: hidden; height: 600px; color: #fff; isolation: isolate; }
+/* Height is a FLOOR, not a fixed box: the rows now hold a real WorkoutCard, which is
+   ~338px vs the 150px cover it replaced, and a fixed 600px clipped it away. */
+.lxl .journey { position: relative; margin-top: 40px; border-radius: 28px; overflow: hidden; min-height: 600px; color: #fff; isolation: isolate; }
 .lxl .journey .jbg { position: absolute; inset: 0; z-index: 0; transition: opacity .9s ease, transform 7s linear; }
 .lxl .journey .jbg.ph-alap { background: linear-gradient(135deg, oklch(.46 .028 168), oklch(.30 .022 168)); }
 .lxl .journey .jbg.ph-epites { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
@@ -188,8 +267,8 @@
 .lxl .journey-inner { position: relative; z-index: 2; display: grid; grid-template-columns: .92fr 1.08fr; gap: 44px; align-items: start; padding: 56px 58px 74px; }
 .lxl .j-eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: oklch(1 0 168/.82); }
 .lxl .j-weeknum { font-weight: 800; font-size: clamp(92px,13vw,168px); line-height: .82; letter-spacing: -.05em; margin: 10px 0 2px; }
-.lxl .j-week { font-weight: 300; font-size: clamp(24px,2.6vw,34px); letter-spacing: -.02em; }
-.lxl .j-desc { font-size: 15px; line-height: 1.5; color: oklch(1 0 168/.82); max-width: 340px; margin-top: 16px; text-wrap: pretty; min-height: 68px; }
+.lxl .j-week { font-weight: 300; font-size: 34px; line-height: 42px; letter-spacing: -.015em; }
+.lxl .j-desc { font-size: 15px; line-height: 25px; color: var(--tx-d2); max-width: 340px; margin-top: 16px; text-wrap: pretty; min-height: 68px; }
 .lxl .j-meta { font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: oklch(1 0 168/.7); margin-top: 16px; }
 .lxl .j-anim > * { animation: lxl-jSwap .8s cubic-bezier(.22,1,.36,1) both; }
 @keyframes lxl-jSwap { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
@@ -199,34 +278,35 @@
 .lxl .j-drow.active .j-dhead { background: oklch(1 0 168/.22); border-color: oklch(1 0 168/.45); }
 .lxl .j-dhead .j-dot { width: 11px; height: 11px; border-radius: 4px; flex: none; }
 .lxl .j-dhead .j-day { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; color: oklch(1 0 168/.72); width: 26px; flex: none; }
-.lxl .j-dhead .j-t { font-size: 15px; font-weight: 500; letter-spacing: -.01em; transition: font-weight .3s; }
-.lxl .j-drow.active .j-dhead .j-t { font-weight: 700; }
-/* Expand via grid-template-rows (cheaper than the old max-height loop — 03 D11). */
+.lxl .j-dhead .j-t { font-size: 15px; font-weight: 400; letter-spacing: -.01em; transition: font-weight .3s; }
+.lxl .j-drow.active .j-dhead .j-t { font-weight: 600; }
+/* Expand via grid-template-rows (cheaper than the old max-height loop - 03 D11). */
 .lxl .j-card { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .6s cubic-bezier(.22,1,.36,1), opacity .45s ease, margin-top .5s ease; }
 .lxl .j-card-inner { overflow: hidden; min-height: 0; }
 .lxl .j-drow.active .j-card { grid-template-rows: 1fr; opacity: 1; margin-top: 9px; }
-.lxl .j-cover { position: relative; height: 150px; border-radius: 16px; overflow: hidden; display: flex; align-items: flex-end; padding: 16px; box-shadow: 0 20px 40px -22px oklch(0 0 168/.55); }
-.lxl .j-cover::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 85% 10%, oklch(1 0 168/.18), transparent 55%); }
-.lxl .j-ring { position: absolute; top: -38px; right: -26px; width: 150px; height: 150px; border-radius: 50%; border: 2px solid oklch(1 0 168/.28); z-index: 0; }
-.lxl .j-word { position: absolute; top: 12px; right: 18px; font-weight: 900; font-size: 34px; letter-spacing: .02em; color: oklch(1 0 168/.34); z-index: 1; line-height: 1; }
-.lxl .j-cmeta { position: relative; z-index: 1; color: #fff; }
-.lxl .j-cmeta b { display: block; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
-.lxl .j-cmeta span { font-family: var(--mono); font-size: 11px; letter-spacing: .05em; color: oklch(1 0 168/.82); }
-.lxl .j-chapters { position: absolute; left: 58px; right: 58px; bottom: 30px; z-index: 3; display: flex; gap: 10px; }
-.lxl .j-chap { flex: 1; height: 4px; border: none; padding: 0; border-radius: 99px; background: oklch(1 0 168/.25); overflow: hidden; cursor: pointer; position: relative; }
+
+/* The journey now renders the real WorkoutCard. It sits on a dark gradient, and the
+   component colours itself from the app's ink tokens - so remap the tokens rather
+   than overriding each rule. The card styles itself correctly from there. */
+.lxl .journey .j-wc {
+  --ink: #fff;
+  --ink-2: oklch(1 0 168/.74);
+  --ink-3: oklch(1 0 168/.58);
+  padding-bottom: 2px;
+}
+.lxl .journey .j-wc .wc-save { display: none; }   /* no list to save to, logged out */
+.lxl .journey .j-wc .wc { gap: 8px; }
+.lxl .j-chapters { position: absolute; left: 58px; right: 58px; bottom: 10px; z-index: 3; display: flex; gap: 10px; }
+/* 44px tall for the finger, 4px tall for the eye - the track is the child. */
+.lxl .j-chap { flex: 1; height: 44px; border: none; padding: 0; background: none; cursor: pointer; display: flex; align-items: center; }
+.lxl .j-chap:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
+.lxl .j-track { display: block; width: 100%; height: 4px; border-radius: 99px; background: oklch(1 0 168/.25); overflow: hidden; position: relative; }
 .lxl .j-chap .fill { position: absolute; inset: 0; transform: scaleX(0); transform-origin: left; background: #fff; border-radius: 99px; }
 .lxl .j-chap.on .fill { animation: lxl-scFill var(--dur,4500ms) linear forwards; }
 .lxl .j-chap.done .fill { transform: scaleX(1); }
 .lxl .j-chap.paused .fill { animation-play-state: paused; }
 
 /* ---- unlimited course cards ---- */
-.lxl .unlim-card { position: relative; flex: none; width: 230px; height: 290px; border-radius: 18px; overflow: hidden; display: flex; align-items: flex-end; padding: 18px; box-shadow: 0 24px 48px -26px oklch(0 0 168/.5); }
-.lxl .unlim-card::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 85% 10%, oklch(1 0 168/.18), transparent 55%); }
-.lxl .uc-ring { position: absolute; top: -46px; right: -32px; width: 180px; height: 180px; border-radius: 50%; border: 2px solid oklch(1 0 168/.28); z-index: 0; }
-.lxl .uc-word { position: absolute; top: 14px; right: 18px; font-weight: 900; font-size: 32px; letter-spacing: .02em; color: oklch(1 0 168/.34); z-index: 1; line-height: 1; }
-.lxl .uc-meta { position: relative; z-index: 1; color: #fff; }
-.lxl .uc-meta b { display: block; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
-.lxl .uc-meta span { font-family: var(--mono); font-size: 11px; letter-spacing: .05em; color: oklch(1 0 168/.82); }
 
 /* ---- cinematic showcase ---- */
 .lxl .showcase-band { padding: 96px 0 104px; margin: 16px 16px 0; border-radius: 28px; }
@@ -245,7 +325,7 @@
 .lxl .sc-screen { background: #0c0c10; }
 .lxl .sc-scene { position: absolute; inset: 0; opacity: 0; transform: scale(1.12); transition: opacity 1s ease, transform 6s linear; z-index: 0; }
 .lxl .sc-scene.on { opacity: 1; transform: scale(1); z-index: 1; }
-.lxl .sc-caption { margin-top: 40px; font-weight: 300; font-size: clamp(22px,2.6vw,32px); letter-spacing: -.02em; color: #fff; text-align: center; min-height: 1.3em; transition: opacity .5s; text-wrap: balance; }
+.lxl .sc-caption { margin-top: 40px; font-weight: 300; font-size: clamp(22px,2.6vw,32px); letter-spacing: -.015em; color: #fff; text-align: center; min-height: 1.3em; transition: opacity .5s; text-wrap: balance; }
 .lxl .sc-chapters { display: flex; gap: 10px; margin-top: 30px; width: min(420px,80vw); }
 .lxl .sc-chap { flex: 1; height: 4px; border: none; padding: 0; border-radius: 99px; background: oklch(1 0 168/.18); overflow: hidden; cursor: pointer; position: relative; }
 .lxl .sc-chap .fill { position: absolute; inset: 0; transform: scaleX(0); transform-origin: left; background: var(--accent); border-radius: 99px; }
@@ -255,7 +335,8 @@
 @keyframes lxl-scFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 /* ---- sticky nav · floating glass pill ---- */
-.lxl .stickynav { position: fixed; top: 0; left: 0; right: 0; z-index: 60; padding: 16px 20px 0; transform: translateY(-130%); transition: transform .34s cubic-bezier(.22,1,.36,1); }
+.lxl .stickynav { position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+  padding: calc(16px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 0 calc(20px + env(safe-area-inset-left)); transform: translateY(-130%); transition: transform .34s cubic-bezier(.22,1,.36,1); }
 .lxl .stickynav.show { transform: none; }
 /* bg raised .6 → .74 so the pill stays legible over the navy bands (03 B6) */
 .lxl .stickynav .row1 { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: var(--col); margin: 0 auto; background: oklch(1 0 168/.74); border: 1px solid oklch(1 0 168/.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 999px; padding: 11px 12px 11px 24px; box-shadow: 0 20px 44px -26px oklch(.4 .03 168/.6), inset 0 1px 0 oklch(1 0 168/.85); }
@@ -263,20 +344,55 @@
 .lxl .stickynav .row1 .links { display: flex; gap: 22px; font-family: var(--mono); font-size: 11px; letter-spacing: .11em; text-transform: uppercase; }
 .lxl .stickynav .row1 .links a { color: oklch(.235 .014 168/.58); transition: color .2s; white-space: nowrap; }
 .lxl .stickynav .row1 .links a:hover { color: var(--ink); }
-.lxl .stickynav .row1 .links a.active { color: var(--ink); font-weight: 600; }
-.lxl .stickynav .mini { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); border: none; border-radius: 999px; padding: 10px 18px; font-size: 11px; color: #fff; font-family: var(--mono); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; transition: background .2s; }
+.lxl .stickynav .row1 .links a.active { color: var(--ink); font-weight: 500; }
+.lxl .stickynav .mini { min-height: 44px; display: inline-flex; align-items: center; gap: 8px; background: var(--ink); border: none; border-radius: 999px; padding: 10px 18px; font-size: 11px; color: #fff; font-family: var(--mono); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; transition: background .2s; }
 .lxl .stickynav .mini:hover { background: var(--accent-2); color: #fff; }
 
-/* ---- cast diagram (vertical layout) ---- */
-.lxl .cast { position: relative; }
-.lxl .cast-top { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 2; }
+/* ---- cast diagram ----
+   The phone and the TV are ONE composition, so they live in one coordinate space:
+   the stage is the TV's box, and the phone is positioned inside it as a percentage.
+   That is what lets "sit in the bottom ~15% of the TV" be stated directly instead of
+   guessed at with a negative margin against a different row's height. */
+.lxl .cast { position: relative; display: flex; flex-direction: column; align-items: center; }
+.lxl .cast-copy { width: 100%; max-width: var(--col); }
 .lxl .cast-icons { display: flex; gap: 16px; color: #fff; margin-bottom: 18px; }
-.lxl .cast-phone { position: relative; display: flex; justify-content: center; }
-.lxl .cast-shot { border-radius: 20px; overflow: hidden; box-shadow: 0 40px 90px -40px oklch(0 0 168/.7); position: relative; z-index: 2; }
-.lxl .cast-shot.ph { width: 340px; height: 212px; }
-.lxl .cast-tvwrap { display: flex; justify-content: center; margin-top: -60px; position: relative; z-index: 1; }
-.lxl .cast-shot.tv { width: min(680px,90%); aspect-ratio: 16/10; }
-.lxl .cast-beam { position: absolute; top: 58%; left: 50%; width: 200%; height: 360px; transform: translateX(-46%); background: linear-gradient(180deg, oklch(.660 .042 168/.5), transparent 88%); clip-path: polygon(46% 0,56% 0,34% 100%,20% 100%); filter: blur(8px); z-index: 0; pointer-events: none; }
+/* Typography: the display heading keeps its tight internal leading (1.04 - correct
+   for large type), but the INTERVAL between heading and body was zero, so the two
+   sizes collided and read as one block. The gap scales with the heading instead of
+   being a fixed value, so the relationship holds at every width. */
+/* One headline→body slot and one paragraph slot, matching every other band.
+   These were clamped (18–28px / 10–14px), which made §4 the only section whose
+   heading spacing changed with viewport width - drift, not intent. */
+.lxl .cast-copy .h-thin + .body { margin-top: 14px; }
+.lxl .cast-copy .body + .body { margin-top: 14px; }
+
+.lxl .cast-stage { position: relative; width: min(660px, 92%); margin-top: 44px; }
+.lxl .cast-shot { border-radius: 20px; overflow: hidden; box-shadow: 0 40px 90px -40px oklch(0 0 168/.7); position: relative; }
+/* The TV is the destination and the larger object - it sets the stage's size. */
+.lxl .cast-shot.tv { width: 100%; aspect-ratio: 16 / 10; z-index: 1; }
+/* The phone is the source, held in the foreground: ~1/3 the TV's width, and its
+   BOTTOM edge lands in the lowest ~15% of the TV.
+   Historic note: this was once `.ph`, which collided with the striped-placeholder
+   class whose `height: 100%` silently overrode the aspect ratio. That placeholder
+   is gone now - every image on the page is a real asset - but the name stays
+   `.phone` because it is the accurate one. */
+.lxl .cast-shot.phone {
+  position: absolute; z-index: 2;
+  /* Sits mostly OUTSIDE the TV to its right: only ~25% of the phone's width
+     overlaps the screen. Negative `right` is measured against the stage, i.e. the
+     TV itself, so the relationship is stated once and holds at any size. */
+  right: -24%; bottom: 15%;
+  width: 32%; aspect-ratio: 9 / 19.5;
+  border-radius: 18px;
+  box-shadow: 0 30px 60px -22px oklch(0 0 168/.85);
+}
+/* Between the mobile breakpoint and ~1180px there isn't room for the phone to hang
+   that far right without leaving the content column, so it tucks back in. */
+@media (max-width: 1180px) {
+  .lxl .cast-stage { width: min(560px, 88%); }
+  .lxl .cast-shot.phone { right: -18%; }
+}
+
 .lxl .castrow { display: flex; align-items: center; justify-content: center; gap: 26px; margin-top: 48px; flex-wrap: wrap; }
 .lxl .castrow .dev { display: flex; flex-direction: column; align-items: center; gap: 8px; color: oklch(1 0 168/.8); }
 .lxl .castrow .dev .lab { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; }
@@ -293,46 +409,52 @@
 
 /* ---- alexa finale ---- */
 .lxl .alexa-band { text-align: center; }
-.lxl .alexa-pull-big { font-weight: 300; font-size: clamp(30px,4vw,52px); letter-spacing: -.03em; color: var(--accent); margin-bottom: 34px; text-wrap: balance; }
-.lxl .aq-promise { display: flex; flex-direction: column; gap: 8px; font-family: var(--mono); font-size: 13px; letter-spacing: .04em; color: oklch(1 0 168/.68); }
-.lxl .aq-close { font-weight: 300; font-size: clamp(40px,6vw,76px); line-height: 1.02; letter-spacing: -.03em; color: #fff; margin: 30px 0 0; text-wrap: balance; }
+/* Leading tracks size inversely: this is display type, so it takes the same tight
+   1.05 that .aq-close uses at 60px. It was inheriting the 1.5 body value. */
+.lxl .alexa-pull-big { font-weight: 300; font-size: 52px; line-height: 63px; letter-spacing: -.022em; color: var(--accent); margin-bottom: 34px; text-wrap: balance; }
+/* Three parallel refusals - a list, so it is announced as one. */
+.lxl .aq-promise { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-family: var(--mono); font-size: 13px; letter-spacing: .04em; color: oklch(1 0 168/.68); }
+.lxl .aq-close { font-weight: 300; font-size: 60px; line-height: 72px; letter-spacing: -.022em; color: var(--tx-d1); margin: 30px 0 0; text-wrap: balance; }
 .lxl .aq-sign { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: oklch(1 0 168/.6); margin-top: 20px; }
 .lxl .aq-cta { margin-top: 30px; }
 
 /* ---- FAQ ---- */
 .lxl .faq { display: flex; flex-direction: column; gap: 10px; max-width: 720px; margin: 26px auto 0; text-align: left; }
 .lxl .faq-item { background: #fff; border: 1px solid oklch(0 0 168/.07); border-radius: 14px; padding: 0 20px; }
-.lxl .faq-item summary { cursor: pointer; font-weight: 600; font-size: 15px; letter-spacing: -.01em; padding: 16px 26px 16px 0; list-style: none; position: relative; }
+.lxl .faq-item summary { cursor: pointer; font-weight: 600; font-size: 15px; letter-spacing: 0; padding: 16px 26px 16px 0; list-style: none; position: relative; }
 .lxl .faq-item summary::-webkit-details-marker { display: none; }
 .lxl .faq-item summary::after { content: "+"; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-weight: 400; font-size: 20px; color: var(--accent-2); transition: transform .25s var(--ease-out); }
 .lxl .faq-item[open] summary::after { transform: translateY(-50%) rotate(45deg); }
 .lxl .faq-item summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
-.lxl .faq-item p { padding: 0 0 16px; font-size: 14.5px; line-height: 1.55; color: oklch(.235 .014 168/.72); }
+.lxl .faq-item p { padding: 0 0 16px; font-size: 14.5px; line-height: 25px; color: var(--tx-3); }
 
-/* founder credential chips — left-aligned variant of .starter-facts */
+/* founder credential chips - left-aligned variant of .starter-facts */
 .lxl .founder-facts { justify-content: flex-start; margin-top: 20px; }
 
 /* ---- pricing ---- */
 .lxl .pricing-band { background: var(--sage-2); padding: 120px 0 90px; }
 .lxl .price-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 760px; margin: 0 auto; align-items: stretch; }
 .lxl .price-card { background: var(--cream); border-radius: 16px; padding: 34px 20px 30px; text-align: center; box-shadow: 0 18px 40px -26px oklch(0 0 168/.35); }
-/* Annual — the hero tier. Accent frame + lift, no fake discount (J4). */
+/* Annual - the hero tier. Accent frame + lift, no fake discount (J4). */
 .lxl .price-card.featured { outline: 2px solid var(--accent); outline-offset: -2px; box-shadow: 0 26px 52px -24px oklch(from var(--accent) l c h / .5); }
 .lxl .price-card .plan { font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
 .lxl .price-card .rule { width: 34px; height: 2px; background: var(--ink); opacity: .5; margin: 14px auto; }
 .lxl .price-card .old { font-size: 13px; color: oklch(.235 .014 168/.5); text-decoration: line-through; min-height: 18px; }
-.lxl .price-card .amt { font-weight: 700; font-size: 38px; letter-spacing: -.01em; }
+.lxl .price-card .amt { font-weight: 700; font-size: 38px; line-height: 47px; letter-spacing: -.018em; }
 .lxl .price-card .cur { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; opacity: .6; }
 .lxl .price-card .save { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; min-height: 32px; display: flex; align-items: center; justify-content: center; text-wrap: balance; }
 .lxl .price-card .save.cyan { color: var(--accent-2); }
 .lxl .price-card .save.coral { color: var(--cat-cardio); }
-.lxl .price-card .fine { font-size: 12px; color: oklch(.235 .014 168/.6); line-height: 1.4; margin-top: 6px; }
+.lxl .price-card .fine { font-size: 12px; color: var(--tx-4); line-height: 18px; margin-top: 6px; }
 .lxl .price-foot { display: flex; justify-content: center; margin-top: 40px; }
 
 /* ---- footer ---- */
 .lxl .foot { display: flex; justify-content: space-between; align-items: flex-start; padding: 70px 40px 40px; max-width: var(--col); margin: 0 auto; font-size: 13px; color: oklch(.235 .014 168/.75); gap: 24px; flex-wrap: wrap; }
+.lxl .foot .help a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 4px; }
 .lxl .foot .help { display: flex; gap: 10px; max-width: 420px; line-height: 1.5; }
-.lxl .foot .legal a { color: var(--ink); opacity: .8; margin-left: 14px; }
+/* Were 18px tall with a 0px gap between two of them - guaranteed mis-taps. */
+.lxl .foot .legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; }
+.lxl .foot .legal a { color: var(--ink); opacity: .85; margin-left: 0; display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px; }
 
 /* ---- stage-3 interaction layer ---- */
 /* Smooth anchor travel on the landing only; instant under reduced motion. */
@@ -349,17 +471,13 @@
 .lxl .coverflow.dragging .cf-card { transition: opacity .6s ease; } /* 1:1 transform while dragging */
 
 /* Journey day rows are real buttons now. */
-.lxl button.j-drow { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; text-align: left; width: 100%; cursor: pointer; display: block; }
-.lxl .j-drow:focus-visible { outline: 2px solid oklch(1 0 168/.75); outline-offset: 3px; border-radius: 16px; }
+.lxl button.j-dhead { width: 100%; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.lxl .j-dhead:focus-visible { outline: 2px solid oklch(1 0 168/.75); outline-offset: 3px; }
 
 /* Press feedback on every liftable card, matching .pill:active. */
-.lxl .unlim-card:active, .lxl .trainer-card:active, .lxl .price-card:active, .lxl .cf-card:active { transform: translateY(1px); }
+.lxl .trainer-card:active, .lxl .price-card:active, .lxl .cf-card:active { transform: translateY(1px); }
 
-/* Mobile sticky bottom CTA bar (02 C3) — hidden on desktop. */
-.lxl .mcta { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 60; display: none; align-items: center; justify-content: space-between; gap: 12px; background: oklch(1 0 168/.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid oklch(1 0 168/.7); border-radius: 18px; padding: 10px 10px 10px 16px; box-shadow: 0 20px 44px -20px oklch(.3 .03 168/.55); transform: translateY(140%); transition: transform .34s var(--ease-out); }
-.lxl .mcta.show { transform: none; }
-.lxl .mcta > span { font-family: var(--mono); font-size: 11.5px; letter-spacing: .03em; color: var(--ink); }
-.lxl .mcta .pill { padding: 12px 18px; font-size: 12px; white-space: nowrap; }
+/* Mobile sticky bottom CTA bar (02 C3) - hidden on desktop. */
 
 /* ---- reveal system ----
    Two granularities of ONE motion: `.rise` moves the element as a block;
@@ -368,7 +486,7 @@
 .lxl .rise { opacity: 0; transform: translateY(var(--rise-y)); transition: opacity var(--rise-dur) var(--ease-out), transform var(--rise-dur) var(--ease-out); }
 .lxl .rise.in { opacity: 1; transform: none; }
 
-/* sequence variant — element stays visible, children rise in order */
+/* sequence variant - element stays visible, children rise in order */
 .lxl .rise.seq { opacity: 1; transform: none; }
 .lxl .rise.seq > * { opacity: 0; transform: translateY(var(--rise-y)); transition: opacity var(--rise-dur) var(--ease-out), transform var(--rise-dur) var(--ease-out); }
 .lxl .rise.seq.in > * { opacity: 1; transform: none; }
@@ -379,35 +497,81 @@
 .lxl .rise.seq.in > :nth-child(5) { transition-delay: calc(var(--rise-step) * 4); }
 .lxl .rise.seq.in > :nth-child(6) { transition-delay: calc(var(--rise-step) * 5); }
 
-/* ---- hover micro-interactions — uniform lift on every static card ---- */
-.lxl .unlim-card, .lxl .trainer-card, .lxl .price-card {
+/* ---- hover micro-interactions - uniform lift on every static card ---- */
+.lxl .trainer-card, .lxl .price-card {
   transition: transform .32s var(--ease-out), box-shadow .32s var(--ease-out);
 }
-.lxl .unlim-card:hover { transform: translateY(-4px); box-shadow: 0 30px 56px -26px oklch(0 0 168/.6); }
 .lxl .trainer-card:hover { transform: translateY(-4px); }
 .lxl .price-card:hover { transform: translateY(-4px); box-shadow: 0 26px 50px -26px oklch(0 0 168/.45); }
 
 /* ---- responsive ---- */
 @media (max-width: 900px) {
-  .lxl .hero-body { grid-template-columns: 1fr; }
+  /* ── §1 · the hero nav ran 82px past the viewport and lost "Belépés" entirely,
+        so a returning member had no way in. The section links are hidden (the
+        page has anchors; the hero doesn't need them at this width) and the one
+        link that matters is kept. ── */
+  .lxl .hero-nav { gap: 16px; }
+  .lxl .hero-nav .links { gap: 0; }
+  .lxl .hero-nav .links a:not(:last-child) { display: none; }
+  /* The sticky pill's links hid at 760px but stopped FITTING at ~820px, so
+     between 761 and 820 the CTA was pushed 50px past the viewport and clipped —
+     invisible, on the one control that matters. Hidden at the same 900px the
+     hero nav uses, which also keeps the two navs behaving alike. */
+  .lxl .stickynav .row1 .links { display: none; }
+  .lxl .hero-nav .links a:last-child { padding-left: 12px; }
+
+  /* ── §5 · long program names wrapped the lockup pill onto two lines. ── */
+  /* `max-width: 100%` on the lockup only helps if its PARENT is already the right
+     width. `.pgs-content` is a flex/grid item, so its default `min-width: auto`
+     resolves to min-content — which the nowrap lockup pushed to 324px inside a
+     276px card, and the ellipsis never fired because the box grew instead of
+     clipping. Same root cause as the minmax(0,1fr) fix on the grid track. */
+  .lxl .lx-embed .pgs-content { min-width: 0; }
+  .lxl .lx-embed .pgs-lock { max-width: 100%; }
+  .lxl .lx-embed .pgs-lock .nm {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  }
+
+  /* ── §14 · on desktop the centre card reads as recommended; once stacked, FIRST
+        reads as recommended - so the annual plan was buried second. ── */
+  .lxl .price-grid { display: flex; flex-direction: column; }
+  .lxl .price-card.featured { order: -1; }
+
+  .lxl .hero-body { grid-template-columns: 1fr; margin-top: 44px; }
   .lxl .hero-copy { text-align: center; }
   .lxl .hero-copy .body { margin-left: auto; margin-right: auto; }
-  .lxl .hero-device { width: min(320px, 82vw); height: auto; aspect-ratio: 320/566; }
+  /* The 490 Ft line fell below the fold on 320×568 and the trust line on 360×640.
+     Tightening the stack (not shrinking the type) brings both back above it. */
+  .lxl .hero-copy .body { margin-top: 18px; font-size: 15.5px; }
+  .lxl .hero-row { margin-top: 24px; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .lxl .hero-price { margin-top: 18px; }
+  .lxl .hero-trust { margin-top: 16px; }
+  /* One column: copy first, photo under it. `100svh` is released here - a phone
+     cannot hold a headline, body, CTA, price AND a 3:4 photo in one screen
+     without shrinking all of them below usable sizes. */
+  .lxl .hero { min-height: 0; }
+  .lxl .hero-body { grid-template-columns: 1fr; gap: 30px; margin-top: 34px; }
+  .lxl .hero-copy { max-width: none; }
+  .lxl .hero-device { width: min(320px, 82vw); max-height: none; aspect-ratio: 320/566; align-self: center; }
   .lxl .price-grid { grid-template-columns: repeat(2,1fr); }
   .lxl .panel-pad { padding: 36px; }
 }
 @media (max-width: 760px) {
   /* Sticky pill collapses to wordmark + CTA; the bottom bar carries the offer. */
-  .lxl .stickynav .row1 .links { display: none; }
   .lxl .stickynav .row1 { padding: 9px 10px 9px 18px; }
-  .lxl .mcta { display: flex; }
   .lxl .panel-grid { grid-template-columns: 1fr; gap: 28px; }
   .lxl .panel-media { order: -1; }
-  .lxl .cast-top { grid-template-columns: 1fr; gap: 26px; }
+  /* Narrow viewport: the stage takes the full column and the phone grows slightly
+     in relative terms so its screen stays readable - but it stays a third of the
+     TV, because the section's claim is "the BIG screen". */
+  /* On a phone-width viewport a 2.17 portrait is inevitably taller than a 16:10
+     TV, so the device was rising ~80px above the stage and covering the copy.
+     Sized to sit essentially INSIDE the TV's vertical span instead. */
+  .lxl .cast-stage { width: 100%; margin-top: 40px; }
+  .lxl .cast-shot.phone { width: 28%; right: 4%; bottom: 6%; border-radius: 10px; }
   .lxl .journey { height: auto; min-height: 540px; }
   .lxl .journey-inner { grid-template-columns: 1fr; gap: 26px; padding: 40px 30px 66px; }
   .lxl .j-chapters { left: 30px; right: 30px; }
-  .lxl .carousel { padding: 6px 20px; }
   .lxl .coverflow { height: 320px; }
   .lxl .hero { margin: 8px 8px 0; }
   .lxl .showcase-band { margin: 8px 8px 0; }
@@ -418,35 +582,474 @@
   .lxl .foot { flex-direction: column; }
 }
 
+/* SE-class widths: the sticky pill holds a wordmark AND the page's one CTA, and
+   at 320px the two together ran 48px past the screen — the CTA clipped, exactly
+   the failure the 760→900px fix above removed at tablet size. Tighten the pill
+   rather than drop either element; both earn their place. */
+@media (max-width: 360px) {
+  .lxl .stickynav .row1 { gap: 10px; padding: 8px 8px 8px 14px; }
+  .lxl .stickynav .mini { font-size: 10px; letter-spacing: .06em; padding: 10px 13px; gap: 6px; }
+  .lxl .stickynav .wordmark { font-size: 17px; line-height: 23px; }
+}
+
 /* ---- reduced motion: freeze auto-motion, keep static first frames ---- */
 @media (prefers-reduced-motion: reduce) {
-  .lxl .hero-aura, .lxl .hero-device, .lxl .jglow, .lxl .sc-glow { animation: none !important; }
+  .lxl .jglow, .lxl .sc-glow { animation: none !important; }
   .lxl .j-anim > * { animation: none !important; }
   .lxl .j-chap .fill, .lxl .sc-chap .fill { animation: none !important; }
   .lxl .rise, .lxl .rise.seq > * { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .lxl .unlim-card:hover, .lxl .trainer-card:hover, .lxl .price-card:hover { transform: none !important; }
+  .lxl .trainer-card:hover, .lxl .price-card:hover { transform: none !important; }
   .lxl .sc-scene { transition: opacity .3s ease !important; }
 }
 
 /* ── Pricing emphasis: hero price line, mid-page anchor band, trust row ── */
 .lxl .hero-price { font-family: var(--mono); font-size: 12.5px; letter-spacing: .03em; color: oklch(from var(--ink) l c h / .9); margin-top: 22px; }
-.lxl .hero-price b { font-weight: 700; }
+.lxl .hero-price b { font-weight: 500; }
 
 .lxl .price-anchor { text-align: center; }
 .lxl .price-anchor .eyebrow { color: oklch(1 0 168/.68); }
-.lxl .pa-num { display: flex; align-items: baseline; justify-content: center; gap: 12px; margin-top: 12px; }
+/* The unit is a single phrase, so it never breaks mid-phrase - at 320px "/ első hét"
+   was splitting into "/ első" + "hét", which cost 55px of height and destroyed the
+   baseline the number and unit share. If it still can't fit, the whole unit drops to
+   its own line instead. */
+/* This is an <h3> (the number IS this band's headline - it needs to be in the
+   document outline), so the UA's h3 defaults must be neutralised: they were
+   leaking font-weight:700 into the unit span, which has no 700 face in IBM Plex
+   Mono and was therefore being faux-bolded by the browser. */
+.lxl .pa-num { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 12px; margin-top: 12px; font-size: 1rem; font-weight: 400; }
 .lxl .pa-num b { font-weight: 800; font-size: clamp(60px,11vw,132px); line-height: .92; letter-spacing: -.04em; color: #fff; }
-.lxl .pa-num > span { font-family: var(--mono); font-size: clamp(15px,2vw,20px); letter-spacing: .1em; color: var(--sage); }
+.lxl .pa-num > span { white-space: nowrap; font-family: var(--mono); font-size: clamp(15px,2vw,20px); letter-spacing: .1em; color: var(--sage); }
 .lxl .pa-lead { color: oklch(1 0 168/.74); margin-top: 18px; }
 .lxl .pa-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; margin: 26px 0 34px; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: oklch(1 0 168/.58); }
-.lxl .pa-row b { color: var(--sage); font-weight: 600; }
+.lxl .pa-row b { color: var(--sage); font-weight: 500; }
 
-.lxl .price-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 24px; margin-top: 30px; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: oklch(.235 .014 168/.6); }
+/* Contrast-audited: was 2.77:1 on sage - the worst on the page, and it carries every
+   risk-reversal fact at the moment of decision. Now solid ink at 11.5px. */
+.lxl .price-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 24px; margin-top: 30px; font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
 
 /* ── Selectable price cards (card click → that plan's checkout) ── */
 .lxl a.price-card { color: var(--ink); text-decoration: none; display: block; position: relative; cursor: pointer; }
 .lxl a.price-card:hover { color: var(--ink); }
-.lxl .price-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; padding: 5px 13px; border-radius: 999px; white-space: nowrap; box-shadow: 0 6px 16px -8px oklch(from var(--accent) l c h /.6); }
-.lxl .price-pick { margin-top: 16px; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); opacity: .78; transition: opacity .2s var(--ease-out); }
+.lxl .price-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-family: var(--mono); font-size: 10.5px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; padding: 5px 13px; border-radius: 999px; white-space: nowrap; box-shadow: 0 6px 16px -8px oklch(from var(--accent) l c h /.6); }
+.lxl .price-pick { margin-top: 16px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); opacity: .78; transition: opacity .2s var(--ease-out); }
 .lxl .price-card:hover .price-pick { opacity: 1; }
 .lxl .price-card.featured .price-pick { opacity: 1; }
+
+/* ══════════════════════════════════════════════════════════════════
+   Sections added in the 2026-08 homepage rebuild
+   (docs/landing-analysis/05-homepage-wireframe.md). Every rule reuses
+   the existing tokens - no new colours, no second motion language.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Back to top - a 22-screen page needs a way back that is not 22 screens ── */
+.lxl .totop {
+  position: fixed; right: calc(16px + env(safe-area-inset-right));
+  bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 59;
+  width: 48px; height: 48px; border-radius: 999px; border: 1px solid oklch(1 0 168/.6);
+  background: oklch(1 0 168/.74); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 14px 32px -18px oklch(.4 .03 168/.7); color: var(--ink);
+  display: grid; place-items: center; cursor: pointer;
+  opacity: 0; transform: translateY(12px) scale(.9); pointer-events: none;
+  transition: opacity .28s var(--ease-out), transform .28s var(--ease-out);
+}
+.lxl .totop.show { opacity: 1; transform: none; pointer-events: auto; }
+.lxl .totop:active { transform: scale(.94); }
+.lxl .totop:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .lxl .totop { transition: opacity .2s ease; transform: none; } }
+
+/* visually-hidden live region */
+.lxl .lx-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ── §2 Hogyan működik - the three steps ── */
+.lxl .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 46px; }
+.lxl .step { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.lxl .step-n {
+  font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .14em;
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  color: #fff; background: var(--accent); margin-bottom: 16px;
+}
+.lxl .step-shot { width: 100%; max-width: 208px; aspect-ratio: 9 / 19.5; border-radius: 26px; }
+/* Real app screenshots, all three 772×1664 (0.464) against the frame's 0.462 -
+   `cover` crops under half a percent, so each step shows a whole screen rather
+   than a detail of one. The hairline + shadow are what make these read as a
+   device on the cream rather than a picture pasted onto it. */
+.lxl .step-shot { background: #fff; box-shadow: 0 18px 40px -22px oklch(0 0 168/.42), 0 0 0 1px oklch(0 0 168/.07); }
+.lxl .step-shot img { object-fit: cover; object-position: top center; }
+.lxl .step-h { display: block; margin-top: 20px; font-size: 17px; line-height: 23px; font-weight: 600; letter-spacing: 0; }
+.lxl .step-b { margin-top: 8px; font-size: 14.5px; line-height: 25px; color: var(--tx-3); max-width: 30ch; }
+.lxl .step-kicker {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .06em;
+  color: var(--accent-2); text-wrap: balance;
+}
+
+/* ── §5 Programok - hosting the REAL app components ──
+   The landing renders the same ProgramBanner and WorkoutCard as /app. Those are
+   `.lx`-scoped, and `.lx` paints the app shell background - which would cover the
+   cream band. Neutralise only that; everything else stays the app's styling. */
+.lxl .lx-embed { background: transparent; color: inherit; }
+
+/* ── Compact program banner ──
+   The app stacks seven full-height billboards because that page IS the catalog.
+   On a marketing page that eats the entire scroll, so the landing runs a two-up
+   grid at roughly half the height. Identity is untouched - same hue gradient,
+   watermark, lockup and chips - only the scale changes. */
+.lxl .lx-embed .pgs-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.lxl .lx-embed .pgs-card { display: block; color: inherit; }
+.lxl .lx-embed .pgs-card:hover { color: inherit; }
+.lxl .lx-embed .pgs-hero {
+  min-height: 172px; padding: 20px 22px 22px; border-radius: 18px;
+  transition: transform .18s var(--ease-out), box-shadow .18s var(--ease-out);
+}
+@media (hover: hover) {
+  .lxl .lx-embed .pgs-card:hover .pgs-hero { transform: translateY(-3px); box-shadow: 0 24px 44px -24px oklch(0 0 168/.55); }
+}
+.lxl .lx-embed .pgs-card:active .pgs-hero { transform: translateY(1px); }
+/* Decorative texture at 10% opacity, not a label - but on a half-width card the
+   longer program titles clip mid-word, so drop the size until more of it reads. */
+.lxl .lx-embed .pgs-word { font-size: 42px; bottom: 6px; right: -10px; }
+.lxl .lx-embed .pgs-ring { top: -46%; width: 46%; border-width: 22px; }
+.lxl .lx-embed .pgs-title { font-size: clamp(19px, 1.7vw, 23px); margin-top: 6px; }
+.lxl .lx-embed .pgs-eyebrow { font-size: 10.5px; }
+.lxl .lx-embed .pgs-syn { font-size: 13px; line-height: 1.5; margin-top: 8px; -webkit-line-clamp: 2; }
+.lxl .lx-embed .pgs-lock { transform: scale(.9); transform-origin: left center; }
+.lxl .lx-embed .pgs-chips { margin-top: 10px; }
+/* Cards sit on cream here rather than the app's own surface, so give the row a
+   little breathing room and let it bleed to the gutter like the app rows do. */
+.lxl .lx-embed .hrow { padding-bottom: 12px; }
+/* 85% of this rail is off-screen; without an edge signal it reads as a finished row. */
+.lxl .lx-embed .hrow, .lxl .lx-embed .chrow {
+  -webkit-mask: linear-gradient(90deg, #000 0, #000 92%, transparent 100%);
+          mask: linear-gradient(90deg, #000 0, #000 92%, transparent 100%);
+}
+/* At the end of the scroll there is nothing more to hint at - drop the fade. */
+.lxl .lx-embed .hrow.at-end, .lxl .lx-embed .chrow.at-end { -webkit-mask: none; mask: none; }
+/* No account, so no list to save to - the "+" would be an affordance that lies.
+   Applies to both the workout card and the Kihívások card. */
+.lxl .lx-embed .wc-save,
+.lxl .lx-embed .chc-save { display: none; }
+/* The archive rail, matching .hrow's behaviour so both rows on this page scroll
+   and mask identically. The app's own Kihívások row lives inside a grid; here it
+   is a rail, so the scroll container is declared on the landing side. */
+.lxl .lx-embed .chrow {
+  display: flex; gap: 14px; overflow-x: auto; padding-bottom: 12px;
+  scroll-snap-type: x proximity; scrollbar-width: none;
+}
+.lxl .lx-embed .chrow::-webkit-scrollbar { display: none; }
+.lxl .lx-embed .chrow > .chc { scroll-snap-align: start; }
+/* The card's own name/state type is tuned for arm's length in-app; bump it for a
+   marketing page read cold, exactly as the workout card is bumped above. */
+.lxl .lx-embed .chc-name { font-size: 14px; }
+.lxl .lx-embed .chc-state { font-size: 12px; }
+/* How many there are, stated rather than implied - the rail shows ~2.5 cards, so
+   without this the archive reads as however many happen to fit. */
+.lxl .lx-embed .ch-count {
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+
+/* ---- the Facebook group card (§11) ---------------------------------------
+   A cold visitor met "amit a csoportban kitalálunk" with no evidence a group
+   existed. This block answers what / how big / how much in one glance by using
+   the layout everyone already knows: cover → name → privacy + members → join.
+   It is a link wearing the group's furniture, never a simulated screenshot -
+   no invented posts, comments, member names or faces appear anywhere. */
+.lxl .fbg {
+  max-width: 560px; margin: 0 auto; border-radius: 16px; overflow: hidden;
+  background: #fff; border: 1px solid oklch(0 0 168/.08);
+  box-shadow: 0 18px 40px -26px oklch(0 0 168/.4);
+}
+/* The real cover is 1920×1005 (1.91:1, Facebook's own ratio). Shown whole at
+   560px wide it would be 293px tall and dominate the band, so it is cropped from
+   the centre. The artwork's headline block sits between 30% and 70% of the image
+   height, and 190px of a 560px card keeps 65% - the text can never be clipped. */
+.lxl .fbg-cover { position: relative; height: 190px; overflow: hidden; background: #F9A0C8; }
+.lxl .fbg-cover img { object-fit: cover; object-position: center; }
+.lxl .fbg-body {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 16px 20px 18px;
+}
+.lxl .fbg-id { display: flex; align-items: center; gap: 12px; flex: 1 1 260px; min-width: 0; }
+.lxl .fbg-logo { flex: none; display: flex; color: #1877F2; }
+.lxl .fbg-txt { min-width: 0; }
+.lxl .fbg-name {
+  font-size: 16px; line-height: 22px; font-weight: 600; letter-spacing: 0; color: var(--ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lxl .fbg-meta {
+  display: flex; align-items: center; gap: 6px; margin-top: 3px;
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .03em; color: var(--ink-3);
+}
+.lxl .fbg-meta svg { stroke: var(--ink-3); flex: none; }
+/* Facebook's own action colour: this button leaves the site for Facebook, and
+   dressing it in brand sage would misrepresent where it goes. */
+.lxl .fbg-join {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: 0 20px; border-radius: 8px;
+  background: #1877F2; color: #fff; font-size: 14px; font-weight: 600;
+  text-decoration: none; transition: background .18s ease, transform .16s cubic-bezier(.2,.7,.3,1);
+}
+.lxl .fbg-join:hover { background: #166FE5; }
+.lxl .fbg-join:active { transform: scale(.98); transition-duration: .09s; }
+.lxl .fbg-join:focus-visible { outline: 2px solid #1877F2; outline-offset: 3px; }
+
+@media (max-width: 560px) {
+  /* Below this the name and the button fight for the same row; stack and let the
+     button go full-width so it stays the obvious next action. */
+  .lxl .fbg-cover { height: 120px; }
+  .lxl .fbg-body { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px 16px 16px; }
+  /* `flex: 1 1 260px` above sets flex-BASIS, which is the main axis - once the body
+     stacks, that 260px became a height and opened ~200px of dead space inside the
+     card. In column direction the id block just takes its content height. */
+  .lxl .fbg-id { flex: none; }
+  .lxl .fbg-join { width: 100%; }
+  .lxl .fbg-name { white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lxl .fbg-join { transition: background .18s ease; }
+  .lxl .fbg-join:active { transform: none; }
+}
+/* App type scale is tuned for a focused screen at arm's length. On a marketing page
+   read cold, 8.5px and 10px are decoration rather than information. */
+.lxl .lx-embed .ncard-lockup .ey, .lxl .lx-embed .wc-program span { font-size: 11px; }
+.lxl .lx-embed .wc-dur { font-size: 11px; }
+.lxl .lx-embed .wc-sub { font-size: 12.5px; }
+.lxl .lx-embed .pgs-chip { font-size: 11px; }
+.lxl .lx-embed .pgs-eyebrow { font-size: 11.5px; }
+.lxl .lx-embed .hrow-head h3 { font-family: var(--font); font-weight: 600; line-height: 22px; }
+.lxl .lx-embed .cap-body { text-align: left; margin-left: 0; }
+
+/* ── §7 A heted - the live week picker ── */
+/* Centred like .price-anchor: the picker and the copy share one axis, so the
+   eyebrow, heading and CTA must not sit left of it. */
+.lxl .heted-band { text-align: center; }
+.lxl .heted-band .eyebrow { display: block; }
+.lxl .heted-band .starter-title { text-wrap: balance; }
+.lxl .wkp { margin: 34px 0 30px; }
+.lxl .wkp-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.lxl .wkp-day {
+  min-width: 60px; height: 60px; border-radius: 16px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; font-weight: 500;
+  background: oklch(1 0 168/.07); border: 1px solid oklch(1 0 168/.16); color: oklch(1 0 168/.6);
+  transition: background .22s var(--ease-out), color .22s var(--ease-out),
+              border-color .22s var(--ease-out), transform .12s var(--ease-out);
+}
+.lxl .wkp-day .wkp-mark { font-size: 15px; line-height: 1; opacity: .5; }
+.lxl .wkp-day.on { background: var(--sage); border-color: var(--sage); color: var(--navy); }
+.lxl .wkp-day.on .wkp-mark { opacity: 0; }
+/* Feedback lands on the press, not the release. */
+.lxl .wkp-day:not(:disabled):active { transform: scale(.95); }
+.lxl .wkp-day:disabled { cursor: not-allowed; opacity: .45; }
+.lxl .wkp-day:focus-visible { outline: 2px solid var(--sage); outline-offset: 3px; }
+
+.lxl .wkp-out {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 16px;
+  margin-top: 22px; font-family: var(--mono); font-size: 12px; letter-spacing: .1em;
+  text-transform: uppercase; color: oklch(1 0 168/.6);
+}
+.lxl .wkp-count b { color: var(--sage); font-size: 17px; font-weight: 500; margin-right: 4px; }
+.lxl .wkp-sep { width: 4px; height: 4px; border-radius: 50%; background: oklch(1 0 168/.3); }
+.lxl .wkp-hint {
+  margin-top: 14px; text-align: center; font-size: 14px; line-height: 24px;
+  color: var(--tx-d4); min-height: 24px; transition: opacity .3s var(--ease-out);
+}
+
+/* ── §9 Amikor kész vagy - the finish marquee band ── */
+.lxl .finish-band { overflow: hidden; }
+/* ── grounds, after the 2026-08-11 reorder ────────────────────────────────
+   §9 Amikor kész vagy moved from a navy ground to cream, and §10 Kihívások
+   the other way, so A heted and the finish band stop forming one unbroken
+   navy run. Both bands embed components whose text colour was tuned for the
+   OLD ground - those are re-pointed here rather than inside the components,
+   which must stay correct for the app. */
+
+/* §9 on cream: the marquee's caption was hardcoded white and would vanish. */
+.lxl .finish-band .fex-name { color: var(--tx-3); }
+
+/* §10 on navy: ChallengeCard's title/state are ink-on-light by design. */
+.lxl #kihivasok .lx-embed .chc-name { color: var(--tx-d1); }
+.lxl #kihivasok .lx-embed .chc-state { color: var(--tx-d3); }
+.lxl #kihivasok .lx-embed .chc-stack { background: oklch(1 0 168/.92); }
+.lxl #kihivasok .ch-count { color: var(--tx-d3); }
+/* The white FB card reads as the section's bright object on navy - correct, and
+   that means EVERYTHING inside it keeps its dark-on-white treatment. Re-grounding
+   is per-surface, not per-band: `.fbg-meta` sits on the card, not on the navy, and
+   lightening it made it white-on-white. */
+.lxl #kihivasok .fbg-name { color: var(--ink); }
+.lxl #kihivasok .fbg-meta { color: #5c6e66; }
+
+/* ── §11 Alexa - the full-bleed photographic peak ── */
+.lxl .alexa-hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  /* Column, bottom-aligned: the heading and the story are separate children now, and
+     this keeps them reading as one stacked block in the lower-left on desktop. */
+  min-height: min(860px, 100svh); display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 120px 0 90px; background: var(--navy); color: #fff;
+}
+.lxl .alexa-hero .ax-photo { position: absolute; inset: 0; z-index: 0; }
+/* Tuned to THIS photograph: the subject is centred (~45% across) and sits low in
+   the frame (~55% down), so the crop window follows her rather than the 70%/30%
+   the previous placeholder assumed. Wide viewports crop vertically, narrow ones
+   crop horizontally - one pair of values has to serve both. */
+.lxl .alexa-hero .ax-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 45% 55%; }
+/* Copy sits in the darkened half; the portrait keeps the rest. */
+.lxl .ax-scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(90deg, oklch(.16 .012 168/.94) 0%, oklch(.16 .012 168/.82) 38%, oklch(.16 .012 168/.15) 74%, transparent 100%),
+    linear-gradient(0deg, oklch(.16 .012 168/.8) 0%, transparent 42%);
+}
+/* The band is a flex container, so .wrap would shrink-to-fit around the narrow
+   copy column and drift toward the middle. Hold the page grid explicitly. */
+.lxl .alexa-hero > .wrap { width: 100%; }
+.lxl .ax-inner, .lxl .ax-headin { position: relative; z-index: 2; max-width: 560px; }
+.lxl .ax-inner .alexa-pull-big, .lxl .ax-headin .alexa-pull-big { color: var(--sage); margin: 14px 0 26px; }
+.lxl .ax-story { display: flex; flex-direction: column; gap: 14px; }
+.lxl .ax-story p { font-size: 16px; line-height: 26px; color: var(--tx-d2); text-wrap: pretty; }
+.lxl .ax-inner .founder-facts span {
+  background: oklch(1 0 168/.1); border-color: oklch(1 0 168/.18); color: oklch(1 0 168/.78);
+}
+.lxl .ax-inner .aq-promise { margin-top: 30px; }
+/* size + leading now come from the base rule and the mobile step below. */
+
+/* Short viewports (SE-class, and any phone in landscape). The problem is height,
+   not width, so this is a height query: tighten the hero stack until the price -
+   the one commercial fact worth putting above the fold - actually clears it. */
+@media (max-height: 640px) {
+  .lxl .hero { padding-top: 0; }
+  .lxl .hero-body { margin-top: 26px; }
+  .lxl .hero-copy h1 { font-size: 38px; }
+  .lxl .hero-copy .body { margin-top: 12px; font-size: 14.5px; line-height: 25px; }
+  .lxl .hero-row { margin-top: 16px; }
+  .lxl .hero-price { margin-top: 12px; }
+  .lxl .hero-trust { margin-top: 10px; }
+  .lxl .hero-eyebrow { margin-bottom: 10px; }
+}
+
+@media (max-width: 900px) {
+  /* One column, and the watermark shrinks again so it doesn't swallow the card. */
+  /* minmax(0, 1fr), not 1fr: `1fr` resolves to minmax(auto, 1fr) whose auto MIN is
+     min-content, and the banner's nowrap watermark pushed the track to 360px inside
+     a 276px grid — the cards were clipped 62px at 320. */
+  .lxl .lx-embed .pgs-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .lxl .lx-embed .pgs-hero { min-height: 158px; padding: 18px 18px 20px; }
+  .lxl .lx-embed .pgs-word { font-size: 44px; }
+  /* §2 was 2,199px on a 360px phone - three 9:19.5 frames stacked is ~1,150px of
+     mockup before a word is read, so this became a 3-up row. That was right while
+     the frames held striped placeholders; with real 772px screenshots in them the
+     3-up row renders each at 109px - 14% scale, where the app's body text is 4px.
+     A screenshot nobody can read is decoration pretending to be evidence.
+     A rail keeps the height saving AND makes each screen legible: 68vw ≈ 265px is
+     34% scale, and the same pattern the programs and challenges rows already use.
+     The step numbers carry the sequence, and the next card peeks. */
+  .lxl .steps {
+    display: flex; grid-template-columns: none; gap: 14px; margin-top: 30px;
+    overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    padding-bottom: 4px;
+    /* Bleed to the gutter like the app rows, so the peek reads as "more to the
+       right" rather than a card clipped by a container. */
+    margin-inline: -22px;   /* matches .lxl .wrap padding at this breakpoint */
+    padding-inline: 22px;
+    /* Snap positions are measured from the scrollport, not the padding box, so
+       without this the rail rests at scrollLeft:22 and card 1 hugs the screen
+       edge while the heading above it is inset. */
+    scroll-padding-inline: 22px;
+  }
+  .lxl .steps::-webkit-scrollbar { display: none; }
+  .lxl .step { flex: 0 0 min(68vw, 265px); scroll-snap-align: start; }
+  .lxl .step-shot { max-width: none; border-radius: 18px; }
+  .lxl .step-n { width: 22px; height: 22px; font-size: 10px; margin-bottom: 10px; }
+  .lxl .step-h { margin-top: 14px; font-size: 15px; line-height: 21px; }
+  .lxl .step-b { margin-top: 6px; font-size: 13px; line-height: 23px; }
+  /* Same model as desktop: the photograph is the BACKGROUND, not a card stacked above
+     the copy. It cannot cover the whole band though - six paragraphs make this section
+     ~1400px tall on a phone, and a 3:2 source stretched over that crops her to a
+     vertical sliver. So the image is anchored to the top at a fixed share of the
+     viewport and dissolved into the navy by a heavy gradient + vignette; the copy
+     rises into the dark end of it. One variable drives the image height and the
+     copy's offset, so they cannot drift apart. */
+  .lxl .alexa-hero {
+    --ax-img-h: min(58vh, 480px);
+    min-height: 0; padding: 86px 0 70px; display: flex; flex-direction: column;
+  }
+  /* label + quote first, then the photograph, then the story */
+  .lxl .ax-head { order: 1; }
+  .lxl .alexa-hero .ax-photo {
+    order: 2; position: relative; inset: auto; height: var(--ax-img-h);
+    width: 100%; margin: 22px 0 0; border-radius: 0; aspect-ratio: auto; overflow: hidden;
+  }
+  .lxl .alexa-hero > .wrap:not(.ax-head) { order: 3; margin-top: -56px; }
+  .lxl .alexa-hero .ax-photo img { object-position: 50% 30%; }
+  /* The scrim rides ON the photo now rather than being a band-sized sibling - its
+     percentage stops resolve against the image, so every stop lands where it looks
+     like it does. Heavy dissolve into navy at both ends + a vignette, so the picture
+     reads as background rather than a card, and the story rises into the dark end. */
+  .lxl .ax-scrim { display: none; }
+  .lxl .alexa-hero .ax-photo::after {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      radial-gradient(118% 84% at 50% 38%, transparent 36%, oklch(.16 .012 168/.52) 100%),
+      linear-gradient(180deg,
+        var(--navy) 0%,
+        oklch(.16 .012 168/.55) 9%,
+        oklch(.16 .012 168/.10) 26%,
+        oklch(.16 .012 168/.22) 60%,
+        oklch(.16 .012 168/.72) 84%,
+        var(--navy) 100%);
+  }
+  .lxl .ax-inner { max-width: none; }
+  .lxl .wkp-day { min-width: 44px; height: 52px; font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxl .wkp-day { transition: none; }
+  .lxl .wkp-day:not(:disabled):active { transform: none; }
+  .lxl .wkp-hint { transition: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Section-by-section audit fixes (2026-08-11). Placed last on purpose:
+   two of these were previously overridden by later blocks in this file,
+   which is exactly the cascade collision worth avoiding.
+   ══════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* §7 · seven 44px days + gaps needed 356px in a 350px row, so Sunday wrapped
+     onto its own line - a week rendering 6+1 undermines the thing it demonstrates. */
+  .lxl .wkp-row { flex-wrap: nowrap; gap: 5px; }
+  .lxl .wkp-day { min-width: 0; flex: 1 1 0; max-width: 48px; padding: 0; }
+
+  /* §3 · the panel grid stacks media-first, so a 607px striped placeholder landed
+     above the copy. Text first on mobile; the mockup follows it. */
+  .lxl .panel-grid .ticon { order: -1; }
+  .lxl .panel-grid .panel-media { order: 0; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOBILE TYPE RAMP - must stay last in this file.
+   `clamp()` was removed from every heading: a clamped size with a fixed
+   line-height RATIO drifts out of pairing at every viewport between its bounds,
+   so the heading is mis-led at all widths and progressively worse as it shrinks
+   (13-lexfit-type-spec.md §10). Each step is now a literal size with a literal
+   leading, derived as round(size × 1.131 + 3.9) for display type and
+   round(size × 1.013 + 10) for running text - constants measured from Poppins'
+   actual ink height (1.013em, vs SF Pro's 0.883em), NOT copied from Apple.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Size, leading AND tracking step together - a step that carries only its size
+     is the pairing bug in a different costume. Tracking tiers:
+     ≥70 −.028 | 50–69 −.022 | 36–49 −.018 | 26–35 −.015 | 20–25 −.012 | <20 0 */
+  .lxl .hero-copy h1     { font-size: 44px; line-height: 54px; letter-spacing: -.018em; }
+  .lxl .h-thin           { font-size: 30px; line-height: 38px; letter-spacing: -.015em; }
+  .lxl .h-bold           { font-size: 26px; line-height: 33px; letter-spacing: -.015em; }
+  .lxl .cap-title        { font-size: 20px; line-height: 27px; letter-spacing: -.012em; }
+  .lxl .starter-title    { font-size: 32px; line-height: 40px; letter-spacing: -.015em; }
+  .lxl .alexa-pull-big   { font-size: 30px; line-height: 38px; letter-spacing: -.015em; }
+  .lxl .ax-inner .aq-close,
+  .lxl .aq-close         { font-size: 34px; line-height: 42px; letter-spacing: -.015em; }
+  .lxl .j-week           { font-size: 24px; line-height: 31px; letter-spacing: -.012em; }
+  .lxl .wordmark         { font-size: 20px; line-height: 26px; }
+  .lxl .body             { font-size: 15px; line-height: 25px; }
+}

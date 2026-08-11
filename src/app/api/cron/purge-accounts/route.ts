@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-// P6.2 — stage 2. Daily. For every deletion older than 30 days: recursively delete
+// P6.2 - stage 2. Daily. For every deletion older than 30 days: recursively delete
 // the users/{uid} Firestore subtree, delete users/{uid}/** in Storage, and delete
 // the Auth user. Invoices/billing records live outside users/ and are retained as
 // law requires. Secured with CRON_SECRET (same as api/cron/reminders).

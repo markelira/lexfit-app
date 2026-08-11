@@ -63,7 +63,7 @@ export default function HaladasomPage() {
   useEffect(() => {
     if (!user) return;
     const uid = user.uid;
-    // Pull fresh Mux data first — this page is the reason the sync exists.
+    // Pull fresh Mux data first - this page is the reason the sync exists.
     syncMuxProgress({ force: true })
       .then(() => Promise.all([getProgress(uid), getOnboarding(uid), getPhotos(uid), loadFoundation(uid), getPrefs(uid)]))
       .then(([p, o, ph, f, pr]) => {
@@ -100,7 +100,7 @@ export default function HaladasomPage() {
         <span className="hp-crumb">az edzéseid, hétről hétre</span>
       </header>
 
-      {/* ── Q1 · „Jól állok a héten?" — ring + week strip ── */}
+      {/* ── Q1 · „Jól állok a héten?" - ring + week strip ── */}
       <section className="hp-q1">
         <div className="hp-card hp-ring-card">
           <div className="hp-ring" style={{ "--p": Math.min(100, Math.round((m.thisWeek / Math.max(1, m.weekTarget)) * 100)) } as React.CSSProperties} aria-hidden="true" />
@@ -127,7 +127,7 @@ export default function HaladasomPage() {
         </div>
       </section>
 
-      {/* ── Q2 · „Tartom a szokást?" — consistency (streak with forgiveness) ── */}
+      {/* ── Q2 · „Tartom a szokást?" - consistency (streak with forgiveness) ── */}
       <section className="hp-stats">
         {m.streak >= 1
           ? <Stat n={String(m.streak)} k="napos sorozat" d={m.streak >= m.longest ? "a leghosszabb eddig" : `a leghosszabb: ${m.longest} nap`} />
@@ -141,7 +141,7 @@ export default function HaladasomPage() {
         <Stat n={String(m.done)} k="elvégzett edzés" d={m.weekStreak > 0 ? `${m.weekStreak} hét egymás után` : "eddig összesen"} />
       </section>
 
-      {/* rolling weekly rhythm — starts once there's real activity (first started
+      {/* rolling weekly rhythm - starts once there's real activity (first started
           or completed video); before that, an invitation to begin, not an empty chart */}
       <section className="hp-card hp-chart">
         <div className="hp-card-ttl"><LxIcon d={lxPaths.chartColumn} size={16} /> Heti ritmus</div>
@@ -163,7 +163,7 @@ export default function HaladasomPage() {
           </>
         ) : (
           <div className="hp-chart-empty">
-            <p>Még nincs mit mutatni. Indítsd el az első edzésed, és itt épül fel a heti ritmusod — hétről hétre.</p>
+            <p>Még nincs mit mutatni. Indítsd el az első edzésed, és itt épül fel a heti ritmusod - hétről hétre.</p>
             <button className="lxbtn m primary" onClick={() => router.push("/app")}>
               <LxIcon d={lxPaths.play} size={15} fill /> Első edzés indítása
             </button>
@@ -171,16 +171,16 @@ export default function HaladasomPage() {
         )}
       </section>
 
-      {/* ── Q3 · the proof — non-scale wins (real, Firebase-backed observations) ── */}
+      {/* ── Q3 · the proof - non-scale wins (real, Firebase-backed observations) ── */}
       <section className="hp-h4">
         <Wins why={m.why} observations={m.observations} onAdd={submitWin} />
       </section>
 
-      {/* private progress photos — own full-width row, larger slots */}
+      {/* private progress photos - own full-width row, larger slots */}
       <Photos photos={photos} currentWeek={m.currentWeek} onUpload={upload} />
 
       <p className="hp-foot">
-        <LxIcon d={lxPaths.check} size={13} sw={2.6} /> A víz, a hormonok és a napszak ingadoznak — a trend számít.
+        <LxIcon d={lxPaths.check} size={13} sw={2.6} /> A víz, a hormonok és a napszak ingadoznak - a trend számít.
       </p>
     </div>
   );
@@ -217,7 +217,7 @@ function derive(
     : Math.max(1, Math.floor((p?.currentIndex ?? 0) / cadence) + 1);
 
   // THIS week's status comes from the SHARED collector (lib/week-progress) so
-  // this card is identical to the home (/app) strip — same plan training days,
+  // this card is identical to the home (/app) strip - same plan training days,
   // same completions (confirmed + pending), same calendar week and target.
   const wk = computeWeekProgress({
     weekdays: plan.weekdays,
@@ -232,7 +232,7 @@ function derive(
   // Rest-day-aware streak uses the same training days, 0-based Mon..Sun.
   const workoutIdx = new Set<number>(plan.weekdays.map((w) => w - 1));
 
-  // Distinct DONE DAYS in a range (not raw completions) — a day you trained
+  // Distinct DONE DAYS in a range (not raw completions) - a day you trained
   // counts once, matching the ring/checkmarks. Keeps the delta + Heti ritmus
   // bars on the same metric as `thisWeek`.
   const inRange = (from: Date, to: Date) =>
@@ -241,7 +241,7 @@ function derive(
   const mon = mondayOf(today);
   const lastWeek = inRange(addDays(mon, -7), mon);
 
-  // Rolling last-8 CALENDAR weeks (oldest → this week) — the weekly rhythm across
+  // Rolling last-8 CALENDAR weeks (oldest → this week) - the weekly rhythm across
   // every activity (programs, challenges, standalone), not one program's arc.
   const ROLL = 8;
   const bars = Array.from({ length: ROLL }, (_, k) => {
@@ -260,7 +260,7 @@ function derive(
     : `${MONTHS[mon.getMonth()]} ${mon.getDate()}. – ${MONTHS[sun.getMonth()]} ${sun.getDate()}.`;
 
   const distinctCodes = [...new Set(completed.map((c) => c.code))];
-  // Real watched time from the dated watchByDay buckets (Mux-synced) — total,
+  // Real watched time from the dated watchByDay buckets (Mux-synced) - total,
   // this-week vs last-week, and this-month vs last-month directions.
   const watch = p?.watchByDay ?? {};
   const totalMins = Math.round(Object.values(watch).reduce((a, b) => a + b, 0) / 60);
@@ -320,7 +320,7 @@ function Wins({ why, observations, onAdd }: { why: string; observations: Won[]; 
       <div className="hp-card-ttl"><LxIcon d={lxPaths.check} size={16} /> Amit észrevettél</div>
       {why && <div className="hp-why">Miért kezdted: <span>„{why}”</span></div>}
       {observations.length === 0 && !adding && (
-        <p className="hp-wins-empty">Amit egy mérleg sosem mutat meg — kevesebb kifulladás, könnyebb reggelek. Írd le a saját szavaiddal.</p>
+        <p className="hp-wins-empty">Amit egy mérleg sosem mutat meg - kevesebb kifulladás, könnyebb reggelek. Írd le a saját szavaiddal.</p>
       )}
       {observations.map((o, i) => (
         <div className="hp-win" key={i}>
@@ -389,7 +389,7 @@ function Photos({ photos, currentWeek, onUpload }: { photos: Partial<Record<Mile
   );
 }
 
-// ── before/after comparison (kept — slider + side-by-side) ───────────────────
+// ── before/after comparison (kept - slider + side-by-side) ───────────────────
 function Compare({
   startUrl, nowUrl, currentWeek, onUploadStart, onUploadNow,
 }: {
@@ -432,12 +432,12 @@ function Compare({
           <div className="halc-slider" ref={ref}>
             <div className="ba-layer">
               <div className={`hal-photo${nowUrl ? "" : " empty"}`} style={photoStyle(nowUrl)}>
-                {!nowUrl && <span className="ph-hint">Mai fotó — tölts fel egy álló képet</span>}
+                {!nowUrl && <span className="ph-hint">Mai fotó - tölts fel egy álló képet</span>}
               </div>
             </div>
             <div className="ba-layer" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
               <div className={`hal-photo${startUrl ? "" : " empty"}`} style={photoStyle(startUrl)}>
-                {!startUrl && <span className="ph-hint">Indulás-fotó — tölts fel egy álló képet</span>}
+                {!startUrl && <span className="ph-hint">Indulás-fotó - tölts fel egy álló képet</span>}
               </div>
             </div>
             <span className="halc-tag l" style={{ opacity: pos < 16 ? 0.35 : 1 }}>INDULÁS · HÉT 1</span>

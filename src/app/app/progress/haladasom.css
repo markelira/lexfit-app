@@ -1,4 +1,4 @@
-/* LEXFIT Haladásom — "Proof, not encouragement." Three questions in frequency
+/* LEXFIT Haladásom - "Proof, not encouragement." Three questions in frequency
    order: week (ring+strip) → habit (stats+8-week bars) → the visszamérés payoff,
    body last. Apple-Fitness rings + banking-dashboard numbers. Scoped under .lx. */
 
@@ -15,7 +15,7 @@
 .lx .hp-card-ttl svg { color: var(--ink-3); flex: none; }
 .lx .hp-eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink-3); }
 
-/* every figure carries a direction (H-RULE 02) — plain bold green text, not a chip */
+/* every figure carries a direction (H-RULE 02) - plain bold green text, not a chip */
 .lx .hp-delta { font-size: 13px; font-weight: 700; letter-spacing: -0.005em; }
 .lx .hp-delta.up { color: var(--accent-ink); }
 .lx .hp-delta.down { color: var(--danger, oklch(0.55 0.18 25)); }
@@ -24,7 +24,7 @@
 /* ── Q1 · ring + week strip ── */
 .lx .hp-q1 { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 16px; }
 .lx .hp-ring-card { display: flex; align-items: center; gap: 26px; }
-/* empty ring (arc only) — the big number sits beside it (Apple-Fitness pattern) */
+/* empty ring (arc only) - the big number sits beside it (Apple-Fitness pattern) */
 .lx .hp-ring { position: relative; width: 132px; height: 132px; flex: none; border-radius: 50%;
   background: conic-gradient(var(--accent-2) calc(var(--p, 0) * 1%), var(--surface-2) 0); }
 .lx .hp-ring::before { content: ""; position: absolute; inset: 17px; border-radius: 50%; background: var(--surface); }
@@ -61,7 +61,7 @@
 .lx .hp-bar .wl { position: absolute; bottom: -19px; left: 0; right: 0; text-align: center; font-family: var(--mono); font-size: 9px; letter-spacing: 0.02em; color: var(--ink-3); white-space: nowrap; }
 .lx .hp-bar.future .wl { color: var(--ink-3); opacity: 0.7; }
 .lx .hp-chart-note { font-size: 12.5px; color: var(--ink-3); }
-/* empty state — before the first started/completed video */
+/* empty state - before the first started/completed video */
 .lx .hp-chart-empty { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 26px 16px 12px; }
 .lx .hp-chart-empty p { font-size: 13px; color: var(--ink-2); line-height: 1.5; max-width: 360px; margin: 0; }
 

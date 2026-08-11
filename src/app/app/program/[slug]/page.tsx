@@ -16,7 +16,7 @@ import { loadProgram, type ProgramData } from "@/lib/program";
 import { loadProgramIndex, type ProgramIndex } from "@/lib/program-index";
 import { ProgramDetailSkeleton } from "@/components/Skeletons";
 
-// Programme detail — ANY published programme in full: phases, facts and every
+// Programme detail - ANY published programme in full: phases, facts and every
 // workout, with the user's position. Foundation keeps its stored guided cursor;
 // other programmes derive position from completions (lib/program.ts).
 export default function ProgramDetailPage() {

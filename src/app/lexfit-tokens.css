@@ -1,11 +1,11 @@
-/* LEXFIT — design tokens v2 · colors from szavazzmagadra.hu
+/* LEXFIT - design tokens v2 · colors from szavazzmagadra.hu
    Ported 1:1 from the prototype (LEXFIT-design/lexfit-tokens.css).
    Fonts are loaded via next/font (see layout.tsx), so the Google Fonts
    @import was removed and --font/--mono point at the next/font variables. */
 
 :root {
   /* szavazzmagadra.hu palette: rose pink + warm plum-black + white */
-  --bg: oklch(0.955 0.015 168);            /* solid soft blush — no gradient, not white */
+  --bg: oklch(0.955 0.015 168);            /* solid soft blush - no gradient, not white */
   --surface: #ffffff;
   --surface-2: oklch(0.952 0.014 168);
   --line: oklch(0.90 0.012 168);
@@ -19,18 +19,18 @@
   --accent-ink: oklch(0.50 0.05 168);
   --ok: oklch(0.63 0.130 152);            /* done green */
   --ok-soft: oklch(0.945 0.035 152);
-  --danger: oklch(0.47 0.11 33);          /* muted brick red — destructive text/fill */
+  --danger: oklch(0.47 0.11 33);          /* muted brick red - destructive text/fill */
   --danger-soft: oklch(0.95 0.028 33);
 
-  /* categorical cover colors — same family as the site's chip colors */
-  --cat-also: oklch(0.660 0.042 168);        /* alsótest — brand rose */
-  --cat-felso: oklch(0.450 0.030 150);     /* felsőtest — plum */
-  --cat-cardio: oklch(0.560 0.085 72);     /* cardio — warm coral */
-  --cat-teljes: oklch(0.520 0.058 42);    /* teljes test — deep rose */
-  --cat-mobility: oklch(0.755 0.032 225);  /* mobility — sage green */
-  --cat-tartas: oklch(0.62 0.105 295);    /* tartás — lavender */
+  /* categorical cover colors - same family as the site's chip colors */
+  --cat-also: oklch(0.660 0.042 168);        /* alsótest - brand rose */
+  --cat-felso: oklch(0.450 0.030 150);     /* felsőtest - plum */
+  --cat-cardio: oklch(0.560 0.085 72);     /* cardio - warm coral */
+  --cat-teljes: oklch(0.520 0.058 42);    /* teljes test - deep rose */
+  --cat-mobility: oklch(0.755 0.032 225);  /* mobility - sage green */
+  --cat-tartas: oklch(0.62 0.105 295);    /* tartás - lavender */
 
-  /* dark (player) — the site's dark plum sections */
+  /* dark (player) - the site's dark plum sections */
   --d-bg: oklch(0.235 0.014 168);
   --d-surface: oklch(0.295 0.025 168);
   --d-surface-2: oklch(0.34 0.027 168);
@@ -47,30 +47,30 @@
   --r-sm: 8px; --r-md: 14px; --r-lg: 20px;
   --shadow-card: 0 1px 2px oklch(0.3 0.014 168 / 0.05), 0 6px 24px -8px oklch(0.42 0.03 168 / 0.13);
 
-  /* Spacing scale (00 §0.3) — 4px base, these eight values only. Use gap, not margins. */
+  /* Spacing scale (00 §0.3) - 4px base, these eight values only. Use gap, not margins. */
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
   --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
 
-  /* Motion (00 §0.8) — animate opacity/transform only; honour prefers-reduced-motion. */
+  /* Motion (00 §0.8) - animate opacity/transform only; honour prefers-reduced-motion. */
   --dur-fast: 120ms; --dur-base: 200ms; --dur-slow: 320ms;
   --ease: cubic-bezier(0.2, 0, 0.2, 1);
 
-  /* Breakpoints (00 §0.6) — reference values; @media uses the literal px. */
+  /* Breakpoints (00 §0.6) - reference values; @media uses the literal px. */
   --bp-mobile: 840px; --bp-compact: 1080px;
 
-  /* Button ladder — heights only (three steps; XS dropped). Padding, type and icon
+  /* Button ladder - heights only (three steps; XS dropped). Padding, type and icon
      size derive per step in lx-atoms.css. Radius is always --r-sm (pills/circles aside). */
   --btn-s: 34px; --btn-m: 40px; --btn-l: 48px;
   --btn-gap: 8px;
   --btn-r: var(--r-sm);
 }
 
-/* Below 840px every step promotes to a 44px floor — defined once, no per-component variants. */
+/* Below 840px every step promotes to a 44px floor - defined once, no per-component variants. */
 @media (max-width: 840px) {
   :root { --btn-s: 44px; --btn-m: 48px; --btn-l: 52px; }
 }
 
-/* Bottom tab bar height — 0 on desktop, present on mobile so sheets sit above it
+/* Bottom tab bar height - 0 on desktop, present on mobile so sheets sit above it
    (M-RULE 01: the tab bar never disappears, even under a sheet). */
 :root { --tabbar-h: 0px; }
 @media (max-width: 840px) { :root { --tabbar-h: calc(60px + env(safe-area-inset-bottom)); } }

@@ -1,7 +1,7 @@
-// LEXFIT pricing — pro-rata withdrawal maths (J2). Pure and unit-tested.
+// LEXFIT pricing - pro-rata withdrawal maths (J2). Pure and unit-tested.
 //
 // Critical case (F2.1 makes it real): the weekly plan's first two periods have
-// DIFFERENT prices — 490 Ft for week 1, then 1 990 Ft for week 2. A withdrawal
+// DIFFERENT prices - 490 Ft for week 1, then 1 990 Ft for week 2. A withdrawal
 // on day 10 must refund the unused portion of EACH actually-paid invoice, not a
 // single price × fraction. So the refund is a sum over real invoices, each
 // weighted by how much of ITS OWN period is still unused.

@@ -5,12 +5,12 @@ import { db } from "@/lib/firebase";
 import { ymd } from "@/lib/streak";
 import type { ChallengeProgress } from "@/lib/types";
 
-// Per-user challenge completion — a SEPARATE store from Foundation progress
+// Per-user challenge completion - a SEPARATE store from Foundation progress
 // (users/{uid}/progress/state), so a challenge never disturbs currentIndex /
 // doneCount. Completing a challenge day still feeds the shared flame streak:
 // the server Mux sync folds challenge-video completion dates into computeStreak
 // (see /api/progress/sync). These client writes are the optimistic bridge over
-// Mux's finalization delay — same pattern as notePendingCompletion for workouts.
+// Mux's finalization delay - same pattern as notePendingCompletion for workouts.
 
 const ref = (uid: string, slug: string) => doc(db, "users", uid, "challengeProgress", slug);
 

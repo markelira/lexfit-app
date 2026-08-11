@@ -21,7 +21,7 @@ export default function NewVideoPage() {
           </div>
           <h1 className="adm-h1">Új videó</h1>
           <p className="adm-sub">
-            Add meg a kódot, töltsd fel a videót és állítsd be az adatokat — bármilyen sorrendben. A videó a Muxba
+            Add meg a kódot, töltsd fel a videót és állítsd be az adatokat - bármilyen sorrendben. A videó a Muxba
             tölt fel, az appban aláírt lejátszással jelenik meg.
           </p>
         </div>

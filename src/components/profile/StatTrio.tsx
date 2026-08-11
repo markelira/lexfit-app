@@ -1,4 +1,4 @@
-// Three tabular numbers — the calm mirror of Haladásom, not a chart (30 §30.3.2).
+// Three tabular numbers - the calm mirror of Haladásom, not a chart (30 §30.3.2).
 export function StatTrio({ items }: { items: { n: string | number; k: string }[] }) {
   return (
     <div className="pf-stattrio">

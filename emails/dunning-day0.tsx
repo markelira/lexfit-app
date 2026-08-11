@@ -1,4 +1,4 @@
-// §4b/7 — Dunning day 0. Trigger: invoice.payment_failed webhook.
+// §4b/7 - Dunning day 0. Trigger: invoice.payment_failed webhook.
 // Copy carried verbatim from src/lib/pricing/templates.ts dunningDay0().
 // payUrl = Stripe hosted invoice (the one sanctioned external link).
 
@@ -12,11 +12,11 @@ export const subject = "Nem ment át a kártyád";
 
 export default function DunningDay0({ payUrl }: { payUrl: string }) {
   return (
-    <EmailLayout preview="Valószínűleg csak lejárt vagy váltott a kártya — egy perc rendbe tenni.">
+    <EmailLayout preview="Valószínűleg csak lejárt vagy váltott a kártya - egy perc rendbe tenni.">
       <Text style={styles.eyebrow}>Fizetés</Text>
       <Text style={styles.h1}>Nem ment át a kártyád</Text>
       <Text style={styles.body}>
-        A mostani terhelés nem sikerült — valószínűleg csak lejárt vagy váltott
+        A mostani terhelés nem sikerült - valószínűleg csak lejárt vagy váltott
         a kártya.
       </Text>
       <Text style={styles.body}>Frissítsd itt, és minden megy tovább:</Text>

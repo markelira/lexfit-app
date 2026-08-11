@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { hasOnboarded } from "@/lib/user";
 import { getSubscription, isSubscribed } from "@/lib/billing";
 
-/** Full-screen branded loader shown while auth/onboarding state resolves —
+/** Full-screen branded loader shown while auth/onboarding state resolves -
  *  a quiet pulsing brand mark, no text (the label feeds screen readers only). */
 export function Loader({ label = "Töltés…" }: { label?: string }) {
   return (
@@ -48,11 +48,11 @@ export function Loader({ label = "Töltés…" }: { label?: string }) {
  * an active entitlement to /subscribe.
  *
  * requirePaid exemptions (deliberate):
- *  - a `session_id` query param — the post-checkout success return; the page's
+ *  - a `session_id` query param - the post-checkout success return; the page's
  *    confirmCheckout fulfills access before the webhook lands, so the gate
  *    must not bounce the buyer while the doc is still being written;
- *  - /app/membership — PAUSED hard-denies access, but resume/cancel live there.
- * The gate is UX only — real enforcement stays server-side (video tokens).
+ *  - /app/membership - PAUSED hard-denies access, but resume/cancel live there.
+ * The gate is UX only - real enforcement stays server-side (video tokens).
  */
 export function Protected({
   children,
@@ -63,7 +63,7 @@ export function Protected({
   children: React.ReactNode;
   requireOnboarded?: boolean;
   requirePaid?: boolean;
-  /** Rendered while the gate resolves — pass a page skeleton for a seamless
+  /** Rendered while the gate resolves - pass a page skeleton for a seamless
    *  load; defaults to the branded Loader. */
   fallback?: React.ReactNode;
 }) {
@@ -94,7 +94,7 @@ export function Protected({
           (new URLSearchParams(window.location.search).has("session_id") ||
             window.location.pathname.startsWith("/app/membership"));
         if (!exempt) {
-          let paid = true; // fail-open on read errors — the server re-validates anyway
+          let paid = true; // fail-open on read errors - the server re-validates anyway
           try {
             paid = isSubscribed(await getSubscription(user.uid));
           } catch {}

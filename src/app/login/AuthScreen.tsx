@@ -52,13 +52,13 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
   const isReg = mode === "register";
 
   // Route once authenticated (40 §40.8). A pre-auth onboarding draft is attached
-  // here — exactly once, idempotently — before any redirect:
+  // here - exactly once, idempotently - before any redirect:
   //  · already onboarded → discard the local draft, go to the app (never re-ask);
   //  · not onboarded + a draft → save it, then checkout (/subscribe);
   //  · not onboarded, no draft → finish onboarding.
-  // On attach failure the draft is kept and we retry in place — the user is
+  // On attach failure the draft is kept and we retry in place - the user is
   // never sent back through the questions (40 §40.12 / P3.5). Pricing is not part
-  // of auth — plan selection is the checkout step.
+  // of auth - plan selection is the checkout step.
   const routeAfterAuth = useCallback(async () => {
     if (!user) return;
     setAttachError(false);
@@ -192,14 +192,14 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
     }
     try {
       // Branded reset email via the server (Admin SDK link + SendGrid). The
-      // endpoint answers generically — account existence is never leaked.
+      // endpoint answers generically - account existence is never leaked.
       await fetch("/api/auth/reset-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim() }),
       });
     } catch {
-      // Network failure — the generic notice below still applies.
+      // Network failure - the generic notice below still applies.
     }
     setNotice("Ha létezik fiók ezzel a címmel, elküldtük a jelszó-visszaállító linket.");
   }
@@ -208,9 +208,9 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
     router.push(target === "login" ? "/login" : "/register");
   }
 
-  // While auth resolves or a redirect is pending, show the branded loader — or,
+  // While auth resolves or a redirect is pending, show the branded loader - or,
   // if attaching the onboarding answers failed, an in-place retry (never a trip
-  // back through the questions — the draft is still in localStorage; P3.5).
+  // back through the questions - the draft is still in localStorage; P3.5).
   if (loading) return <Loader />;
   if (user) {
     if (attachError) {
@@ -280,7 +280,7 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
               <h1 className="ax-h1">{isReg ? "Kezdjük el." : "Üdv újra itt."}</h1>
               <p className="lede">
                 {isReg
-                  ? "Hozz létre egy fiókot — a csomagot a következő lépésben választod ki."
+                  ? "Hozz létre egy fiókot - a csomagot a következő lépésben választod ki."
                   : "Lépj be, és folytasd ott, ahol abbahagytad."}
               </p>
 
@@ -295,7 +295,7 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                   {isReg ? "Regisztráció Google-lel" : "Folytatás Google-lel"}
                 </button>
                 {/* Apple sign-in deferred (no Apple Developer membership yet).
-                    signInWithApple/AppleMark are kept — re-add this button to enable. */}
+                    signInWithApple/AppleMark are kept - re-add this button to enable. */}
               </div>
 
               <div className="div">vagy</div>
@@ -457,13 +457,13 @@ export function authErrorHu(err: unknown): string {
     case "auth/invalid-email":
       return "Érvénytelen e-mail cím.";
     case "auth/weak-password":
-      return "A jelszó túl gyenge — legalább 8 karakter, egy számmal.";
+      return "A jelszó túl gyenge - legalább 8 karakter, egy számmal.";
     case "auth/invalid-credential":
     case "auth/wrong-password":
     case "auth/user-not-found":
       return "Hibás e-mail cím vagy jelszó.";
     case "auth/too-many-requests":
-      return "Túl sok próbálkozás — próbáld kicsit később.";
+      return "Túl sok próbálkozás - próbáld kicsit később.";
     case "auth/popup-closed-by-user":
     case "auth/cancelled-popup-request":
       return "A bejelentkezés megszakadt. Próbáld újra.";

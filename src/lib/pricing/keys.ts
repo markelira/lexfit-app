@@ -1,4 +1,4 @@
-// LEXFIT pricing — Firestore collection names + deterministic document IDs.
+// LEXFIT pricing - Firestore collection names + deterministic document IDs.
 //
 // Pure and dependency-free (no firebase, no server-only) so the SAME id logic is
 // shared by the client, the Admin-SDK server code, and the Stripe seed script.
@@ -35,7 +35,7 @@ export function budapestDay(date: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: BUSINESS_TZ }).format(date);
 }
 
-/** Hour-of-day (0–23) in Europe/Budapest — used for the 04:00 late-check-in cutoff. */
+/** Hour-of-day (0–23) in Europe/Budapest - used for the 04:00 late-check-in cutoff. */
 export function budapestHour(date: Date = new Date()): number {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: BUSINESS_TZ,
@@ -48,7 +48,7 @@ export function budapestHour(date: Date = new Date()): number {
 
 /**
  * Add `n` calendar days to a `YYYY-MM-DD` day-string. Pure civil-date
- * arithmetic (UTC anchored, no timezone) — the input already IS a Budapest
+ * arithmetic (UTC anchored, no timezone) - the input already IS a Budapest
  * calendar day, so we just walk the civil calendar and never re-introduce a TZ.
  */
 export function addDaysToDay(day: string, n: number): string {
@@ -61,7 +61,7 @@ export function addDaysToDay(day: string, n: number): string {
 }
 
 export const subscriptionDocId = (uid: string): string => uid;
-/** `day` must come from budapestDay() — the Budapest calendar day, not UTC. */
+/** `day` must come from budapestDay() - the Budapest calendar day, not UTC. */
 export const checkinDocId = (uid: string, day: string): string => `${uid}_${day}`;
 export const offerDocId = (uid: string, type: string): string => `${uid}_${type}`;
 export const milestoneDocId = (uid: string, kind: string): string => `${uid}_${kind}`;

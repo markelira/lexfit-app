@@ -7,7 +7,7 @@ import { adminDb } from "@/lib/firebase-admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// P6.1 — "Adataim letöltése". Assembles the user's own data into one JSON file:
+// P6.1 - "Adataim letöltése". Assembles the user's own data into one JSON file:
 // account, onboarding, progress (full completed log), settings, photo METADATA
 // (paths + dates, not bytes) and a subscription summary (no Stripe internals).
 const MAX_PER_DAY = 5;

@@ -65,7 +65,7 @@ export default function AdminChallengeVideosPage() {
         <div className="adm-titles">
           <div className="adm-eyebrow">KIHÍVÁSOK</div>
           <h1 className="adm-h1">Kihívás-videók</h1>
-          <p className="adm-sub">A Szavazz Magadra napi videók (9:16) — {videos?.length ?? 0} videó. Külön a videótártól; csak kihívásokban jelennek meg.</p>
+          <p className="adm-sub">A Szavazz Magadra napi videók (9:16) - {videos?.length ?? 0} videó. Külön a videótártól; csak kihívásokban jelennek meg.</p>
         </div>
         <div className="adm-actions">
           <Link href="/admin/challenge-videos/new" className="adm-btn primary">

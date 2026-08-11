@@ -1,12 +1,12 @@
 // LEXFIT Firestore data model (flexible "library + programs" design).
 //
 // Topology:
-//   videos/{code}                  — global library; a video is intrinsic and
+//   videos/{code}                  - global library; a video is intrinsic and
 //                                    program-agnostic, reusable by any program.
-//   programs/{slug}                — rich, data-driven program metadata.
-//   programs/{slug}/sessions/{id}  — the playlist: ordered references to videos.
-//   filters/{key}                  — editable taxonomy (not hardcoded).
-//   users/{uid}/…                  — per-user data written by the app.
+//   programs/{slug}                - rich, data-driven program metadata.
+//   programs/{slug}/sessions/{id}  - the playlist: ordered references to videos.
+//   filters/{key}                  - editable taxonomy (not hardcoded).
+//   users/{uid}/…                  - per-user data written by the app.
 //
 // Content is read-only to authed users; paid gating is enforced server-side via
 // Mux SIGNED playback (one membership unlocks everything).
@@ -16,7 +16,7 @@ export type MuxStatus = "none" | "uploading" | "processing" | "ready" | "error";
 export type RetestKind = "soft" | "final" | null;
 
 // ─────────────────────────────────────────────────────────────
-// videos/{code} — the global library item (intrinsic, reusable)
+// videos/{code} - the global library item (intrinsic, reusable)
 // ─────────────────────────────────────────────────────────────
 
 /** One exercise (Gyakorlat) inside a block. */
@@ -31,7 +31,7 @@ export type VideoExerciseItem = string | VideoExercise;
 /** One block of a session (warm-up, circuit, cool-down). */
 export interface VideoBlock {
   name: string;
-  mins: number;        // block length in minutes — auto-derived from `start` gaps when stamped
+  mins: number;        // block length in minutes - auto-derived from `start` gaps when stamped
   items: VideoExerciseItem[];  // exercises; a string (legacy/unstamped) or { name, start? }
   start?: number;      // seconds into the video where this block begins (optional; enables exact player nav)
 }
@@ -52,7 +52,7 @@ export interface Video {
   focus?: string[];
   subtitle?: string | null;
   blocks: VideoBlock[];         // exercise breakdown (often empty until authored)
-  // Video source — attached via Mux (Phase 3). Library docs may be readable by
+  // Video source - attached via Mux (Phase 3). Library docs may be readable by
   // anyone authed; playback itself is gated by signed Mux URLs.
   muxAssetId: string | null;
   muxPlaybackId: string | null;
@@ -66,10 +66,10 @@ export interface Video {
 }
 
 // ─────────────────────────────────────────────────────────────
-// programs/{slug} — rich, data-driven program
+// programs/{slug} - rich, data-driven program
 // ─────────────────────────────────────────────────────────────
 
-/** A program phase (optional — empty array means a non-phased program). */
+/** A program phase (optional - empty array means a non-phased program). */
 export interface ProgramPhase {
   idx: number;
   icon: string;
@@ -77,7 +77,7 @@ export interface ProgramPhase {
   short: string;
   desc: string;
   colorVar: string;    // CSS var, e.g. "var(--cat-mobility)"
-  // NB: phase size is DERIVED from how many sessions carry this phaseIdx — a
+  // NB: phase size is DERIVED from how many sessions carry this phaseIdx - a
   // program is an ordered, phase-grouped playlist, not a fixed-week calendar.
 }
 
@@ -97,7 +97,7 @@ export interface Program {
   equipment: string | null;  // "nincs (matrac)"
   synopsis: string;
   facts: ProgramFact[];
-  // Structure — a program is an ORDERED, PHASE-GROUPED POOL of workouts. It does
+  // Structure - a program is an ORDERED, PHASE-GROUPED POOL of workouts. It does
   // NOT author a weeks × per-week calendar: how many workouts a user does per
   // week (and on which days) is the USER's onboarding choice
   // (prefs.plan.daysPerWeek / weekdays), so "weeks" are emergent, never authored.
@@ -107,7 +107,7 @@ export interface Program {
   // Presentation
   cover: string | null;
   trailerPlaybackId: string | null;
-  // Ops — one-membership model: "members" needs a subscription, "free" is open.
+  // Ops - one-membership model: "members" needs a subscription, "free" is open.
   access: "members" | "free";
   status: ContentStatus;
   order: number;             // catalog ordering
@@ -115,10 +115,10 @@ export interface Program {
   updatedAt?: unknown;
 }
 
-/** programs/{slug}/sessions/{id} — a playlist entry pointing at a video.
+/** programs/{slug}/sessions/{id} - a playlist entry pointing at a video.
  *  The playlist is the whole structure: `order` is the sequence a user walks
  *  through (one workout per completion), `phaseIdx` groups it. No weekday/week
- *  is authored — the user's cadence schedules it. */
+ *  is authored - the user's cadence schedules it. */
 export interface ProgramSession {
   id: string;                // session doc id (zero-padded order, e.g. "00")
   videoCode: string;         // → videos/{code}
@@ -128,20 +128,20 @@ export interface ProgramSession {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Kihívások — the "Szavazz Magadra" archive (a SECOND library,
+// Kihívások - the "Szavazz Magadra" archive (a SECOND library,
 // parallel to videos/programs; see docs/kihivasok-plan.md)
 //
 // Topology:
-//   challengeVideos/{code}          — separate 9:16 video pool; NEVER surfaces
+//   challengeVideos/{code}          - separate 9:16 video pool; NEVER surfaces
 //                                     in Videótár (that reads videos/{code}).
-//   challenges/{slug}               — a challenge = an ordered 5–14 day series.
-//   challenges/{slug}/days/{id}     — the playlist: ordered refs to challengeVideos.
-//   challengeFilters/{key}          — editable taxonomy (HOSSZ buckets, TESTRÉSZ).
-//   settings/challenges             — { fbGroupUrl } global link-out.
-//   users/{uid}/challengeProgress/{slug} — per-user completion store.
+//   challenges/{slug}               - a challenge = an ordered 5–14 day series.
+//   challenges/{slug}/days/{id}     - the playlist: ordered refs to challengeVideos.
+//   challengeFilters/{key}          - editable taxonomy (HOSSZ buckets, TESTRÉSZ).
+//   settings/challenges             - { fbGroupUrl } global link-out.
+//   users/{uid}/challengeProgress/{slug} - per-user completion store.
 // ─────────────────────────────────────────────────────────────
 
-/** challengeVideos/{code} — a 9:16 challenge day video (own pool, Mux signed). */
+/** challengeVideos/{code} - a 9:16 challenge day video (own pool, Mux signed). */
 export interface ChallengeVideo {
   code: string;                 // "SZM24-1" (doc id)
   title: string;
@@ -149,8 +149,8 @@ export interface ChallengeVideo {
   mins: number;
   level: number;                // 1–3
   blocks: VideoBlock[];         // exercise breakdown (reuses the workout block shape)
-  orientation: "portrait";      // 9:16 reels — distinguishes the player mode
-  // Video source — Mux (signed playback), mirrors Video's fields.
+  orientation: "portrait";      // 9:16 reels - distinguishes the player mode
+  // Video source - Mux (signed playback), mirrors Video's fields.
   muxAssetId: string | null;
   muxPlaybackId: string | null;
   muxUploadId?: string | null;
@@ -168,7 +168,7 @@ export interface Challenge {
   title: string;                // "7 napos has-kihívás"
   series: string;               // eyebrow, e.g. "Szavazz Magadra"
   monthLabel: string;           // human label, "2024. november"
-  sortDate: string;             // sortable "YYYY-MM" (or ISO) — archive reads newest-first
+  sortDate: string;             // sortable "YYYY-MM" (or ISO) - archive reads newest-first
   synopsis: string;
   bodyPart: string;             // → challengeFilters/theme (TESTRÉSZ)
   equipment: string | null;     // "eszköz nélkül"
@@ -187,15 +187,15 @@ export interface Challenge {
   updatedAt?: unknown;
 }
 
-/** challenges/{slug}/days/{id} — a flat, ordered day pointing at a challengeVideo. */
+/** challenges/{slug}/days/{id} - a flat, ordered day pointing at a challengeVideo. */
 export interface ChallengeDay {
   id: string;                   // day doc id (zero-padded order, e.g. "00")
   videoCode: string;            // → challengeVideos/{code}
   order: number;                // 0-based position (day N = order + 1)
-  dayTitle: string | null;      // "Alapozás", "Kitartás" — the "6. nap · Kitartás" suffix
+  dayTitle: string | null;      // "Alapozás", "Kitartás" - the "6. nap · Kitartás" suffix
 }
 
-/** users/{uid}/challengeProgress/{slug} — per-user completion (separate store). */
+/** users/{uid}/challengeProgress/{slug} - per-user completion (separate store). */
 export interface ChallengeProgress {
   slug: string;
   doneDays: string[];           // videoCodes completed (order-agnostic)
@@ -206,11 +206,11 @@ export interface ChallengeProgress {
   completedAt?: unknown;        // set when doneDays covers all days
 }
 
-/** Computed per-user challenge state (not stored) — the ÁLLAPOT filter. */
+/** Computed per-user challenge state (not stored) - the ÁLLAPOT filter. */
 export type ChallengeState = "elkezdetlen" | "folyamatban" | "kesz";
 
 // ─────────────────────────────────────────────────────────────
-// filters/{key} — editable taxonomy (one doc per dimension)
+// filters/{key} - editable taxonomy (one doc per dimension)
 // ─────────────────────────────────────────────────────────────
 
 export interface FilterDimension {
@@ -222,7 +222,7 @@ export interface FilterDimension {
 }
 
 // ─────────────────────────────────────────────────────────────
-// users/{uid}/… — written by the app
+// users/{uid}/… - written by the app
 // ─────────────────────────────────────────────────────────────
 
 export interface UserProfile {

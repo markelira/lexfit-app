@@ -6,7 +6,7 @@ import type { FilterDimension } from "@/lib/types";
 
 /**
  * Shared upsert for taxonomy dimensions (filters/ and challengeFilters/).
- * Creates the doc when missing — on empty prod the first admin save
+ * Creates the doc when missing - on empty prod the first admin save
  * bootstraps the dimension using the canonical defaults for label/order.
  */
 export async function upsertFilterDimension(

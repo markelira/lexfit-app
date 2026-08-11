@@ -6,7 +6,7 @@
   position: fixed; inset: 0; z-index: 200; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   background: radial-gradient(125% 75% at 50% 8%, #191b1d 0%, #0b0b0c 68%);
-  color: #fff; font-family: var(--font, "Poppins", sans-serif);
+  color: #fff; font-family: var(--font);
 }
 .fc-inner {
   flex: none; min-width: 0; box-sizing: border-box; width: min(860px, 100%); max-height: 100%; overflow-y: auto;
@@ -24,32 +24,11 @@
 .fc-title { flex: none; font-size: clamp(28px, 7.5vw, 40px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.0; margin: 4px 0 0; max-width: 100%; padding: 0 16px; }
 .fc-stat { flex: none; font-size: clamp(12.5px, 3.6vw, 14.5px); line-height: 1.4; color: rgba(255,255,255,.66); margin: 0; max-width: 40ch; padding: 0 16px; }
 .fc-stat b { color: #bfe0d0; font-weight: 600; }
-.fc-eyebrow { flex: none; font-family: var(--mono, monospace); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-top: 2px; padding: 0 16px; }
+.fc-eyebrow { flex: none; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-top: 2px; padding: 0 16px; }
 
-/* Infinite rolling carousel of examples */
-.fex-marquee {
-  flex: none; width: 100%; overflow: hidden; padding: 6px 0;
-  -webkit-mask: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
-  mask: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
-}
-.fex-track { display: flex; width: max-content; animation: fex-scroll 46s linear infinite; will-change: transform; }
-@media (hover: hover) { .fex-marquee:hover .fex-track { animation-play-state: paused; } }
-.fex-card {
-  flex: none; width: clamp(150px, 44vw, 196px); margin-right: 14px;
-  display: flex; flex-direction: column; align-items: center; gap: 7px;
-  background: none; border: none; padding: 0; cursor: pointer;
-}
-.fex-frame {
-  width: 100%; aspect-ratio: 9 / 16; position: relative; border-radius: 14px; overflow: hidden; background: #000;
-  box-shadow: 0 12px 30px -14px rgba(0,0,0,.7);
-  transition: transform .16s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease;
-}
-.fex-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.fex-card:active .fex-frame { transform: scale(.965); transition-duration: .09s; }
-@media (hover: hover) { .fex-card:hover .fex-frame { transform: translateY(-3px); box-shadow: 0 18px 40px -16px rgba(0,0,0,.78); } }
-.fex-card:focus-visible .fex-frame { outline: 2px solid #bfe0d0; outline-offset: 2px; }
-.fex-name { flex: none; font-family: var(--mono, monospace); font-size: 9.5px; letter-spacing: 0.05em; color: rgba(255,255,255,.5); }
-@keyframes fex-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+/* The rolling example carousel lives in FinishExamples.css (the component imports
+   it itself, so the marketing homepage can render it too). Only the fc-context
+   overrides for it stay here - the entry stagger and the landscape-phone hide. */
 
 .fc-cta {
   flex: none; display: inline-flex; align-items: center; gap: 9px; height: 50px; padding: 0 26px; border-radius: 999px;
@@ -59,11 +38,11 @@
 .fc-cta svg { stroke: currentColor; }
 .fc-cta:active { transform: scale(.97); }
 
-/* Footer — skip only */
+/* Footer - skip only */
 .fc-foot { flex: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 0 16px; box-sizing: border-box; }
 .fc-skip { background: none; border: none; color: rgba(255,255,255,.42); font-family: inherit; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
-/* Motion — quiet materialize + light stagger */
+/* Motion - quiet materialize + light stagger */
 @keyframes fc-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes fc-badge-in { from { opacity: 0; transform: scale(.72); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes fc-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -76,7 +55,7 @@
 .fc-foot { animation-delay: .3s; }
 .fc-badge { animation: fc-badge-in .55s cubic-bezier(.2,.8,.25,1) both; }
 
-/* Landscape phone (finished before rotating back): compact celebration —
+/* Landscape phone (finished before rotating back): compact celebration -
    drop the example marquee, keep title + stats + CTA + skip fully in view. */
 @media (max-height: 480px) {
   .fc-inner { gap: 7px; padding: 14px 0 12px; }
@@ -88,8 +67,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .fc-inner > *, .fc-badge { animation: fc-fade .3s ease both; }
-  .fex-track { animation: none; }
-  .fex-frame, .fc-cta { transition: none; }
-  .fex-card:active .fex-frame, .fc-cta:active { transform: none; }
-  @media (hover: hover) { .fex-card:hover .fex-frame { transform: none; } }
+  .fc-cta { transition: none; }
+  .fc-cta:active { transform: none; }
 }

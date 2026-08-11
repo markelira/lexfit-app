@@ -58,7 +58,7 @@ async function muxGet<T>(path: string, params: URLSearchParams): Promise<T> {
 async function listViews(uid: string, fromSec: number, toSec: number): Promise<MuxViewListItem[]> {
   const out: MuxViewListItem[] = [];
   for (let page = 1; page <= 10; page++) {
-    // NB: viewer_id is a dedicated query param on the list endpoint —
+    // NB: viewer_id is a dedicated query param on the list endpoint -
     // `filters[]=viewer_id:…` is rejected as an invalid dimension.
     const params = new URLSearchParams({ limit: "100", page: String(page), viewer_id: uid });
     params.append("timeframe[]", String(fromSec));
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
   if (!token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const uid = token.uid;
 
-  // One call fans out to up to ~100 Mux Data fetches — cap per uid well above
+  // One call fans out to up to ~100 Mux Data fetches - cap per uid well above
   // legit usage (client throttles to 15 min, force paths are user actions).
   if (!(await allowRequest("progressSync", uid, 30, HOUR_MS))) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
@@ -140,7 +140,7 @@ export async function POST(req: Request) {
 
   // 3 · Program context: code → session order (playlist position). The streak's
   // workout-day set comes from the USER's chosen training days (their cadence),
-  // NOT an authored program calendar — a program is an ordered pool.
+  // NOT an authored program calendar - a program is an ordered pool.
   const sessionsSnap = await adminDb.collection("programs/foundation/sessions").get();
   const orderByCode: Record<string, number> = {};
   sessionsSnap.forEach((d) => {
@@ -195,7 +195,7 @@ export async function POST(req: Request) {
         const code = (d.data() as { videoCode?: string }).videoCode;
         if (slug && code) { slugByCode[code] = slug; challengeDaysCount[slug] = (challengeDaysCount[slug] ?? 0) + 1; }
       });
-    } catch { /* ignore — completions just won't be attributed this sync */ }
+    } catch { /* ignore - completions just won't be attributed this sync */ }
     for (const c of rawChallengeCompletions) {
       const slug = slugByCode[c.code];
       if (slug) challengeCompletions.push({ slug, code: c.code, at: c.at });
@@ -207,7 +207,7 @@ export async function POST(req: Request) {
   for (const id of Object.keys(seen)) if (seen[id] < nowSec - SEEN_TTL_S) delete seen[id];
 
   // 5 · Rebuild derived state. First sync starts clean: legacy client-collected
-  // completions/watch time are discarded — Mux is the only source from cutover.
+  // completions/watch time are discarded - Mux is the only source from cutover.
   const baseCompleted = firstSync
     ? []
     : ([...((cur.completed as Completion[] | undefined) ?? [])] as Completion[]);
@@ -283,8 +283,8 @@ export async function POST(req: Request) {
   if (!snap.exists) {
     await ref.set({ ...derived, joinedAt: FieldValue.serverTimestamp(), resume: {} });
   } else {
-    // update(): top-level map values (watchByDay, muxSync) replace wholesale —
-    // set+merge would deep-merge and resurrect pruned/wiped keys — and dotted
+    // update(): top-level map values (watchByDay, muxSync) replace wholesale -
+    // set+merge would deep-merge and resurrect pruned/wiped keys - and dotted
     // paths delete just the completed codes' resume positions.
     const update: Record<string, unknown> = { ...derived };
     for (const c of completions) {
@@ -294,7 +294,7 @@ export async function POST(req: Request) {
     await ref.update(update);
   }
 
-  // "Az első megvan" — the activation-milestone email, fired the first time a
+  // "Az első megvan" - the activation-milestone email, fired the first time a
   // completion ever lands for this user (§4d/17). Best-effort + milestone-
   // gated: a send failure or a double sync can never break or repeat it.
   const hadCompletionsBefore =

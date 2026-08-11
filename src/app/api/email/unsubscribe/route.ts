@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 // One-click unsubscribe (RFC 8058). GET = a human clicked the footer link
 // (apply + tiny HU confirmation page); POST = a mail client's headless
-// one-click (apply + 200). HMAC-verified — fails closed without CRON_SECRET.
+// one-click (apply + 200). HMAC-verified - fails closed without CRON_SECRET.
 
 function parse(req: Request): { uid: string; kind: UnsubKind } | null {
   const url = new URL(req.url);
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
   const html = `<!doctype html><html lang="hu"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Leiratkozva — LEXFIT</title></head>
+<title>Leiratkozva - LEXFIT</title></head>
 <body style="margin:0;background:#f1f6f4;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#18201d">
 <div style="max-width:440px;margin:80px auto;padding:38px 32px;background:#fff;border:1px solid #d8e0dd;border-radius:20px;text-align:center">
 <p style="font-weight:900;letter-spacing:0.04em;margin:0 0 18px">LEX<span style="color:#496c5e">FIT</span></p>

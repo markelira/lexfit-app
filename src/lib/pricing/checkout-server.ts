@@ -4,7 +4,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getStripe } from "@/lib/stripe";
 import { PRICES, isRecurringRole, type CheckoutRole, type PriceRole } from "./config";
 
-/** Resolve a role's Stripe price id via its lookup_key. Cached per process —
+/** Resolve a role's Stripe price id via its lookup_key. Cached per process -
  *  lookup_keys are stable, and re-seeding rotates the key deliberately. */
 const priceIdCache = new Map<string, string>();
 
@@ -16,18 +16,18 @@ export async function priceIdForRole(role: PriceRole): Promise<string> {
   const res = await getStripe().prices.list({ lookup_keys: [lookupKey], limit: 1 });
   const id = res.data[0]?.id;
   if (!id) {
-    throw new Error(`No Stripe price for lookup_key ${lookupKey} — run npm run seed:stripe`);
+    throw new Error(`No Stripe price for lookup_key ${lookupKey} - run npm run seed:stripe`);
   }
   priceIdCache.set(lookupKey, id);
   return id;
 }
 
 /**
- * F2.1 — convert a freshly created weekly subscription into an intro→standard
+ * F2.1 - convert a freshly created weekly subscription into an intro→standard
  * schedule: phase 1 = intro price for one week, phase 2 = standard, then release
  * so the subscription continues on the standard price indefinitely.
  *
- * Idempotent: if the subscription already has a schedule attached, do nothing —
+ * Idempotent: if the subscription already has a schedule attached, do nothing -
  * so a duplicate `checkout.session.completed` delivery can't create a second
  * schedule (this runs before the webhook's dedup transaction).
  */
@@ -45,7 +45,7 @@ export async function ensureWeeklySchedule(sub: Stripe.Subscription): Promise<vo
   await stripe.subscriptionSchedules.update(schedule.id, {
     end_behavior: "release", // after the std phase, continue on std indefinitely
     phases: [
-      // week 1 — the intro price already paid at checkout
+      // week 1 - the intro price already paid at checkout
       {
         items: [{ price: introPrice }],
         start_date: start,
@@ -58,7 +58,7 @@ export async function ensureWeeklySchedule(sub: Stripe.Subscription): Promise<vo
 }
 
 /**
- * F3.3 — the Grand Slam earned-annual step-up: year 1 at the earned price, then
+ * F3.3 - the Grand Slam earned-annual step-up: year 1 at the earned price, then
  * the standard annual price from year 2, released to continue indefinitely.
  * Idempotent (skips if a schedule is already attached).
  */
@@ -74,22 +74,22 @@ export async function ensureEarnedAnnualSchedule(sub: Stripe.Subscription): Prom
   await stripe.subscriptionSchedules.update(schedule.id, {
     end_behavior: "release",
     phases: [
-      // year 1 — the earned price already paid
+      // year 1 - the earned price already paid
       {
         items: [{ price: earnedPrice }],
         start_date: start,
         duration: { interval: "year", interval_count: 1 },
       },
-      // year 2 onward — standard annual, released to continue indefinitely
+      // year 2 onward - standard annual, released to continue indefinitely
       { items: [{ price: stdPrice }], duration: { interval: "year", interval_count: 1 } },
     ],
   });
 }
 
 export interface ConsentInput {
-  /** J1 auto-renew acknowledgement — required for recurring, N/A for one-off. */
+  /** J1 auto-renew acknowledgement - required for recurring, N/A for one-off. */
   autoRenew: boolean | null;
-  /** J2 immediate-start + pro-rata acknowledgement — required for ALL purchases. */
+  /** J2 immediate-start + pro-rata acknowledgement - required for ALL purchases. */
   immediateStart: boolean;
 }
 
@@ -105,7 +105,7 @@ export function validateConsent(role: CheckoutRole, c: ConsentInput): string | n
 }
 
 /**
- * Persist a consent record BEFORE checkout — the auditable proof required by
+ * Persist a consent record BEFORE checkout - the auditable proof required by
  * F1.2 (for withdrawals / disputes). Returns the doc id, which is attached to
  * the Checkout Session metadata so a payment can be traced to its consent.
  * If this write fails, the caller MUST NOT create the checkout session.

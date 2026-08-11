@@ -5,15 +5,15 @@ import Script from "next/script";
 import "./analytics-consent.css";
 
 // Consent-gated Google tags. GDPR-first: NOTHING loads and no cookie is
-// written until the visitor explicitly accepts — hard-gating the scripts is
+// written until the visitor explicitly accepts - hard-gating the scripts is
 // simpler and stricter than Consent Mode. The choice persists in localStorage;
 // "Elutasítom" is remembered and never nags again.
 //
 // Two independent loaders, each off until its env var is set:
-//   NEXT_PUBLIC_GA_ID  (G-…)   — GA4 via gtag.js, wired directly in code.
-//   NEXT_PUBLIC_GTM_ID (GTM-…) — the GTM container, for future marketing tags.
+//   NEXT_PUBLIC_GA_ID  (G-…)   - GA4 via gtag.js, wired directly in code.
+//   NEXT_PUBLIC_GTM_ID (GTM-…) - the GTM container, for future marketing tags.
 // IMPORTANT: do NOT also add the same G-… as a Google Tag inside the GTM
-// container — pageviews would double-count.
+// container - pageviews would double-count.
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;

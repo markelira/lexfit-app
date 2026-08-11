@@ -42,14 +42,14 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
 
   // Open the camera while in the camera stage. A per-run `cancelled` flag ensures
   // a stream that resolves AFTER teardown (user closed during the permission
-  // prompt) is stopped immediately — otherwise the camera would stay on.
+  // prompt) is stopped immediately - otherwise the camera would stay on.
   useEffect(() => {
     if (stage !== "camera") return;
     let cancelled = false;
     let stream: MediaStream | null = null;
     (async () => {
       setCamErr(null);
-      // Only hint a width — forcing a portrait 1080×1920 made the browser pick a
+      // Only hint a width - forcing a portrait 1080×1920 made the browser pick a
       // cropped/zoomed sensor mode. A width-only ideal keeps the native ~1x FOV;
       // the 9:16 crop happens on capture + object-fit on the preview.
       const constraints = (fm: MediaTrackConstraints["facingMode"]): MediaStreamConstraints => ({
@@ -158,7 +158,7 @@ export function FinishShare({ data, onClose, onShared, startInReview }: { data: 
         download(file);
         onShared?.(); // Web Share unavailable → still report done so the desktop clears
       }
-    } catch { /* user cancelled share or it failed — no-op */ }
+    } catch { /* user cancelled share or it failed - no-op */ }
     finally { setBusy(false); }
   }
 

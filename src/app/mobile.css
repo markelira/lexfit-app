@@ -1,4 +1,4 @@
-/* LEXFIT mobile atoms — bottom sheet + card detail sheet + filter-sheet chips.
+/* LEXFIT mobile atoms - bottom sheet + card detail sheet + filter-sheet chips.
    Global, scoped under .lx. Values from 00-FOUNDATIONS.md. */
 
 /* ── Bottom sheet (01 §1.5) ── */
@@ -70,13 +70,13 @@
 .lx .mws-save.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-2); }
 .lx .mws-save:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 
-/* filter-sheet chips — 44px tap floor, accent fill when selected (ink text per §0.2) */
+/* filter-sheet chips - 44px tap floor, accent fill when selected (ink text per §0.2) */
 .lx .bsheet-chips .chip { min-height: 44px; }
 .lx .bsheet-chips .chip.on { background: var(--accent); border-color: var(--accent); color: var(--ink); }
 .lx .bsheet-clear { background: none; border: none; cursor: pointer; font-family: var(--font); font-size: 12.5px; font-weight: 600; color: var(--accent-2); }
 .lx .bsheet-clear:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 
-/* results-meta chips scroll horizontally below 840px — they never collapse (§11.3) */
+/* results-meta chips scroll horizontally below 840px - they never collapse (§11.3) */
 @media (max-width: 840px) {
   .lx .lib-resmeta { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .lx .lib-resmeta::-webkit-scrollbar { display: none; }

@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-// P6.3 — hourly habit reminders (email only). Separate from the billing cron: a
+// P6.3 - hourly habit reminders (email only). Separate from the billing cron: a
 // daily reminder on the user's own edzésnapok at their chosen hour, plus a 20:00
 // "Sorozat veszélyben" pass. ONE message per user per day across both, idempotent
 // via a milestone doc. Never remind someone who already trained today.
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
   const { day, hour, weekday } = budapestNow();
 
   // Users who want the daily reminder. (Needs a collection-group index on
-  // settings/reminders.workout.enabled — see firestore.indexes.json.)
+  // settings/reminders.workout.enabled - see firestore.indexes.json.)
   const snap = await adminDb
     .collectionGroup("settings")
     .where("reminders.workout.enabled", "==", true)

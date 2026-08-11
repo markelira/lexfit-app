@@ -111,7 +111,7 @@ export function ProgramForm({ initial, create }: { initial: Program | null; crea
           <div className="adm-frow">
             <label className="adm-flabel">Slug (azonosító) <span className="req">*</span></label>
             <input type="text" value={d.slug} disabled={!create} onChange={(e) => set("slug", e.target.value)} placeholder="foundation" />
-            {!create && <span className="adm-fhint">A slug a dokumentum azonosítója — nem módosítható.</span>}
+            {!create && <span className="adm-fhint">A slug a dokumentum azonosítója - nem módosítható.</span>}
           </div>
           <div className="adm-frow">
             <label className="adm-flabel">Kategória</label>

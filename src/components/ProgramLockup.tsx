@@ -2,9 +2,9 @@ import { programVisual } from "@/lib/programs";
 import { ProgramMark } from "./ProgramMark";
 
 // The consistent, COLORLESS program badge. Identical styling on every program and
-// on every category color — only the icon shape + name change. Placement variants:
-//   top-left    — glass pill, top-left corner (TV key art)
-//   corner-tab  — smaller glass pill (dense shelf)
+// on every category color - only the icon shape + name change. Placement variants:
+//   top-left    - glass pill, top-left corner (TV key art)
+//   corner-tab  - smaller glass pill (dense shelf)
 type Variant = "top-left" | "corner-tab";
 
 export function ProgramLockup({

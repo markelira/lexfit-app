@@ -25,7 +25,7 @@ export const SUB_BADGE: Record<string, string> = {
 };
 
 const fmtDate = (iso: string | null) =>
-  iso ? new Intl.DateTimeFormat("hu-HU", { year: "numeric", month: "short", day: "numeric" }).format(new Date(iso)) : "—";
+  iso ? new Intl.DateTimeFormat("hu-HU", { year: "numeric", month: "short", day: "numeric" }).format(new Date(iso)) : "-";
 
 export default function AdminMembersPage() {
   const router = useRouter();
@@ -51,7 +51,7 @@ export default function AdminMembersPage() {
         <div className="adm-titles">
           <div className="adm-eyebrow">TAGOK</div>
           <h1 className="adm-h1">Tagok</h1>
-          <p className="adm-sub">{users?.length ?? 0} tag — előfizetés és aktivitás áttekintése (csak megtekintés).</p>
+          <p className="adm-sub">{users?.length ?? 0} tag - előfizetés és aktivitás áttekintése (csak megtekintés).</p>
         </div>
       </div>
 
@@ -86,8 +86,8 @@ export default function AdminMembersPage() {
             )}
             {filtered.map((u) => (
               <tr key={u.uid} className="row" onClick={() => router.push(`/admin/members/${u.uid}`)}>
-                <td>{u.displayName ?? "—"}</td>
-                <td className="muted">{u.email ?? "—"}</td>
+                <td>{u.displayName ?? "-"}</td>
+                <td className="muted">{u.email ?? "-"}</td>
                 <td className="muted">{fmtDate(u.createdAt)}</td>
                 <td>
                   <span className={`adm-badge ${SUB_BADGE[u.subscriptionStatus] ?? "none"}`}>

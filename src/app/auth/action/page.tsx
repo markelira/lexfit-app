@@ -1,6 +1,6 @@
 "use client";
 
-// Firebase Auth action handler — the in-app landing for the e-mail links
+// Firebase Auth action handler - the in-app landing for the e-mail links
 // (password reset, e-mail verification, e-mail-change recovery). The Firebase
 // console's e-mail templates must point their action URL at
 // https://www.lexfit.hu/auth/action for this page to receive the links;
@@ -92,7 +92,7 @@ function ActionHandler() {
       setMsg("Az új jelszavad él. Jelentkezz be vele!");
       setState("done");
     } catch {
-      setErr("Nem sikerült menteni — a link lejárhatott. Kérj új jelszó-visszaállítást.");
+      setErr("Nem sikerült menteni - a link lejárhatott. Kérj új jelszó-visszaállítást.");
     } finally {
       setBusy(false);
     }

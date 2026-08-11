@@ -4,7 +4,7 @@ import { LegalDoc } from "@/components/LegalDoc";
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "Impresszum — LEXFIT",
+  title: "Impresszum - LEXFIT",
   description: "A LEXFIT szolgáltatás üzemeltetőjének adatai (Ekertv. 4. §).",
 };
 

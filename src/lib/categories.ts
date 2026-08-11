@@ -11,7 +11,7 @@ export const CAT: Record<string, { c: string; word: string; short: string }> = {
 };
 
 export const catOf = (t: string) => CAT[t] ?? CAT["Teljes test"];
-/** Full category name, UPPERCASED — the centered cover word (final spec). */
+/** Full category name, UPPERCASED - the centered cover word (final spec). */
 export const catWord = (t: string) => catOf(t).word;
 /** Legacy abbreviation, for tight single-line spots that can't fit the full name. */
 export const catShort = (t: string) => catOf(t).short;

@@ -13,11 +13,11 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 /**
  * Branded password-reset email. Replaces the client SDK's
  * `sendPasswordResetEmail` (which sends Google's default template): the Admin
- * SDK generates the action link and SendGrid delivers our own email — the
+ * SDK generates the action link and SendGrid delivers our own email - the
  * sanctioned custom-auth-email pattern. The link points at the Firebase-console
  * action URL (https://www.lexfit.hu/auth/action) and expires in 1 hour.
  *
- * ALWAYS answers { ok: true } for a syntactically valid email — never leaks
+ * ALWAYS answers { ok: true } for a syntactically valid email - never leaks
  * whether an account exists (auth/email-not-found is swallowed). Public
  * endpoint → rate-limited per address so it can't be used to bomb an inbox.
  */

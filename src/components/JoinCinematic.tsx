@@ -23,11 +23,11 @@ const CINE: Scene[] = [
     bg: "radial-gradient(125% 125% at 30% 18%, oklch(0.52 0.05 168) 0%, oklch(0.16 0.04 168) 70%)" },
   { dur: 4400, kind: "big", big: "EGY STABIL ALAP", sub: "Szokást építünk, formába hozunk, és felkészítünk minden következő edzésre.",
     bg: "radial-gradient(125% 125% at 72% 26%, oklch(0.56 0.17 32) 0%, oklch(0.15 0.03 330) 72%)" },
-  { dur: 5000, kind: "rhythm", title: "A HETED", sub: "5 edzésnap, 2 pihenő. Napi fix 30 perc, eszköz nélkül — csak egy matrac.",
+  { dur: 5000, kind: "rhythm", title: "A HETED", sub: "5 edzésnap, 2 pihenő. Napi fix 30 perc, eszköz nélkül - csak egy matrac.",
     bg: "linear-gradient(135deg, oklch(0.5 0.15 300) 0%, oklch(0.14 0.03 168) 78%)" },
-  { dur: 5000, kind: "types", title: "AMIT CSINÁLNI FOGSZ", sub: "Circuit, EMOM, Tabata, AMRAP, flow — minden nap más, sosem unalmas.",
+  { dur: 5000, kind: "types", title: "AMIT CSINÁLNI FOGSZ", sub: "Circuit, EMOM, Tabata, AMRAP, flow - minden nap más, sosem unalmas.",
     bg: "radial-gradient(120% 120% at 60% 80%, oklch(0.52 0.16 45) 0%, oklch(0.14 0.03 340) 74%)" },
-  { dur: 4600, kind: "phases", title: "4 FÁZIS", sub: "A formától az erőig — lépésről lépésre építünk fel.",
+  { dur: 4600, kind: "phases", title: "4 FÁZIS", sub: "A formától az erőig - lépésről lépésre építünk fel.",
     bg: "radial-gradient(110% 130% at 50% 0%, oklch(0.5 0.16 150) 0%, oklch(0.15 0.03 340) 74%)" },
   { dur: 4800, kind: "big", big: "MÉRD MAGAD", sub: "A program végén ugyanazt csinálod, mint az elején. A különbség te leszel.",
     bg: "radial-gradient(125% 125% at 38% 82%, oklch(0.55 0.18 18) 0%, oklch(0.13 0.03 168) 72%)" },
@@ -54,7 +54,7 @@ const CINE_GOALS: [string, string][] = [
 ];
 const CONFETTI_COLORS = ["#7a9b8d", "#496c5e", "#ffb86b", "#7ee0a8", "#ffffff", "#b692d8"];
 
-// Deterministic 0..1 hash (pure — avoids Math.random impurity + hydration mismatch).
+// Deterministic 0..1 hash (pure - avoids Math.random impurity + hydration mismatch).
 const rand = (n: number) => {
   const x = Math.sin(n * 12.9898) * 43758.5453;
   return x - Math.floor(x);
@@ -62,7 +62,7 @@ const rand = (n: number) => {
 
 /**
  * Netflix-trailer-style join intro. `onJoin` runs after the celebration (do the real
- * join + start the guide there). `onClose` is "skip" — close without joining.
+ * join + start the guide there). `onClose` is "skip" - close without joining.
  */
 export function JoinCinematic({
   name = "te",
@@ -144,7 +144,7 @@ export function JoinCinematic({
             <>
               <div className="cine-kicker">{sc.kicker}</div>
               <div className="cine-title">FOUNDATION</div>
-              <div className="cine-sub">Az alapprogram — kezdőknek és újrakezdőknek.</div>
+              <div className="cine-sub">Az alapprogram - kezdőknek és újrakezdőknek.</div>
             </>
           ) : sc.finale ? (
             <>
@@ -152,7 +152,7 @@ export function JoinCinematic({
               <div className="cine-sub">{sc.sub}</div>
               <div className="cine-cta">
                 <button className="cine-join" onClick={() => setCelebrating(true)}>
-                  <LxIcon d={lxPaths.flame} size={20} sw={2} /> Csatlakozom — kezdjük az 1. nappal
+                  <LxIcon d={lxPaths.flame} size={20} sw={2} /> Csatlakozom - kezdjük az 1. nappal
                 </button>
                 <button className="cine-ghost" onClick={onClose}>Még körülnézek</button>
               </div>
@@ -246,7 +246,7 @@ export function JoinCinematic({
           </div>
           <div className="ce-badge">🎉</div>
           <h2>Üdv a programban!</h2>
-          <p>{name}, ez itt a kezdet. Megmutatom, hogyan működik — 30 másodperc.</p>
+          <p>{name}, ez itt a kezdet. Megmutatom, hogyan működik - 30 másodperc.</p>
           <button className="ce-go" onClick={() => onJoin()}>Mutasd meg, hogyan működik →</button>
         </div>
       )}

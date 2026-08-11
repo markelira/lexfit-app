@@ -3,7 +3,7 @@ import { lxPaths } from "@/lib/icons";
 import type { WeekCellState } from "@/lib/profile";
 
 // Seven equal cells, Monday-first. Five states incl. `missed` (planned, past, not
-// done — no red, no scolding; 30 §30.3.3). Day letters mono above each cell.
+// done - no red, no scolding; 30 §30.3.3). Day letters mono above each cell.
 const DAY_LABELS = ["H", "K", "SZE", "CS", "P", "SZO", "V"];
 
 export function WeekStrip({ week }: { week: { weekday: number; state: WeekCellState }[] }) {

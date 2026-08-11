@@ -27,7 +27,7 @@ export function SkelPage({ className = "", children }: { className?: string; chi
 
 /* ── shared parts ── */
 
-/** WorkoutCard ghost — real .wc class so .hrow gives it the exact card width. */
+/** WorkoutCard ghost - real .wc class so .hrow gives it the exact card width. */
 export function SkelCard() {
   return (
     <div className="wc" aria-hidden="true">
@@ -108,8 +108,8 @@ export function HomeSkeleton() {
   );
 }
 
-/** The /app auth+entitlement gate: the WHOLE shell as a skeleton — top bar,
- *  sidebar (desktop; CSS hides it on mobile) and Kezdőlap-shaped content — so
+/** The /app auth+entitlement gate: the WHOLE shell as a skeleton - top bar,
+ *  sidebar (desktop; CSS hides it on mobile) and Kezdőlap-shaped content - so
  *  entering the app never shows a blank branded screen. */
 export function AppShellSkeleton() {
   return (
@@ -148,7 +148,7 @@ export function AppShellSkeleton() {
   );
 }
 
-/** Player gate: dark theater skeleton — video stage + control/meta ghosts. */
+/** Player gate: dark theater skeleton - video stage + control/meta ghosts. */
 export function PlayerSkeleton() {
   return (
     <div

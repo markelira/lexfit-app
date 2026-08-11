@@ -12,7 +12,7 @@ export interface OptionItem {
 
 // A single option row (40 §40.4). Icon tile · bold label · sub · mark. The mark
 // shape is the affordance: a circle for single-choice (radio), a rounded square
-// for multi (checkbox). Presentational — semantics/keyboard live in OptionList.
+// for multi (checkbox). Presentational - semantics/keyboard live in OptionList.
 export const OptionRow = forwardRef<
   HTMLButtonElement,
   {

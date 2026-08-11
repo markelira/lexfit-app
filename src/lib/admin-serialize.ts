@@ -1,5 +1,5 @@
 // Recursively convert Firestore Timestamps (Admin SDK) to ISO strings so the
-// result is JSON-serializable for admin API responses. Pure — server or client.
+// result is JSON-serializable for admin API responses. Pure - server or client.
 export function serialize<T = unknown>(v: unknown): T {
   if (v == null) return v as T;
   if (typeof v === "object") {

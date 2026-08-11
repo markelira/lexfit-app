@@ -1,4 +1,4 @@
-/* ── Programok — Netflix/Apple TV catalog ───────────────────────────────────
+/* ── Programok - Netflix/Apple TV catalog ───────────────────────────────────
    Every published program is a full-width billboard band (same visual grammar
    as the Kezdőlap hero) with its playlist rail beneath. Each band carries its
    OWN hue (--pgs-h, from programVisual) with identical lightness/chroma so the
@@ -8,7 +8,7 @@
 
 .lx .pgs { display: flex; flex-direction: column; gap: 18px; }
 
-/* the band — edge-to-edge across the content column, like the home billboard */
+/* the band - edge-to-edge across the content column, like the home billboard */
 .lx .pgs-hero {
   --pgs-h: 168;
   position: relative;

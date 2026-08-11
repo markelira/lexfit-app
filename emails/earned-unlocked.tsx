@@ -1,4 +1,4 @@
-// §4c/12 — Earned annual ("Kiérdemelt Ár") unlocked: 5 check-ins in the first 7 days.
+// §4c/12 - Earned annual ("Kiérdemelt Ár") unlocked: 5 check-ins in the first 7 days.
 // Copy carried from pricing/templates.ts earnedUnlocked(), with the pink-era 💗
 // corrected to 💚. Status, not sale (J4). The 72h deadline is real and final.
 
@@ -29,7 +29,7 @@ export default function EarnedUnlocked({
       </Text>
       <Panel>
         <PanelText>
-          <strong>{earnedPrice}</strong> az első évre — {perWeek}/hét.
+          <strong>{earnedPrice}</strong> az első évre - {perWeek}/hét.
         </PanelText>
       </Panel>
       <Text style={styles.body}>

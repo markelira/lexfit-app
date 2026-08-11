@@ -1,4 +1,4 @@
-/* LEXFIT Profil & Beállítások — the settings grammar every phone ships with, in
+/* LEXFIT Profil & Beállítások - the settings grammar every phone ships with, in
    plain Hungarian. Token-only: --r-sm|md|lg radii, --sp-* spacing, --danger for
    destructive. Green (Eukaliptusz). No literal px radii. (30-PROFIL.md) */
 
@@ -8,7 +8,7 @@
 /* load / error / empty */
 .pf-loading { font-family: var(--mono); color: var(--ink-3); margin-top: 40px; }
 
-/* skeletons — real shapes, no spinner, no layout shift (P9.1 / 00 §0.9) */
+/* skeletons - real shapes, no spinner, no layout shift (P9.1 / 00 §0.9) */
 .pf-skel { background: linear-gradient(90deg, var(--surface-2) 25%, var(--line) 37%, var(--surface-2) 63%); background-size: 400% 100%; animation: pf-shimmer 1.4s ease infinite; border-radius: var(--r-sm); }
 @keyframes pf-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 .pf-skel.ava { width: 76px; height: 76px; border-radius: 50%; flex: none; }
@@ -153,14 +153,14 @@
 .hit44 { position: relative; }
 .hit44::after { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; }
 
-/* mobile section list (P8.3 — Beállítások with no sub-nav) */
+/* mobile section list (P8.3 - Beállítások with no sub-nav) */
 .pf-mobsec { margin-top: var(--sp-4); }
 
 /* ── mobile full pass (P8 §30.5) ──────────────────────────────────────────── */
 @media (max-width: 840px) {
   .pf-set-grid, .pf-set-grid.mobile { grid-template-columns: 1fr; gap: 0; }
 
-  /* P-02 Profil — centre-stacked identity; streak pill under the meta; the small
+  /* P-02 Profil - centre-stacked identity; streak pill under the meta; the small
      settings button becomes a compact icon (the avatar menu is the main route). */
   .pf-identity { flex-direction: column; text-align: center; gap: var(--sp-3); padding: var(--sp-5) var(--sp-4); }
   .pf-identity .ava { width: 64px; height: 64px; font-size: 26px; }

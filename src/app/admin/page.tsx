@@ -57,10 +57,10 @@ export default function AdminHome() {
         <div className="adm-card" style={{ marginBottom: 26 }}>A statisztikák betöltése nem sikerült.</div>
       ) : (
         <div className="adm-kpis">
-          <div className="adm-kpi"><div className="v">{kpis ? kpis.total : "—"}</div><div className="k">Összes tag</div></div>
-          <div className="adm-kpi"><div className="v">{kpis ? kpis.subs : "—"}</div><div className="k">Aktív előfizetés</div></div>
-          <div className="adm-kpi"><div className="v">{kpis ? kpis.activeThisWeek : "—"}</div><div className="k">Aktív a héten</div></div>
-          <div className="adm-kpi"><div className="v">{kpis ? kpis.newThisMonth : "—"}</div><div className="k">Új e hónapban</div></div>
+          <div className="adm-kpi"><div className="v">{kpis ? kpis.total : "-"}</div><div className="k">Összes tag</div></div>
+          <div className="adm-kpi"><div className="v">{kpis ? kpis.subs : "-"}</div><div className="k">Aktív előfizetés</div></div>
+          <div className="adm-kpi"><div className="v">{kpis ? kpis.activeThisWeek : "-"}</div><div className="k">Aktív a héten</div></div>
+          <div className="adm-kpi"><div className="v">{kpis ? kpis.newThisMonth : "-"}</div><div className="k">Új e hónapban</div></div>
         </div>
       )}
 
@@ -85,9 +85,9 @@ export default function AdminHome() {
             <tbody>
               {recent.map((u) => (
                 <tr key={u.uid} className="row" onClick={() => router.push(`/admin/members/${u.uid}`)}>
-                  <td>{u.displayName ?? "—"}</td>
-                  <td className="muted">{u.email ?? "—"}</td>
-                  <td>{isActiveSub(u.subscriptionStatus) ? "Aktív" : "—"}</td>
+                  <td>{u.displayName ?? "-"}</td>
+                  <td className="muted">{u.email ?? "-"}</td>
+                  <td>{isActiveSub(u.subscriptionStatus) ? "Aktív" : "-"}</td>
                 </tr>
               ))}
             </tbody>

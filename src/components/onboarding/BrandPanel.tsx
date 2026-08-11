@@ -1,9 +1,9 @@
 import Image from "next/image";
 
-// The step-aware left column for the /register wizard — Apple-style, image-led:
+// The step-aware left column for the /register wizard - Apple-style, image-led:
 // a full-bleed photo per step, a dark bottom scrim, the LEXFIT wordmark top, and
 // one short caption. Images live in public/onboarding/{key}.jpg (placeholders now;
-// replace with real photos — see public/onboarding/README.md). Static per step,
+// replace with real photos - see public/onboarding/README.md). Static per step,
 // cross-fades. docs/onboarding-left-panels.md
 //
 // Slogan rule: default "A változás otthon kezdődik" (welcome); "Egyedül nehéz.
@@ -33,14 +33,14 @@ const CAP: Record<PanelKey, { eyebrow?: string; line: React.ReactNode; slogan?: 
   welcome: { line: <>A változás<br /><b>otthon kezdődik.</b></>, slogan: true },
   community: { eyebrow: "A közösség", line: <>1 200+ csoporttag,<br />akik már csinálják.</> },
   focus: { eyebrow: "Minden területre", line: "Van edzés arra, ahol erősödni akarsz." },
-  level: { eyebrow: "Minden szint", line: "A szint hozzád igazodik — kezdőtől haladóig." },
+  level: { eyebrow: "Minden szint", line: "A szint hozzád igazodik - kezdőtől haladóig." },
   days: { eyebrow: "A heted", line: "Annyi nap, amennyi tényleg belefér." },
-  player: { eyebrow: "A lejátszó", line: "Hang nélkül is végigvezet — TV-re is." },
-  env: { eyebrow: "Minden helyzetre", line: "Bármi is az — van rá változat." },
+  player: { eyebrow: "A lejátszó", line: "Hang nélkül is végigvezet - TV-re is." },
+  env: { eyebrow: "Minden helyzetre", line: "Bármi is az - van rá változat." },
   alone: { eyebrow: "Nem vagy egyedül", line: <>Egyedül nehéz. <b>Együtt muszáj.</b></>, slogan: true },
-  story: { eyebrow: "Az alapító", line: <>„Egyedül nem megy.” <span className="bp-by">— Alexa</span></>, slogan: true },
+  story: { eyebrow: "Az alapító", line: <>„Egyedül nem megy.” <span className="bp-by">- Alexa</span></>, slogan: true },
   promise: { eyebrow: "A terved kész", line: "Innentől együtt csináljuk." },
-  reassure: { eyebrow: "Itt a helyed", line: <>A terved kész — <b>már csak te hiányzol.</b></>, slogan: true },
+  reassure: { eyebrow: "Itt a helyed", line: <>A terved kész - <b>már csak te hiányzol.</b></>, slogan: true },
 };
 
 export function BrandPanel({ step }: { step: string }) {

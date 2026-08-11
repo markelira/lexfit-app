@@ -1,7 +1,7 @@
 "use client";
 
 // Rasterize a finish-share overlay onto a photo, at export resolution, mirroring
-// FinishOverlay's DOM geometry via the SAME GEO constants — so the shared image
+// FinishOverlay's DOM geometry via the SAME GEO constants - so the shared image
 // is pixel-identical to the on-screen preview. Pure white, no shadow.
 import {
   GEO, LOCKUP, REF_W, REF_H,
@@ -16,13 +16,34 @@ const WD_TRACK = 0.055; // em
 
 type Align = "left" | "center";
 
+/**
+ * The app's sans stack, read back from the DOM.
+ *
+ * Canvas cannot see CSS custom properties - `ctx.font` takes a plain string - so
+ * naming the family literally here is the one place a `--font` token change would
+ * silently miss, and the share card would quietly render in `sans-serif`. Resolving
+ * it off `<body>` (which is `font-family: var(--font)`) keeps the raster following
+ * the token instead of a hardcoded name.
+ */
+function sansStack(): string {
+  if (typeof document === "undefined") return "sans-serif";
+  const resolved = getComputedStyle(document.body).fontFamily;
+  return resolved && resolved.trim() ? resolved : "sans-serif";
+}
+
+/** First family of the stack - what `document.fonts.load()` needs to match a face. */
+function primaryFamily(): string {
+  return sansStack().split(",")[0].trim() || "sans-serif";
+}
+
 async function ensureFonts() {
   if (typeof document === "undefined" || !document.fonts) return;
+  const fam = primaryFamily();
   try {
     await Promise.all([
-      document.fonts.load("600 13px Poppins"),
-      document.fonts.load("700 78px Poppins"),
-      document.fonts.load("800 18px Poppins"),
+      document.fonts.load(`600 13px ${fam}`),
+      document.fonts.load(`700 78px ${fam}`),
+      document.fonts.load(`800 18px ${fam}`),
     ]);
   } catch { /* fall back to whatever's available */ }
 }
@@ -70,7 +91,7 @@ export async function renderFinishImage(opts: RenderOpts): Promise<Blob> {
 
 function setFont(ctx: CanvasRenderingContext2D, weight: number, sizeRef: number, trackEm: number, S: number) {
   const px = sizeRef * S;
-  ctx.font = `${weight} ${px}px Poppins, sans-serif`;
+  ctx.font = `${weight} ${px}px ${sansStack()}`;
   ctx.letterSpacing = `${trackEm * px}px`;
 }
 function text(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, align: Align) {
@@ -234,7 +255,7 @@ function spineApproxHeight(sizeRef: number, trackEm: number, S: number) {
 }
 
 function lockHeights(g: typeof GEO.C, c: ReturnType<typeof posterContent>, S: number) {
-  // lockup() consumes max(iconH, word) — match it so the bottom-anchor is exact.
+  // lockup() consumes max(iconH, word) - match it so the bottom-anchor is exact.
   let h = Math.max(LOCKUP.sm.iconH, LOCKUP.sm.word) * S + g.lockupGap * S;
   h += labelH(S) + 2 * S;                 // headline
   h += g.bigSize * S * g.bigLine;         // big number

@@ -6,8 +6,8 @@ import { lxPaths } from "@/lib/icons";
 import { FinishExamples } from "@/components/finish/FinishExamples";
 
 /**
- * The redesigned workout-completion moment. Fills the whole screen; everything —
- * the celebration, the full grid of real member finish-cards, and the CTA — is
+ * The redesigned workout-completion moment. Fills the whole screen; everything -
+ * the celebration, the full grid of real member finish-cards, and the CTA - is
  * visible at once, no scrolling. Apple-design: restraint, materials, a quiet
  * materialize-in.
  */
@@ -27,7 +27,7 @@ export function FinishComplete({
         <h1 className="fc-title">Megcsináltad.</h1>
         <p className="fc-stat">{title} · {mins} perc · <b>{streak}. napos</b> sorozat</p>
 
-        <div className="fc-eyebrow">Oszd meg egy szelfivel — így néz ki</div>
+        <div className="fc-eyebrow">Oszd meg egy szelfivel - így néz ki</div>
         <FinishExamples onPick={onShare} />
 
         <button className="fc-cta" onClick={onShare}>

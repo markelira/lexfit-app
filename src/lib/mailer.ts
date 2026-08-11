@@ -13,10 +13,10 @@ import {
 // ── The render+send layer for every system email. ───────────────────────────
 // Templates live in emails/ (react-email; `npm run email:dev` to preview) and
 // carry the copy; this module composes their data (prices from config so no
-// number is ever hardcoded here — the F0.5 hard rule), renders html+text, tags
+// number is ever hardcoded here - the F0.5 hard rule), renders html+text, tags
 // the SendGrid category, and attaches the one-click unsubscribe header for
 // every non-transactional send. Callers own idempotency (milestone docs /
-// dunning flags) — mailer functions just send.
+// dunning flags) - mailer functions just send.
 
 import AnnualNudge, { subject as annualNudgeSubject } from "../../emails/annual-nudge";
 import AnnualRenewalReminder, { subjectFor as annualRenewalSubject } from "../../emails/annual-renewal-reminder";
@@ -59,7 +59,7 @@ async function deliver(opts: {
   });
 }
 
-/** "2026. szeptember 9." — Budapest calendar date from epoch ms. */
+/** "2026. szeptember 9." - Budapest calendar date from epoch ms. */
 export function dateHu(ms: number): string {
   return new Intl.DateTimeFormat("hu-HU", {
     timeZone: "Europe/Budapest",
@@ -108,7 +108,7 @@ export function planDisplay(
   return {
     planName: spec.nickname,
     priceLine,
-    nextChargeDate: periodEndMs != null ? dateHu(periodEndMs) : "—",
+    nextChargeDate: periodEndMs != null ? dateHu(periodEndMs) : "-",
     oneOff,
   };
 }
@@ -210,7 +210,7 @@ export const sendEarnedUnlocked = (to: string) =>
       }),
   });
 
-// ── Marketing (Grtv. §6 — caller MUST gate on marketingOptIn) ───────────────
+// ── Marketing (Grtv. §6 - caller MUST gate on marketingOptIn) ───────────────
 
 export const sendAnnualNudge = (to: string, uid: string) =>
   deliver({

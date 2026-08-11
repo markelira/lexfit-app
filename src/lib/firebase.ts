@@ -1,4 +1,4 @@
-// Firebase Web SDK (client). Safe for the browser — uses NEXT_PUBLIC_* config.
+// Firebase Web SDK (client). Safe for the browser - uses NEXT_PUBLIC_* config.
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import { connectAuthEmulator, getAuth, type Auth } from "firebase/auth";
@@ -17,13 +17,13 @@ const firebaseConfig = {
 // Reuse the app across hot reloads / route segments instead of re-initializing.
 export const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Firebase App Check (reCAPTCHA v3) — attests requests come from the real app,
+// Firebase App Check (reCAPTCHA v3) - attests requests come from the real app,
 // protecting Firestore/Storage/Auth from abuse. Browser-only, and skipped under
 // the emulator (which doesn't enforce App Check). Inert until the site key env
 // is set, so it never breaks local/preview runs that lack it. Initialized right
 // after the app so tokens attach to subsequent Firebase requests.
 // NOTE: keep every service UNENFORCED in the Firebase console until this ships
-// and tokens show up in App Check monitoring — enforcing first would reject
+// and tokens show up in App Check monitoring - enforcing first would reject
 // every client request.
 declare global {
   // eslint-disable-next-line no-var
@@ -56,7 +56,7 @@ export const storage: FirebaseStorage = getStorage(app);
 
 // Dev only: point Auth + Firestore + Storage at the Local Emulator so all
 // content/mock data stays on your machine and production stays empty. Auth MUST
-// be emulated too — the Firestore emulator only trusts tokens from the Auth
+// be emulated too - the Firestore emulator only trusts tokens from the Auth
 // emulator, so with real auth its security rules would deny every read.
 // Enabled by NEXT_PUBLIC_USE_EMULATORS=true. Sign-in uses the emulator's
 // (fake) Google flow.

@@ -25,14 +25,14 @@ function requireUser() {
   return user;
 }
 
-/** P5.2 — display name to Auth + users/{uid} in one action. */
+/** P5.2 - display name to Auth + users/{uid} in one action. */
 export async function updateDisplayName(name: string): Promise<void> {
   const user = requireUser();
   await updateProfile(user, { displayName: name });
   await setDoc(doc(db, "users", user.uid), { displayName: name }, { merge: true });
 }
 
-/** P5.3 — verify-first email change; re-auths on requires-recent-login. Never
+/** P5.3 - verify-first email change; re-auths on requires-recent-login. Never
  *  updateEmail directly. For password accounts the current password is needed. */
 export async function changeEmail(newEmail: string, currentPassword?: string): Promise<void> {
   const user = requireUser();
@@ -51,7 +51,7 @@ export async function changeEmail(newEmail: string, currentPassword?: string): P
   }
 }
 
-/** P5.4 — password change with re-auth (password accounts only). */
+/** P5.4 - password change with re-auth (password accounts only). */
 export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
   const user = requireUser();
   await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email ?? "", currentPassword));
@@ -84,7 +84,7 @@ function resize512(file: File): Promise<Blob> {
 
 const avatarPath = (uid: string) => `users/${uid}/avatar.jpg`;
 
-/** P5.5 — resize, upload to Storage, mirror photoURL to Auth + users/{uid}. */
+/** P5.5 - resize, upload to Storage, mirror photoURL to Auth + users/{uid}. */
 export async function uploadAvatar(file: File): Promise<string> {
   const user = requireUser();
   const blob = await resize512(file);
@@ -96,7 +96,7 @@ export async function uploadAvatar(file: File): Promise<string> {
   return url;
 }
 
-/** P5.5 — remove the avatar (Storage + Auth + users/{uid}). */
+/** P5.5 - remove the avatar (Storage + Auth + users/{uid}). */
 export async function removeAvatar(): Promise<void> {
   const user = requireUser();
   try { await deleteObject(ref(storage, avatarPath(user.uid))); } catch { /* already gone */ }
@@ -106,7 +106,7 @@ export async function removeAvatar(): Promise<void> {
 
 // ── P6 · account-level server actions ──
 
-/** P6.1 — fetch the export JSON and trigger a download. */
+/** P6.1 - fetch the export JSON and trigger a download. */
 export async function downloadMyData(): Promise<void> {
   const idToken = await auth.currentUser?.getIdToken();
   const res = await fetch("/api/account/export", {
@@ -138,7 +138,7 @@ export async function reauthenticate(currentPassword?: string): Promise<void> {
   }
 }
 
-/** P6.2 — request account deletion (typed TÖRLÉS). Returns "reauth" if a fresh
+/** P6.2 - request account deletion (typed TÖRLÉS). Returns "reauth" if a fresh
  *  login is required; the caller re-auths and retries. */
 export async function requestAccountDeletion(): Promise<"ok" | "reauth"> {
   const idToken = await auth.currentUser?.getIdToken(true);

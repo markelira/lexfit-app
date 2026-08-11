@@ -1,4 +1,4 @@
-/* LEXFIT — CINEMATIC join intro (Netflix-trailer feel). Ported from prog-guide.css. */
+/* LEXFIT - CINEMATIC join intro (Netflix-trailer feel). Ported from prog-guide.css. */
 .lx.cine-back { position: fixed; inset: 0; z-index: 120; background: #0b090a; overflow: hidden; animation: cineFade 0.45s ease both; }
 @keyframes cineFade { from { opacity: 0; } to { opacity: 1; } }
 .lx .cine-bar { position: absolute; left: 0; right: 0; height: 7vh; background: #000; z-index: 5; pointer-events: none; }

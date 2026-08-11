@@ -1,8 +1,8 @@
-// LEXFIT pricing — display derivations. Pure; every number is computed from the
+// LEXFIT pricing - display derivations. Pure; every number is computed from the
 // config prices so on-screen figures can never drift from what Stripe charges.
 //
 // J4 note: the ONLY savings comparison allowed is monthly-annualized ↔ annual.
-// The one-off ↔ continuous prices are two separate products — never framed as a
+// The one-off ↔ continuous prices are two separate products - never framed as a
 // discount, never struck through. There is deliberately no "one-off savings"
 // helper here, so no UI can accidentally render one.
 
@@ -10,7 +10,7 @@ import { PRICES } from "./config";
 
 const HU = new Intl.NumberFormat("hu-HU");
 
-/** "39 900 Ft" — Hungarian grouping (space thousands). */
+/** "39 900 Ft" - Hungarian grouping (space thousands). */
 export function formatHuf(amount: number): string {
   return `${HU.format(amount)} Ft`;
 }
@@ -21,7 +21,7 @@ export function perWeekHuf(annualHuf: number = PRICES.annual_std.amountHuf): num
 }
 
 /**
- * Savings % of the annual plan vs paying the monthly plan for 12 months —
+ * Savings % of the annual plan vs paying the monthly plan for 12 months -
  * the one legitimate "Spórolj X%" comparison (monthly-annualized ↔ annual).
  */
 export function annualSavingsPct(

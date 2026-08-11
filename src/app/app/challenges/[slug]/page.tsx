@@ -45,7 +45,7 @@ export default function ChallengeDetailPage() {
   const ctaLabel =
     state === "elkezdetlen" ? "Kihívás indítása"
     : state === "kesz" ? "Kezdd újra"
-    : `Folytatás — ${nextDayNum}. nap`;
+    : `Folytatás - ${nextDayNum}. nap`;
   const fbHref = c.fbPostUrl || fbGroupUrl;
 
   return (

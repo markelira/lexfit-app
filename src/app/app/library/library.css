@@ -1,4 +1,4 @@
-/* LEXFIT Videótár — ported from screen-library.css. Scoped under .lx. */
+/* LEXFIT Videótár - ported from screen-library.css. Scoped under .lx. */
 .lx .lib-page { display: flex; flex-direction: column; gap: 30px; }
 
 /* sticky bar */
@@ -55,9 +55,9 @@
 .lx .lib-resmeta .linkish:hover { color: var(--ink); text-decoration: underline; }
 /* No-results header: NINCS TALÁLAT label, restated filters, then a hairline (ref V-empty) */
 .lx .lib-resmeta.is-empty { flex-direction: column; align-items: stretch; gap: 14px; border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 26px; }
-.lx .lib-resmeta-none { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
-/* Restated active-filter pill — grayscale (charcoal fill), icon + value + ✕ */
-.lx .lib-fchip { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: #fff; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
+.lx .lib-resmeta-none { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+/* Restated active-filter pill - grayscale (charcoal fill), icon + value + ✕ */
+.lx .lib-fchip { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: #fff; font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
 .lx .lib-fchip svg { flex: none; opacity: 0.9; }
 .lx .lib-fchip:hover { background: oklch(from var(--ink) calc(l - 0.05) c h); }
 .lx .lib-fchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -67,7 +67,7 @@
 @media (max-width: 840px) { .lx .lib-grid { grid-template-columns: 1fr; } } /* mobile: one workout card per row */
 
 
-/* Universal empty / no-results state (00 §0.9) — dashed card, grayscale search-× icon */
+/* Universal empty / no-results state (00 §0.9) - dashed card, grayscale search-× icon */
 .lx .lib-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--sp-3); padding: 56px 24px; border: 1.5px dashed var(--line); border-radius: var(--r-lg); }
 .lx .lib-empty .ic { display: flex; align-items: center; justify-content: center; color: var(--ink); }
 .lx .lib-empty .t { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
@@ -75,7 +75,7 @@
 .lx .lib-empty .s b { color: var(--ink); }
 .lx .lib-empty .acts { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; margin-top: var(--sp-2); }
 
-/* Category tiles + banner (§20.3) — the browse element that navigates, not plays */
+/* Category tiles + banner (§20.3) - the browse element that navigates, not plays */
 .lx .lib-cats { display: flex; flex-direction: column; gap: 14px; }
 .lx .lib-cats-h { font-size: 16px; font-weight: 800; letter-spacing: -0.015em; }
 .lx .lib-cattiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -96,7 +96,7 @@
 .lx .lib-catbanner h1 { font-size: 23px; font-weight: 800; letter-spacing: -0.02em; margin-top: 4px; }
 .lx .lib-catbanner .cnt { font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
 
-/* Filter bar — visible dimension chips + dropdowns + sort (§20.2 C1) */
+/* Filter bar - visible dimension chips + dropdowns + sort (§20.2 C1) */
 .lx .lib-filterbar { display: flex; align-items: center; gap: 12px; }
 .lx .lib-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 0; }
 .lx .lib-chip-wrap { position: relative; }
@@ -122,7 +122,7 @@
 .lx .lib-chip-opt:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 /* mobile: chips scroll, never collapse (§20.5) */
 @media (max-width: 840px) {
-  /* Horizontally scrolling chip strip (§20.5 / reference V6) — first thing on the page,
+  /* Horizontally scrolling chip strip (§20.5 / reference V6) - first thing on the page,
      never collapses, never requires vertical scrolling to reach. */
   .lx .lib-filterbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 8px; -webkit-overflow-scrolling: touch; scroll-padding: 0 4px; }
   .lx .lib-filterbar::-webkit-scrollbar { display: none; }

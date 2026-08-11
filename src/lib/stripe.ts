@@ -1,7 +1,7 @@
 import "server-only";
 import Stripe from "stripe";
 
-// Lazy singleton — instantiating Stripe with an empty key throws, which would
+// Lazy singleton - instantiating Stripe with an empty key throws, which would
 // break the build (module is imported when collecting route config). Only
 // create it at request time, when the key is present.
 let _stripe: Stripe | null = null;
@@ -24,6 +24,6 @@ export async function uidForCustomer(
   return (c.metadata?.uid as string | undefined) ?? null;
 }
 
-// Subscription reads/writes live in @/lib/pricing/subscription — the single
+// Subscription reads/writes live in @/lib/pricing/subscription - the single
 // source of truth for the subscriptions/{uid} document. Do not add Firestore
 // access here; keep this module Stripe-client-only to avoid two access paths.

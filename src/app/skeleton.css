@@ -1,7 +1,7 @@
 /* ── Skeleton loading system (app-wide) ─────────────────────────────────────
    Same shimmer recipe as the Profil pf-skel (familiarity: one loading language
    everywhere): surface-2/line gradient sweep, 1.4s, static under
-   prefers-reduced-motion. Skeletons MIRROR the layout they precede — pages
+   prefers-reduced-motion. Skeletons MIRROR the layout they precede - pages
    compose them from the real layout containers (hb, pgs-hero, hrow, ch-grid…)
    so nothing jumps when content arrives. */
 
@@ -16,7 +16,7 @@
   100% { background-position: 0 0; }
 }
 
-/* Dark hero surface — neutralizes hb/pgs-hero/lib-spot art while loading so
+/* Dark hero surface - neutralizes hb/pgs-hero/lib-spot art while loading so
    there's no wrong-color flash before the real program/category art arrives. */
 /* doubled class = higher specificity than .lx .hb / .lx .pgs-hero / .lx .lib-spot,
    so the neutral surface wins regardless of CSS import order */

@@ -1,6 +1,6 @@
 "use client";
 
-// Root-layout error boundary — errors thrown in the root layout itself bypass
+// Root-layout error boundary - errors thrown in the root layout itself bypass
 // app/error.tsx and land here. Must render its own <html>/<body>.
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
@@ -26,7 +26,7 @@ export default function GlobalError({
         <p style={{ letterSpacing: "0.18em", fontWeight: 700 }}>LEXFIT</p>
         <h1 style={{ fontSize: 22, margin: 0 }}>Valami elromlott</h1>
         <p style={{ opacity: 0.7, margin: 0 }}>
-          Ez a mi hibánk, nem a tiéd. Próbáld újra — ha nem segít, írj nekünk:{" "}
+          Ez a mi hibánk, nem a tiéd. Próbáld újra - ha nem segít, írj nekünk:{" "}
           <a href="mailto:hi@lexfit.hu">hi@lexfit.hu</a>
         </p>
         <button

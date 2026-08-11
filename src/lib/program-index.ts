@@ -1,6 +1,6 @@
 "use client";
 
-// The data-driven program index — the single source for "which programs exist"
+// The data-driven program index - the single source for "which programs exist"
 // and "which program does this video belong to". Replaces the old hardcoded
 // registry guesses: programs come from programs/ (published only) and
 // membership from each program's sessions playlist. A video in no playlist is
@@ -50,7 +50,7 @@ export function loadProgramIndex(): Promise<ProgramIndex> {
   return cache;
 }
 
-/** Derived position in a program from the user's per-video completions —
+/** Derived position in a program from the user's per-video completions -
  *  no extra storage: done = # of playlist codes completed, current = the first
  *  uncompleted playlist index. */
 export function programPosition(codes: string[], completedCodes: Set<string>) {

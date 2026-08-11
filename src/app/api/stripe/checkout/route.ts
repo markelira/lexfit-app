@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     role?: string;
     autoRenew?: boolean;
     immediateStart?: boolean;
-    embedded?: boolean; // E2 — embedded Checkout (return clientSecret instead of a redirect url)
+    embedded?: boolean; // E2 - embedded Checkout (return clientSecret instead of a redirect url)
   };
   const role = body.role;
   if (!role || !isCheckoutRole(role)) {
@@ -48,18 +48,18 @@ export async function POST(req: Request) {
   const consentError = validateConsent(role, consent);
   if (consentError) return NextResponse.json({ error: consentError }, { status: 400 });
 
-  // Every call writes a consent doc + creates a Stripe session — cap per uid.
+  // Every call writes a consent doc + creates a Stripe session - cap per uid.
   if (!(await allowRequest("checkout", token.uid, 20, DAY_MS_RL))) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  // Persist consent BEFORE creating the session — if this throws, no checkout.
+  // Persist consent BEFORE creating the session - if this throws, no checkout.
   const consentId = await recordConsent(token.uid, role, consent, {
     ip: req.headers.get("x-forwarded-for"),
     userAgent: req.headers.get("user-agent"),
   });
 
-  // F2.1 — the 490 Ft weekly intro is once per user. The guard is SERVER-SIDE,
+  // F2.1 - the 490 Ft weekly intro is once per user. The guard is SERVER-SIDE,
   // decided here at session creation (never trusted from the UI): a returning
   // weekly buyer gets the standard price directly, with no intro schedule.
   let priceRole: PriceRole = role;

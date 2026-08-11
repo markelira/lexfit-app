@@ -3,7 +3,7 @@ import { adminDb } from "@/lib/firebase-admin";
 
 // F6.1 instrumentation, seeded early so events exist retroactively. Firestore
 // adaptation of the plan's `events` table: one doc per event in `events`.
-// Admin-only collections (default-deny in rules; Admin SDK bypasses) — never
+// Admin-only collections (default-deny in rules; Admin SDK bypasses) - never
 // read client-side.
 
 export type PricingEvent =
@@ -39,7 +39,7 @@ export async function logEvent(
 }
 
 /**
- * Raise an admin notification (e.g. every withdrawal — an F6 guardrail signal).
+ * Raise an admin notification (e.g. every withdrawal - an F6 guardrail signal).
  * Written to `adminNotifications` for the dashboard to surface. Email delivery
  * is deferred until the transactional provider is wired (F5); this doc is the
  * durable record in the meantime.

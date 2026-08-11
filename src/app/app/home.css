@@ -1,4 +1,4 @@
-/* LEXFIT Kezdőlap — Variant B card, home rows, week strip. Scoped under .lx.
+/* LEXFIT Kezdőlap - Variant B card, home rows, week strip. Scoped under .lx.
    Palette from lexfit-tokens.css (Eukaliptusz green). */
 
 .lx .home { display: flex; flex-direction: column; gap: 30px; }
@@ -19,7 +19,7 @@
   -webkit-backdrop-filter: blur(6px);
 }
 
-/* ════════ Week strip (Apple-Fitness model — RULE 07) ════════ */
+/* ════════ Week strip (Apple-Fitness model - RULE 07) ════════ */
 .lx .wstrip {
   display: grid;
   grid-template-columns: auto repeat(7, 1fr);
@@ -79,7 +79,7 @@
   .lx .wstrip-day .dot { height: 22px; } /* 11 §11.2 */
 }
 
-/* ════════ Home rows — 4-up, horizontally scrollable, 4th peeks (§3.3) ════════ */
+/* ════════ Home rows - 4-up, horizontally scrollable, 4th peeks (§3.3) ════════ */
 .lx .hrow-sec { min-width: 0; }
 .lx .hrow-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
 .lx .hrow-head h3 { font-size: 16px; font-weight: 800; letter-spacing: -0.015em; color: var(--ink); }
@@ -114,14 +114,14 @@
 @media (max-width: 1080px) { .lx .hrow > .wc { flex-basis: clamp(210px, 31%, 300px); } }
 @media (max-width: 840px) { .lx .hrow > .wc { flex-basis: 72%; } }
 
-/* Variant B card styles live in src/app/workout-card.css (global — the card is now
+/* Variant B card styles live in src/app/workout-card.css (global - the card is now
    the app-wide default, used by Kezdőlap, programme detail and Videótár). */
 
 @media (prefers-reduced-motion: reduce) {
   .lx .home.fade-in { animation: none; }
 }
 
-/* ── First entry (40 §40.9 / P7) — first-workout whisper + reminder card. ── */
+/* ── First entry (40 §40.9 / P7) - first-workout whisper + reminder card. ── */
 .lx .firstentry { display: flex; flex-direction: column; gap: 16px; }
 .lx .fe-kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-ink); }
 .lx .fe-whisper { display: flex; gap: 8px; align-items: flex-start; margin-top: 6px; font-size: 14px; font-style: italic; color: var(--ink-2); line-height: 1.5; text-wrap: pretty; }

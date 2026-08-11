@@ -54,7 +54,7 @@ export default function AdminChallengesPage() {
         <div className="adm-titles">
           <div className="adm-eyebrow">KIHÍVÁSOK</div>
           <h1 className="adm-h1">Kihívások</h1>
-          <p className="adm-sub">A Szavazz Magadra heti kihívások archívuma — mindegyik napi videók lejátszási listája.</p>
+          <p className="adm-sub">A Szavazz Magadra heti kihívások archívuma - mindegyik napi videók lejátszási listája.</p>
         </div>
         <div className="adm-actions">
           <Link href="/admin/challenges/new" className="adm-btn primary">
@@ -124,7 +124,7 @@ export default function AdminChallengesPage() {
   );
 }
 
-/** settings/challenges editor — the Kihívások community (FB-csoport) link.
+/** settings/challenges editor - the Kihívások community (FB-csoport) link.
  *  Without this the doc was unauthorable on prod (only the emulator seed
  *  ever wrote it). Empty value clears the link (the app hides the button). */
 function ChallengeSettingsCard() {

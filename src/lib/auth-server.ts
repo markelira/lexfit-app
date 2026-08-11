@@ -14,7 +14,7 @@ export async function verifyRequest(req: Request): Promise<DecodedIdToken | null
   }
 }
 
-// Admin allowlist — the owner + AM Studios (Kecskeméti Ádám).
+// Admin allowlist - the owner + AM Studios (Kecskeméti Ádám).
 const ADMIN_EMAILS = new Set(["gorgeimarko@gmail.com", "kecskemetiad@gmail.com"]);
 
 /**

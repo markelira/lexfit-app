@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 // Server-side error monitoring. Inert until SENTRY_DSN is set in the
-// environment — safe in dev/emulator, active in prod once the Sentry
+// environment - safe in dev/emulator, active in prod once the Sentry
 // project exists. No source-map upload (that needs withSentryConfig +
 // an auth token; runtime capture works without it).
 export function register() {

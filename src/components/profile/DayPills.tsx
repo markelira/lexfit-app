@@ -2,7 +2,7 @@
 
 // Weekday multi-select. Monday-first; weekday values are 1=Mon … 7=Sun.
 // role="group" + aria-pressed pills (30 §30.9). Selected = --accent-2 fill / white
-// (never white-on-light-accent — 30 §30.9 contrast trap).
+// (never white-on-light-accent - 30 §30.9 contrast trap).
 const DAY_LABELS = ["H", "K", "SZE", "CS", "P", "SZO", "V"];
 
 export function DayPills({

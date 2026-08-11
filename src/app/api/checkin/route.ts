@@ -8,10 +8,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * F3.1 daily check-in. Works for EVERY signed-in user (community mechanic — not
+ * F3.1 daily check-in. Works for EVERY signed-in user (community mechanic - not
  * gated on plan). `day` defaults to today; an explicit day is accepted only if
  * it is currently loggable (today, or yesterday before the 04:00 makeup cutoff).
- * After recording, the offer engine is nudged — but it self-guards on plan and
+ * After recording, the offer engine is nudged - but it self-guards on plan and
  * on prior-offer existence, so nothing unlocks for annual/one-off buyers.
  */
 export async function POST(req: Request) {

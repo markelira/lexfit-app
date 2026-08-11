@@ -81,7 +81,7 @@ export function VideoForm({
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
   const [saved, setSaved] = useState(false);
-  // Once the code is bound (by an upload or a first save) it can't change — the
+  // Once the code is bound (by an upload or a first save) it can't change - the
   // Mux upload and the doc id are tied to it. Existing videos are already bound.
   const [codeBound, setCodeBound] = useState(!create);
 
@@ -116,9 +116,9 @@ export function VideoForm({
     .sort((a, b) => a - b);
   const durationLabel = (startText: string): string => {
     const s = clockToSec(startText);
-    if (s == null) return "—";
+    if (s == null) return "-";
     const end = blockStarts.find((x) => x > s) ?? muxDuration;
-    return end != null && end > s ? secToClock(end - s) : "—";
+    return end != null && end > s ? secToClock(end - s) : "-";
   };
 
   // Soft, non-blocking warning for an exercise time: outside its block's window, or
@@ -151,7 +151,7 @@ export function VideoForm({
     setSaving(true);
     setErr("");
     try {
-      // Guard against clobbering an existing code — but only before we've bound it
+      // Guard against clobbering an existing code - but only before we've bound it
       // (if an upload already created this doc, codeBound is true and we skip).
       if (create && !codeBound) {
         const existing = await getDoc(doc(db, "videos", effectiveCode));
@@ -214,7 +214,7 @@ export function VideoForm({
             <span className="adm-fhint">
               {codeEditable
                 ? "A videó azonosítója. A feltöltéshez add meg először."
-                : "A kód a dokumentum azonosítója — rögzítve."}
+                : "A kód a dokumentum azonosítója - rögzítve."}
             </span>
           </div>
           <div className="adm-frow">
@@ -233,12 +233,12 @@ export function VideoForm({
           </div>
         )}
 
-        {/* Video upload — on the first screen, right under the code. */}
+        {/* Video upload - on the first screen, right under the code. */}
         {create && !validCode ? (
           <div className="adm-upload">
             <div className="adm-upload-hd">Videó</div>
             <div className="adm-upload-sub">
-              Adj meg egy érvényes kódot fent (pl. F001) — utána itt rögtön feltöltheted a videót a Muxba.
+              Adj meg egy érvényes kódot fent (pl. F001) - utána itt rögtön feltöltheted a videót a Muxba.
             </div>
           </div>
         ) : (
@@ -319,9 +319,9 @@ export function VideoForm({
         <div className="adm-frow">
           <label className="adm-flabel">Blokkok (opcionális)</label>
           <span className="adm-fhint">
-            Az edzés felépítése. Add meg minden blokk <b>kezdési idejét</b> (perc:mp, pl. 2:30) — a hossz automatikusan
+            Az edzés felépítése. Add meg minden blokk <b>kezdési idejét</b> (perc:mp, pl. 2:30) - a hossz automatikusan
             számolódik a következő blokkig{muxDuration ? "" : " (az utolsó blokk hosszához a videó kell)"}. Minden
-            gyakorlathoz megadhatsz egy <b>kezdési időt</b> is (opcionális) — akkor a lejátszóban rá lehet ugrani és
+            gyakorlathoz megadhatsz egy <b>kezdési időt</b> is (opcionális) - akkor a lejátszóban rá lehet ugrani és
             kiemelődik. Időbélyeg nélkül a gyakorlat sima listaelem marad.
           </span>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
@@ -343,7 +343,7 @@ export function VideoForm({
                           className="mins"
                           value={ex.startText}
                           onChange={(e) => setItem(i, ii, { startText: e.target.value })}
-                          placeholder="—:—"
+                          placeholder="-:-"
                           title="Gyakorlat kezdése (perc:mp, opcionális)"
                         />
                         <input

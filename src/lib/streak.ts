@@ -1,5 +1,5 @@
 // Pure date/streak helpers shared by the client screens and the server-side
-// Mux sync route. No Firebase, no browser APIs — everything works on plain
+// Mux sync route. No Firebase, no browser APIs - everything works on plain
 // YYYY-MM-DD strings so client (local time) and server (Europe/Budapest) agree.
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -17,11 +17,11 @@ export const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMo
 export const weekdayIdx = (s: string) => (parseYmd(s).getDay() + 6) % 7;
 
 /**
- * Current streak in days, derived fresh from the completion dates — never
+ * Current streak in days, derived fresh from the completion dates - never
  * stored-stale. Honors the product promise "a pihenőnap nem töri meg a
  * sorozatot": a day with no completion only breaks the streak if it was a
  * scheduled workout day (`workoutIdx`, Monday-first indices). Today without a
- * completion never breaks — the day isn't over. With an unknown schedule
+ * completion never breaks - the day isn't over. With an unknown schedule
  * (empty set) every missed day breaks, matching the old strict behavior.
  */
 export function computeStreak(
@@ -37,7 +37,7 @@ export function computeStreak(
     const day = addDays(today, -i);
     const key = ymd(day);
     if (done.has(key)) { streak++; continue; }
-    if (i === 0) continue; // today, not yet trained — undecided, not broken
+    if (i === 0) continue; // today, not yet trained - undecided, not broken
     const rest = workoutIdx.size > 0 && !workoutIdx.has((day.getDay() + 6) % 7);
     // A scheduled rest day only protects the streak when the user leaves that on
     // (prefs.plan.restDayKeepsStreak). Turned off → any gap breaks it. (30 §P5.9)

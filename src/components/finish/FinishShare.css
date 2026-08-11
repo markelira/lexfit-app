@@ -2,13 +2,13 @@
 .fsh {
   position: fixed;
   inset: 0;
-  /* Above .fc (the fullscreen finish screen, z-200) — see FinishComplete.css. */
+  /* Above .fc (the fullscreen finish screen, z-200) - see FinishComplete.css. */
   z-index: 210;
   display: flex;
   flex-direction: column;
   background: #0b0b0c;
   color: #fff;
-  font-family: var(--font, "Poppins", sans-serif);
+  font-family: var(--font);
 }
 
 .fsh-top {
@@ -41,7 +41,7 @@
 }
 .fsh-video.front { transform: scaleX(-1); } /* selfie mirror (front only; still is pre-mirrored on capture) */
 
-/* Flip front/back camera — sits inside the preview frame, bottom-right. */
+/* Flip front/back camera - sits inside the preview frame, bottom-right. */
 .fsh-flip {
   position: absolute; right: 12px; bottom: 12px; z-index: 4;
   width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
@@ -58,7 +58,7 @@
 }
 .fsh-camerr p { font-size: 14px; color: rgba(255,255,255,.85); margin: 0; }
 
-/* Camera controls — the shutter. */
+/* Camera controls - the shutter. */
 .fsh-controls { flex: none; display: flex; justify-content: center; padding: 22px 0 30px; }
 .fsh-shutter {
   width: 74px; height: 74px; border-radius: 50%; border: 4px solid rgba(255,255,255,.9);

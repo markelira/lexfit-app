@@ -6,7 +6,7 @@ import { EditorModal } from "@/components/profile/EditorModal";
 import { useAuth } from "@/lib/auth-context";
 import { NEED_PASSWORD, reauthenticate, requestAccountDeletion } from "@/lib/account";
 
-// P6.2 — the deletion flow (30 §30.7 copy). Typed TÖRLÉS confirm; re-auths if the
+// P6.2 - the deletion flow (30 §30.7 copy). Typed TÖRLÉS confirm; re-auths if the
 // login isn't fresh; on success signs out and returns to /login.
 export function DeleteAccountModal({ provider, onClose }: { provider: string | null; onClose: () => void }) {
   const router = useRouter();
@@ -49,7 +49,7 @@ export function DeleteAccountModal({ provider, onClose }: { provider: string | n
       saveLabel="Végleges törlés" onClose={onClose} onSave={doDelete}
     >
       <p className="pf-editor-note">
-        Ezzel az edzéseid, a sorozatod és a fotóid is törlődnek. 30 napig visszavonható — írj Alexának.
+        Ezzel az edzéseid, a sorozatod és a fotóid is törlődnek. 30 napig visszavonható - írj Alexának.
       </p>
       <label className="pf-ed-field2"><span>Írd be: TÖRLÉS</span>
         <input autoFocus value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="TÖRLÉS" />

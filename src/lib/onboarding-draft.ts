@@ -1,6 +1,6 @@
 // The pre-auth onboarding draft (40 §40.8 / 41 §P2.1). Answers are held here
 // through steps 1–8 and attached to Firestore on registration (P3). Every access
-// is guarded — Safari private mode throws on localStorage. The `v` field is
+// is guarded - Safari private mode throws on localStorage. The `v` field is
 // present from day one so a future shape change is a migration, not a corruption.
 //
 // Key is `lexfit_onb_v1` (the new pre-auth shape). We deliberately do NOT read or
@@ -44,7 +44,7 @@ export function writeDraft(d: Draft): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(d));
   } catch {
-    /* private mode / quota — the funnel still works, it just won't resume */
+    /* private mode / quota - the funnel still works, it just won't resume */
   }
 }
 

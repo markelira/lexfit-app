@@ -2,10 +2,10 @@ import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { notifyAdmin } from "./events";
 
-// F0.6 — NAV-compliant invoicing via Billingo (v3 REST/JSON). Chosen over
+// F0.6 - NAV-compliant invoicing via Billingo (v3 REST/JSON). Chosen over
 // Számlázz.hu for its modern JSON API. Every displayed price is GROSS HUF with
 // VAT: AM Studios Group Kft. is ALANYI ADÓMENTES (confirmed by owner
-// 2026-08-08), so invoices carry the AAM code — no VAT content, gross = net.
+// 2026-08-08), so invoices carry the AAM code - no VAT content, gross = net.
 // If the company ever crosses the AAM threshold and becomes VAT-registered,
 // set BILLINGO_VAT_CODE=27% in the environment (no code change needed).
 //
@@ -98,8 +98,8 @@ export async function issueInvoice(ref: string, payload: InvoicePayload): Promis
     if (process.env.NODE_ENV === "production") {
       // A legally required NAV invoice was NOT issued. Record it as "failed"
       // (the payload is already on the marker) so the daily cron re-issues it
-      // automatically once the Billingo env is fixed — and be loud about it.
-      console.error(`[invoice] FAILED — BILLINGO_API_KEY/BLOCK_ID not configured ref=${ref} ${payload.amountHuf} Ft`);
+      // automatically once the Billingo env is fixed - and be loud about it.
+      console.error(`[invoice] FAILED - BILLINGO_API_KEY/BLOCK_ID not configured ref=${ref} ${payload.amountHuf} Ft`);
       await markerRef.set({ status: "failed", error: "no_billingo_config", at: Date.now() }, { merge: true });
       await notifyAdmin("invoice_failed", { ref, amountHuf: payload.amountHuf, error: "no_billingo_config" });
     } else {

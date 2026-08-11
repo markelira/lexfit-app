@@ -50,7 +50,7 @@ export async function startCheckout(role: string, consents: Consents): Promise<v
   window.location.href = body.url as string;
 }
 
-/** E2 — create an embedded Checkout session; returns its client_secret so the
+/** E2 - create an embedded Checkout session; returns its client_secret so the
  *  page can mount <EmbeddedCheckout>. Consent is recorded server-side first. */
 export async function fetchEmbeddedClientSecret(role: string, consents: Consents): Promise<string> {
   const body = await postJson("/api/stripe/checkout", {
@@ -70,7 +70,7 @@ export async function requestWithdrawal(): Promise<number> {
 }
 
 // ── F2.3 cancel-flow actions ───────────────────────────────────────────────
-/** Pause 1/2/3 months — billing + access pause, remaining time is banked. */
+/** Pause 1/2/3 months - billing + access pause, remaining time is banked. */
 export async function pauseSubscription(months: 1 | 2 | 3): Promise<void> {
   await postJson("/api/subscription/manage", { action: "pause", months });
 }
@@ -152,14 +152,14 @@ export async function getSubscription(uid: string): Promise<Subscription | null>
   return snap.exists() ? (snap.data() as Subscription) : null;
 }
 
-/** UI access check — same pure rule the server entitlement uses. */
+/** UI access check - same pure rule the server entitlement uses. */
 export const isSubscribed = (sub: Subscription | null): boolean =>
   hasAccessFromData(sub, Date.now());
 
 /**
  * Where an onboarded user belongs (40 §40.8 truth table): the app if they have
  * an active entitlement, else checkout. On a read failure default to /app rather
- * than trapping them at /subscribe — the server re-validates access anyway.
+ * than trapping them at /subscribe - the server re-validates access anyway.
  */
 export async function paidDestination(uid: string): Promise<"/app" | "/subscribe"> {
   try {

@@ -43,7 +43,7 @@ export function FirstEntry({
             <span className="mark" aria-hidden="true">
               <LxIcon d={lxPaths.messageCircle} size={14} />
             </span>
-            „Itt vagyok. Az első nap a legnehezebb — utána már csak csináljuk.”
+            „Itt vagyok. Az első nap a legnehezebb - utána már csak csináljuk.”
           </p>
         </div>
       )}

@@ -30,7 +30,7 @@ export interface PickVideo {
   muxStatus: string;
 }
 
-/** Ordered-video builder is shared by Programok (sessions) and Kihívások (days) —
+/** Ordered-video builder is shared by Programok (sessions) and Kihívások (days) -
  *  both are "link existing videos + drag to order", differing only in endpoint,
  *  the source video pool, and copy. Only `videoCode` is read from initial items. */
 interface OrderedItem {
@@ -51,7 +51,7 @@ export function SessionsBuilder({
   videos,
   endpoint,
   title = "Lejátszási lista",
-  hint = "Kapcsolj be videókat a videótárból, és húzd a ⠿ fogantyúval a kívánt sorrendbe — mint egy lejátszási lista. A hét/nap-beosztást a program a sorrendből számolja.",
+  hint = "Kapcsolj be videókat a videótárból, és húzd a ⠿ fogantyúval a kívánt sorrendbe - mint egy lejátszási lista. A hét/nap-beosztást a program a sorrendből számolja.",
   saveLabel = "Lejátszási lista mentése",
   pickLabel = "Videó bekapcsolása a videótárból",
   pickPlaceholder = "Keresés a videótárban (kód, cím, téma)…",

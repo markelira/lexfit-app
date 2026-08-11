@@ -13,7 +13,7 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 // The account step as a reusable register-OR-login form (E1.2). Creates or signs
 // into the account (email or Google/Apple), attaches the pre-auth onboarding
 // draft idempotently, then calls onAuthed() so the wizard advances to payment.
-// If the email already exists during register, we switch to login in place —
+// If the email already exists during register, we switch to login in place -
 // the user is never dead-ended. Attach failure retries (40 §40.12).
 export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
   const { user, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
@@ -22,7 +22,7 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [marketing, setMarketing] = useState(false); // GDPR opt-in — default UNCHECKED
+  const [marketing, setMarketing] = useState(false); // GDPR opt-in - default UNCHECKED
   const [showPw, setShowPw] = useState(false);
   const [errs, setErrs] = useState<{ name?: string; email?: string; password?: string }>({});
   const [formErr, setFormErr] = useState<string | null>(null);
@@ -120,7 +120,7 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
       if (isReg && code === "auth/email-already-in-use") {
         setMode("login");
         setPassword("");
-        setNotice("Ezzel a címmel már van fiók — lépj be a folytatáshoz.");
+        setNotice("Ezzel a címmel már van fiók - lépj be a folytatáshoz.");
       } else {
         setFormErr(authErrorHu(err));
       }

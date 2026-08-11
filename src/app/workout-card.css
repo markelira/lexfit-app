@@ -1,10 +1,10 @@
-/* LEXFIT WorkoutCard (Variant B) — the app-wide default card. Global so every
+/* LEXFIT WorkoutCard (Variant B) - the app-wide default card. Global so every
    surface that renders it (Kezdőlap, programme detail, Videótár) is styled.
    Container widths are set per-context (.hrow, .nxrail, .lib-grid). Scoped under .lx. */
 
 /* min-width:0 is load-bearing: as a flex/grid item the card defaults to min-width:auto,
    so any unbreakable descendant (a long nowrap benefit line, a wide word) would push the
-   card past its track basis — making that one card wider and, via the 16/9 thumb, taller.
+   card past its track basis - making that one card wider and, via the 16/9 thumb, taller.
    Capping min-width keeps every card identical in every context (rail, 1fr grid, home row). */
 .lx .wc { position: relative; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
 .lx .wc-thumb {
@@ -14,7 +14,7 @@
   overflow: hidden;
   background: var(--surface-2);
 }
-/* Generated typographic category cover — the graphic thumbnail (gradient + category
+/* Generated typographic category cover - the graphic thumbnail (gradient + category
    word + LEXFIT·code). This is the card art. */
 .lx .wc-cover-art { position: absolute; inset: 0; }
 .lx .wc-cover-art .cc-ring { left: -12%; top: -44%; width: 58%; aspect-ratio: 1; border-width: 18px; }
@@ -124,7 +124,7 @@
   font-size: 12px;
 }
 .lx .wc-txt { flex: 1; min-width: 0; }
-/* program-membership eyebrow — colorless lockup (mark + wordmark), mixed rows only */
+/* program-membership eyebrow - colorless lockup (mark + wordmark), mixed rows only */
 .lx .wc-program {
   display: flex;
   align-items: center;

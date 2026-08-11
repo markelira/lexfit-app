@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Success-page fulfillment (F1 / research-verified). The webhook is the source
- * of truth and always fires, but it can lag — so when the paying user lands on
+ * of truth and always fires, but it can lag - so when the paying user lands on
  * the success page we ALSO write the subscription doc here, giving instant
  * access. Idempotent: it merges the same fields the webhook writes, so running
  * both (even concurrently) converges. Only writes the access-governing doc;

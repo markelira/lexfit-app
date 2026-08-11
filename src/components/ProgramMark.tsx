@@ -1,6 +1,6 @@
 import type { ProgramIcon } from "@/lib/programs";
 
-// The 5 geometric program marks — the non-color cue that distinguishes programs.
+// The 5 geometric program marks - the non-color cue that distinguishes programs.
 // 24×24 viewBox, fill: currentColor. Keep any new marks as simple primitives so
 // they read at small sizes and stay colorless / colourblind-safe.
 const SHAPES: Record<ProgramIcon, React.ReactNode> = {

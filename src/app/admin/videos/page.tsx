@@ -65,7 +65,7 @@ export default function AdminVideosPage() {
         <div className="adm-titles">
           <div className="adm-eyebrow">TARTALOM</div>
           <h1 className="adm-h1">Videók</h1>
-          <p className="adm-sub">A globális videótár — {videos?.length ?? 0} videó. Az appban aláírt Mux lejátszással jelenik meg.</p>
+          <p className="adm-sub">A globális videótár - {videos?.length ?? 0} videó. Az appban aláírt Mux lejátszással jelenik meg.</p>
         </div>
         <div className="adm-actions">
           <Link href="/admin/videos/new" className="adm-btn primary">

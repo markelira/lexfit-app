@@ -1,4 +1,4 @@
-/* LEXFIT shared UI atoms — ported from the prototype's lexfit-app.css.
+/* LEXFIT shared UI atoms - ported from the prototype's lexfit-app.css.
    Scoped under .lx so they only apply inside a LEXFIT surface. */
 
 .lx a,
@@ -33,10 +33,10 @@
 .lx .btn:active:not([disabled]) { transform: translateY(1px); }
 .lx .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .lx .btn[disabled] { opacity: 0.42; pointer-events: none; }
-/* primary — accent fill (holds contrast on light and dark surfaces) */
+/* primary - accent fill (holds contrast on light and dark surfaces) */
 .lx .btn.accent { background: var(--accent-2); color: #fff; border-color: var(--accent-2); box-shadow: none; }
 .lx .btn.accent:hover { background: oklch(from var(--accent-2) calc(l - 0.05) c h); }
-/* ghost — text only */
+/* ghost - text only */
 .lx .btn.ghost {
   background: none;
   border-color: transparent;
@@ -53,7 +53,7 @@
 .lx .btn.glass-cta { background: #fff; color: var(--ink); border-color: #fff; box-shadow: none; }
 .lx .btn.glass-cta:hover { background: oklch(0.94 0 0); }
 
-/* ── Button system — Button.tsx / IconButton (docs/design_handoff_buttons).
+/* ── Button system - Button.tsx / IconButton (docs/design_handoff_buttons).
    Three heights (S/M/L), flat, 8px radius, colour-only hover, 1px press, focus ring
    on every variant. Heights promote to a 44px floor < 840px via the tokens. ── */
 .lx .lxbtn {
@@ -75,11 +75,11 @@
 }
 .lx .lxbtn svg { flex: none; }
 .lx .lxbtn.wide { width: 100%; }
-/* sizes — padding/type derived from the height */
+/* sizes - padding/type derived from the height */
 .lx .lxbtn.s { height: var(--btn-s); padding: 0 14px; font-size: 12.5px; }
 .lx .lxbtn.m { height: var(--btn-m); padding: 0 18px; font-size: 13.5px; }
 .lx .lxbtn.l { height: var(--btn-l); padding: 0 24px; font-size: 15px; font-weight: 700; }
-/* emphasis — light surface */
+/* emphasis - light surface */
 .lx .lxbtn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
 .lx .lxbtn.primary:hover { background: oklch(from var(--ink) calc(l - 0.04) c h); }
 .lx .lxbtn.secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
@@ -90,7 +90,7 @@
 .lx .lxbtn.destructive:hover { background: var(--danger-soft); }
 .lx .lxbtn.destructive.solid { background: var(--danger); color: #fff; border-color: var(--danger); }
 .lx .lxbtn.destructive.solid:hover { background: oklch(from var(--danger) calc(l - 0.04) c h); }
-/* emphasis — on dark surfaces (hero, player): primary inverts so contrast holds */
+/* emphasis - on dark surfaces (hero, player): primary inverts so contrast holds */
 .lx .lxbtn.on-dark.primary { background: #fff; color: var(--ink); border-color: #fff; }
 .lx .lxbtn.on-dark.primary:hover { background: oklch(0.94 0 0); }
 .lx .lxbtn.on-dark.secondary { background: oklch(1 0 168 / 0.14); color: #fff; border-color: oklch(1 0 168 / 0.3); }
@@ -102,7 +102,7 @@
 .lx .lxbtn.on-dark:focus-visible { outline-color: #fff; }
 .lx .lxbtn:active:not(:disabled) { transform: translateY(1px); }
 .lx .lxbtn:disabled, .lx .lxbtn[aria-disabled="true"] { opacity: 0.42; pointer-events: none; }
-/* loading — spinner replaces the icon slot; width does not change */
+/* loading - spinner replaces the icon slot; width does not change */
 .lx .lxbtn-spin {
   display: inline-block;
   border-radius: 50%;
@@ -112,7 +112,7 @@
 }
 @keyframes lxbtnspin { to { transform: rotate(360deg); } }
 
-/* icon-only — circular (actions) / square (toolbars). Same ladder + states. */
+/* icon-only - circular (actions) / square (toolbars). Same ladder + states. */
 .lx .lxbtn-i {
   display: inline-flex;
   align-items: center;
@@ -204,7 +204,7 @@
   box-shadow: inset 0 1px 0 oklch(1 0 168 / 0.85), 0 10px 36px -16px oklch(0.42 0.03 168 / 0.18);
 }
 
-/* ── horizontal content rail (Netflix row) — shared by Videótár + Foundation ── */
+/* ── horizontal content rail (Netflix row) - shared by Videótár + Foundation ── */
 .lx .nxrail-sec { position: relative; }
 .lx .nxrail-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
 .lx .nxrail-head h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }

@@ -72,7 +72,7 @@ function SettingsContent({ profile: p, activeKey, rawSection, reload }: { profil
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
 
-  // Section change moves focus to the section heading (P9.2) — but not on first mount.
+  // Section change moves focus to the section heading (P9.2) - but not on first mount.
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
   useEffect(() => {
@@ -133,7 +133,7 @@ function SettingsContent({ profile: p, activeKey, rawSection, reload }: { profil
   const valueFor = (key: string): string | undefined => {
     switch (key) {
       case "name": return p.identity.name;
-      case "email": return p.identity.email ?? "—";
+      case "email": return p.identity.email ?? "-";
       case "photo": return p.identity.photoURL ? "Beállítva" : "Nincs";
       case "password": return p.identity.provider === "google.com" ? "Google-fiók" : "Módosítás";
       case "days": return `${eff.plan.daysPerWeek} nap`;
@@ -158,7 +158,7 @@ function SettingsContent({ profile: p, activeKey, rawSection, reload }: { profil
   };
 
   // E-mail and Jelszó are editable ONLY for email/password accounts. Federated
-  // (Google/Facebook/Apple) accounts manage both with their provider — those rows
+  // (Google/Facebook/Apple) accounts manage both with their provider - those rows
   // become read-only notes, no editor.
   const isPassword = p.identity.provider === "password";
   const PROVIDER_NAME: Record<string, string> = { "google.com": "Google", "facebook.com": "Facebook", "apple.com": "Apple" };
@@ -240,8 +240,8 @@ function SettingsContent({ profile: p, activeKey, rawSection, reload }: { profil
                   const what = row.key === "password" ? "a jelszót" : "az e-mail címet";
                   return (
                     <SetRow key={row.key} icon={row.icon} label={row.label}
-                      value={row.key === "email" ? (p.identity.email ?? "—") : `${providerName}-fiók`}
-                      desc={`${providerName}-fiókkal léptél be — ${what} ott tudod módosítani.`}
+                      value={row.key === "email" ? (p.identity.email ?? "-") : `${providerName}-fiók`}
+                      desc={`${providerName}-fiókkal léptél be - ${what} ott tudod módosítani.`}
                       control="none" />
                   );
                 }
@@ -329,11 +329,11 @@ function SubscriptionPanel({
     sub.status === "ACTIVE" ? `Aktív · megújul ${fullDate(sub.renewalAt)}${price ? ` · ${price}` : ""}`
     : sub.status === "PAUSED" ? `Szüneteltetve · ${fullDate(sub.accessUntil)}-ig`
     : sub.status === "CANCELED" ? `Lemondva · a hozzáférésed ${fullDate(sub.accessUntil)}-ig aktív`
-    : sub.status === "PAST_DUE" ? "Fizetési gond — frissítsd a kártyát"
+    : sub.status === "PAST_DUE" ? "Fizetési gond - frissítsd a kártyát"
     : `${sub.status}${price ? ` · ${price}` : ""}`;
   return (
     <div className="pf-subpanel">
-      <div className="l1">LEXFIT — {sub.planLabel}</div>
+      <div className="l1">LEXFIT - {sub.planLabel}</div>
       <div className="l2">{line2}</div>
       <div className="pf-subpanel-cta">
         <button type="button" className="lxbtn s secondary" onClick={onManage}>Csomag váltása</button>

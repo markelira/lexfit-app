@@ -66,7 +66,7 @@ export default function ChallengePlayerPage() {
   const video = day?.video ?? null;
   const nextDay = detail?.days.find((x) => x.order > (day?.order ?? -1) && !x.done);
 
-  // Persist resume position (throttled) while playing — read off the media element.
+  // Persist resume position (throttled) while playing - read off the media element.
   const onTimeUpdate = (e: { target: EventTarget | null }) => {
     if (!user) return;
     const t = (e.target as HTMLMediaElement | null)?.currentTime ?? 0;
@@ -123,7 +123,7 @@ export default function ChallengePlayerPage() {
             ) : (
               <>
                 <div className="h">Kész a nap.</div>
-                <div className="s">{(day?.order ?? 0) + 1}. nap kész — szép munka.</div>
+                <div className="s">{(day?.order ?? 0) + 1}. nap kész - szép munka.</div>
               </>
             )}
             <div className="cpl-done-acts">

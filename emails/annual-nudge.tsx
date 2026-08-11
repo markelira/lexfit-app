@@ -1,5 +1,5 @@
-// §4c/13 — Annual nudge (days 10–18, non-earners). Copy carried verbatim from
-// pricing/templates.ts annualNudge(). "Comparison, not discount" — but genuinely
+// §4c/13 - Annual nudge (days 10–18, non-earners). Copy carried verbatim from
+// pricing/templates.ts annualNudge(). "Comparison, not discount" - but genuinely
 // promotional, so it is a MARKETING email: gate on marketingOptIn (Grtv. §6),
 // carry unsubscribe.
 
@@ -21,13 +21,13 @@ export default function AnnualNudge({
   return (
     <EmailLayout
       footer="marketing"
-      preview="Ugyanaz a hozzáférés — csak jóval kevesebbe kerül, ha egyben nézed."
+      preview="Ugyanaz a hozzáférés - csak jóval kevesebbe kerül, ha egyben nézed."
     >
       <Text style={styles.eyebrow}>Éves tagság</Text>
       <Text style={styles.h1}>Ugyanaz, csak okosabban</Text>
       <Panel>
         <PanelText>
-          Hetente <strong>{weekStd}/hét</strong> — évesben{" "}
+          Hetente <strong>{weekStd}/hét</strong> - évesben{" "}
           <strong>{annualPerWeek}/hét</strong>.
         </PanelText>
       </Panel>

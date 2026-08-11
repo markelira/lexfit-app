@@ -1,11 +1,11 @@
-/* LEXFIT — course card + program thumbnail system.
+/* LEXFIT - course card + program thumbnail system.
    CATEGORY owns color + the big centered word; PROGRAM owns a colorless icon+name
    lockup. Ported from the design handoff (cards.css + prog-thumbs.css). All selectors
    are scoped under `.lx` like the rest of the app. */
 
 /* ── shared cover atoms ── */
 .lx .lx-cover { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-/* trainer underlayer — her tones pick up the category color, the room dissolves at the edges.
+/* trainer underlayer - her tones pick up the category color, the room dissolves at the edges.
    background-image + position come from inline style (the image is a prop). */
 .lx .lx-cover-photo { position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background-size: cover; mix-blend-mode: luminosity; opacity: 0.42;
@@ -13,7 +13,7 @@
   mask-image: radial-gradient(125% 105% at 66% 34%, #000 40%, transparent 82%); }
 .lx .cc-ring { position: absolute; border-radius: 50%; border: 26px solid oklch(1 0 168 / 0.13); pointer-events: none; }
 
-/* centered category lockup — the "key art" */
+/* centered category lockup - the "key art" */
 .lx .cca-lockup { position: relative; z-index: 1; text-align: center; }
 .lx .cca-lockup .ey { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.08em; color: oklch(1 0 168 / 0.8); }
 .lx .cca-lockup .wd { font-weight: 900; font-size: 31px; letter-spacing: -0.03em; line-height: 1;
@@ -25,7 +25,7 @@
   color: white; background: oklch(1 0 168 / 0.18); border: 1px solid oklch(1 0 168 / 0.3);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 3px 9px; border-radius: 999px; }
 
-/* play veil — dark wash + white glass circle, fades in on hover */
+/* play veil - dark wash + white glass circle, fades in on hover */
 .lx .cc-play { position: absolute; inset: 0; z-index: 4; display: flex; align-items: center; justify-content: center;
   background: oklch(0.2 0.02 168 / 0.34); opacity: 0; transition: opacity 0.16s ease; }
 .lx .pt-tv:hover .cc-play { opacity: 1; }
@@ -33,7 +33,7 @@
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--ink);
   display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px -6px oklch(0 0 168 / 0.35); }
 
-/* ── program lockup — consistent, colorless (icon + name) ── */
+/* ── program lockup - consistent, colorless (icon + name) ── */
 /* top-left glass pill (TV key art, grid) */
 .lx .pt-tv-tl { position: absolute; top: 11px; left: 11px; z-index: 3; display: inline-flex; align-items: center; gap: 8px;
   padding: 5px 12px 5px 6px; border-radius: 999px; background: oklch(0.18 0.03 168 / 0.5);

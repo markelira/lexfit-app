@@ -77,7 +77,7 @@
 }
 .optCta:hover { border-color: var(--ink-3); }
 
-/* Primary action button — used identically on every confirm screen. */
+/* Primary action button - used identically on every confirm screen. */
 .primary {
   margin-top: 1.4rem;
   width: 100%;

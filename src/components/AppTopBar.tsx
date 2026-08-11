@@ -14,7 +14,7 @@ import { getMyList, setSaved } from "@/lib/mylist";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { BottomSheet } from "@/components/BottomSheet";
 
-// Avatar menu — six labelled destinations (30 §30.2). Desktop dropdown / mobile
+// Avatar menu - six labelled destinations (30 §30.2). Desktop dropdown / mobile
 // bottom sheet share this list. Kijelentkezés is last, coloured, and separated.
 type MenuItem = { label: string; icon: keyof typeof lxPaths; href?: string; action?: "logout"; danger?: boolean };
 const AVATAR_MENU: MenuItem[] = [
@@ -26,7 +26,7 @@ const AVATAR_MENU: MenuItem[] = [
   { label: "Kijelentkezés", icon: "logOut", action: "logout", danger: true },
 ];
 
-// The LEXFIT mark ("Az Ív") — arc + dot, white glyph on an accent tile.
+// The LEXFIT mark ("Az Ív") - arc + dot, white glyph on an accent tile.
 function LexMark() {
   return (
     <span className="lxtb-mark" aria-hidden="true">
@@ -40,7 +40,7 @@ function LexMark() {
   );
 }
 
-// Quick filters (Gyors szűrők) — deep-link into Videótár with a filter param.
+// Quick filters (Gyors szűrők) - deep-link into Videótár with a filter param.
 const QUICK: { label: string; href: string }[] = [
   { label: "10 PERC ALATT", href: `/app/library?dur=${encodeURIComponent("5–15 perc")}` },
   { label: "ALSÓTEST", href: `/app/library?theme=${encodeURIComponent("Alsótest")}` },
@@ -58,7 +58,7 @@ const readRecent = (): string[] => {
   }
 };
 
-/** Global top bar — logo, shell search (with overlay), streak, avatar menu. */
+/** Global top bar - logo, shell search (with overlay), streak, avatar menu. */
 export function AppTopBar({ streak }: { streak: number }) {
   const router = useRouter();
   const { user, signOutUser } = useAuth();
@@ -191,7 +191,7 @@ export function AppTopBar({ streak }: { streak: number }) {
     setSearchOpen(false);
     router.push(href);
   }
-  // Any acted-on query is saved to recents (not just Enter — mobile users tap results).
+  // Any acted-on query is saved to recents (not just Enter - mobile users tap results).
   function commitAndGoLibrary() {
     const t = q.trim();
     if (t) pushRecent(t);
@@ -346,7 +346,7 @@ export function AppTopBar({ streak }: { streak: number }) {
 
   return (
     <header className="lxtb">
-      <Link href="/app" className="lxtb-brand" aria-label="LEXFIT — Kezdőlap">
+      <Link href="/app" className="lxtb-brand" aria-label="LEXFIT - Kezdőlap">
         <LexMark />
         <span className="wm">
           LEX<span>FIT</span>

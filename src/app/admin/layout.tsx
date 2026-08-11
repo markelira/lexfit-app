@@ -65,7 +65,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
 function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(true);
-  // Which backend do admin writes hit? Renders a permanent badge — the
+  // Which backend do admin writes hit? Renders a permanent badge - the
   // "plain `npm run dev` writes to prod" footgun becomes visible at a glance.
   const [emulator, setEmulator] = useState<boolean | null>(null);
   useEffect(() => {

@@ -9,7 +9,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /**
  * Admin video upload. The file goes straight to Mux (chunked/resumable via
- * @mux/mux-uploader). The app then plays it through SIGNED Mux playback —
+ * @mux/mux-uploader). The app then plays it through SIGNED Mux playback -
  * we only ever store the playbackId here, never the file.
  */
 export function VideoUploader({
@@ -38,11 +38,11 @@ export function VideoUploader({
 
   const attached = status === "ready" && playbackId && !replacing;
 
-  // Called by MuxUploader when the upload starts — mint a signed direct-upload URL.
+  // Called by MuxUploader when the upload starts - mint a signed direct-upload URL.
   async function getEndpoint(): Promise<string> {
     setIsError(false);
     setMsg("Feltöltés előkészítése…");
-    onBound?.(); // the upload creates videos/{code} — lock the code from here
+    onBound?.(); // the upload creates videos/{code} - lock the code from here
     const { url, uploadId } = await adminJson<{ url: string; uploadId: string }>(uploadPath, {
       method: "POST",
       body: JSON.stringify({ code }),
@@ -78,11 +78,11 @@ export function VideoUploader({
           return;
         }
       } catch {
-        /* transient — keep polling */
+        /* transient - keep polling */
       }
       await sleep(3000);
     }
-    setMsg("A feldolgozás még tart — töltsd újra az oldalt kicsit később a státuszért.");
+    setMsg("A feldolgozás még tart - töltsd újra az oldalt kicsit később a státuszért.");
   }
 
   function onUploadError(e: unknown) {
@@ -102,7 +102,7 @@ export function VideoUploader({
     <div className="adm-upload">
       <div className="adm-upload-hd">Videó</div>
       <div className="adm-upload-sub">
-        A fájl közvetlenül a Muxba töltődik fel. Az appban aláírt (védett) lejátszással jelenik meg — előfizetés
+        A fájl közvetlenül a Muxba töltődik fel. Az appban aláírt (védett) lejátszással jelenik meg - előfizetés
         nélkül nem nézhető.
       </div>
 

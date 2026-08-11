@@ -1,5 +1,5 @@
 // Static preview of the Foundation program's first week (F001–F007), for the
-// ANONYMOUS reveal step — prod content is admin-uploaded and the reveal runs
+// ANONYMOUS reveal step - prod content is admin-uploaded and the reveal runs
 // pre-auth, so it can't call loadFoundation(uid). Source: docs/workouts.
 // Foundation is a fixed ordered queue; "fewer days = slower progression", so a
 // user's week 1 is simply the first N workouts on their chosen weekdays.
@@ -18,12 +18,12 @@ export const FOUNDATION_WEEK1: PreviewWorkout[] = [
   { code: "F002", order: 2, title: "Felsőtest indító", theme: "Felsőtest", mins: 22 },
   { code: "F003", order: 3, title: "Csendes kardió", theme: "Kardió", mins: 22 },
   { code: "F004", order: 4, title: "Mindent egy edzésben", theme: "Teljes test", mins: 22 },
-  { code: "F005", order: 5, title: "Reset — alap flow", theme: "Mobilitás", mins: 22 },
+  { code: "F005", order: 5, title: "Reset - alap flow", theme: "Mobilitás", mins: 22 },
   { code: "F006", order: 6, title: "Fenék-fókusz", theme: "Fenék", mins: 22 },
   { code: "F007", order: 7, title: "Egyenes hát, nyitott mell", theme: "Hát · tartás", mins: 22 },
 ];
 
-/** The reveal's "első edzésed" — always F001 (Foundation is a fixed progression). */
+/** The reveal's "első edzésed" - always F001 (Foundation is a fixed progression). */
 export const FIRST_WORKOUT = FOUNDATION_WEEK1[0];
 
 /** Week 1 for a chosen day count: the first N workouts of the fixed queue. */

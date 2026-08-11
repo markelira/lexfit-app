@@ -13,7 +13,7 @@ import { useProfile } from "./useProfile";
 import { IdentityEditor } from "./settings/IdentityEditor";
 import "./profile.css";
 
-// Profil — the read-only mirror (30 §30.3), now backed by loadProfile. The
+// Profil - the read-only mirror (30 §30.3), now backed by loadProfile. The
 // „Következő mérföldkő" card was dropped (visszamérés removed from Haladásom).
 export default function ProfileV2() {
   const router = useRouter();
@@ -77,14 +77,14 @@ export default function ProfileV2() {
 
       {isNew && (
         <div className="pf-empty-cta">
-          <span>Még nincs sorozatod — az első edzés elindítja.</span>
+          <span>Még nincs sorozatod - az első edzés elindítja.</span>
           <button type="button" className="lxbtn m primary" onClick={() => router.push("/app")}>
             <LxIcon d={lxPaths.play} size={15} fill /> Kezdd el a mai edzést
           </button>
         </div>
       )}
 
-      {/* Az edzésterved — the week strip */}
+      {/* Az edzésterved - the week strip */}
       <section className="pf-card pf-week">
         <div className="pf-card-ttl">
           <LxIcon d={lxPaths.calendarCheck} size={16} /> Az edzésterved
@@ -102,7 +102,7 @@ export default function ProfileV2() {
         </div>
       </section>
 
-      {/* Miért kezdted — hidden entirely when onboarding skipped */}
+      {/* Miért kezdted - hidden entirely when onboarding skipped */}
       {p.why && (
         <section className="pf-card pf-why">
           <div className="pf-card-ttl">

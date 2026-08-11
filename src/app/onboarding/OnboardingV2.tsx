@@ -25,7 +25,7 @@ import { MOCK } from "./_mock";
 
 // ─── The wizard steps. URL: ?q=1…5 · why · reveal · plan · account · pay;
 // welcome has no q. Onboarding is now part of one flow ending in payment
-// (pay-to-join). (E1 — docs/onboarding-embedded-plan.md)
+// (pay-to-join). (E1 - docs/onboarding-embedded-plan.md)
 const STEPS = [
   "welcome", "goal", "focus", "level", "days", "time", "env", "obstacle", "why",
   "reveal", "plan", "account", "pay",
@@ -58,7 +58,7 @@ const HEADINGS: Partial<Record<StepId, string>> = {
 // ── The subscription offer ("A teljes LEXFIT"), styled to the iOS-paywall
 // reference (docs/LEXFIT Elofizetes iOS.html). Features + selectable plan rows +
 // a tucked CTA showing the selected price. Our real figures; NO fixed-length
-// claims (owner rule — no "8 hetes / 40 edzés / 5.–8. hét"). ──
+// claims (owner rule - no "8 hetes / 40 edzés / 5.–8. hét"). ──
 // The offer data + header/features live in the shared paywall module (also used
 // by /subscribe): PAYWALL_FEATURES/PAYWALL_PLANS, LexMark, PaywallOffer.
 
@@ -165,7 +165,7 @@ export function OnboardingV2() {
 
   // Resume once, on cold open: if a draft has a step past welcome and the URL is
   // at welcome, jump to where they left off (P3, path 2). goto() updates the URL
-  // store, not React state — safe to call from an effect.
+  // store, not React state - safe to call from an effect.
   useEffect(() => {
     if (resumedRef.current) return;
     resumedRef.current = true;
@@ -214,7 +214,7 @@ export function OnboardingV2() {
     return true; // time/env/obstacle/why are non-blocking
   }, [step, answers]);
 
-  // Polite step-change announcement (40 §40.12) — reliable across screen readers
+  // Polite step-change announcement (40 §40.12) - reliable across screen readers
   // regardless of whether a focused <legend> is spoken.
   const liveLabel = useMemo(() => {
     if (step === "welcome") return "";
@@ -306,10 +306,10 @@ export function OnboardingV2() {
   );
 }
 
-// (BrandAside + MobileMark removed — the wizard now uses the shared <AuthBrand/>
+// (BrandAside + MobileMark removed - the wizard now uses the shared <AuthBrand/>
 //  in the /login split-screen shell for exact consistency with /login.)
 
-// ── Step 01 — Üdvözlés ──
+// ── Step 01 - Üdvözlés ──
 function Welcome({ onStart }: { onStart: () => void }) {
   const w = MOCK.welcome;
   return (
@@ -338,7 +338,7 @@ function Welcome({ onStart }: { onStart: () => void }) {
   );
 }
 
-// ── Steps 02–06 — the five questions ──
+// ── Steps 02–06 - the five questions ──
 function QuestionStep({
   step, answers, set, onBack, onNext, canNext, headingRef,
 }: {
@@ -433,7 +433,7 @@ function QuestionStep({
               : `heti ${answers.days} edzés`}
           </p>
 
-          {/* Week card — interactive check/moon day-boxes (wireframe 1:1); tap a
+          {/* Week card - interactive check/moon day-boxes (wireframe 1:1); tap a
               day to toggle it work/rest (P0.3 weekday picking). */}
           <div className="fnl-weekcard">
             <span className="wc-hd mono">{MOCK.days.weekHeading}</span>
@@ -446,7 +446,7 @@ function QuestionStep({
                     key={wd}
                     type="button"
                     aria-pressed={on}
-                    aria-label={`${lb} — ${on ? "edzésnap" : "pihenőnap"}`}
+                    aria-label={`${lb} - ${on ? "edzésnap" : "pihenőnap"}`}
                     className={`fnl-day${on ? " done" : " rest"}`}
                     onClick={() => {
                       const next = on
@@ -501,7 +501,7 @@ function QuestionStep({
   );
 }
 
-// ── Step 07 — Miért kezdted ──
+// ── Step 07 - Miért kezdted ──
 function WhyStep({
   value, onChange, onBack, onNext, headingRef,
 }: {
@@ -549,7 +549,7 @@ function WhyStep({
   );
 }
 
-// ── Step 08 — the reveal. Apple-Fitness-style (skill: apple-design): the week
+// ── Step 08 - the reveal. Apple-Fitness-style (skill: apple-design): the week
 // ring is the signature; everything else stays quiet. A once-per-session
 // "building your plan" moment (honest, reflects real inputs) materializes into
 // the plan. Consumes every answer: ring=days, legend=weekdays, headline=goal,
@@ -563,9 +563,9 @@ const revealSeen = () => {
 };
 const markRevealSeen = () => { try { sessionStorage.setItem(REVEAL_SEEN_KEY, "1"); } catch { /* private mode */ } };
 
-// The activity ring — one green arc filled to days/7, the count in the centre.
+// The activity ring - one green arc filled to days/7, the count in the centre.
 // Draws on mount via CSS (stroke-dashoffset from a --c custom prop); structure
-// is information — the arc IS the share of the week that is training.
+// is information - the arc IS the share of the week that is training.
 function WeekRing({ days, size = 132 }: { days: number; size?: number }) {
   const stroke = 12;
   const rad = (size - stroke) / 2;
@@ -613,7 +613,7 @@ function WeekdayLegend({ cells }: { cells: { weekday: number; state: WeekCellSta
 }
 
 // The honest "building your plan" moment (research: labor illusion lifts perceived
-// value; skill §11 — never fake-long). Status lines reflect real answers.
+// value; skill §11 - never fake-long). Status lines reflect real answers.
 function BuildingPlan({ a, onDone }: { a: FunnelAnswers; onDone: () => void }) {
   const r = MOCK.reveal;
   const lines = useMemo(() => {
@@ -667,7 +667,7 @@ function Reveal({
   const why = a.why.trim();
   const obstacleLine = a.obstacle ? r.obstaclePhrase[a.obstacle] : null;
 
-  // Stat tiles — every answer echoed back (Apple "summary" tiles). Only the
+  // Stat tiles - every answer echoed back (Apple "summary" tiles). Only the
   // answers with a value render; days lives in the ring.
   const timeChip = MOCK.time.options.find((o) => o.v === a.time)?.label;
   const envReal = a.env.filter((e) => e !== "none");
@@ -691,7 +691,7 @@ function Reveal({
         </button>
       </div>
       <div className="fnl-scroll rv2">
-        {/* Hero — the ring is the signature; count = days/week, legend = which days. */}
+        {/* Hero - the ring is the signature; count = days/week, legend = which days. */}
         <div className="rv-hero">
           <div className="eyebrow mono">{r.eyebrow}</div>
           <WeekRing days={a.days} />
@@ -699,19 +699,19 @@ function Reveal({
           <h1 className="reveal-hd" ref={headRef} tabIndex={-1}>{headline}</h1>
         </div>
 
-        {/* Their own words, quoted back — the emotional anchor. */}
+        {/* Their own words, quoted back - the emotional anchor. */}
         {why && (
           <figure className="fnl-quote rv-i">
             <span className="fq-l mono">{r.whyLabel}</span>
             <blockquote>„{why}”</blockquote>
-            <figcaption>— {r.whyEcho}</figcaption>
+            <figcaption>- {r.whyEcho}</figcaption>
           </figure>
         )}
 
         {/* Alexa's reassurance for the obstacle they named. */}
         {obstacleLine && <p className="rv-coach rv-i">{obstacleLine}</p>}
 
-        {/* Plan summary — stat tiles + honest, computed pace footer. */}
+        {/* Plan summary - stat tiles + honest, computed pace footer. */}
         <section className="rv-card rv-i" aria-label={r.chipsLabel}>
           <div className="rv-stats">
             {stats.map((s) => (
@@ -727,7 +727,7 @@ function Reveal({
           </div>
         </section>
 
-        {/* The concrete first step — the material card (deliberate depth). */}
+        {/* The concrete first step - the material card (deliberate depth). */}
         <span className="reveal-wl mono rv-i">{r.workoutLabel}</span>
         <div className="fnl-workout rv-i">
           <div className="thumb">
@@ -778,7 +778,7 @@ function PlanRow({
   );
 }
 
-// ── Step 09 — the subscription offer ("A teljes LEXFIT"), redesigned to the
+// ── Step 09 - the subscription offer ("A teljes LEXFIT"), redesigned to the
 // iOS-paywall reference. Features + selectable plan rows + a tucked CTA with the
 // selected price. CTA → account → embedded Stripe pay. ──
 function PlanStep({
@@ -827,7 +827,7 @@ function PlanStep({
         </div>
       </div>
       <div className="fnl-foot">
-        <button className="fnl-cta" onClick={onNext}>Előfizetek — {sel.cta}</button>
+        <button className="fnl-cta" onClick={onNext}>Előfizetek - {sel.cta}</button>
         <p className="pw-fine">
           Az előfizetés automatikusan megújul, amíg le nem mondod. Bármikor lemondható · 14 napos elállási jog.
         </p>
@@ -840,7 +840,7 @@ function PlanStep({
   );
 }
 
-// ── Step 10 — account (E1 STUB; E1.2 mounts the extracted <RegisterForm>). ──
+// ── Step 10 - account (E1 STUB; E1.2 mounts the extracted <RegisterForm>). ──
 function AccountStep({
   onBack, onNext, headRef,
 }: {
@@ -857,15 +857,15 @@ function AccountStep({
       </div>
       <div className="fnl-scroll">
         <h1 className="fnl-q" ref={headRef} tabIndex={-1}>Készítsd el a fiókod</h1>
-        <p className="fnl-sub">A válaszaidat a fiókodhoz mentem — így bármikor folytathatod.</p>
+        <p className="fnl-sub">A válaszaidat a fiókodhoz mentem - így bármikor folytathatod.</p>
         <RegisterForm onAuthed={onNext} />
       </div>
     </div>
   );
 }
 
-// ── Step 11 — pay: embedded Stripe Checkout. Repeats the user's goal outcome
-// above checkout (research — surfacing the goal at the paywall lifts pay). ──
+// ── Step 11 - pay: embedded Stripe Checkout. Repeats the user's goal outcome
+// above checkout (research - surfacing the goal at the paywall lifts pay). ──
 function PayStep({
   plan, goal, onBack, onPlanChange, onExit, headRef,
 }: {

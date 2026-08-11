@@ -21,7 +21,7 @@ export interface WorkoutCardVideo {
   muxDuration?: number | null;
 }
 
-// Today's date as YYYY-MM-DD (local) — for the "ma" vs dated completion label.
+// Today's date as YYYY-MM-DD (local) - for the "ma" vs dated completion label.
 const todayStr = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -32,9 +32,9 @@ const todayStr = () => {
 const ALEXA_FACE = <img className="wc-ava-img" src="/alexa-av.jpg" alt="" />;
 
 /**
- * Variant B card (README §4) — YouTube geometry, LEXFIT content.
+ * Variant B card (README §4) - YouTube geometry, LEXFIT content.
  * The whole card plays; the save "+" is an independent nested-safe control.
- * Completed workouts are NOT dimmed — they gain a check + a timestamp line.
+ * Completed workouts are NOT dimmed - they gain a check + a timestamp line.
  */
 export function WorkoutCard({
   v,
@@ -59,7 +59,7 @@ export function WorkoutCard({
   /** Program membership eyebrow for MIXED contexts (home rows, Videótár, search).
    *  Omit on a program's own page where every card shares one program. */
   programBadge?: { slug: string; name: string } | null;
-  /** The program's UNIQUE brand hue — colors the cover in place of the category
+  /** The program's UNIQUE brand hue - colors the cover in place of the category
    *  gradient. Pass for every program-member card; standalone videos omit it. */
   programHue?: number | null;
   resume?: number; // 0–1 fraction, if in progress
@@ -74,11 +74,11 @@ export function WorkoutCard({
   const showBar = frac != null && frac > 0;
 
   // Avatar ring encodes progress THROUGH the program by workout position (§4 #4);
-  // plain outside a program. Cadence-neutral — no week assumption.
+  // plain outside a program. Cadence-neutral - no week assumption.
   const ringPct =
     isProgram && programStep && programTotal ? Math.round((Math.min(programStep, programTotal) / programTotal) * 100) : null;
 
-  // state line — rendered ONLY when there is state to report (§4 #5)
+  // state line - rendered ONLY when there is state to report (§4 #5)
   let state: { text: string; done?: boolean } | null = null;
   if (done) {
     const when = completedAt ? (completedAt === todayStr() ? "ma" : completedAt) : "";

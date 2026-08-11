@@ -10,7 +10,7 @@ import { sendEmail } from "@/lib/email";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// P6.2 — stage 1 of account deletion. Requires a FRESH ID token and the typed word
+// P6.2 - stage 1 of account deletion. Requires a FRESH ID token and the typed word
 // TÖRLÉS. Marks deletionRequestedAt (server-only), cancels Stripe at period end,
 // disables the Auth user, and emails the 30-day window + how to reverse. The
 // GET /api/cron/purge-accounts job hard-deletes 30 days later.
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
   if (email) {
     await sendEmail({
       to: email,
-      subject: "LEXFIT — elindítottuk a fiókod törlését",
+      subject: "LEXFIT - elindítottuk a fiókod törlését",
       text:
         "Elindítottuk a fiókod törlését. Az edzéseid, a sorozatod és a fotóid 30 napon " +
         "belül véglegesen törlődnek.\n\nHa meggondolnád magad, a 30 napon belül írj " +

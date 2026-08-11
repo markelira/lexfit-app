@@ -49,7 +49,7 @@ function planBlocks(v: Video): VideoBlock[] {
   if (v.blocks?.length) return inferBlockStarts(v.blocks);
   return [
     { name: "Bemelegítés", mins: Math.max(2, Math.round(v.mins * 0.15)), items: ["Átmozgatás Alexával"] },
-    { name: "Fő rész", mins: Math.round(v.mins * 0.65), items: ["Vezetett blokk — kövesd Alexát"] },
+    { name: "Fő rész", mins: Math.round(v.mins * 0.65), items: ["Vezetett blokk - kövesd Alexát"] },
     { name: "Levezetés", mins: Math.max(2, Math.round(v.mins * 0.2)), items: ["Nyújtás + légzés"] },
   ];
 }
@@ -94,7 +94,7 @@ function PlayerScreen({ code }: { code: string }) {
   const [showRemain, setShowRemain] = useState(false);
   const [keysOpen, setKeysOpen] = useState(false);
   const [idle, setIdle] = useState(false);
-  const [hud, setHud] = useState(true); // over-video info (name+countdown) in fullscreen — toggleable
+  const [hud, setHud] = useState(true); // over-video info (name+countdown) in fullscreen - toggleable
   const [mCtl, setMCtl] = useState(false); // mobile tap-to-reveal overlay
   const [ctlPing, setCtlPing] = useState(0); // bumps on overlay taps → re-arms the auto-hide timer
   const [saved, setSaved] = useState(false); // mobile "Mentés" pill
@@ -128,7 +128,7 @@ function PlayerScreen({ code }: { code: string }) {
   }, [video]);
 
   // Skip the player's own preview stage when arrived via an explicit "play" action
-  // (e.g. the detail modal's "Edzés indítása") — go straight into playback.
+  // (e.g. the detail modal's "Edzés indítása") - go straight into playback.
   useEffect(() => {
     setWantAutostart(new URLSearchParams(window.location.search).get("autostart") === "1");
   }, []);
@@ -142,7 +142,7 @@ function PlayerScreen({ code }: { code: string }) {
 
   // Prefetch the signed playback token the moment the preview is shown, so the
   // token round-trip (auth verify → subscription check → Firestore read → JWT sign)
-  // is off the click path — clicking "Kezdjük" then jumps straight to the player.
+  // is off the click path - clicking "Kezdjük" then jumps straight to the player.
   // Tokens are valid 6h, so lingering on the preview never expires them. A 403 (no
   // subscription) is swallowed here; the click path still routes to the paywall.
   useEffect(() => {
@@ -171,7 +171,7 @@ function PlayerScreen({ code }: { code: string }) {
       });
     }
     // Guard totalMins=0 (mins never authored): distribute evenly instead of
-    // dividing by zero — NaN bounds silently killed the seekbar + active-block
+    // dividing by zero - NaN bounds silently killed the seekbar + active-block
     // detection (found live 2026-08-09).
     if (totalMins <= 0) {
       const n = Math.max(1, blocks.length);
@@ -193,16 +193,16 @@ function PlayerScreen({ code }: { code: string }) {
     stamped && dur > 0 ? Math.max(1, Math.round((bounds[i].endSec - bounds[i].startSec) / 60)) : blocks[i].mins;
   const cb = bounds.findIndex((b) => frac >= b.start && frac < b.end);
   // No match → past the end means the last block; anything else (start, NaN
-  // safety) means the first — never default to the end at 0:00.
+  // safety) means the first - never default to the end at 0:00.
   const active = cb !== -1 ? cb : frac >= 1 ? Math.max(0, bounds.length - 1) : 0;
   const blockEndSec = (bounds[active]?.end ?? 1) * dur;
   const blockLeft = Math.max(0, Math.ceil(blockEndSec - cur));
   const nextBlock = blocks[active + 1];
-  // The expanded block in the playlist — the current one unless the user opened another.
+  // The expanded block in the playlist - the current one unless the user opened another.
   const openBlock = expanded ?? active;
 
   // Active block's exercises, normalized. `start` (absolute seconds) is optional per
-  // exercise — these power the now-panel highlight, the next-exercise countdown, and
+  // exercise - these power the now-panel highlight, the next-exercise countdown, and
   // the click-to-seek list. Everything below degrades to today's behavior when unstamped.
   const activeItems = useMemo(() => (blocks[active]?.items ?? []).map(normalizeExercise), [blocks, active]);
   const activeEx = useMemo(() => {
@@ -222,7 +222,7 @@ function PlayerScreen({ code }: { code: string }) {
   // ── overlay copy ──────────────────────────────────────────────────────────
   const blockName = blocks[active]?.name ?? "";
   const totalEx = useMemo(() => blocks.reduce((n, b) => n + (b.items?.length ?? 0), 0), [blocks]);
-  // Memoized so the share sheet / desktop handoff gets a STABLE `data` object —
+  // Memoized so the share sheet / desktop handoff gets a STABLE `data` object -
   // an inline rebuild each render tears down the handoff's onSnapshot listener.
   const finishData = useMemo(
     () => (video ? buildFinishData({
@@ -273,7 +273,7 @@ function PlayerScreen({ code }: { code: string }) {
     }
   }
 
-  // The workout visibly completed. No Firestore write — the authoritative
+  // The workout visibly completed. No Firestore write - the authoritative
   // completion arrives via the Mux sync once the view finalizes. Locally: drop
   // the pending marker, clear the resume position, and compute the streak
   // optimistically for the finish screen (identical math to the server's).
@@ -321,7 +321,7 @@ function PlayerScreen({ code }: { code: string }) {
       el.removeEventListener("play", onPlay);
       el.removeEventListener("pause", onPause);
       el.removeEventListener("ended", onEnd);
-      // Leaving inside the last 10% still counts — mark it so Haladásom can
+      // Leaving inside the last 10% still counts - mark it so Haladásom can
       // show the workout before the Mux view lands.
       const d = durRef.current;
       if (d > 0 && posRef.current / d >= 0.9) notePendingCompletion(code);
@@ -341,7 +341,7 @@ function PlayerScreen({ code }: { code: string }) {
   const rewind = () => { const el = playerRef.current; if (el) el.currentTime = Math.max(0, el.currentTime - 10); };
   const forward = () => { const el = playerRef.current; if (el && dur) el.currentTime = Math.min(dur - 0.1, el.currentTime + 10); };
   const skip = () => { const el = playerRef.current; if (el && dur) el.currentTime = Math.min(dur - 0.1, blockEndSec); };
-  // Symmetric speed cycle 0.75× · 1× · 1.25× (L4 — slowing down is an a11y feature).
+  // Symmetric speed cycle 0.75× · 1× · 1.25× (L4 - slowing down is an a11y feature).
   const cycleSpeed = () => {
     const steps = [0.75, 1, 1.25];
     const next = steps[(steps.indexOf(speed) + 1) % steps.length] ?? 1;
@@ -375,7 +375,7 @@ function PlayerScreen({ code }: { code: string }) {
     try {
       if (typeof v.webkitShowPlaybackTargetPicker === "function") { v.webkitShowPlaybackTargetPicker(); return; }
       if (v.remote?.prompt) v.remote.prompt().catch(() => {});
-    } catch { /* no cast target — button is only shown when available anyway */ }
+    } catch { /* no cast target - button is only shown when available anyway */ }
   };
   // Watch for cast targets once the media element exists (it mounts after "playing").
   useEffect(() => {
@@ -408,10 +408,10 @@ function PlayerScreen({ code }: { code: string }) {
   }, [stage]);
   // Fullscreen ladder, YouTube-style. Element fullscreen keeps our HUD
   // (desktop, Android, iPadOS 16.4+, iPhone iOS 17.2+). Older iPhones have NO
-  // element-fullscreen API — there we do exactly what m.youtube.com does:
+  // element-fullscreen API - there we do exactly what m.youtube.com does:
   // native video fullscreen (webkitEnterFullscreen → AVPlayer chrome, HUD
   // lost, but genuinely fullscreen). The CSS pseudo-fullscreen is the last
-  // resort only — it can never hide Safari's URL bar.
+  // resort only - it can never hide Safari's URL bar.
   const isPhone = () => typeof window !== "undefined" && Math.min(window.screen.width, window.screen.height) <= 500;
   const enterFs = () => {
     const el = frameRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
@@ -449,7 +449,7 @@ function PlayerScreen({ code }: { code: string }) {
   const exit = () => router.push("/app");
 
   // Keep the fullscreen icon (maximize ⇄ minimize) in sync with the browser
-  // state — including the iPhone NATIVE video fullscreen, which reports via
+  // state - including the iPhone NATIVE video fullscreen, which reports via
   // webkitbegin/endfullscreen on the <video>, not on document.
   useEffect(() => {
     const d = document as Document & { webkitFullscreenElement?: Element | null };
@@ -483,7 +483,7 @@ function PlayerScreen({ code }: { code: string }) {
   // Rotate-to-fullscreen (YouTube behavior): on a phone, landscape while
   // playing = fullscreen, portrait = exit. Checked BOTH when playback starts
   // (the phone may already be rotated) and on every orientation change. A
-  // gestureless element-fullscreen request is refused by the browser — the
+  // gestureless element-fullscreen request is refused by the browser - the
   // ladder inside enterFs then drops to native video fullscreen (iPhone) or
   // the CSS fallback, neither of which needs a gesture.
   useEffect(() => {
@@ -494,7 +494,7 @@ function PlayerScreen({ code }: { code: string }) {
       if (mq.matches) enterFs();
       else exitFs();
     };
-    // Give autoplay a moment — native video fullscreen needs a playing <video>.
+    // Give autoplay a moment - native video fullscreen needs a playing <video>.
     const t = setTimeout(() => { if (isPhone() && mq.matches) enterFs(); }, 600);
     mq.addEventListener("change", onTurn);
     return () => { clearTimeout(t); mq.removeEventListener("change", onTurn); };
@@ -513,13 +513,13 @@ function PlayerScreen({ code }: { code: string }) {
   // The workout ended → leave fullscreen (any rung: element, native AVPlayer,
   // pseudo) so the finish screen actually shows. Inside native fullscreen the
   // DOM can't render at all, and in landscape element-fullscreen the finish
-  // screen is cramped — exiting also unlocks orientation back to the sensor.
+  // screen is cramped - exiting also unlocks orientation back to the sensor.
   useEffect(() => {
     if (stage === "finished") exitFs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
 
-  // Pseudo-fullscreen pins the stage over the page — freeze the page behind it.
+  // Pseudo-fullscreen pins the stage over the page - freeze the page behind it.
   useEffect(() => {
     if (!fakeFs) return;
     const prev = document.body.style.overflow;
@@ -547,7 +547,7 @@ function PlayerScreen({ code }: { code: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nativeFsHud, hud]);
   // Re-issue the cue on every HUD tick (countdown changes once a second);
-  // replacing the cue — rather than mutating its text — forces a repaint.
+  // replacing the cue - rather than mutating its text - forces a repaint.
   useEffect(() => {
     const track = hudTrackRef.current;
     const v = getVideo();
@@ -557,14 +557,14 @@ function PlayerScreen({ code }: { code: string }) {
       const t = v.currentTime ?? 0;
       const text = currentMove ? `${currentMove}  ·  ${countdown}` : countdown;
       track.addCue(new VTTCue(Math.max(0, t - 0.05), t + 2, text));
-    } catch { /* cue churn during teardown — harmless */ }
+    } catch { /* cue churn during teardown - harmless */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown, currentMove, nativeFsHud]);
 
   // When playback crosses into a new block, snap the playlist back to auto-follow it.
   useEffect(() => { setExpanded(null); }, [active]);
 
-  // Keyboard map (L4): Space ← → F M Esc N 1/2/3 ? — the set the audience already
+  // Keyboard map (L4): Space ← → F M Esc N 1/2/3 ? - the set the audience already
   // has in their fingers from YouTube/Netflix. Only active during playback.
   useEffect(() => {
     if (stage !== "playing") return;
@@ -681,7 +681,7 @@ function PlayerScreen({ code }: { code: string }) {
             ) : (
               <>
                 <span className="chip" style={{ marginTop: 4, padding: "12px 22px" }}>🎬 A videó hamarosan elérhető</span>
-                <span className="prev-note">Ez az edzés még készül — nézz vissza később.</span>
+                <span className="prev-note">Ez az edzés még készül - nézz vissza később.</span>
               </>
             )}
           </div>
@@ -697,7 +697,7 @@ function PlayerScreen({ code }: { code: string }) {
     <div className="lx szm-player">
       <div className="szm-pl-stagebg" style={{ background: grad(video.theme) }} aria-hidden="true" />
 
-      {/* TOP BAR — exit always visible (L-RULE 06) */}
+      {/* TOP BAR - exit always visible (L-RULE 06) */}
       <header className="pf-top">
         <button className="pf-ex" onClick={exit}><LxIcon d={lxPaths.chevronLeft} size={16} /> Kilépés</button>
         <div className="pf-ttl"><span className="nm">{video.title}</span><span className="c">{video.code} · FOUNDATION · {video.theme.toUpperCase()}</span></div>
@@ -718,7 +718,7 @@ function PlayerScreen({ code }: { code: string }) {
                 metadata={{
                   video_title: video.title,
                   video_id: video.code,
-                  // Attribute the view to the user — the /api/progress/sync
+                  // Attribute the view to the user - the /api/progress/sync
                   // route queries Mux Data by this id (watch time + completions).
                   viewer_user_id: user?.uid,
                   video_duration: video.muxDuration ? Math.round(video.muxDuration * 1000) : undefined,
@@ -737,7 +737,7 @@ function PlayerScreen({ code }: { code: string }) {
                   </div>
                   <div className="cdw"><div className="cdk">HÁTRA VAN</div><div className="cd">{countdown}</div></div>
                 </div>
-                {/* mobile: thin chapter progress on the video — hidden while the tap
+                {/* mobile: thin chapter progress on the video - hidden while the tap
                     overlay is open (its own bar takes over, so no doubled bar) */}
                 {!mCtl && (
                   <div className="pf-ytp-restbar">
@@ -790,11 +790,11 @@ function PlayerScreen({ code }: { code: string }) {
                 <div className="h">Levegő. Ráérsz.</div>
                 <div className="s">{blockName} · <b>{currentMove}</b> · {fmt(cur)} / {fmt(totalSec)}</div>
                 <button className="pf-gbtn" onClick={togglePlay}><LxIcon d={lxPaths.play} size={16} fill /> Folytatás</button>
-                <button className="pf-gbtn ghost" onClick={exit}>Kilépés — a haladásod megmarad</button>
+                <button className="pf-gbtn ghost" onClick={exit}>Kilépés - a haladásod megmarad</button>
               </div>
             )}
 
-            {/* END (L3) — redesigned completion moment + share examples */}
+            {/* END (L3) - redesigned completion moment + share examples */}
             {isFinished && (
               <FinishComplete
                 title={video.title}
@@ -805,7 +805,7 @@ function PlayerScreen({ code }: { code: string }) {
               />
             )}
 
-            {/* Finish share — selfie + data overlay (mobile: inline camera; desktop: QR handoff) */}
+            {/* Finish share - selfie + data overlay (mobile: inline camera; desktop: QR handoff) */}
             {finishData && (
               <FinishShareEntry open={shareOpen} onClose={() => setShareOpen(false)} data={finishData} />
             )}
@@ -865,14 +865,14 @@ function PlayerScreen({ code }: { code: string }) {
           </div>
         </div>
 
-        {/* DESKTOP RAIL — the playlist (L2 pin 4) */}
+        {/* DESKTOP RAIL - the playlist (L2 pin 4) */}
         <aside className="pf-rail">
           <h3>Az edzés menete</h3>
           {blocks.map((b, i) => {
             const now = i === active; const done = frac >= bounds[i].end; const open = i === openBlock;
             return (
               <div key={b.name} className={`pf-blk${now ? " now" : ""}${done ? " done" : ""}`}>
-                {/* click a block to EXPAND it (not seek) — only exercises seek */}
+                {/* click a block to EXPAND it (not seek) - only exercises seek */}
                 <button className="pf-blk-hd" onClick={() => setExpanded(i)} aria-expanded={open}>
                   <span className={`n${done ? " done" : now ? " on" : ""}`}>{done ? <Check size={11} /> : i + 1}</span>
                   <span className="nm">{b.name}</span>
@@ -891,10 +891,10 @@ function PlayerScreen({ code }: { code: string }) {
               </div>
             );
           })}
-          <div className="pf-railfoot">A végén a ✅ automatikus — neked csak mozognod kell.</div>
+          <div className="pf-railfoot">A végén a ✅ automatikus - neked csak mozognod kell.</div>
         </aside>
 
-        {/* MOBILE — YouTube watch page (L5) */}
+        {/* MOBILE - YouTube watch page (L5) */}
         <div className="pf-mbody">
           <div className="pf-yttitle">
             <div className="tt">{video.title} <LxIcon d={lxPaths.chevronDown} size={16} /></div>
@@ -949,7 +949,7 @@ function PlayerScreen({ code }: { code: string }) {
           </div>
         </div>
 
-        {/* MOBILE tab bar stays (L5 — page, not takeover) */}
+        {/* MOBILE tab bar stays (L5 - page, not takeover) */}
         <nav className="pf-mtabs">
           <button className="pf-mtab on" onClick={() => router.push("/app")}><LxIcon d={lxPaths.house} size={20} /> Kezdőlap</button>
           <button className="pf-mtab" onClick={() => router.push("/app/library")}><LxIcon d={lxPaths.layoutGrid} size={20} /> Videótár</button>

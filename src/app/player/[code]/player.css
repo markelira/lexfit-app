@@ -1,4 +1,4 @@
-/* LEXFIT workout player — YouTube-theater desktop + YouTube-watch-page mobile.
+/* LEXFIT workout player - YouTube-theater desktop + YouTube-watch-page mobile.
    Rebuilt 1:1 from docs "LEXFIT Player Wireframe" (L2–L6). Dark ramp = --d-*.
    Two numbers dominate the frame: the exercise (name) and the clock (countdown).
    Scoped under .lx. Preview stage kept from the prior build (.szm-pl-prev*). */
@@ -26,7 +26,7 @@
   inset: 0;
   background: radial-gradient(60% 60% at 50% 42%, transparent, var(--d-bg) 92%);
 }
-/* The playing view is NEUTRAL grayscale (reference is hue-less) — only the green
+/* The playing view is NEUTRAL grayscale (reference is hue-less) - only the green
    accents (done-checks, progress fill, completion) keep colour. The preview keeps
    its category colour, so scope the neutral ramp to the non-preview root. */
 .lx.szm-player:not(.szm-pl-prevwrap) {
@@ -39,7 +39,7 @@
 }
 .lx.szm-player:not(.szm-pl-prevwrap) .szm-pl-stagebg { filter: blur(90px) saturate(0); opacity: 0.08; }
 
-/* ══════════ TOP BAR (L2 · pin 1 — exit always visible) ══════════ */
+/* ══════════ TOP BAR (L2 · pin 1 - exit always visible) ══════════ */
 .lx .pf-top {
   position: relative;
   z-index: 5;
@@ -73,7 +73,7 @@
 .lx .pf-ico:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .lx .pf-ico.on { border-color: var(--accent); color: var(--accent); }
 
-/* ══════════ BODY GRID — video left, rail right (L2) ══════════ */
+/* ══════════ BODY GRID - video left, rail right (L2) ══════════ */
 .lx .pf-body { position: relative; z-index: 3; flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 300px; }
 .lx .pf-main { min-width: 0; display: flex; flex-direction: column; }
 
@@ -98,7 +98,7 @@
 }
 .lx .pf-nextpill b { color: #fff; font-weight: 700; }
 
-/* work overlay — the two numbers, distance-legible (L2 pins 2+3, L-RULE 01/02) */
+/* work overlay - the two numbers, distance-legible (L2 pins 2+3, L-RULE 01/02) */
 .lx .pf-ovwork {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
   padding: 22px 26px; display: flex; align-items: flex-end; gap: 18px;
@@ -112,11 +112,11 @@
 .lx .pf-ovwork .cd { font-family: var(--mono); font-size: 64px; font-weight: 500; color: #fff; line-height: 0.9; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
 
 /* fullscreen scales the two numbers up (L4 · same layout, further away).
-   Also FORCE the desktop over-video info on in fullscreen even on mobile widths —
+   Also FORCE the desktop over-video info on in fullscreen even on mobile widths -
    rotated-phone fullscreen must carry the countdown + exercise + block/rep marks
    exactly like desktop (higher specificity beats the mobile display:none). */
 .lx .pf-stage:is(:fullscreen, .fake-fs) { background: #000; }
-/* iPhone Safari has no element-fullscreen API — .fake-fs is the CSS stand-in:
+/* iPhone Safari has no element-fullscreen API - .fake-fs is the CSS stand-in:
    pin the stage over the viewport (under the finish screen at z-200). */
 .lx .pf-stage.fake-fs { position: fixed; inset: 0; z-index: 150; aspect-ratio: auto; height: auto; flex: none; }
 .lx .pf-stage:is(:fullscreen, .fake-fs) .pf-ovwork { display: flex; }
@@ -127,7 +127,7 @@
 .lx .pf-stage:is(:fullscreen, .fake-fs) .pf-ovwork .cd { font-size: 96px; }
 .lx .pf-stage:is(:fullscreen, .fake-fs) .pf-repchip { font-size: 12px; }
 .lx .pf-stage:is(:fullscreen, .fake-fs) .pf-nextpill { font-size: 14px; }
-/* toggle the over-video info off (eye button / "H") — fullscreen only */
+/* toggle the over-video info off (eye button / "H") - fullscreen only */
 .lx .pf-stage.hud-off:is(:fullscreen, .fake-fs) .pf-ovwork,
 .lx .pf-stage.hud-off:is(:fullscreen, .fake-fs) .pf-repchip,
 .lx .pf-stage.hud-off:is(:fullscreen, .fake-fs) .pf-nextpill { display: none; }
@@ -147,14 +147,14 @@
 /* ══════════ CONTROLS (L2/L4) ══════════ */
 .lx .pf-ctl { flex: none; padding: 13px 20px 16px; background: var(--d-surface); border-top: 1px solid var(--d-line); display: flex; flex-direction: column; gap: 12px; position: relative; }
 
-/* chapters — one segment per block, proportional, clickable (L-RULE 03) */
+/* chapters - one segment per block, proportional, clickable (L-RULE 03) */
 .lx .pf-chapwrap { position: relative; padding: 4px 0; cursor: pointer; }
 .lx .pf-chaps { display: flex; gap: 4px; }
 .lx .pf-chaps .sg { height: 7px; border-radius: 99px; background: oklch(1 0 168 / 0.2); overflow: hidden; position: relative; display: block; border: none; padding: 0; cursor: pointer; }
 .lx .pf-chaps .sg > i { display: block; height: 100%; background: #fff; }
 .lx .pf-chaps .sg.done > i { background: var(--accent); }
 .lx .pf-chaps .sg:hover { background: oklch(1 0 168 / 0.32); }
-/* seek preview (L4) — the exercise at the hovered point */
+/* seek preview (L4) - the exercise at the hovered point */
 .lx .pf-seekprev {
   position: absolute; bottom: 18px; transform: translateX(-50%); z-index: 6;
   background: var(--d-surface-2); border: 1px solid var(--d-line); border-radius: 8px; padding: 7px 11px;
@@ -196,7 +196,7 @@
 .lx .pf-gear .r .v { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--d-ink-2); }
 .lx .pf-gear .r .v.on { color: var(--accent); }
 
-/* ══════════ RIGHT RAIL — the playlist (L2 pin 4) ══════════ */
+/* ══════════ RIGHT RAIL - the playlist (L2 pin 4) ══════════ */
 .lx .pf-rail { border-left: 1px solid var(--d-line); background: var(--d-bg); padding: 16px 15px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
 .lx .pf-rail h3 { color: var(--d-ink); font-size: 13px; font-weight: 700; margin-bottom: 4px; }
 .lx .pf-blk { border-radius: 10px; padding: 4px; }
@@ -262,11 +262,11 @@
 .lx .pf-keys-box .t { font-size: 13px; color: var(--d-ink-2); }
 .lx .pf-keys-close { margin-top: 14px; width: 100%; height: 40px; border-radius: 8px; border: 1px solid var(--d-line); background: none; color: var(--d-ink); font-weight: 600; cursor: pointer; }
 
-/* controls fade after idle (L4) — information (overlay) never fades */
+/* controls fade after idle (L4) - information (overlay) never fades */
 .lx .pf-main.idle .pf-ctl { opacity: 0; transition: opacity 0.4s ease; }
 .lx .pf-main.idle { cursor: none; }
 
-/* ══════════ MOBILE — YouTube watch page (L5) ══════════ */
+/* ══════════ MOBILE - YouTube watch page (L5) ══════════ */
 /* mobile-only elements are absent on desktop */
 .lx .pf-mbody, .lx .pf-mtabs, .lx .pf-ytov, .lx .pf-ytp-restbar { display: none; }
 
@@ -304,14 +304,14 @@
   .lx .pf-chapbar span { height: 4px; border-radius: 2px; background: oklch(1 0 168 / 0.32); position: relative; overflow: hidden; }
   .lx .pf-chapbar span i { position: absolute; left: 0; top: 0; bottom: 0; background: #fff; display: block; }
 
-  /* body scrolls beneath — light surface, YouTube watch page */
+  /* body scrolls beneath - light surface, YouTube watch page */
   .lx .pf-mbody { background: var(--surface); color: var(--ink); }
   .lx .pf-yttitle { padding: 12px 14px 10px; border-bottom: 1px solid var(--line); }
   .lx .pf-yttitle .tt { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; display: flex; gap: 8px; align-items: flex-start; color: var(--ink); }
   .lx .pf-yttitle .tt svg { color: var(--ink-3); flex: none; margin-top: 2px; }
   .lx .pf-yttitle .mt { font-size: 11px; color: var(--ink-2); margin-top: 4px; }
 
-  /* countdown strip BELOW the video (L5 — the one deliberate divergence) */
+  /* countdown strip BELOW the video (L5 - the one deliberate divergence) */
   .lx .pf-nowstrip { margin: 12px 14px 0; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 11px 13px; display: flex; align-items: center; gap: 13px; }
   .lx .pf-nowstrip .cd { font-family: var(--mono); font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; flex: none; }
   .lx .pf-nowstrip .stp { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--ink-3); }
@@ -357,7 +357,7 @@
   .lx .pf-whisper { font-size: 11px; line-height: 1.35; color: var(--accent-ink); background: var(--accent-soft); border: 1px solid var(--accent-soft); border-radius: 6px; padding: 7px 9px; display: flex; gap: 6px; align-items: flex-start; margin-bottom: 8px; }
   .lx .pf-whisper svg { color: var(--accent-ink); flex: none; margin-top: 1px; }
 
-  /* bottom tab bar stays (L5 — page, not takeover) */
+  /* bottom tab bar stays (L5 - page, not takeover) */
   .lx .pf-mtabs { height: 62px; flex: none; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface-2); position: sticky; bottom: 0; }
   .lx .pf-mtab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 9.5px; color: var(--ink-3); background: none; border: none; cursor: pointer; min-height: 44px; }
   .lx .pf-mtab svg { color: var(--ink-3); }
@@ -373,7 +373,7 @@
   .lx .pf-chaps .sg > i, .lx .pf-blk-hd .n, .lx .pf-ctl, .lx .fade-in { transition: none !important; animation: none !important; }
 }
 
-/* ══════════ PREVIEW STAGE (kept — "Előnézet-állapot · Marad") ══════════ */
+/* ══════════ PREVIEW STAGE (kept - "Előnézet-állapot · Marad") ══════════ */
 .lx .szm-pl-prevwrap,
 .lx.szm-pl-prevwrap { align-items: center; justify-content: center; }
 .lx .szm-pl-prev { position: relative; z-index: 1; display: flex; align-items: center; gap: 44px; max-width: 980px; padding: 30px; }

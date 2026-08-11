@@ -62,7 +62,7 @@ async function emailForUid(uid: string): Promise<string | null> {
 }
 
 /**
- * F5.1 day-0 dunning email — the card was declined. Sends once per episode
+ * F5.1 day-0 dunning email - the card was declined. Sends once per episode
  * (gated by `dunningDay0Sent`), linking the Stripe hosted invoice so the user
  * can pay / update the card. Access is kept through the grace window meanwhile.
  * The day-3 reminder + grace expiry live in the cron.
@@ -90,7 +90,7 @@ async function maybeDunning(event: Stripe.Event): Promise<void> {
 }
 
 /**
- * "Elindult az előfizetésed" — the subscription-started / payment-confirmed
+ * "Elindult az előfizetésed" - the subscription-started / payment-confirmed
  * email, once per checkout session (milestone-keyed on the session id, so
  * Stripe redeliveries and plan renewals never re-fire it). Best-effort: a send
  * failure must not 500 the webhook. Billingo sends the legal invoice separately.
@@ -166,7 +166,7 @@ async function maybeIssueInvoice(event: Stripe.Event): Promise<void> {
 
 /**
  * Resolve the business effect of an event. All external Stripe calls happen
- * HERE, before the transaction — a Firestore transaction may retry, and it must
+ * HERE, before the transaction - a Firestore transaction may retry, and it must
  * not re-issue network I/O. Returns the write to apply, or null (status-only /
  * not-yet-handled events still get deduped so retries are cheap).
  */
@@ -198,7 +198,7 @@ async function resolveWrite(event: Stripe.Event): Promise<PendingWrite> {
         return { uid, data };
       }
       if (session.mode === "payment") {
-        // One-off (7/30-day) purchase — resolve which price was bought.
+        // One-off (7/30-day) purchase - resolve which price was bought.
         const items = await stripe.checkout.sessions.listLineItems(session.id, {
           expand: ["data.price"],
         });
@@ -238,7 +238,7 @@ async function resolveWrite(event: Stripe.Event): Promise<PendingWrite> {
       if (event.type === "invoice.paid") {
         data.amountPaid = invoice.amount_paid ?? null; // pro-rata base (F1.3)
         if (prior?.status === "PAST_DUE") {
-          // Recovered — clear dunning bookkeeping (churn saved).
+          // Recovered - clear dunning bookkeeping (churn saved).
           data.pastDueSince = null;
           data.dunningDay0Sent = false;
           data.dunningDay3Sent = false;
@@ -264,7 +264,7 @@ async function resolveWrite(event: Stripe.Event): Promise<PendingWrite> {
       if (!uid) return null;
       const data = buildSubscriptionData(sub);
       if (event.type === "customer.subscription.deleted") {
-        // Fully gone — access ends at the (already-past) period end. Win-back
+        // Fully gone - access ends at the (already-past) period end. Win-back
         // email trigger is F5.3.
         data.status = "EXPIRED";
         data.accessUntil = data.currentPeriodEnd;
@@ -300,14 +300,14 @@ export async function POST(req: Request) {
   }
 
   try {
-    // External Stripe I/O first — never inside the transaction (it may retry).
+    // External Stripe I/O first - never inside the transaction (it may retry).
     const write = await resolveWrite(event);
 
     await adminDb.runTransaction(async (tx) => {
       const evtRef = adminDb
         .collection(COLLECTIONS.stripeWebhookEvents)
         .doc(webhookEventDocId(event.id));
-      const seen = await tx.get(evtRef); // read before write — Firestore tx rule
+      const seen = await tx.get(evtRef); // read before write - Firestore tx rule
       if (seen.exists) return; // already processed → idempotent skip
 
       if (write) tx.set(subscriptionRef(write.uid), write.data, { merge: true });

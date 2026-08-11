@@ -3,7 +3,7 @@
 import { useRef } from "react";
 
 // The 3/4/5/6 control (40 §40.4 step 3). A radiogroup rendered as a pill track;
-// selected cell lifts to --surface. Numbers only — the "ajánlott · heti {n}"
+// selected cell lifts to --surface. Numbers only - the "ajánlott · heti {n}"
 // note is rendered by the step below the control. Full WAI radiogroup keyboard
 // support (40 §40.12): one tab stop (roving tabindex), arrows move + select.
 export function Segmented({

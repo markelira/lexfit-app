@@ -1,4 +1,4 @@
-// LEXFIT pricing — THE single source of truth for every price, window, and
+// LEXFIT pricing - THE single source of truth for every price, window, and
 // threshold in the "Kiérdemelt Ár" system (F0.5).
 //
 // HARD RULE: no pricing-numeric value (amount, window length, count) may be
@@ -23,7 +23,7 @@ function envInt(name: string, fallback: number): number {
 // ── Currency / tax ─────────────────────────────────────────────────────────
 export const CURRENCY = "huf";
 // Every amount below is the FINAL price the consumer pays. The company is
-// alanyi adómentes (AAM) — invoices carry no VAT content (see lib/pricing/
+// alanyi adómentes (AAM) - invoices carry no VAT content (see lib/pricing/
 // invoice.ts). If VAT registration ever happens, prices stay gross and
 // BILLINGO_VAT_CODE switches the invoice split.
 
@@ -57,7 +57,7 @@ export type PriceRole =
 
 export interface PriceSpec {
   role: PriceRole;
-  /** Stripe price lookup_key — idempotency key for the seed script. */
+  /** Stripe price lookup_key - idempotency key for the seed script. */
   lookupKey: string;
   /** Gross HUF (VAT included). */
   amountHuf: number;
@@ -76,7 +76,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "week",
     intervalCount: 1,
-    nickname: "Heti — intro (első 7 nap)",
+    nickname: "Heti - intro (első 7 nap)",
   },
   week_std: {
     role: "week_std",
@@ -85,7 +85,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "week",
     intervalCount: 1,
-    nickname: "Heti — folyamatos",
+    nickname: "Heti - folyamatos",
   },
   week_oneoff: {
     role: "week_oneoff",
@@ -94,7 +94,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "one_time",
     interval: null,
     intervalCount: 1,
-    nickname: "Heti — egyszeri (7 nap)",
+    nickname: "Heti - egyszeri (7 nap)",
   },
   month_std: {
     role: "month_std",
@@ -103,7 +103,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "month",
     intervalCount: 1,
-    nickname: "Havi — folyamatos",
+    nickname: "Havi - folyamatos",
   },
   month_oneoff: {
     role: "month_oneoff",
@@ -112,7 +112,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "one_time",
     interval: null,
     intervalCount: 1,
-    nickname: "Havi — egyszeri (30 nap)",
+    nickname: "Havi - egyszeri (30 nap)",
   },
   annual_std: {
     role: "annual_std",
@@ -121,7 +121,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "year",
     intervalCount: 1,
-    nickname: "Éves — standard",
+    nickname: "Éves - standard",
   },
   annual_earned: {
     role: "annual_earned",
@@ -130,7 +130,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "year",
     intervalCount: 1,
-    nickname: "Éves — kiérdemelt (első év)",
+    nickname: "Éves - kiérdemelt (első év)",
   },
   month_founder: {
     role: "month_founder",
@@ -139,7 +139,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "month",
     intervalCount: 1,
-    nickname: "Havi — alapító zárolás",
+    nickname: "Havi - alapító zárolás",
   },
   annual_renew: {
     role: "annual_renew",
@@ -148,7 +148,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "year",
     intervalCount: 1,
-    nickname: "Éves — hosszabbítás (12 hó)",
+    nickname: "Éves - hosszabbítás (12 hó)",
   },
   biennial_renew: {
     role: "biennial_renew",
@@ -157,7 +157,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "year",
     intervalCount: 2,
-    nickname: "Kétéves — előre (24 hó)",
+    nickname: "Kétéves - előre (24 hó)",
   },
   annual_winback: {
     role: "annual_winback",
@@ -166,11 +166,11 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "year",
     intervalCount: 1,
-    nickname: "Éves — win-back (első év)",
+    nickname: "Éves - win-back (első év)",
   },
 };
 
-/** All specs as a list — the seed script iterates this. */
+/** All specs as a list - the seed script iterates this. */
 export const PRICE_LIST: PriceSpec[] = Object.values(PRICES);
 
 /** Reverse lookup: Stripe price lookup_key → role. Used by the webhook to map a
@@ -199,7 +199,7 @@ export const EARNING = {
   requiredCheckins: envInt("PRICING_EARNING_REQUIRED_CHECKINS", 5),
 } as const;
 
-/** Grand Slam offer lifetime — a REAL, final deadline (J4). */
+/** Grand Slam offer lifetime - a REAL, final deadline (J4). */
 export const GRAND_SLAM_WINDOW_HOURS = envInt("PRICING_GRAND_SLAM_HOURS", 72);
 /** How long a "redeeming" lock holds before a new checkout attempt may retry. */
 export const GRAND_SLAM_REDEEM_LOCK_MS = envInt("PRICING_GRAND_SLAM_REDEEM_LOCK_MIN", 15) * 60_000;
@@ -239,13 +239,13 @@ export const DUNNING = {
 export const WEEKLY_REMINDER_DAY = envInt("PRICING_WEEKLY_REMINDER_DAY", 5);
 export const MONTHLY_REMINDER_DAYS_BEFORE = envInt("PRICING_MONTHLY_REMINDER_DAYS", 3);
 
-/** 14-day right of withdrawal (45/2014. Korm. r.) — J2. Non-excludable. */
+/** 14-day right of withdrawal (45/2014. Korm. r.) - J2. Non-excludable. */
 export const WITHDRAWAL_DAYS = envInt("PRICING_WITHDRAWAL_DAYS", 14);
 
 /** Pause durations offered in the cancel flow (F2.3). */
 export const PAUSE_MONTHS_ALLOWED = [1, 2, 3] as const;
 export type PauseMonths = (typeof PAUSE_MONTHS_ALLOWED)[number];
-/** Auto-resume reminder — days before a pause ends (F5.2). */
+/** Auto-resume reminder - days before a pause ends (F5.2). */
 export const PAUSE_RESUME_REMINDER_DAYS = envInt("PRICING_PAUSE_RESUME_REMINDER_DAYS", 3);
 
 // ── Which roles are purchasable from the pricing page (the 6 starting SKUs) ──

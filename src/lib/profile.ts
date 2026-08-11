@@ -1,6 +1,6 @@
 // The Profil read model. One typed shape so both surfaces (Profil + Beállítások)
 // read the same thing. `loadProfile` (src/lib/profile-load.ts) composes getOnboarding
-// / loadFoundation / getProgress / getSubscription / users/{uid} / prefs into this —
+// / loadFoundation / getProgress / getSubscription / users/{uid} / prefs into this -
 // no per-component Firestore queries.
 
 import type { Plan, SubStatus } from "@/lib/pricing/types";
@@ -21,7 +21,7 @@ export function weekdayNamesHu(weekdays: number[]): string {
   return [...weekdays].sort((a, b) => a - b).map((w) => DAY_FULL[w - 1]).filter(Boolean).join(", ");
 }
 
-/** The user's training plan — persisted under users/{uid}/settings/prefs (P3.2). */
+/** The user's training plan - persisted under users/{uid}/settings/prefs (P3.2). */
 export interface PlanPrefs {
   daysPerWeek: number;          // 3–6
   weekdays: number[];           // 1=Mon … 7=Sun
@@ -48,7 +48,7 @@ export interface Prefs {
   updatedAt?: number;
 }
 
-/** Subscription, flattened for display — figures come from PRICES via formatHuf. */
+/** Subscription, flattened for display - figures come from PRICES via formatHuf. */
 export interface ProfileSubscription {
   plan: Plan;
   planLabel: string;

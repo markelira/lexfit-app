@@ -1,4 +1,4 @@
-// Shared shell for every LEXFIT email — Apple structure (one column, one card,
+// Shared shell for every LEXFIT email - Apple structure (one column, one card,
 // generous space), LEXFIT skin. The wordmark is live text (no image dependency,
 // survives image-blocking), exactly like the app's .wm markup.
 
@@ -48,7 +48,7 @@ export function EmailLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Email template, not a Next page — the pages/_document rule doesn't apply. */}
+        {/* Email template, not a Next page - the pages/_document rule doesn't apply. */}
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap"
@@ -113,7 +113,7 @@ export function EmailLayout({
                 >
                   Leiratkozás
                 </Link>{" "}
-                — egy kattintás, nem kérdezünk vissza.
+                - egy kattintás, nem kérdezünk vissza.
               </Text>
             )}
             <Text style={{ ...styles.small, margin: "14px 0 0", color: color.ink3 }}>

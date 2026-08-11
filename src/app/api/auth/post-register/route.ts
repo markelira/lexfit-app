@@ -20,8 +20,8 @@ async function milestoneOnce(uid: string, kind: string): Promise<boolean> {
 
 /**
  * Fired (fire-and-forget) by the register flows right after ensureUserDoc
- * creates the user doc. Sends the welcome email, and — for email+password
- * accounts — our branded verification email via the Admin SDK action link
+ * creates the user doc. Sends the welcome email, and - for email+password
+ * accounts - our branded verification email via the Admin SDK action link
  * (replacing the client SDK's Google-templated `sendEmailVerification`).
  * Idempotent via milestone docs, and refuses accounts older than 48h so a
  * replayed call can never welcome a veteran.
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     results.welcome = true;
   }
 
-  // P5.4: verification is informational, never an access gate — but the email
+  // P5.4: verification is informational, never an access gate - but the email
   // itself is ours now. Password accounts only; OAuth addresses arrive verified.
   if (token.firebase?.sign_in_provider === "password" && !user.emailVerified) {
     if (await milestoneOnce(token.uid, "verify_email_sent")) {

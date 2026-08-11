@@ -1,4 +1,4 @@
-/* LEXFIT admin — internal CMS shell. Hand-built on the .lx design tokens (no Tailwind). */
+/* LEXFIT admin - internal CMS shell. Hand-built on the .lx design tokens (no Tailwind). */
 
 .lx.adm-shell { min-height: 100dvh; display: flex; background: var(--bg, oklch(0.985 0.006 168)); font-size: 15px; }
 
@@ -186,7 +186,7 @@
 .lx .adm-upload { border: 1px solid var(--line); border-radius: 16px; padding: 20px; background: var(--surface); }
 .lx .adm-upload-hd { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
 .lx .adm-upload-sub { font-size: 13px; color: var(--ink-2); margin-bottom: 14px; text-wrap: pretty; }
-.lx .adm-upload mux-uploader { --uploader-font-family: var(--font-poppins), sans-serif; width: 100%; }
+.lx .adm-upload mux-uploader { --uploader-font-family: var(--font); width: 100%; }
 .lx .adm-upload-status { font-size: 13px; font-weight: 600; margin-top: 12px; }
 .lx .adm-upload-status.error { color: var(--accent-2); }
 .lx .adm-upload-done { display: flex; align-items: center; gap: 12px; }

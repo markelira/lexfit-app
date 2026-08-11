@@ -1,4 +1,4 @@
-// §4d/16 — Weekly recap ("A heted, ahogy volt"). Trigger: Monday 08:00 cron,
+// §4d/16 - Weekly recap ("A heted, ahogy volt"). Trigger: Monday 08:00 cron,
 // covering Mon–Sun. Data MUST come from lib/week-progress computeWeekProgress +
 // lib/streak computeStreak (both pure) or the numbers diverge from the app.
 // Zero-activity week → restart variant, never a 0/N scoreboard.
@@ -24,11 +24,11 @@ export default function WeeklyRecap({
   doneThisWeek: number;
   target: number;
   streak: number;
-  /** Mon–Sun, from computeWeekProgress — label = H/K/Sz/Cs/P/Szo/V. */
+  /** Mon–Sun, from computeWeekProgress - label = H/K/Sz/Cs/P/Szo/V. */
   days: { label: string; state: DayState }[];
-  /** e.g. "hétfő, kedd, csütörtök, péntek" — from weekdayNamesHu(). */
+  /** e.g. "hétfő, kedd, csütörtök, péntek" - from weekdayNamesHu(). */
   nextWeekDays: string;
-  /** Optional "Új ezen a héten" line — content news rides here, never separately. */
+  /** Optional "Új ezen a héten" line - content news rides here, never separately. */
   newContentLine?: string;
 }) {
   const zeroWeek = doneThisWeek === 0;
@@ -37,8 +37,8 @@ export default function WeeklyRecap({
       footer="reminder"
       preview={
         zeroWeek
-          ? "A múlt hét kimaradt — előfordul. A terved változatlanul megvan."
-          : `${doneThisWeek}/${target} edzésnap — így nézett ki a heted.`
+          ? "A múlt hét kimaradt - előfordul. A terved változatlanul megvan."
+          : `${doneThisWeek}/${target} edzésnap - így nézett ki a heted.`
       }
     >
       <Text style={styles.eyebrow}>Heti összefoglaló</Text>
@@ -46,12 +46,12 @@ export default function WeeklyRecap({
         <>
           <Text style={styles.h1}>Új hét, tiszta lap</Text>
           <Text style={styles.body}>
-            A múlt hét kimaradt — előfordul, és nem történt semmi
+            A múlt hét kimaradt - előfordul, és nem történt semmi
             visszafordíthatatlan. A terved változatlanul megvan: {nextWeekDays}.
           </Text>
           <Text style={styles.body}>
             Ma pont jó nap újrakezdeni. Egy 20 perces edzés elég ahhoz, hogy
-            visszatalálj a ritmusba — a többit majd hozza magával.
+            visszatalálj a ritmusba - a többit majd hozza magával.
           </Text>
         </>
       ) : (
@@ -66,8 +66,8 @@ export default function WeeklyRecap({
           />
           <Text style={{ ...styles.body, margin: "18px 0 16px" }}>
             {doneThisWeek >= target
-              ? "Minden betervezett napot kipipáltál — ez volt a terv, és megcsináltad. 💚"
-              : "Ami megvolt, az megvolt — a kimaradt nap nem tartozás, csak egy nap. Új hét, ugyanaz a terv."}
+              ? "Minden betervezett napot kipipáltál - ez volt a terv, és megcsináltad. 💚"
+              : "Ami megvolt, az megvolt - a kimaradt nap nem tartozás, csak egy nap. Új hét, ugyanaz a terv."}
           </Text>
           <Text style={styles.body}>Ezen a héten: {nextWeekDays}.</Text>
         </>

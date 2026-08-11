@@ -18,7 +18,7 @@ const stripePromise = pk ? loadStripe(pk) : null;
 const CONSENTS: Consents = { autoRenew: true, immediateStart: true };
 
 // Embedded Stripe Checkout mounted on the pay step (E2). The user can still
-// change the plan here (no need to go back) — the selection is controlled by the
+// change the plan here (no need to go back) - the selection is controlled by the
 // funnel (onRoleChange → answers.plan). Consent gates it; once "Tovább" is hit we
 // lock the plan, create the session (server-side consent record), and mount
 // Stripe's own secure checkout inline. Success returns to /app?sub=success.
@@ -61,7 +61,7 @@ export function EmbeddedPay({
     <div className="fnl-pay">
       {!ready ? (
         <>
-          {/* Same summary-card style — but all three are selectable here, so the
+          {/* Same summary-card style - but all three are selectable here, so the
               user can switch plan without going back. */}
           <div className="fnl-payopts" role="radiogroup" aria-label="Csomag">
             {plans.map((p, i) => {
@@ -89,7 +89,7 @@ export function EmbeddedPay({
             <span>
               Elfogadom, hogy az előfizetés a fenti ár és periódus szerint automatikusan megújul,
               a szolgáltatás azonnal elindul, és elállás esetén az igénybe vett időszakra időarányos
-              díj számolható el — <a href="/aszf">részletek</a>.
+              díj számolható el - <a href="/aszf">részletek</a>.
             </span>
           </label>
           <button className="fnl-cta" disabled={!consented} onClick={() => setReady(true)}>

@@ -35,7 +35,7 @@ export async function POST(req: Request) {
   const token = await verifyRequest(req);
   if (!token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  // Unbounded doc creation otherwise (TTL only cleans up later) — cap per uid.
+  // Unbounded doc creation otherwise (TTL only cleans up later) - cap per uid.
   if (!(await allowRequest("finishShare", token.uid, 30, DAY_MS_RL))) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }

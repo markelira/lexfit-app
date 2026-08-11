@@ -1,6 +1,6 @@
 // Canonical default filter taxonomy (2026-08 Hungarian glossary). On an EMPTY
 // production Firestore the admin Szűrők screen renders these as the starting
-// point, and the first save creates the filters/{key} docs — without this,
+// point, and the first save creates the filters/{key} docs - without this,
 // taxonomy could never be authored on prod (the API used to 404 on missing
 // docs and the screen listed nothing). Firestore content always wins over
 // these defaults once the docs exist.
@@ -15,13 +15,13 @@ export const DEFAULT_FILTERS: FilterDimension[] = [
   { key: "type", label: "Típus", options: ["🔇 Csendes", "🪑 Falra fogva", "🧘 Lazító", "⚡ Intenzív", "🌅 Reggeli", "🌙 Esti"], order: 5, editable: true },
 ];
 
-// Kihívások taxonomy — challengeFilters/{key}. Only "theme" (TESTRÉSZ) exists.
+// Kihívások taxonomy - challengeFilters/{key}. Only "theme" (TESTRÉSZ) exists.
 export const DEFAULT_CHALLENGE_FILTERS: FilterDimension[] = [
   { key: "theme", label: "Testrész", options: ["Has & törzs", "Fenék & comb", "Karok & váll", "Tánc-kardió", "Mobilitás", "Felsőtest", "Tartás"], order: 0, editable: true },
 ];
 
 /** Firestore docs win; defaults fill what doesn't exist yet. `stored: false`
- *  marks a dimension that only exists as a default — the admin UI treats it as
+ *  marks a dimension that only exists as a default - the admin UI treats it as
  *  unsaved so one Mentés bootstraps the doc. */
 export function mergeWithDefaults(
   defaults: FilterDimension[],

@@ -2,7 +2,7 @@
 // THE FIXTURE (40 §41 P1). The single content source for the v2 funnel while
 // layout is reviewed. Deleted in P4, one block at a time, as real content
 // (onboarding-data.ts / loadFoundation / PRICES) replaces each part. The build
-// MUST break when this file is removed — nothing may fall back to a default.
+// MUST break when this file is removed - nothing may fall back to a default.
 //
 // Copy is verbatim from 40 §40.11 / §40.4. Option labels/subs are verbatim from
 // STEP_OPTIONS; only the icons change (emoji → lxPaths, 40 §B5). No emoji here.
@@ -36,22 +36,22 @@ export const MOCK = {
   // The five questions, in order. `key` matches OnboardingAnswers fields.
   goal: {
     heading: "Mi hozott ide?",
-    sub: "Egyet válassz — ez adja az edzéseid fókuszát. Később módosítható.",
+    sub: "Egyet válassz - ez adja az edzéseid fókuszát. Később módosítható.",
     options: [
       { v: "ero", icon: lxPaths.dumbbell, label: "Erősebb, energikusabb test", sub: "Hogy bírjam a napot, és jó legyen a tükörben." },
-      { v: "forma", icon: lxPaths.flame, label: "Lefogyni, formálódni", sub: "Égessünk, formáljunk — fokozatosan, fenntarthatóan." },
-      { v: "vissza", icon: lxPaths.rotateCcw, label: "Visszatérni a mozgáshoz", sub: "Régen volt — most újrakezdem, nulláról, szépen." },
-      { v: "tartas", icon: lxPaths.userRound, label: "Jobb tartás, kevesebb fájdalom", sub: "Sok ülés, fáradt hát — mozduljunk ki belőle." },
+      { v: "forma", icon: lxPaths.flame, label: "Lefogyni, formálódni", sub: "Égessünk, formáljunk - fokozatosan, fenntarthatóan." },
+      { v: "vissza", icon: lxPaths.rotateCcw, label: "Visszatérni a mozgáshoz", sub: "Régen volt - most újrakezdem, nulláról, szépen." },
+      { v: "tartas", icon: lxPaths.userRound, label: "Jobb tartás, kevesebb fájdalom", sub: "Sok ülés, fáradt hát - mozduljunk ki belőle." },
       { v: "szokas", icon: lxPaths.calendarCheck, label: "Napi mozgás-szokás", sub: "Nem a csoda kell, hanem hogy végre rendszer legyen." },
     ] satisfies OptionItem[],
   },
 
-  // Focus area — the body-positive rewrite of "problem areas" (research: the
+  // Focus area - the body-positive rewrite of "problem areas" (research: the
   // single biggest untapped "this is mine" lever). Framed
   // as "where you want to feel stronger", never "trouble zones". Single-select.
   focus: {
     heading: "Hol szeretnél erősödni?",
-    sub: "Egyet válassz — erre teszek majd külön hangsúlyt. Később módosítható.",
+    sub: "Egyet válassz - erre teszek majd külön hangsúlyt. Később módosítható.",
     options: [
       { v: "fenek", icon: lxPaths.flame, label: "Fenék, comb", sub: "Stabil, erős alsótest." },
       { v: "core", icon: lxPaths.gauge, label: "Has, törzs", sub: "Erős törzs, biztos tartás." },
@@ -63,12 +63,12 @@ export const MOCK = {
 
   level: {
     heading: "Hol tartasz most?",
-    sub: "Ne becsüld túl és ne is alá — ehhez igazítjuk a tempót.",
+    sub: "Ne becsüld túl és ne is alá - ehhez igazítjuk a tempót.",
     // flames → FlameRating, injected by the step (leading node needs no data here).
     options: [
-      { v: 1, flames: 1, label: "Kezdő", sub: "Most kezdem, vagy rég mozogtam — vezess végig." },
+      { v: 1, flames: 1, label: "Kezdő", sub: "Most kezdem, vagy rég mozogtam - vezess végig." },
       { v: 2, flames: 2, label: "Közepes", sub: "Szoktam mozogni, az alapok mennek." },
-      { v: 3, flames: 3, label: "Haladó", sub: "Edzett vagyok — jöhet a kihívás." },
+      { v: 3, flames: 3, label: "Haladó", sub: "Edzett vagyok - jöhet a kihívás." },
     ],
   },
 
@@ -84,7 +84,7 @@ export const MOCK = {
     recommended: 5,
     weekHeading: "Így néz majd ki a heted",
     weekdaysLabel: "Mely napokon?",
-    restNote: "A pihenőnap is a terv része — nem töri meg a sorozatot.",
+    restNote: "A pihenőnap is a terv része - nem töri meg a sorozatot.",
     // Sensible default weekday sets per count (1=Mon … 7=Sun).
     defaults: { 3: [1, 3, 5], 4: [1, 2, 4, 5], 5: [1, 2, 4, 5, 6], 6: [1, 2, 3, 4, 5, 6] } as Record<number, number[]>,
   },
@@ -112,11 +112,11 @@ export const MOCK = {
     ] satisfies OptionItem[],
   },
 
-  // Obstacle — "what stopped you before?" (research: reflect it back on the
+  // Obstacle - "what stopped you before?" (research: reflect it back on the
   // reveal, pre-empt the churn reason). Empathy, not failure. Single-select.
   obstacle: {
     heading: "Mi állított meg eddig?",
-    sub: "Hogy tudjam, mire figyeljek — és mikor bátorítsalak. Nincs rossz válasz.",
+    sub: "Hogy tudjam, mire figyeljek - és mikor bátorítsalak. Nincs rossz válasz.",
     options: [
       { v: "ido", icon: lxPaths.clock, label: "Nem volt rá időm", sub: "Sose jött ki a naptárból." },
       { v: "motiv", icon: lxPaths.rotateCcw, label: "Elfogyott a lendület", sub: "Elkezdtem, de abbamaradt." },
@@ -128,16 +128,16 @@ export const MOCK = {
 
   why: {
     heading: "És miért most?",
-    sub: "Egy mondat elég. Ezt később visszahozom neked — akkor, amikor nehéz lesz.",
+    sub: "Egy mondat elég. Ezt később visszahozom neked - akkor, amikor nehéz lesz.",
     placeholder: "Pl. „Hogy a lépcsőn ne fulladjak ki, és bírjam a gyerekekkel.”",
     maxLength: 160,
-    whisper: "„Ezt csak te fogod látni. Nem kell szépnek lennie — elég, ha igaz.”",
+    whisper: "„Ezt csak te fogod látni. Nem kell szépnek lennie - elég, ha igaz.”",
     cta: "Mehet",
     skip: "Most kihagyom",
   },
 
   // The reveal now CONSUMES every answer (research: perceived personalization =
-  // echo the user's own inputs back). Copy is real & honest — NO weight numbers,
+  // echo the user's own inputs back). Copy is real & honest - NO weight numbers,
   // NO fixed program length, NO placeholder beats. The "trajectory" is effort/
   // consistency (days → monthly cadence + habit), never a body outcome.
   reveal: {
@@ -148,19 +148,19 @@ export const MOCK = {
     weekLabel: "Ez a heted",
     phaseLabel: "1. blokk · Alapozás",
     paceLabel: "A tempód",
-    // {days}/{sessions} filled at render — computed, honest, no fixed length.
+    // {days}/{sessions} filled at render - computed, honest, no fixed length.
     paceLine: "Heti {days} edzés · havonta ~{sessions} alkalom",
-    paceNote: "A lényeg a rendszer, nem a sebesség — pár hét, és magától megy.",
+    paceNote: "A lényeg a rendszer, nem a sebesség - pár hét, és magától megy.",
     workoutLabel: "Az első edzésed",
-    social: "1 200+ csoporttag — akik már velünk csinálják.",
+    social: "1 200+ csoporttag - akik már velünk csinálják.",
     whisper: "„Ezt a hetet a válaszaidból raktam össze. Ha nem passzol, együtt átírjuk.”",
     cta: "Mentsük el a tervedet",
     // Goal → the reveal headline (real per-goal capability line). Also reused at
     // the pay step. No beats, no fixed-length claim.
     outcomes: {
       ero: { headline: "Erősebb, energikusabb tested lesz." },
-      forma: { headline: "Formálódsz — fokozatosan, fenntarthatóan." },
-      vissza: { headline: "Visszatérsz a mozgáshoz — nulláról, szépen." },
+      forma: { headline: "Formálódsz - fokozatosan, fenntarthatóan." },
+      vissza: { headline: "Visszatérsz a mozgáshoz - nulláról, szépen." },
       tartas: { headline: "Jobb tartás, kevesebb fájdalom." },
       szokas: { headline: "Végre meglesz a napi mozgás-szokásod." },
     } as Record<string, { headline: string }>,
@@ -176,11 +176,11 @@ export const MOCK = {
     envChipMany: "Rád szabva",
     // Obstacle → Alexa's reassurance, reflected back (empathy, not failure).
     obstaclePhrase: {
-      ido: "Tudom, hogy az idő a legszűkösebb — ezért napi 30 perc, és kész.",
-      motiv: "A lendület el szokott fogyni — ezért viszlek végig, lépésről lépésre.",
-      tudas: "Nem kell kitalálnod semmit — mindig megmondom, mi a következő.",
-      serules: "Óvatosak leszünk — minden mozdulathoz van kíméletes változat.",
-      elso: "Az első lépés a legnehezebb — innentől már együtt csináljuk.",
+      ido: "Tudom, hogy az idő a legszűkösebb - ezért napi 30 perc, és kész.",
+      motiv: "A lendület el szokott fogyni - ezért viszlek végig, lépésről lépésre.",
+      tudas: "Nem kell kitalálnod semmit - mindig megmondom, mi a következő.",
+      serules: "Óvatosak leszünk - minden mozdulathoz van kíméletes változat.",
+      elso: "Az első lépés a legnehezebb - innentől már együtt csináljuk.",
     } as Record<string, string>,
   },
 
@@ -197,14 +197,14 @@ export const MOCK = {
   envPhraseMany: "rád szabott variációkkal",
 };
 
-// (The subscribe fixture was removed — P6 built /subscribe from real PRICES, so
+// (The subscribe fixture was removed - P6 built /subscribe from real PRICES, so
 // the placeholder plan prices are gone. Deleting was a P9.3 audit fix.)
 
 // ── First-entry fixture (40 §P1.5 / §40.9). ──
 export const MOCK_FIRST_ENTRY = {
   hero: {
     kicker: "Kezdjük az elsőt",
-    whisper: "„Itt vagyok. Az első nap a legnehezebb — utána már csak csináljuk.”",
+    whisper: "„Itt vagyok. Az első nap a legnehezebb - utána már csak csináljuk.”",
     workout: { flag: "1. NAP", duration: "22 PERC", title: "Foundation · alapozás" },
   },
   reminder: {

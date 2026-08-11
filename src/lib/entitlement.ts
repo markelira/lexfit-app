@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * Access model: all videos are gated — a user needs an active entitlement to
+ * Access model: all videos are gated - a user needs an active entitlement to
  * stream. Previews/catalog are free, playback is not.
  *
  * The decision now lives in the single source of truth (subscriptions/{uid},

@@ -217,7 +217,7 @@ export async function GET(req: Request) {
   // ── F3.3: void Grand Slam offers whose 72h deadline has passed (J4) ──
   const voided = await voidExpiredOffers(now);
 
-  // ── F2.3/F5.2: paused subs — 3-day resume reminder + auto-resume ──
+  // ── F2.3/F5.2: paused subs - 3-day resume reminder + auto-resume ──
   const paused = await adminDb
     .collection(COLLECTIONS.subscriptions)
     .where("status", "==", "PAUSED")
@@ -259,7 +259,7 @@ export async function GET(req: Request) {
     const prog = (await adminDb.doc(`users/${uid}/progress/state`).get()).data() as
       | ProgressDoc
       | undefined;
-    if ((prog?.completed?.length ?? 0) > 0) continue; // already active — skip
+    if ((prog?.completed?.length ?? 0) > 0) continue; // already active - skip
     if (!(await milestoneOnce(uid, "day2_nudge_sent"))) continue;
     const email = await emailFor(uid);
     if (!email) continue;
@@ -270,10 +270,10 @@ export async function GET(req: Request) {
     day2Nudges++;
   }
 
-  // ── Weekly recap — Mondays, covering last Mon–Sun (§4d/16) ──
+  // ── Weekly recap - Mondays, covering last Mon–Sun (§4d/16) ──
   // Skips: opted-out, never-activated (day-2 nudge territory), >21 days
   // inactive (win-back territory, F5.3), and PAST_DUE users (one narrative at
-  // a time — dunning owns the inbox).
+  // a time - dunning owns the inbox).
   let recaps = 0;
   if (today.weekday === 1) {
     const labels = ["H", "K", "Sz", "Cs", "P", "Szo", "V"];

@@ -45,7 +45,7 @@ function Shell({ children }: { children: React.ReactNode }) {
     const uid = user.uid;
     // Fold any freshly finished Mux views into the progress doc (throttled), then
     // derive the streak FRESH the same way Haladásom does (computeStreak over the
-    // dated completions + the user's plan) — never the stored, drift-prone field.
+    // dated completions + the user's plan) - never the stored, drift-prone field.
     syncMuxProgress()
       .then(() => Promise.all([getProgress(uid), getPrefs(uid)]))
       .then(([p, pr]) => {
@@ -94,7 +94,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      {/* Mobile bottom tab bar (< 840px) — labels kept, 44px targets (RULE 06 / F-07). */}
+      {/* Mobile bottom tab bar (< 840px) - labels kept, 44px targets (RULE 06 / F-07). */}
       <nav className="lx-tabbar" aria-label="Fő navigáció">
         {NAV.map(([href, ic, label]) => {
           const on = isActive(href, pathname);

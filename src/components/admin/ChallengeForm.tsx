@@ -64,7 +64,7 @@ export function ChallengeForm({
 
   async function save() {
     if (create && !validSlug) {
-      setErr("Érvényes slug kell (kisbetű, szám, kötőjel — pl. 7-napos-has-kihivas).");
+      setErr("Érvényes slug kell (kisbetű, szám, kötőjel - pl. 7-napos-has-kihivas).");
       return;
     }
     if (!d.title.trim()) {
@@ -118,7 +118,7 @@ export function ChallengeForm({
               Slug {create && <span className="req">*</span>}
             </label>
             <input type="text" value={d.slug} disabled={!create} onChange={(e) => set("slug", e.target.value)} placeholder="7-napos-has-kihivas" />
-            <span className="adm-fhint">{create ? "A kihívás azonosítója az URL-ben — rögzül létrehozás után." : "Rögzített azonosító."}</span>
+            <span className="adm-fhint">{create ? "A kihívás azonosítója az URL-ben - rögzül létrehozás után." : "Rögzített azonosító."}</span>
           </div>
           <div className="adm-frow">
             <label className="adm-flabel">Sorozat (eyebrow)</label>
@@ -142,7 +142,7 @@ export function ChallengeForm({
             <label className="adm-flabel">Rendezési dátum</label>
             <input type="text" value={d.sortDate} onChange={(e) => set("sortDate", e.target.value)} placeholder="2024-11" />
             <span className="adm-fhint">
-              Az archívum e szerint rendez, legújabb elöl. Formátum: ÉÉÉÉ-HH — azonos
+              Az archívum e szerint rendez, legújabb elöl. Formátum: ÉÉÉÉ-HH - azonos
               hónapon belül adj meg napot is (ÉÉÉÉ-HH-NN) a sorrendhez.
             </span>
           </div>
@@ -152,7 +152,7 @@ export function ChallengeForm({
           <div className="adm-frow">
             <label className="adm-flabel">Testrész</label>
             <select value={d.bodyPart} onChange={(e) => set("bodyPart", e.target.value)}>
-              {bodyParts.length === 0 && <option value="">—</option>}
+              {bodyParts.length === 0 && <option value="">-</option>}
               {bodyParts.map((o) => (
                 <option key={o} value={o}>{o}</option>
               ))}

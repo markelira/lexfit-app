@@ -1,4 +1,4 @@
-// LEXFIT icon paths — ported from the prototype's lxPaths (lexfit-shared.jsx).
+// LEXFIT icon paths - ported from the prototype's lxPaths (lexfit-shared.jsx).
 // Stroke-based 24×24 paths; a value may be a single path or an array of paths.
 export const lxPaths: Record<string, string | string[]> = {
   check: "M5 12.5 L10 17.5 L19 7",
@@ -14,7 +14,7 @@ export const lxPaths: Record<string, string | string[]> = {
   play: "M7 4 L19 12 L7 20 Z",
   lock: ["M6 11 H18 V20 H6 Z", "M9 11 V8 a3 3 0 0 1 6 0 V11"],
   search: ["M11 18 a7 7 0 1 0 0-14 a7 7 0 0 0 0 14 Z", "M16 16 L21 21"],
-  // Magnifier with an × in the lens — the "no results" empty state (§20.2 C4).
+  // Magnifier with an × in the lens - the "no results" empty state (§20.2 C4).
   searchX: ["M11 18 a7 7 0 1 0 0-14 a7 7 0 0 0 0 14 Z", "M16 16 L21 21", "M9 9 L13 13", "M13 9 L9 13"],
   filter: ["M4 5 H20", "M7 12 H17", "M10 19 H14"],
   // ── Kezdőlap redesign additions (same 24×24 stroke style) ──
@@ -27,7 +27,7 @@ export const lxPaths: Record<string, string | string[]> = {
   chevronLeft: "M15 18 L9 12 L15 6",
   chevronRight: "M9 6 L15 12 L9 18",
   moon: "M21 12.8 A9 9 0 1 1 11.2 3 A7 7 0 0 0 21 12.8 Z",
-  // ── Player (Lejátszó) — Lucide-style transport + chrome ──
+  // ── Player (Lejátszó) - Lucide-style transport + chrome ──
   rotateCcw: ["M3 12 a9 9 0 1 0 2.64-6.36 L3 8", "M3 3 V8 H8"],
   rotateCw: ["M21 12 a9 9 0 1 1-2.64-6.36 L21 8", "M21 3 V8 H16"],
   pauseBars: ["M9 5 V19", "M15 5 V19"],

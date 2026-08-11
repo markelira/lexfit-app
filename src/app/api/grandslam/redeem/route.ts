@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   if (!token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   try {
-    await lockOfferForRedeem(token.uid); // transactional gate — throws if not redeemable
+    await lockOfferForRedeem(token.uid); // transactional gate - throws if not redeemable
   } catch (e) {
     if (e instanceof RedeemError) {
       return NextResponse.json({ error: e.message }, { status: 409 });

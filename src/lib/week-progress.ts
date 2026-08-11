@@ -1,11 +1,11 @@
 // THE single source of truth for "this week" progress. Every screen that shows
-// weekly status — the home (/app) strip + ring, the Haladásom (/app/progress)
-// week card + ring, and any future indicator — MUST derive from this so the
+// weekly status - the home (/app) strip + ring, the Haladásom (/app/progress)
+// week card + ring, and any future indicator - MUST derive from this so the
 // numbers never diverge again.
 //
 // Canonical inputs:
 //   • training days + weekly target  → the user's PLAN (prefs.plan.weekdays /
-//     .daysPerWeek), the days they actually chose — never the Mux-stamped
+//     .daysPerWeek), the days they actually chose - never the Mux-stamped
 //     `workoutDays` or the onboarding snapshot, which drift after a plan edit.
 //   • "done"                          → dated completions, confirmed
 //     (progress.completed) plus the optimistic pending bridge
@@ -73,13 +73,13 @@ export function computeWeekProgress(opts: {
     };
   });
 
-  // The ring numerator is the number of DONE DAYS this week — one per calendar
+  // The ring numerator is the number of DONE DAYS this week - one per calendar
   // day you trained, exactly the strip's checkmarks. NOT the raw completion
   // count (two workouts on one day is still one done day) and never rest days
   // that had no workout (they only keep the streak). So it always agrees with
   // the checkmarks, the streak, and "elvégzett edzés".
   const doneThisWeek = days.filter((d) => d.done).length;
-  // The weekly target is the number of TRAINING days — the workouts you'll do
+  // The weekly target is the number of TRAINING days - the workouts you'll do
   // that week. Rest days are never counted here; the denominator always equals
   // the count of non-rest cells.
   const target = Math.max(1, training.size || opts.daysPerWeek || 1);

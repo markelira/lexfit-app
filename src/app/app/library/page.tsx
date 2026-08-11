@@ -24,13 +24,13 @@ import { LibrarySkeleton } from "@/components/Skeletons";
 type SpotFilter = { group?: keyof ActiveFilters; opt?: string; kind?: "short" };
 const LIB_SPOTS: { ey: string; title: string; theme: string; word: string; blurb: string; play: string; filter: SpotFilter }[] = [
   { ey: "A HÉT VÁLOGATÁSA", title: "Csendes esték", theme: "Mobilitás / nyújtás", word: "CSEND",
-    blurb: "Amikor elalszik a ház, te akkor is mozoghatsz. Ugrálás és zaj nélküli edzések — a szomszéd se veszi észre.",
+    blurb: "Amikor elalszik a ház, te akkor is mozoghatsz. Ugrálás és zaj nélküli edzések - a szomszéd se veszi észre.",
     play: "N003", filter: { group: "type", opt: "🔇 Csendes" } },
   { ey: "NINCS IDŐD? DE ENNYI VAN", title: "15 perc, ami belefér", theme: "Kardió + has", word: "GYORS",
-    blurb: "A rövid edzés is edzés. Tizenöt perc, amit a napod bármelyik résébe becsúsztathatsz — kifogás nélkül.",
+    blurb: "A rövid edzés is edzés. Tizenöt perc, amit a napod bármelyik résébe becsúsztathatsz - kifogás nélkül.",
     play: "B007", filter: { kind: "short" } },
   { ey: "INDÍTSD MOZGÁSSAL", title: "Reggeli rituálé", theme: "Mobilitás / nyújtás", word: "REGGEL",
-    blurb: "Pár perc átmozgatás ébredés után — és másképp indul az egész napod. Kíméletes, ébresztő flow-k.",
+    blurb: "Pár perc átmozgatás ébredés után - és másképp indul az egész napod. Kíméletes, ébresztő flow-k.",
     play: "R001", filter: { group: "type", opt: "🌅 Reggeli" } },
 ];
 
@@ -48,7 +48,7 @@ const RAIL_FILTER: Record<string, SpotFilter> = {
 };
 
 // Only the two must-have filter dimensions live on the bar. Everything
-// rarer was cut — intensity/type/phase/format added noise without pulling weight.
+// rarer was cut - intensity/type/phase/format added noise without pulling weight.
 const CHIP_DIMS: { key: keyof ActiveFilters; label: string; icon?: string | string[] }[] = [
   { key: "dur", label: "HOSSZ", icon: lxPaths.clock },
   { key: "theme", label: "TESTRÉSZ" },
@@ -63,7 +63,7 @@ const CHIP_ICON: Partial<Record<keyof ActiveFilters, string | string[]>> = {
 // Dimensions that round-trip through the URL (§20.2 C2).
 const SYNC_DIMS: (keyof ActiveFilters)[] = ["phase", "theme", "dur", "level", "format", "type"];
 
-// Value equality for two filter sets — lets the URL-read effect bail out (return the
+// Value equality for two filter sets - lets the URL-read effect bail out (return the
 // same reference) when nothing changed, so it can't loop against the URL-write effect.
 // (This Next version patches history.replaceState → useSearchParams updates, so an
 //  unguarded read effect would re-fire on every write and re-render forever.)
@@ -128,7 +128,7 @@ export default function LibraryPage() {
     return p ? { slug: p.slug, name: p.hu || p.title } : null;
   };
 
-  // Keep the URL meaningful — q + filter state (§20.2 C2). Linkable, analytics-legible.
+  // Keep the URL meaningful - q + filter state (§20.2 C2). Linkable, analytics-legible.
   // Skip the mount write so it can't wipe params we were opened with (e.g. ?q= from the
   // shell search) before the read effect above has applied them.
   const didMountWrite = useRef(false);
@@ -202,7 +202,7 @@ export default function LibraryPage() {
 
   const [spot, setSpot] = useState(0);
   // Only spotlight cards whose "Lejátszás" target actually exists in the
-  // loaded library — the codes are curated, and on fresh prod content they
+  // loaded library - the codes are curated, and on fresh prod content they
   // may not have been uploaded (a dead play button would 404).
   const spots = useMemo(
     () => LIB_SPOTS.filter((s) => (data?.videos ?? []).some((v) => v.code === s.play)),
@@ -224,7 +224,7 @@ export default function LibraryPage() {
     else router.push(`/player/${code}?autostart=1`);
   };
 
-  // Filter bottom sheet — draft state, count updates live, applies on confirm (§1.5).
+  // Filter bottom sheet - draft state, count updates live, applies on confirm (§1.5).
   const cloneFilters = (f: ActiveFilters): ActiveFilters => ({
     phase: new Set(f.phase), theme: new Set(f.theme), dur: new Set(f.dur),
     level: new Set(f.level), format: new Set(f.format), type: new Set(f.type),
@@ -239,7 +239,7 @@ export default function LibraryPage() {
   const applyFilters = () => { setActive(draft); setFilterSheet(false); };
 
   // Count results under a hypothetical filter set (for the sheet's live count and the
-  // no-results "which filter caused it" suggestion — §0.9).
+  // no-results "which filter caused it" suggestion - §0.9).
   const countWith = (f: ActiveFilters): number => {
     if (!data) return 0;
     let r = filterVideos(data.videos, f, data.filters);
@@ -248,7 +248,7 @@ export default function LibraryPage() {
     return r.length;
   };
 
-  // withBadge=false inside a program's own rail — the rail title already names it.
+  // withBadge=false inside a program's own rail - the rail title already names it.
   const card = (v: LibVideo, withBadge = true) => (
     <WorkoutCard
       key={v.code}
@@ -426,7 +426,7 @@ export default function LibraryPage() {
             />
           )}
 
-          {/* Kategóriák — the one browse element that navigates (applies a filter), not plays (§20.3) */}
+          {/* Kategóriák - the one browse element that navigates (applies a filter), not plays (§20.3) */}
           <section className="lib-cats">
             <h2 className="lib-cats-h">Kategóriák</h2>
             <div className="lib-cattiles">
@@ -448,7 +448,7 @@ export default function LibraryPage() {
 
           {filterControls}
 
-          {/* Programok — one rail per published program, playlist order. */}
+          {/* Programok - one rail per published program, playlist order. */}
           {programRails.length > 0 && (
             <section className="lib-cats" style={{ marginBottom: 0 }}>
               <h2 className="lib-cats-h">Programok</h2>
@@ -479,7 +479,7 @@ export default function LibraryPage() {
               />
             ))}
 
-          {/* Minden edzés — the complete library, so no video is unreachable in browse. */}
+          {/* Minden edzés - the complete library, so no video is unreachable in browse. */}
           <Rail
             title="Minden edzés"
             sub={`${data.videos.length} videó`}
@@ -538,7 +538,7 @@ function LibSpotlight({
   count: (theme: string) => number; onPlay: (code: string) => void; onBrowse: (f: SpotFilter) => void;
 }) {
   const s = spots[spot];
-  // The spotlight does NOT auto-advance (§20.6) — carousels that move on their own
+  // The spotlight does NOT auto-advance (§20.6) - carousels that move on their own
   // lose the user's place. The dots stay; the user drives.
   return (
     <section className="lib-spot">

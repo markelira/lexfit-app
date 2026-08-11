@@ -17,7 +17,7 @@ const EARNED = "EARNED_ANNUAL" as const;
 const offerRef = (uid: string) =>
   adminDb.collection(COLLECTIONS.offers).doc(offerDocId(uid, EARNED));
 
-/** Record a daily check-in (community mechanic — runs for EVERY user). The doc
+/** Record a daily check-in (community mechanic - runs for EVERY user). The doc
  *  ID is `{uid}_{Budapest-day}`, so it's naturally one-per-user-per-day. The
  *  route validates that `day` is allowed (today, or yesterday before 04:00). */
 export async function recordCheckin(uid: string, day: string): Promise<void> {
@@ -30,10 +30,10 @@ export async function recordCheckin(uid: string, day: string): Promise<void> {
 /**
  * Try to unlock the kiérdemelt éves (Grand Slam) offer. Idempotent and
  * abuse-safe. STEP ORDER MATTERS:
- *   1. offer-doc existence — if one EVER existed (even voided), stop. This is
+ *   1. offer-doc existence - if one EVER existed (even voided), stop. This is
  *      what stops cancel→resubscribe from starting a fresh earning week.
- *   2. eligibility — weekly/monthly only.
- *   3. window + count — ≥5 check-ins among the 7 window days.
+ *   2. eligibility - weekly/monthly only.
+ *   3. window + count - ≥5 check-ins among the 7 window days.
  *   4. create the offer in a transaction (re-checks non-existence).
  * Returns the created offer, or null.
  */
@@ -120,7 +120,7 @@ export async function markOfferRedeemed(uid: string): Promise<void> {
 }
 
 /**
- * Void offers whose deadline has passed (cron). Expired = voided, FINAL — the
+ * Void offers whose deadline has passed (cron). Expired = voided, FINAL - the
  * offer disappears and never reopens (J4). Single-field inequality query, then
  * filter state in code (no composite index).
  */

@@ -37,7 +37,7 @@ export const BLANK_ONBOARDING: OnboardingAnswers = {
 export interface SignupExtra {
   /** First name from the register form; falls back to the Auth displayName. */
   firstName?: string;
-  /** Marketing opt-in — GDPR opt-in, defaults to false when not provided. */
+  /** Marketing opt-in - GDPR opt-in, defaults to false when not provided. */
   marketing?: boolean;
 }
 

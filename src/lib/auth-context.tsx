@@ -29,7 +29,7 @@ interface AuthState {
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 const googleProvider = new GoogleAuthProvider();
-// Apple returns name/email only on the FIRST authorization — request both scopes
+// Apple returns name/email only on the FIRST authorization - request both scopes
 // so we capture them while we can. Apple's default response locale follows the
 // user's device; the popup UI is Apple-hosted.
 const appleProvider = new OAuthProvider("apple.com");
@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signUpWithEmail(email: string, password: string) {
     // The verification email (P5.4: informational, never an access gate) is now
-    // our branded one, sent server-side by /api/auth/post-register — the
+    // our branded one, sent server-side by /api/auth/post-register - the
     // register flows call it right after ensureUserDoc creates the user doc.
     await createUserWithEmailAndPassword(auth, email, password);
   }
