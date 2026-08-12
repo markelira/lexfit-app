@@ -29,8 +29,25 @@
 .fex-name { flex: none; font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; color: rgba(255,255,255,.66); }
 @keyframes fex-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
+/* Speed is a function of viewport, not of the duration alone: the track scrolls
+   50% of its own width, and that width shrinks with the cards. At 46s a phone got
+   28px/s with only ~2.3 cards on screen - a card takes 6s to cross its own width
+   and there are almost no neighbours to read the movement against, so it looks
+   static. Desktop gets away with the same duration because 7+ cards are visible.
+   22s puts phones at 52-65px/s across 320-430, which reads as a slow drift. */
+@media (max-width: 900px) {
+  .fex-track { animation-duration: 22s; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fex-track { animation: none; }
+  /* Stopping the belt must not strand the content: the marquee clips overflow, so
+     without this every card past the first two is unreachable - reduced motion
+     would mean "you can't see this" rather than "don't move it". Swipe/scroll
+     replaces the animation as the way through. */
+  .fex-marquee { overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .fex-marquee::-webkit-scrollbar { display: none; }
+  .fex-card { scroll-snap-align: center; }
   .fex-frame { transition: none; }
   .fex-card:active .fex-frame { transform: none; }
   @media (hover: hover) { .fex-card:hover .fex-frame { transform: none; } }
