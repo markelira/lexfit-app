@@ -7,6 +7,14 @@
   flex: none; width: 100%; overflow: hidden; padding: 6px 0;
   -webkit-mask: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
   mask: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  /* iOS Safari can paint a -webkit-mask'd subtree once and then fail to repaint it
+     while a child is transform-animating: the belt exists but never updates, which
+     looks exactly like a stopped marquee - and only on the phone, because desktop
+     composites the masked layer differently. Promoting the container to its own
+     layer restores the repaint. */
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 .fex-track { display: flex; width: max-content; animation: fex-scroll 46s linear infinite; will-change: transform; }
 @media (hover: hover) { .fex-marquee:hover .fex-track { animation-play-state: paused; } }
@@ -37,6 +45,11 @@
    22s puts phones at 52-65px/s across 320-430, which reads as a slow drift. */
 @media (max-width: 900px) {
   .fex-track { animation-duration: 22s; }
+  /* Belt-and-braces on the same iOS repaint bug: with the mask gone there is no
+     masked subtree left to mis-composite. The edge fade costs 6% per side, which
+     on a 390px row is ~47px of a strip that only shows two cards - the row reads
+     better without it here anyway. */
+  .fex-marquee { -webkit-mask: none; mask: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
