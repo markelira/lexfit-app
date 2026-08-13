@@ -26,6 +26,25 @@ elutasításkor.
 
 ---
 
+## ⚠️ Amit a Meta varázslója mond, és amit NE csinálj
+
+A Meta „Install code manually" lépése azt írja, hogy illeszd a kódot a `<head>`-be, és
+hogy „telepítsd minden oldalra". **A LEXFIT-nél ezt nem szabad megtenni**, két okból:
+
+1. **Megkerülné a hozzájárulást.** A `<head>`-be írt Pixel minden látogatónál azonnal
+   tüzelne — azoknál is, akik a süti-sávon elutasították. Ez ellentmondana az
+   adatvédelmi tájékoztatónknak (7.1: *„elutasítás esetén semmilyen analitikai
+   mérőkód nem töltődik be"*), és a GDPR hozzájárulási követelményének.
+2. **Duplán számolna**, ha a GTM-ben is ott van.
+
+A `<noscript>` képpontot **szintén hagyd ki**: az JavaScript nélkül is tüzel, tehát
+végképp kikerülné a hozzájárulást — és a GTM Custom HTML tagben amúgy sem működik.
+
+**Ebből következik egy fontos mellékhatás:** a Meta varázslójának „ellenőrizzük a
+telepítést" lépése azt fogja mondani, hogy **nem találja a Pixelt**. Ez nem hiba —
+ez a helyes működés: a Pixel csak azután indul el, hogy a látogató elfogadta a
+sütiket. Az ellenőrzést a GTM Preview módban és a Test events fülön végezzük el.
+
 ## 1. lépés — a Pixel alaptag (PageView)
 
 A GTM konténerben (`NEXT_PUBLIC_GTM_ID`, a Vercel env-ben van beállítva):
@@ -95,16 +114,47 @@ webhookból, a **Conversions API**-n keresztül. Két okból:
 2. **Nincs duplikáció.** Ha csak egy forrás küldi a `Purchase`-t, nem kell
    `event_id`-alapú deduplikációval bajlódni.
 
-**Ez még nincs megépítve** — külön kör, mert két nyitott kérdés van:
+**Megépítve** (`src/lib/meta-capi.ts` + a webhook `maybeReportPurchase` függvénye).
 
-- **Access token:** a Meta felületen a *Conversions API → Set up direct integration →
-  Generate access token* alatt kell előállítani. Ez titkos, a Vercel env-be kerül
-  (`META_CAPI_TOKEN`), soha nem a repóba.
-- **Hozzájárulás:** a webhook szerveroldalon fut, ahol **nem látja** a böngésző
-  süti-döntését. Ha valaki elutasította a sütiket, de fizet, a CAPI-hívás az ő
-  hozzájárulása nélkül küldene adatot (hashelt e-mailt) a Metának. Ezt el kell dönteni,
-  mielőtt megépítjük — a legtisztább megoldás a süti-döntés szerveroldali rögzítése a
-  checkoutkor, és a CAPI-hívás ehhez kötése.
+### Hogyan oldottuk meg a hozzájárulás-kérdést
+
+A webhook szerveroldalon fut, ahol **nem látja** sem a sütiket, sem a süti-sáv
+döntését. A megoldás: a böngésző a checkout-session létrehozásakor ráírja a döntést
+a Stripe **session metadatájára**, és a webhook onnan olvassa vissza.
+
+```
+Böngésző (checkout indul)
+  marketingContext() → { consent, _fbp, _fbc }
+        │
+        ▼
+POST /api/stripe/checkout → Stripe session metadata
+  { adConsent: "granted" | "denied", fbp, fbc }
+        │  (előfizetésnél a subscription_data.metadata is megkapja,
+        │   így a megújulás invoice.paid eseménye is látja)
+        ▼
+Stripe webhook → maybeReportPurchase()
+  adConsent !== "granted"  →  NEM jelent, soha
+  adConsent === "granted"  →  Purchase a CAPI-ra
+```
+
+Mellékhaszon: az `_fbp`/`_fbc` süti a legerősebb párosítási jel, amit a Meta ismer —
+és csak akkor létezik, ha a Pixel lefutott, tehát ha volt hozzájárulás. Elutasításból
+nem tud átszivárogni.
+
+Ellenőrizve: elfogadta → jelent; elutasította / nincs döntés / hamisított érték /
+üres metadata → **nem jelent**. Az e-mail SHA-256 kivonatként megy (trim +
+lowercase normalizálás a Meta elvárása szerint), a nyers cím soha.
+
+### Amit még be kell állítanod
+
+1. **Access token:** *Events Manager → Conversions API → Set up direct integration →
+   Generate access token.* Titkos.
+2. **Vercel env** (mindhárom környezetre):
+   `META_PIXEL_ID=1046558821070494` és `META_CAPI_TOKEN=<a token>`
+   Amíg ez a kettő nincs beállítva, a CAPI **néma** — a fizetés és a webhook
+   érintetlen marad.
+3. Ellenőrzés: *Events Manager → Test events* — ott a szerveroldali események is
+   megjelennek, `Server` forrásmegjelöléssel.
 
 ---
 

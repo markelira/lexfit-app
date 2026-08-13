@@ -35,6 +35,9 @@ export async function POST(req: Request) {
     autoRenew?: boolean;
     immediateStart?: boolean;
     embedded?: boolean; // E2 - embedded Checkout (return clientSecret instead of a redirect url)
+    // Ad-measurement context from the browser, carried to the webhook on the
+    // session metadata (the webhook can see neither cookies nor consent).
+    marketing?: { consent?: string; fbp?: string; fbc?: string };
   };
   const role = body.role;
   if (!role || !isCheckoutRole(role)) {
@@ -80,12 +83,25 @@ export async function POST(req: Request) {
   const customer = await getOrCreateCustomer(token.uid, token.email);
   const price = await priceIdForRole(priceRole);
   const recurring = isRecurringRole(role);
+  // Ad-measurement context. Stored on the session so the webhook can report the
+  // purchase to Meta - but ONLY when the buyer accepted cookies. Anything the
+  // client claims here is advertising metadata, never an access decision, so it
+  // needs no trust: the worst a forged value can do is add or drop one of the
+  // buyer's OWN ad events. `granted` must be explicit; everything else refuses.
+  const mkt = body.marketing ?? {};
+  const adConsent = mkt.consent === "granted" ? "granted" : "denied";
   const meta = {
     uid: token.uid,
     role,
     priceRole,
     consentId,
     scheduleWeekly: String(scheduleWeekly),
+    adConsent,
+    // Meta's own first-party cookies; they only exist when the Pixel ran, i.e.
+    // when consent was given. Truncated to stay well inside Stripe's 500-char
+    // per-value metadata limit.
+    ...(adConsent === "granted" && mkt.fbp ? { fbp: String(mkt.fbp).slice(0, 200) } : {}),
+    ...(adConsent === "granted" && mkt.fbc ? { fbc: String(mkt.fbc).slice(0, 200) } : {}),
   };
 
   const embedded = body.embedded === true;

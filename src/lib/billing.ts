@@ -4,6 +4,7 @@ import { doc, getDoc, getDocs, query, where, collection } from "firebase/firesto
 import { auth, db } from "@/lib/firebase";
 import { COLLECTIONS, subscriptionDocId, checkinDocId } from "@/lib/pricing/keys";
 import { hasAccessFromData, type SubscriptionDoc } from "@/lib/pricing/types";
+import { marketingContext } from "@/lib/track";
 
 async function postJson(
   path: string,
@@ -45,6 +46,7 @@ export async function startCheckout(role: string, consents: Consents): Promise<v
     role,
     autoRenew: consents.autoRenew ?? undefined,
     immediateStart: consents.immediateStart,
+    marketing: marketingContext(),
   });
   if (!body.url) throw new Error("Stripe hiba");
   window.location.href = body.url as string;
@@ -58,6 +60,8 @@ export async function fetchEmbeddedClientSecret(role: string, consents: Consents
     autoRenew: consents.autoRenew ?? undefined,
     immediateStart: consents.immediateStart,
     embedded: true,
+    // Carried to the webhook via Stripe metadata - see marketingContext().
+    marketing: marketingContext(),
   });
   if (!body.clientSecret) throw new Error("Stripe hiba");
   return body.clientSecret as string;

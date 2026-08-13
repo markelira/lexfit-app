@@ -41,3 +41,42 @@ export function trackRegistrationComplete(): void {
 export function trackCheckoutStart(plan?: string): void {
   push("lx_checkout_start", plan ? { plan } : undefined);
 }
+
+/** What the SERVER needs to report a purchase to Meta's Conversions API.
+ *
+ *  Why it is collected here, in the browser, and carried through Stripe:
+ *  the purchase is confirmed by a Stripe webhook, which runs server-side and
+ *  can see neither the cookie-consent decision nor Meta's browser cookies. So
+ *  the client hands both to checkout-session creation, Stripe stores them on
+ *  the session metadata, and the webhook reads them back.
+ *
+ *  - `consent`  — the visitor's own cookie decision. Reporting a purchase to
+ *    Meta is advertising measurement, NOT contract performance, so a visitor
+ *    who declined must not be reported. The webhook honours this.
+ *  - `fbp`/`fbc` — Meta's own first-party cookies, set by the Pixel. They are
+ *    the strongest match signal available and only exist if the visitor
+ *    accepted (no Pixel → no cookies), so they cannot leak from a refusal.
+ */
+export interface MarketingContext {
+  consent: "granted" | "denied";
+  fbp?: string;
+  fbc?: string;
+}
+
+function readCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  const hit = document.cookie.split("; ").find((c) => c.startsWith(`${name}=`));
+  return hit ? decodeURIComponent(hit.slice(name.length + 1)) : undefined;
+}
+
+export function marketingContext(): MarketingContext {
+  let consent: "granted" | "denied" = "denied";
+  try {
+    if (localStorage.getItem("lx-consent") === "granted") consent = "granted";
+  } catch {
+    // Storage blocked (Safari private mode, some in-app browsers) → treat as
+    // refusal. Failing closed is the only safe default for a consent check.
+  }
+  if (consent !== "granted") return { consent };
+  return { consent, fbp: readCookie("_fbp"), fbc: readCookie("_fbc") };
+}

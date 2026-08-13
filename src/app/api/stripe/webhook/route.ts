@@ -13,6 +13,7 @@ import { logEvent } from "@/lib/pricing/events";
 import { issueInvoice, type InvoiceParty } from "@/lib/pricing/invoice";
 import { budapestDay } from "@/lib/pricing/keys";
 import { planDisplay, sendDunningDay0, sendSubscriptionStarted } from "@/lib/mailer";
+import { sendPurchase } from "@/lib/meta-capi";
 import { getAuth } from "firebase-admin/auth";
 import { adminApp } from "@/lib/firebase-admin";
 import {
@@ -165,6 +166,68 @@ async function maybeIssueInvoice(event: Stripe.Event): Promise<void> {
       fulfillmentDate: budapestDay(new Date()),
     });
   }
+}
+
+/**
+ * Report the purchase to Meta's Conversions API - the same two events that
+ * trigger invoicing, because those are the ones where money actually arrived.
+ *
+ * ONLY with the buyer's cookie consent. The browser stamped its decision onto
+ * the Checkout session metadata (`adConsent`) at session creation; for
+ * subscription renewals the same metadata is copied onto the subscription, so
+ * `invoice.paid` can read it back. No "granted" → no report, ever.
+ *
+ * Idempotent: `event_id` is the Stripe invoice / payment-intent id, so a Stripe
+ * retry (or a renewal of the same invoice) is deduped by Meta itself.
+ */
+async function maybeReportPurchase(event: Stripe.Event): Promise<void> {
+  const read = (m: Stripe.Metadata | null | undefined) => ({
+    adConsent: m?.adConsent,
+    fbp: m?.fbp,
+    fbc: m?.fbc,
+  });
+
+  let id: string | null = null;
+  let valueHuf = 0;
+  let email: string | null = null;
+  let when = 0;
+  let mkt: { adConsent?: string; fbp?: string; fbc?: string } = {};
+
+  if (event.type === "invoice.paid") {
+    const inv = event.data.object as Stripe.Invoice;
+    if (!inv.amount_paid) return;
+    const sub = inv.parent?.subscription_details?.subscription;
+    const subMeta =
+      sub && typeof sub !== "string" ? sub.metadata : inv.parent?.subscription_details?.metadata;
+    mkt = read(subMeta);
+    id = inv.id ?? null;
+    valueHuf = Math.round(inv.amount_paid / 100);
+    email = inv.customer_email ?? null;
+    when = inv.status_transitions?.paid_at ?? inv.created;
+  } else if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    if (session.mode !== "payment" || !session.amount_total) return; // subs → invoice.paid
+    mkt = read(session.metadata);
+    id =
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : (session.payment_intent?.id ?? session.id);
+    valueHuf = Math.round(session.amount_total / 100);
+    email = session.customer_details?.email ?? null;
+    when = Math.floor(Date.now() / 1000);
+  } else {
+    return;
+  }
+
+  if (mkt.adConsent !== "granted" || !id) return;
+  await sendPurchase({
+    eventId: id,
+    eventTime: when,
+    valueHuf,
+    email,
+    fbp: mkt.fbp,
+    fbc: mkt.fbc,
+  });
 }
 
 /**
@@ -333,6 +396,8 @@ export async function POST(req: Request) {
     await maybeDunning(event);
     // "Elindult az előfizetésed" (gated once per checkout session).
     await maybeSubscriptionStarted(event, write);
+    // Meta Conversions API - consent-gated, best-effort (never throws).
+    await maybeReportPurchase(event);
   } catch (e) {
     // Non-2xx tells Stripe to retry; the dedup record is only written on success.
     return new Response(`handler error: ${e instanceof Error ? e.message : ""}`, {
