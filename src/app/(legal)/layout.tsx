@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/Analytics";
 import "./legal.css";
 
 export default function LegalLayout({ children }: { children: ReactNode }) {
@@ -17,6 +18,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
       <footer className="legal-foot">
         <span>© AM Studios Group Kft.</span>
         <a href="mailto:info@amstudios.hu">info@amstudios.hu</a>
+        <CookieSettingsButton className="legal-cookie-btn" />
       </footer>
     </div>
   );

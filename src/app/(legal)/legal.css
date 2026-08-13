@@ -81,6 +81,13 @@
   flex-wrap: wrap;
 }
 .legal-foot a { color: inherit; }
+/* Consent withdrawal (GDPR 7. cikk (3)) - a button, not a link: it reopens the
+   cookie banner in place instead of navigating. Styled as the sibling links. */
+.legal-foot .legal-cookie-btn {
+  color: inherit; font: inherit; background: none; border: 0; padding: 0;
+  cursor: pointer; text-decoration: none;
+}
+.legal-foot .legal-cookie-btn:hover { text-decoration: underline; }
 
 @media print {
   .legal-top, .legal-foot { display: none; }

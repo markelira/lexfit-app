@@ -2,21 +2,9 @@
 
 **LEXFIT — online otthoni edzésprogram-szolgáltatás**
 
-Hatályos: 2026. [hónap] [nap] napjától.
+Hatályos: 2026. augusztus 11. napjától.
 
 A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete (általános adatvédelmi rendelet, **GDPR**) 13–14. cikke, valamint az információs önrendelkezési jogról és az információszabadságról szóló 2011. évi CXII. törvény (**Infotv.**) alapján készült.
-
----
-
-## **[KITÖLTENDŐ]** — a tulajdonos által megadandó, még hiányzó adatok
-
-| # | Mező | Helye a dokumentumban |
-|---|------|----------------------|
-| 1 | Hatálybalépés dátuma: 2026. [hónap] [nap] — az éles indulás napján töltendő ki | fejléc |
-| 2 | Ügyvédi ellenőrzés (a dokumentum végén lévő megjegyzések szerint) | teljes dokumentum |
-| 3 | A hozzájárulás visszavonását szolgáló felület (süti-beállítások újranyitása) — lásd a záró megjegyzések 10. pontját | 7.4. pont |
-
-*Kitöltve 2026-08-08: adatkezelő képviselője (Kecskeméti Ádám), weboldal (https://lexfit.hu), adatvédelmi tisztviselő: nincs (a GDPR 37. cikk szerinti kijelölési kötelezettség nem áll fenn — ügyvédi ellenőrzés alatt).*
 
 ---
 
@@ -28,7 +16,7 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 - **Képviselő:** Kecskeméti Ádám
 - **E-mail (adatvédelmi megkeresések):** info@amstudios.hu
 - **Weboldal:** https://lexfit.hu
-- **Adatvédelmi tisztviselő:** nincs (a GDPR 37. cikk szerinti kijelölési kötelezettség nem áll fenn — ügyvédi ellenőrzés alatt)
+- **Adatvédelmi tisztviselő:** nincs (a GDPR 37. cikk szerinti kijelölési kötelezettség nem áll fenn)
 
 ## 2. Alapelvek, az adatkezelés környezete
 
@@ -148,7 +136,7 @@ A Weboldal első látogatásakor süti-sáv jelenik meg. **A látogató döntés
 
 A hozzájárulás alapján kezelt adatok körét és megőrzési idejét a 3.1. táblázat **k)** sora, a Google mint címzett szerepét az 5. pont tartalmazza.
 
-7.4. **A hozzájárulás visszavonása.** A hozzájárulás bármikor, korlátozás nélkül visszavonható a böngésző helyi tárolójának (localStorage) törlésével, amely a `lx-consent` bejegyzést is eltávolítja; ezt követően a süti-sáv ismét megjelenik, és a látogató új döntést hozhat. A visszavonás a korábbi adatkezelés jogszerűségét nem érinti.
+7.4. **A hozzájárulás visszavonása.** A hozzájárulás bármikor, korlátozás nélkül visszavonható: a Weboldal láblécében található **„Süti-beállítások"** gombra kattintva a süti-sáv ismét megjelenik, és a látogató új döntést hozhat. A visszavonás így ugyanolyan egyszerű, mint a hozzájárulás megadása (GDPR 7. cikk (3)). Elutasítás esetén a mérőkódok a továbbiakban nem töltődnek be. A visszavonás a korábbi adatkezelés jogszerűségét nem érinti.
 
 7.5. Ha az Adatkezelő a jövőben további analitikai vagy marketingcélú mérőkódot (pl. közösségi média hirdetési pixelt) vezet be, azt kizárólag a fenti hozzájárulási mechanizmus mellett teszi, és e tájékoztatót — a 10. pont szerinti értesítés mellett — ennek megfelelően módosítja.
 
@@ -173,45 +161,3 @@ Az Adatkezelő a GDPR 32. cikke szerinti technikai és szervezési intézkedése
 ## 10. A tájékoztató módosítása
 
 Az Adatkezelő a jelen tájékoztatót jogosult módosítani (pl. új funkció vagy szolgáltató bevezetésekor). A lényeges módosításokról a felhasználók e-mailben vagy az alkalmazásban kapnak értesítést; a mindenkor hatályos változat a Weboldalon érhető el.
-
-<!--
-LAWYER REVIEW NOTES (nem publikálandó — a magyar jogász figyelmébe):
-
-1. Haladási fotók jogalapja (3.1 f / 3.2): a tájékoztató hozzájárulásra (6. cikk (1) a)) épít. Ellenőrizendő, hogy a fotók — mivel testalkat-változás követésére szolgálnak — minősülhetnek-e egészségügyi (9. cikk) adatnak; ha igen, 9. cikk (2) a) szerinti KIFEJEZETT hozzájárulás szükséges a feltöltési felületen (checkbox-szövegezés).
-2. Edzésnapló / haladási adatok: hasonló 9. cikk-kockázat („fitness adat" mint egészségadat) — a jelenlegi minősítés (szerződés teljesítése, nem különleges adat) megerősítendő.
-3. Mux mint címzett: az IP-cím és lejátszási adatok USA-ba továbbítása — ellenőrizendő a Mux aktuális DPF-tanúsítási státusza és DPA-ja; ha nincs DPF, SCC + transzfer-hatásvizsgálat (TIA) szükséges. Ugyanez Twilio SendGrid és Vercel esetén.
-4. Megőrzési idők: a c) sor 5 éves (Ptk. elévülés) és a j) sor Fgytv. 17/A. § szerinti 5 éves ideje megerősítendő; az exportnapló és a consent-rekordok megőrzése arányosítandó.
-5. Cookie-szakasz (7. pont): a feltétlenül szükséges tárolás (7.2) hozzájárulás-mentessége ellenőrizendő az Eht. 155. § (4) és a NAIH gyakorlata szerint, különös tekintettel a Mux-lejátszó és a Stripe technikai tárolására.
-6. A 30 napos törlési türelmi idő (6.3): a GDPR 17. cikkével való összhang (indokolatlan késedelem nélküli törlés vs. visszavonási ablak) — a jelenlegi gyakorlatban a fiók azonnal zárolásra kerül, ez rögzítve; megerősítendő, hogy ez elegendő.
-7. Adatvédelmi tisztviselő kijelölésének szükségessége (37. cikk) — a rendszeres, nagymértékű nyomon követés kérdése a haladáskövetés fényében.
-8. Az e-mail-emlékeztetők Grtv. (2008. évi XLVIII. tv.) 6. § szerinti minősítése: a megújulási/fizetési e-mailek tranzakciósak, de a motivációs/edzés-emlékeztetők reklámnak minősülhetnek → a hozzájárulás szövegezése a beállítási felületen ellenőrizendő.
-
---- A 2026-08-13-i analitikai frissítéssel bekerült pontok ---
-
-9. **ELŐZMÉNY, AMIT JOGÁSZNAK ÉRTÉKELNIE KELL:** a Google Analytics 4 és a Google Tag
-   Manager 2026-08-09 óta (a `4eaf2b7` deploy óta) él a Weboldalon, hozzájárulás-alapú
-   sávval együtt. E tájékoztató **2026-08-13-ig ezzel ellentétesen** azt állította, hogy
-   az Adatkezelő nem végez analitikai követést és hogy „a weboldalon nincs
-   süti-hozzájárulási sáv". A jelen módosítás ezt az ellentmondást szünteti meg.
-   Értékelendő, hogy a ~4 napos időszak igényel-e bármilyen további lépést
-   (a mérés maga végig hozzájáruláshoz volt kötve, tehát az érintettektől hozzájárulás
-   nélkül adat nem került a Google-höz — a hiba a tájékoztatás, nem a gyakorlat oldalán
-   állt fenn).
-10. **A hozzájárulás visszavonásának módja (7.4) — a legfontosabb nyitott pont.** A
-    hozzájárulás megadása egy kattintás, a visszavonás viszont jelenleg a böngésző helyi
-    tárolójának manuális törlését igényli. A GDPR 7. cikk (3) bekezdése szerint a
-    visszavonásnak **ugyanolyan egyszerűnek kell lennie**, mint a megadásnak.
-    Javasolt fejlesztés: a süti-beállítások újranyitására szolgáló link az oldal
-    láblécében vagy az adatvédelmi oldalon. Amíg ez nincs meg, a 7.4. pont szövegezése
-    megfelelőségi kockázatot hordoz.
-11. GA4 adatmegőrzési idő (3.1 k) sor): a Google Analytics tulajdonban ténylegesen
-    beállított érték (2 vagy 14 hónap) ellenőrizendő és a táblázatba konkrétan
-    beírandó.
-12. A 7.3. táblázat sütilistája a jelenlegi tag-készletet tükrözi. Ha a GTM
-    konténerbe további mérőkód kerül (tervezett: Meta Pixel), a lista és a 2.3., 5. és
-    7.5. pont **a bevezetés előtt** frissítendő; ekkor a hirdetési célú adatkezelés
-    jogalapja és az 5. pont „hirdetési célra nem ad át" fordulata is felülvizsgálandó.
-13. Mérlegelendő a Google Consent Mode és az IP-anonimizálás beállítása, valamint hogy
-    a süti-sáv jelenlegi szövege („Sütiket használunk a látogatottság méréséhez (Google
-    Analytics)") a tag-készlet bővülésekor pontatlanná válik.
--->

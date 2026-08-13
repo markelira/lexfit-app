@@ -455,6 +455,14 @@
 /* Were 18px tall with a 0px gap between two of them - guaranteed mis-taps. */
 .lxl .foot .legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; }
 .lxl .foot .legal a { color: var(--ink); opacity: .85; margin-left: 0; display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px; }
+/* The consent-withdrawal control sits among the legal links and must read as one
+   of them - it is a <button> because it opens the banner rather than navigating. */
+.lxl .foot .legal .lx-cookie-btn {
+  color: var(--ink); opacity: .85; display: inline-flex; align-items: center; min-height: 32px;
+  padding: 0 10px; background: none; border: 0; cursor: pointer;
+  font: inherit; text-decoration: none;
+}
+.lxl .foot .legal .lx-cookie-btn:hover { opacity: 1; }
 
 /* ---- stage-3 interaction layer ---- */
 /* Smooth anchor travel on the landing only; instant under reduced motion. */

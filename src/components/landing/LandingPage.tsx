@@ -17,6 +17,7 @@ import { NcardModal, type CardVideo } from "@/components/NcardModal";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { ProgramBanner, bannerChips, bannerEyebrow, CATEGORY_WORD } from "@/components/ProgramBanner";
 import { FinishExamples } from "@/components/finish/FinishExamples";
+import { CookieSettingsButton } from "@/components/Analytics";
 import { WeekPicker } from "@/components/landing/WeekPicker";
 import { FbGroupCard } from "@/components/landing/FbGroupCard";
 import { LexMark } from "@/components/LexMark";
@@ -1044,7 +1045,7 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
           </div>
           <div className="legal">
             <a href="/aszf">Felhasználási feltételek</a> | <a href="/adatvedelem">Adatvédelem</a> |{" "}
-            <a href="/impresszum">Impresszum</a>
+            <a href="/impresszum">Impresszum</a> | <CookieSettingsButton className="lx-cookie-btn" />
           </div>
         </div>
       </div>
