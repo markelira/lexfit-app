@@ -24,7 +24,7 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 
 2.2. A felhasználói adatok elsődleges tárolási helye a Google Firebase platform (Firestore adatbázis, Authentication, Cloud Storage), amelynek régiója **europe-west3 (Frankfurt, Németország)** — az adatok tehát alapértelmezetten az Európai Unióban tárolódnak.
 
-2.3. Az Adatkezelő a Weboldalon webanalitikai célú mérést végez (Google Analytics 4, Google Tag Manager), **kizárólag a látogató előzetes, önkéntes hozzájárulása alapján**: hozzájárulás hiányában egyetlen mérőkód sem töltődik be és analitikai süti nem kerül elhelyezésre (részletesen a 7. pont). Az Adatkezelő a személyes adatokat nem értékesíti.
+2.3. Az Adatkezelő a Weboldalon webanalitikai és hirdetésmérési célú mérést végez (Google Analytics 4, Google Tag Manager, Meta Pixel), **kizárólag a látogató előzetes, önkéntes hozzájárulása alapján**: hozzájárulás hiányában egyetlen mérőkód sem töltődik be és analitikai vagy hirdetési süti nem kerül elhelyezésre (részletesen a 7. pont). Az Adatkezelő a személyes adatokat nem értékesíti.
 
 2.4. Az Adatkezelő nem hoz a GDPR 22. cikke szerinti, kizárólag automatizált adatkezelésen alapuló, joghatással járó döntést. A szolgáltatáson belüli személyre szabás (pl. a regisztrációs kérdőív válaszai alapján ajánlott edzésbeosztás, aktivitásalapú kedvezményajánlatok) a szerződés teljesítésének része, és nem jár az érintettre nézve joghatással vagy hasonlóan jelentős hatással.
 
@@ -45,6 +45,7 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 | **i) „Finish Share" — edzés utáni megosztókép** | (1) b) — szerződés teljesítése (kizárólag a statisztikákra) | Lásd 3.3. pont — **a szelfi nem kerül feltöltésre** | A telefon–számítógép átadási munkamenet adatai (kizárólag edzésstatisztika) **15 perc** után lejárnak és törlődnek |
 | **j) Panaszkezelés, érintetti kérelmek** | (1) c) — jogi kötelezettség; f) — jogos érdek (igényérvényesítés) | A panasz/kérelem tartalma, a válasz, azonosító adatok; az adatexport-kérések napi darabszámát rögzítő technikai napló | Fgytv. szerinti panasznyilvántartás: 5 év; érintetti kérelmek dokumentálása: 5 év |
 | **k) Webanalitika (látogatottságmérés)** | (1) a) — hozzájárulás (süti-sáv) | A Google Analytics 4 által kezelt adatok: álnevesített ügyfél-azonosító (süti), IP-cím, eszköz- és böngészőadatok, megtekintett oldalak és események. **Kizárólag a hozzájáruló látogatókra terjed ki.** | A Google Analytics tulajdonban beállított adatmegőrzési idő szerint, illetve a hozzájárulás visszavonásáig |
+| **l) Hirdetésmérés és -optimalizálás (Meta Pixel)** | (1) a) — hozzájárulás (süti-sáv) | Álnevesített hirdetési azonosító (süti), IP-cím, eszköz- és böngészőadatok, a megtekintett oldal címe és tartalmi jellemzői, valamint a tölcsér eseményei (kérdőív indítása, regisztráció, fizetési lépés elérése). **Kizárólag a hozzájáruló látogatókra terjed ki.** A Meta „automatikus haladó párosítás" (hashelt e-mail/telefonszám küldése) funkciója **kikapcsolva**. | A Meta adatmegőrzési szabályai szerint, illetve a hozzájárulás visszavonásáig |
 
 ### 3.2. Külön figyelmet érdemlő adatkör: haladási fotók
 
@@ -84,8 +85,9 @@ Az Adatkezelő az alábbi adatfeldolgozókat, illetve önálló adatkezelőként
 | **Vercel Inc.** (USA) | webalkalmazás-tárhely és -kiszolgálás | a kiszolgáláshoz szükséges technikai adatok (IP-cím, kérésnaplók) | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
 | **Google LLC — reCAPTCHA (Firebase App Check)** | visszaélés- és botvédelem (a kérések valódi alkalmazásból való származásának ellenőrzése) | eszköz- és böngészőadatok, IP-cím, felhasználói interakciós jelek; a feldolgozás a Google reCAPTCHA feltételei szerint történik | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC. A reCAPTCHA használatára a Google [Adatvédelmi irányelvei](https://policies.google.com/privacy) és [Szolgáltatási feltételei](https://policies.google.com/terms) irányadók |
 | **Google Ireland Ltd. / Google LLC — Google Analytics 4, Google Tag Manager** | webanalitika (látogatottságmérés), mérőkód-kezelés | álnevesített ügyfél-azonosító, IP-cím, eszköz- és böngészőadatok, oldalmegtekintési és eseményadatok | **Kizárólag a látogató hozzájárulása esetén.** A Google LLC az EU–USA adatvédelmi keret (DPF) tanúsított résztvevője; kiegészítésként SCC |
+| **Meta Platforms Ireland Ltd. / Meta Platforms, Inc. — Meta Pixel** | hirdetésmérés és hirdetésoptimalizálás | álnevesített hirdetési azonosító, IP-cím, eszköz- és böngészőadatok, az oldal címe és tartalmi jellemzői, tölcséresemények | **Kizárólag a látogató hozzájárulása esetén.** EU-s szerződő fél; USA-ba történő továbbításra a Meta Platforms, Inc. DPF-tanúsítása, illetve SCC. A Meta a hirdetésmérés tekintetében **közös adatkezelőként** jár el (Meta Business Tools feltételek) |
 
-Az Adatkezelő személyes adatot a fentieken túl kizárólag jogszabályi kötelezettség alapján (pl. NAV, hatóság, bíróság megkeresésére) továbbít. Az Adatkezelő személyes adatot hirdetési célra nem ad át és nem értékesít.
+Az Adatkezelő személyes adatot a fentieken túl kizárólag jogszabályi kötelezettség alapján (pl. NAV, hatóság, bíróság megkeresésére) továbbít. Az Adatkezelő személyes adatot nem értékesít; hirdetési célú adattovábbítás kizárólag a fenti táblázat szerinti, **hozzájáruláshoz kötött** hirdetésmérés keretében történik.
 
 ## 6. Az érintettek jogai
 
@@ -127,18 +129,25 @@ A Weboldal első látogatásakor süti-sáv jelenik meg. **A látogató döntés
 | A Stripe fizetési oldal saját sütijei | süti (a Stripe domainjén) | biztonságos fizetés, csalásmegelőzés | a Stripe tájékoztatója szerint |
 | A Mux videolejátszó technikai tárolása | helyi tárolás | a lejátszás működése és minősége | munkamenethez kötött |
 
-7.3. Hozzájárulás alapján működő analitikai eszközök (GDPR 6. cikk (1) a)):
+7.3. Hozzájárulás alapján működő analitikai és hirdetésmérési eszközök (GDPR 6. cikk (1) a)):
 
 | Eszköz | Szolgáltató | Cél | Elhelyezett tárolás |
 |---|---|---|---|
 | **Google Analytics 4** (gtag.js) | Google Ireland Ltd. / Google LLC | látogatottság- és használatmérés a szolgáltatás fejlesztéséhez | `_ga` előtagú analitikai sütik |
 | **Google Tag Manager** | Google Ireland Ltd. / Google LLC | a mérőkódok kezelése (önmagában nem gyűjt adatot, a benne elhelyezett mérőkódokat tölti be) | a betöltött mérőkód szerint |
+| **Meta Pixel** | Meta Platforms Ireland Ltd. | a hirdetések eredményességének mérése és optimalizálása | `_fbp` (és hirdetésre érkezéskor `_fbc`) hirdetési sütik |
 
-A hozzájárulás alapján kezelt adatok körét és megőrzési idejét a 3.1. táblázat **k)** sora, a Google mint címzett szerepét az 5. pont tartalmazza.
+A hozzájárulás alapján kezelt adatok körét és megőrzési idejét a 3.1. táblázat **k)** és **l)** sora, a Google és a Meta mint címzett szerepét az 5. pont tartalmazza.
+
+A Meta Pixel a beállítása szerint az oldal tartalmi jellemzőit (pl. oldalcím, a
+látogatott oldalon szereplő médiaelemek címe és hivatkozása, ár) is továbbítja a
+Metának. A Weboldalon szereplő tagfotók közzététele az érintett tagok kifejezett
+engedélyével történik; a felhasználók saját haladási fotói **soha nem nyilvánosak**,
+így a hirdetésmérésbe sem kerülnek be (3.2. pont).
 
 7.4. **A hozzájárulás visszavonása.** A hozzájárulás bármikor, korlátozás nélkül visszavonható: a Weboldal láblécében található **„Süti-beállítások"** gombra kattintva a süti-sáv ismét megjelenik, és a látogató új döntést hozhat. A visszavonás így ugyanolyan egyszerű, mint a hozzájárulás megadása (GDPR 7. cikk (3)). Elutasítás esetén a mérőkódok a továbbiakban nem töltődnek be. A visszavonás a korábbi adatkezelés jogszerűségét nem érinti.
 
-7.5. Ha az Adatkezelő a jövőben további analitikai vagy marketingcélú mérőkódot (pl. közösségi média hirdetési pixelt) vezet be, azt kizárólag a fenti hozzájárulási mechanizmus mellett teszi, és e tájékoztatót — a 10. pont szerinti értesítés mellett — ennek megfelelően módosítja.
+7.5. Ha az Adatkezelő a jövőben további analitikai vagy marketingcélú mérőkódot vezet be, azt kizárólag a fenti hozzájárulási mechanizmus mellett teszi, és e tájékoztatót — a 10. pont szerinti értesítés mellett — ennek megfelelően módosítja.
 
 ## 8. Adatbiztonság
 

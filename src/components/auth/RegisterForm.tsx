@@ -6,6 +6,7 @@ import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 import { ensureUserDoc, saveOnboarding, BLANK_ONBOARDING } from "@/lib/user";
 import { readDraft, clearDraft } from "@/lib/onboarding-draft";
+import { trackRegistrationComplete } from "@/lib/track";
 import { authErrorHu, GoogleMark, EyeIcon } from "@/app/login/AuthScreen";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -56,6 +57,9 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
       const created = await ensureUserDoc(user, pendingRef.current ?? undefined);
       pendingRef.current = null;
       if (created) {
+        // `created` is true only for a brand-new account - a returning
+        // sign-in must never count as a registration.
+        trackRegistrationComplete();
         // Fire-and-forget: welcome + (password accounts) branded verification
         // email. Server-gated on account freshness + milestone docs.
         user

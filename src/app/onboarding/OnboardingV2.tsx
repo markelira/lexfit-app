@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { hasOnboarded } from "@/lib/user";
 import { paidDestination } from "@/lib/billing";
 import { readDraft, writeDraft, clearDraft, type DraftAnswers } from "@/lib/onboarding-draft";
+import { trackCheckoutStart, trackOnboardingStart } from "@/lib/track";
 import { FIRST_WORKOUT } from "@/lib/foundation-preview";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
@@ -179,7 +180,13 @@ export function OnboardingV2() {
   // localStorage is an external-system sync, not React state.
   useEffect(() => {
     if (step === "welcome") return;
-    if (startedAtRef.current === 0) startedAtRef.current = readDraft()?.startedAt ?? Date.now();
+    if (startedAtRef.current === 0) {
+      const prior = readDraft()?.startedAt;
+      startedAtRef.current = prior ?? Date.now();
+      // No prior draft = a genuinely new funnel run, not a resume. This is the
+      // one moment the visitor commits to the questionnaire.
+      if (prior == null) trackOnboardingStart();
+    }
     writeDraft({
       v: 1,
       idx: STEPS.indexOf(step),
@@ -193,6 +200,16 @@ export function OnboardingV2() {
     const n = STEPS[Math.max(0, Math.min(STEPS.length - 1, idx + delta))];
     goto(n);
   };
+
+  // The paywall was reached. Keyed on `step` so a back-and-forth to `account`
+  // and again to `pay` does not double-count within one mount.
+  const paidStepSeenRef = useRef(false);
+  useEffect(() => {
+    if (step !== "pay" || paidStepSeenRef.current) return;
+    paidStepSeenRef.current = true;
+    trackCheckoutStart(answers.plan);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   // Move focus to the step heading on change; announce politely (40 §40.12).
   useLayoutEffect(() => {

@@ -11,9 +11,15 @@ import "./analytics-consent.css";
 //
 // Two independent loaders, each off until its env var is set:
 //   NEXT_PUBLIC_GA_ID  (G-…)   - GA4 via gtag.js, wired directly in code.
-//   NEXT_PUBLIC_GTM_ID (GTM-…) - the GTM container, for future marketing tags.
+//   NEXT_PUBLIC_GTM_ID (GTM-…) - the GTM container; the Meta Pixel lives here.
 // IMPORTANT: do NOT also add the same G-… as a Google Tag inside the GTM
 // container - pageviews would double-count.
+//
+// The Meta Pixel is deliberately NOT in this file: it sits in the GTM
+// container, which means it inherits this consent gate for free (GTM itself
+// only loads on "granted"), and new marketing tags never need a deploy. The
+// app only emits vendor-neutral `lx_*` dataLayer events (src/lib/track.ts) -
+// the container maps those to Meta's event names.
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -92,7 +98,8 @@ export function Analytics() {
       {consent === null && (
         <div className="lx-consent" role="dialog" aria-label="Sütik">
           <p className="lx-consent-txt">
-            Sütiket használunk a látogatottság méréséhez (Google Analytics). Részletek:{" "}
+            Sütiket használunk a látogatottság méréséhez és hirdetéseink méréséhez
+            (Google Analytics, Meta Pixel). Részletek:{" "}
             <a href="/adatvedelem">Adatkezelési tájékoztató</a>.
           </p>
           <div className="lx-consent-btns">
