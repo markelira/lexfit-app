@@ -23,23 +23,23 @@ interface BenefitInput {
 // theme → { the three intensity buckets }. Each phrase ≤ ~28 chars, one line.
 const BENEFIT: Record<string, Record<Bucket, string>> = {
   "Alsótest": {
-    strength: "Feszes comb, kerek fenék",
-    burn: "Égeti a combot, formál",
+    strength: "Comb, fenék, vádli",
+    burn: "Comb és fenék, felpörgetve",
     calm: "Kioldott csípő, nyújtott comb",
   },
   "Felsőtest": {
     strength: "Erős kar, feszes hát",
-    burn: "Tónus a karban, égető",
+    burn: "Kar és váll, dinamikusan",
     calm: "Nyitott váll, oldott nyak",
   },
   "Kardió + has": {
-    strength: "Lapos has, stabil törzs",
-    burn: "Zsírégetés, felpörgő pulzus",
+    strength: "Stabil törzs, erős has",
+    burn: "Felpörgő pulzus, ugrálás nélkül",
     calm: "Enyhe kardió, has-fókusz",
   },
   "Teljes test": {
     strength: "Erő az egész testben",
-    burn: "Kalóriaégető, teljes test",
+    burn: "Teljes test, egy körben",
     calm: "Átmozgató, kíméletes",
   },
   "Mobilitás / nyújtás": {
@@ -49,7 +49,7 @@ const BENEFIT: Record<string, Record<Bucket, string>> = {
   },
   "Tartás-fókusz": {
     strength: "Egyenes hát, erős törzs",
-    burn: "Törzs-égető, tartásjavító",
+    burn: "Aktív törzs, egyenes hát",
     calm: "Oldott hát, jobb tartás",
   },
 };
