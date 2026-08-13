@@ -10,8 +10,9 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
+import * as Sentry from "@sentry/nextjs";
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "@/lib/firebase";
+import { auth, initAppCheck } from "@/lib/firebase";
 
 interface AuthState {
   user: User | null;
@@ -36,6 +37,19 @@ const appleProvider = new OAuthProvider("apple.com");
 appleProvider.addScope("email");
 appleProvider.addScope("name");
 
+/** Rendered as AuthProvider's FIRST child: mount effects flush in depth-first
+ *  tree order, so this leaf's effect runs before any page/child effect that
+ *  might call Firebase (e.g. /auth/action's verifyPasswordResetCode on mount).
+ *  A parent-level effect would run AFTER every child effect - too late. Still
+ *  post-hydration on purpose: App Check injects its reCAPTCHA container into
+ *  <body>, which must not race React hydration (see initAppCheck's comment). */
+function AppCheckInit() {
+  useEffect(() => {
+    initAppCheck();
+  }, []);
+  return null;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,6 +59,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
+      // uid only - never email/name (privacy posture matches the replay
+      // masking: LEXFIT handles body-image-sensitive content).
+      Sentry.setUser(u ? { id: u.uid } : null);
     });
   }, []);
 
@@ -84,6 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{ user, loading, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail, signOutUser, refreshUser }}
     >
+      <AppCheckInit />
       {children}
     </AuthContext.Provider>
   );

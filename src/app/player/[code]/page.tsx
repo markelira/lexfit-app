@@ -161,7 +161,9 @@ function PlayerScreen({ code }: { code: string }) {
   // "Stamped": every block has a real start time → use exact seconds; else fall back
   // to proportional-minutes. `bounds` stays as fractions of `dur` so all the math below
   // is identical for both paths.
-  const stamped = blocks.length > 0 && blocks.every((b) => typeof b.start === "number");
+  // Number.isFinite, not typeof: a NaN stamp is typeof "number" and would sail
+  // through into the bounds math → NaN blockEndSec → non-finite seek throw.
+  const stamped = blocks.length > 0 && blocks.every((b) => Number.isFinite(b.start));
   const bounds = useMemo(() => {
     if (stamped && dur > 0) {
       return blocks.map((b, i) => {
@@ -306,7 +308,9 @@ function PlayerScreen({ code }: { code: string }) {
         saveResume(user.uid, code, t);
       }
     };
-    const onMeta = () => { setDur(el.duration ?? 0); durRef.current = el.duration ?? 0; };
+    // ?? only catches null/undefined - a NaN duration would poison `dur` and
+    // silently disable every seek, so normalize with Number.isFinite.
+    const onMeta = () => { const d = Number.isFinite(el.duration) ? el.duration : 0; setDur(d); durRef.current = d; };
     const onPlay = () => setPaused(false);
     const onPause = () => setPaused(true);
     const onEnd = () => finish();
@@ -335,12 +339,27 @@ function PlayerScreen({ code }: { code: string }) {
   const togglePlay = () => {
     const el = playerRef.current;
     if (!el) return;
-    el.paused ? el.play() : el.pause();
+    // play() returns a promise that rejects with AbortError when a seek/pause
+    // interrupts it (chapter-bar scrub while autoplaying). Harmless - but
+    // unhandled it escapes to onunhandledrejection and lands in Sentry.
+    el.paused ? el.play()?.catch(() => {}) : el.pause();
   };
-  const seekTo = (sec: number) => { const el = playerRef.current; if (el && dur) el.currentTime = Math.max(0, Math.min(dur - 0.1, sec)); };
-  const rewind = () => { const el = playerRef.current; if (el) el.currentTime = Math.max(0, el.currentTime - 10); };
-  const forward = () => { const el = playerRef.current; if (el && dur) el.currentTime = Math.min(dur - 0.1, el.currentTime + 10); };
-  const skip = () => { const el = playerRef.current; if (el && dur) el.currentTime = Math.min(dur - 0.1, blockEndSec); };
+  // EVERY currentTime write funnels through here. Non-finite values throw
+  // ("provided double value is non-finite", seen live 2026-08-09) and
+  // Math.min/max propagate NaN straight through a clamp - so gate first.
+  const seekTo = (sec: number) => {
+    const el = playerRef.current;
+    if (!el || !Number.isFinite(sec) || !(dur > 0)) return;
+    el.currentTime = Math.max(0, Math.min(dur - 0.1, sec));
+  };
+  // el.currentTime can be undefined/NaN before loadedmetadata upgrades the
+  // custom element - treat it as 0 rather than arithmetic on it.
+  const posOf = (el: { currentTime?: number }) => (Number.isFinite(el.currentTime) ? (el.currentTime as number) : 0);
+  // rewind doesn't need `dur` (a backward seek can't overshoot the end), so it
+  // writes directly - it must keep working before metadata loads.
+  const rewind = () => { const el = playerRef.current; if (el) el.currentTime = Math.max(0, posOf(el) - 10); };
+  const forward = () => { const el = playerRef.current; if (el) seekTo(posOf(el) + 10); };
+  const skip = () => seekTo(blockEndSec);
   // Symmetric speed cycle 0.75× · 1× · 1.25× (L4 - slowing down is an a11y feature).
   const cycleSpeed = () => {
     const steps = [0.75, 1, 1.25];
@@ -881,10 +900,10 @@ function PlayerScreen({ code }: { code: string }) {
                 {open && b.items.map(normalizeExercise).map((ex, k) => {
                   const exDone = now ? activeEx > k : done;
                   return (
-                    <button key={k} className={`pf-ex-row${now && k === activeEx ? " on" : ""}${exDone ? " done" : ""}`} disabled={ex.start == null} onClick={ex.start != null ? () => seekTo(ex.start!) : undefined}>
+                    <button key={k} className={`pf-ex-row${now && k === activeEx ? " on" : ""}${exDone ? " done" : ""}`} disabled={!Number.isFinite(ex.start)} onClick={Number.isFinite(ex.start) ? () => seekTo(ex.start!) : undefined}>
                       {exDone ? <span className="dc"><Check size={11} /></span> : <span className="d" />}
                       <span className="nm">{ex.name}</span>
-                      {ex.start != null && <span className="t">{secToClock(ex.start)}</span>}
+                      {Number.isFinite(ex.start) && <span className="t">{secToClock(ex.start!)}</span>}
                     </button>
                   );
                 })}
@@ -936,10 +955,10 @@ function PlayerScreen({ code }: { code: string }) {
                     const exActive = bNow && k === activeEx;
                     const exDone = bNow ? activeEx > k : bDone;
                     return (
-                      <button key={k} className={`pf-mi${exActive ? " on" : ""}${exDone ? " done" : ""}`} disabled={ex.start == null} onClick={ex.start != null ? () => seekTo(ex.start!) : undefined}>
+                      <button key={k} className={`pf-mi${exActive ? " on" : ""}${exDone ? " done" : ""}`} disabled={!Number.isFinite(ex.start)} onClick={Number.isFinite(ex.start) ? () => seekTo(ex.start!) : undefined}>
                         <span className="ix">{exDone ? <LxIcon d={lxPaths.check} size={12} /> : <span className="dot" />}</span>
                         <span className="nm">{ex.name}</span>
-                        <span className="tm">{exActive ? "MOST" : ex.start != null ? secToClock(ex.start) : ""}</span>
+                        <span className="tm">{exActive ? "MOST" : Number.isFinite(ex.start) ? secToClock(ex.start!) : ""}</span>
                       </button>
                     );
                   })}

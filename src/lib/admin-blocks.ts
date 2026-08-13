@@ -1,4 +1,5 @@
 import "server-only";
+import { inferBlockStarts } from "@/lib/blocks";
 
 // Shared block/exercise sanitization for admin video writes (workout videos in
 // videos/ and Kihívások day videos in challengeVideos/). Kept in one place so the
@@ -68,19 +69,14 @@ export function buildBlocks(raw: RawBlock[] | undefined, dur: number): CleanBloc
     })
     .filter((bl) => bl.name);
 
-  // Heal missing block starts before the all-or-nothing check (same rules as
-  // the player's lib/blocks.ts inferBlockStarts): a missing start becomes the
-  // block's first stamped exercise; the first block defaults to 0:00. One
+  // Heal missing block starts before the all-or-nothing check - the SAME
+  // helper the player uses (lib/blocks.ts), so the rules (and its NaN-stamp
+  // rejection) can never drift between admin writes and player reads. One
   // forgotten field must never zero out every block's mins.
-  blocks = blocks.map((bl, i) => {
-    if (typeof bl.start === "number") return bl;
-    const firstStamped = bl.items.find((ex) => typeof ex.start === "number")?.start;
-    if (typeof firstStamped === "number") return { ...bl, start: firstStamped };
-    if (i === 0) return { ...bl, start: 0 };
-    return bl;
-  });
+  blocks = inferBlockStarts(blocks);
 
-  const allStamped = blocks.length > 0 && blocks.every((bl) => typeof bl.start === "number");
+  const allStamped =
+    blocks.length > 0 && blocks.every((bl) => typeof bl.start === "number" && Number.isFinite(bl.start));
   if (allStamped) {
     blocks.sort((a, b) => a.start! - b.start!);
     blocks = blocks.map((bl, i) => {

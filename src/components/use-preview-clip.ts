@@ -73,7 +73,9 @@ export function usePreviewClip(code: string, enabled = true) {
   const replay = () => {
     setSec(0);
     const el = playerRef.current;
-    if (el) { el.currentTime = 0; el.play?.(); }
+    // Catch the play() promise: a pause/teardown racing it rejects with
+    // AbortError, which would otherwise surface as an unhandled rejection.
+    if (el) { el.currentTime = 0; el.play?.()?.catch?.(() => {}); }
   };
 
   return { pb, videoReady, muted, sec, ended, playerRef, toggleMute, replay };

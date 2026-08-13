@@ -8,11 +8,18 @@
 
 import { PRICES } from "./config";
 
-const HU = new Intl.NumberFormat("hu-HU");
-
-/** "39 900 Ft" - Hungarian grouping (space thousands). */
+/** "39 900 Ft" - Hungarian grouping (no-break-space thousands).
+ *  Grouped by hand, NOT Intl.NumberFormat("hu-HU"): the separator Intl emits
+ *  (U+00A0 vs U+202F vs plain space) depends on the runtime's ICU version, so
+ *  server-rendered prices hydrated on old browsers (Firefox ESR, iOS 16
+ *  webviews) produced mismatched text nodes → hydration failures on /. */
 export function formatHuf(amount: number): string {
-  return `${HU.format(amount)} Ft`;
+  const n = Math.trunc(Math.abs(amount));
+  // Hungarian CLDR groups only from 5 digits up (minimumGroupingDigits=2):
+  // "3990" stays solid, "39 900" splits - same output Node's Intl produced.
+  const grouped =
+    n < 10000 ? String(n) : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+  return `${amount < 0 ? "-" : ""}${grouped} Ft`;
 }
 
 /** Annual price expressed as Ft/week (the annual card's primary number). */

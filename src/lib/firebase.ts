@@ -20,11 +20,26 @@ export const app: FirebaseApp = getApps().length ? getApp() : initializeApp(fire
 // Firebase App Check (reCAPTCHA v3) - attests requests come from the real app,
 // protecting Firestore/Storage/Auth from abuse. Browser-only, and skipped under
 // the emulator (which doesn't enforce App Check). Inert until the site key env
-// is set, so it never breaks local/preview runs that lack it. Initialized right
-// after the app so tokens attach to subsequent Firebase requests.
-// NOTE: keep every service UNENFORCED in the Firebase console until this ships
+// is set, so it never breaks local/preview runs that lack it.
+//
+// Called from AuthProvider's mount effect - NOT at module scope. The SDK
+// synchronously appends its widget container (div#fire_app_check_[DEFAULT])
+// into <body> and later renders into it by id; doing that at module-eval time
+// raced React hydration, and when hydration recovery re-rendered <body> the div
+// vanished or duplicated ("reCAPTCHA has already been rendered in this element"
+// / "placeholder element must be an element or id", plus the hydration failures
+// on / - all one bug, seen live 2026-08-12 in Meta in-app browsers). Effects
+// only run after hydration commits, so the div now lands in a settled body.
+// Every client Firestore read is gated on the user from that same provider, so
+// App Check still initializes ahead of authed traffic.
+// NOTE: keep every service UNENFORCED in the Firebase console until 403s stop
 // and tokens show up in App Check monitoring - enforcing first would reject
 // every client request.
+// ENFORCEMENT ORDER CAVEAT: getAuth() below runs at module eval and may
+// refresh a persisted session's token BEFORE this post-hydration init - that
+// first Auth request is un-attested by design. Enforce Firestore/Storage
+// first; before enforcing App Check for AUTH, re-test cold-load sign-in and
+// /auth/action (password reset / email verify) explicitly.
 declare global {
   // eslint-disable-next-line no-var
   var __LEXFIT_APPCHECK__: boolean | undefined;
@@ -33,12 +48,15 @@ declare global {
   var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean | string | undefined;
 }
 const appCheckSiteKey = process.env.NEXT_PUBLIC_APPCHECK_RECAPTCHA_SITE_KEY;
-if (
-  typeof window !== "undefined" &&
-  process.env.NEXT_PUBLIC_USE_EMULATORS !== "true" &&
-  appCheckSiteKey &&
-  !globalThis.__LEXFIT_APPCHECK__
-) {
+export function initAppCheck() {
+  if (
+    typeof window === "undefined" ||
+    process.env.NEXT_PUBLIC_USE_EMULATORS === "true" ||
+    !appCheckSiteKey ||
+    globalThis.__LEXFIT_APPCHECK__
+  ) {
+    return;
+  }
   globalThis.__LEXFIT_APPCHECK__ = true;
   // Local (non-emulator) dev: print a debug token to register in the console
   // instead of failing reCAPTCHA on localhost. Never triggers on Vercel

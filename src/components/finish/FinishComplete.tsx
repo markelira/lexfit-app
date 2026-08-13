@@ -30,7 +30,7 @@ export function FinishComplete({
         <div className="fc-eyebrow">Oszd meg egy szelfivel - így néz ki</div>
         <FinishExamples onPick={onShare} />
 
-        <button className="fc-cta" onClick={onShare}>
+        <button type="button" className="fc-cta" onClick={onShare}>
           <LxIcon d={lxPaths.camera} size={17} /> Elkészítem a sajátomat
         </button>
 

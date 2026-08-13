@@ -4,10 +4,12 @@
 
 import type { VideoExercise, VideoExerciseItem } from "./types";
 
-/** Collapse a legacy string OR object exercise into a normalized { name, start? }. */
+/** Collapse a legacy string OR object exercise into a normalized { name, start? }.
+ *  Stamps are validated with Number.isFinite, not typeof - a NaN start is
+ *  typeof "number" and would flow into seek math as a "valid" stamp. */
 export function normalizeExercise(it: VideoExerciseItem): VideoExercise {
   if (typeof it === "string") return { name: it };
-  return { name: it.name, ...(typeof it.start === "number" ? { start: it.start } : {}) };
+  return { name: it.name, ...(typeof it.start === "number" && Number.isFinite(it.start) ? { start: it.start } : {}) };
 }
 
 /** The display name of an exercise, whichever shape it is. */
@@ -33,10 +35,10 @@ export function inferBlockStarts<T extends { start?: number; items?: VideoExerci
   blocks: T[],
 ): T[] {
   return blocks.map((b, i) => {
-    if (typeof b.start === "number") return b;
+    if (typeof b.start === "number" && Number.isFinite(b.start)) return b;
     const firstStamped = (b.items ?? [])
       .map((it) => (typeof it === "string" ? undefined : it.start))
-      .find((s): s is number => typeof s === "number");
+      .find((s): s is number => typeof s === "number" && Number.isFinite(s));
     if (typeof firstStamped === "number") return { ...b, start: firstStamped };
     if (i === 0) return { ...b, start: 0 };
     return b;

@@ -52,7 +52,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://stream.mux.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://image.mux.com" crossOrigin="anonymous" />
       </head>
-      <body>
+      {/* suppressHydrationWarning: Meta in-app browsers (a top traffic source)
+          inject their own nodes/attributes into <body> before hydration. This
+          silences that one-level noise only - real structural mismatches in
+          children still surface. */}
+      <body suppressHydrationWarning>
         <AuthProvider>{children}</AuthProvider>
         <Analytics />
       </body>
