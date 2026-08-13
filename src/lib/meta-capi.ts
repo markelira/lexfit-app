@@ -26,6 +26,14 @@ const PIXEL_ID = process.env.META_PIXEL_ID;
 const TOKEN = process.env.META_CAPI_TOKEN;
 const API_VERSION = "v21.0";
 
+// TESTING ONLY. Meta's "Test events" tab shows a SERVER event only if the
+// payload carries a test_event_code - without one the event is real, but it
+// surfaces in Overview ~20 minutes later, which is useless while wiring things
+// up. Set META_CAPI_TEST_CODE to the code shown on that tab to watch purchases
+// land in real time, then REMOVE it: events sent with a test code are flagged
+// as test traffic and do not count towards ad optimisation.
+const TEST_CODE = process.env.META_CAPI_TEST_CODE;
+
 /** Meta requires SHA-256 of the normalised (trimmed, lower-cased) value. */
 function hash(value: string): string {
   return createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
@@ -68,6 +76,7 @@ export async function sendPurchase(p: PurchaseInput): Promise<boolean> {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           access_token: TOKEN,
+          ...(TEST_CODE ? { test_event_code: TEST_CODE } : {}),
           data: [
             {
               event_name: "Purchase",
