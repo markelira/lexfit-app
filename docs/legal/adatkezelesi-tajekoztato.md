@@ -14,6 +14,7 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 |---|------|----------------------|
 | 1 | Hatálybalépés dátuma: 2026. [hónap] [nap] — az éles indulás napján töltendő ki | fejléc |
 | 2 | Ügyvédi ellenőrzés (a dokumentum végén lévő megjegyzések szerint) | teljes dokumentum |
+| 3 | A hozzájárulás visszavonását szolgáló felület (süti-beállítások újranyitása) — lásd a záró megjegyzések 10. pontját | 7.4. pont |
 
 *Kitöltve 2026-08-08: adatkezelő képviselője (Kecskeméti Ádám), weboldal (https://lexfit.hu), adatvédelmi tisztviselő: nincs (a GDPR 37. cikk szerinti kijelölési kötelezettség nem áll fenn — ügyvédi ellenőrzés alatt).*
 
@@ -35,7 +36,7 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 
 2.2. A felhasználói adatok elsődleges tárolási helye a Google Firebase platform (Firestore adatbázis, Authentication, Cloud Storage), amelynek régiója **europe-west3 (Frankfurt, Németország)** — az adatok tehát alapértelmezetten az Európai Unióban tárolódnak.
 
-2.3. Az Adatkezelő **nem végez** harmadik feles hirdetési vagy analitikai célú követést, nem használ hirdetési sütiket, és a személyes adatokat nem értékesíti (lásd 7. pont).
+2.3. Az Adatkezelő a Weboldalon webanalitikai célú mérést végez (Google Analytics 4, Google Tag Manager), **kizárólag a látogató előzetes, önkéntes hozzájárulása alapján**: hozzájárulás hiányában egyetlen mérőkód sem töltődik be és analitikai süti nem kerül elhelyezésre (részletesen a 7. pont). Az Adatkezelő a személyes adatokat nem értékesíti.
 
 2.4. Az Adatkezelő nem hoz a GDPR 22. cikke szerinti, kizárólag automatizált adatkezelésen alapuló, joghatással járó döntést. A szolgáltatáson belüli személyre szabás (pl. a regisztrációs kérdőív válaszai alapján ajánlott edzésbeosztás, aktivitásalapú kedvezményajánlatok) a szerződés teljesítésének része, és nem jár az érintettre nézve joghatással vagy hasonlóan jelentős hatással.
 
@@ -55,6 +56,7 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 | **h) Edzés-emlékeztető e-mailek** | (1) a) — hozzájárulás | E-mail-cím, a választott edzésnapok/beállítások | A hozzájárulás visszavonásáig (leiratkozás), legfeljebb a fiók fennállásáig |
 | **i) „Finish Share" — edzés utáni megosztókép** | (1) b) — szerződés teljesítése (kizárólag a statisztikákra) | Lásd 3.3. pont — **a szelfi nem kerül feltöltésre** | A telefon–számítógép átadási munkamenet adatai (kizárólag edzésstatisztika) **15 perc** után lejárnak és törlődnek |
 | **j) Panaszkezelés, érintetti kérelmek** | (1) c) — jogi kötelezettség; f) — jogos érdek (igényérvényesítés) | A panasz/kérelem tartalma, a válasz, azonosító adatok; az adatexport-kérések napi darabszámát rögzítő technikai napló | Fgytv. szerinti panasznyilvántartás: 5 év; érintetti kérelmek dokumentálása: 5 év |
+| **k) Webanalitika (látogatottságmérés)** | (1) a) — hozzájárulás (süti-sáv) | A Google Analytics 4 által kezelt adatok: álnevesített ügyfél-azonosító (süti), IP-cím, eszköz- és böngészőadatok, megtekintett oldalak és események. **Kizárólag a hozzájáruló látogatókra terjed ki.** | A Google Analytics tulajdonban beállított adatmegőrzési idő szerint, illetve a hozzájárulás visszavonásáig |
 
 ### 3.2. Külön figyelmet érdemlő adatkör: haladási fotók
 
@@ -93,6 +95,7 @@ Az Adatkezelő az alábbi adatfeldolgozókat, illetve önálló adatkezelőként
 | **Twilio Inc. — SendGrid** (USA) | tranzakciós és emlékeztető e-mailek kiküldése | e-mail-cím, név, az üzenet tartalma | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
 | **Vercel Inc.** (USA) | webalkalmazás-tárhely és -kiszolgálás | a kiszolgáláshoz szükséges technikai adatok (IP-cím, kérésnaplók) | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
 | **Google LLC — reCAPTCHA (Firebase App Check)** | visszaélés- és botvédelem (a kérések valódi alkalmazásból való származásának ellenőrzése) | eszköz- és böngészőadatok, IP-cím, felhasználói interakciós jelek; a feldolgozás a Google reCAPTCHA feltételei szerint történik | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC. A reCAPTCHA használatára a Google [Adatvédelmi irányelvei](https://policies.google.com/privacy) és [Szolgáltatási feltételei](https://policies.google.com/terms) irányadók |
+| **Google Ireland Ltd. / Google LLC — Google Analytics 4, Google Tag Manager** | webanalitika (látogatottságmérés), mérőkód-kezelés | álnevesített ügyfél-azonosító, IP-cím, eszköz- és böngészőadatok, oldalmegtekintési és eseményadatok | **Kizárólag a látogató hozzájárulása esetén.** A Google LLC az EU–USA adatvédelmi keret (DPF) tanúsított résztvevője; kiegészítésként SCC |
 
 Az Adatkezelő személyes adatot a fentieken túl kizárólag jogszabályi kötelezettség alapján (pl. NAV, hatóság, bíróság megkeresésére) továbbít. Az Adatkezelő személyes adatot hirdetési célra nem ad át és nem értékesít.
 
@@ -122,7 +125,9 @@ Az érintettet a GDPR 15–21. cikke alapján az alábbi jogok illetik meg; a k�
 
 ## 7. Sütik (cookie-k) és helyi tárolás
 
-7.1. A LEXFIT **nem használ** harmadik feles követő-, hirdetési vagy analitikai sütiket, és jelenleg semmilyen külső webanalitikai eszközt nem alkalmaz. Erre tekintettel a weboldalon nincs süti-hozzájárulási sáv: kizárólag a szolgáltatás működéséhez **feltétlenül szükséges** technikai tárolás történik, amelyhez az ePrivacy szabályok szerint nem szükséges hozzájárulás.
+7.1. A LEXFIT kétféle tárolást alkalmaz: a szolgáltatás működéséhez **feltétlenül szükséges** technikai tárolást (7.2. pont), amelyhez az ePrivacy szabályok szerint nem szükséges hozzájárulás, valamint **kizárólag hozzájárulás alapján** működő analitikai mérést (7.3. pont).
+
+A Weboldal első látogatásakor süti-sáv jelenik meg. **A látogató döntéséig, illetve elutasítás esetén semmilyen analitikai mérőkód nem töltődik be és analitikai süti nem kerül elhelyezésre** — a mérőkódok betöltése technikailag is a hozzájáruláshoz van kötve. A döntést a böngésző helyi tárolója őrzi (`lx-consent` kulcs), így a sáv a döntés után nem jelenik meg újra. A hozzájárulás visszavonásáról a 7.4. pont rendelkezik.
 
 7.2. A feltétlenül szükséges tárolás elemei:
 
@@ -130,10 +135,22 @@ Az érintettet a GDPR 15–21. cikke alapján az alábbi jogok illetik meg; a k�
 |---|---|---|---|
 | Firebase Auth munkamenet (IndexedDB / helyi tárolás) | helyi tárolás a böngészőben | a bejelentkezett állapot fenntartása | a kijelentkezésig, ill. a munkamenet lejártáig |
 | Alkalmazásbeállítások (pl. felület-preferenciák, folyamatállapotok) | localStorage | a felhasználói élmény működéséhez szükséges állapot | a böngészőben történő törlésig |
+| Süti-hozzájárulási döntés (`lx-consent`) | localStorage | a látogató süti-döntésének megőrzése (elfogadás vagy elutasítás), hogy a sáv ne jelenjen meg újra | a böngészőben történő törlésig |
 | A Stripe fizetési oldal saját sütijei | süti (a Stripe domainjén) | biztonságos fizetés, csalásmegelőzés | a Stripe tájékoztatója szerint |
 | A Mux videolejátszó technikai tárolása | helyi tárolás | a lejátszás működése és minősége | munkamenethez kötött |
 
-7.3. Ha az Adatkezelő a jövőben analitikai vagy marketingcélú sütiket, illetve követést vezetne be, azt kizárólag előzetes, önkéntes hozzájárulás (süti-sáv) mellett teszi, és e tájékoztatót ennek megfelelően módosítja.
+7.3. Hozzájárulás alapján működő analitikai eszközök (GDPR 6. cikk (1) a)):
+
+| Eszköz | Szolgáltató | Cél | Elhelyezett tárolás |
+|---|---|---|---|
+| **Google Analytics 4** (gtag.js) | Google Ireland Ltd. / Google LLC | látogatottság- és használatmérés a szolgáltatás fejlesztéséhez | `_ga` előtagú analitikai sütik |
+| **Google Tag Manager** | Google Ireland Ltd. / Google LLC | a mérőkódok kezelése (önmagában nem gyűjt adatot, a benne elhelyezett mérőkódokat tölti be) | a betöltött mérőkód szerint |
+
+A hozzájárulás alapján kezelt adatok körét és megőrzési idejét a 3.1. táblázat **k)** sora, a Google mint címzett szerepét az 5. pont tartalmazza.
+
+7.4. **A hozzájárulás visszavonása.** A hozzájárulás bármikor, korlátozás nélkül visszavonható a böngésző helyi tárolójának (localStorage) törlésével, amely a `lx-consent` bejegyzést is eltávolítja; ezt követően a süti-sáv ismét megjelenik, és a látogató új döntést hozhat. A visszavonás a korábbi adatkezelés jogszerűségét nem érinti.
+
+7.5. Ha az Adatkezelő a jövőben további analitikai vagy marketingcélú mérőkódot (pl. közösségi média hirdetési pixelt) vezet be, azt kizárólag a fenti hozzájárulási mechanizmus mellett teszi, és e tájékoztatót — a 10. pont szerinti értesítés mellett — ennek megfelelően módosítja.
 
 ## 8. Adatbiztonság
 
@@ -164,8 +181,37 @@ LAWYER REVIEW NOTES (nem publikálandó — a magyar jogász figyelmébe):
 2. Edzésnapló / haladási adatok: hasonló 9. cikk-kockázat („fitness adat" mint egészségadat) — a jelenlegi minősítés (szerződés teljesítése, nem különleges adat) megerősítendő.
 3. Mux mint címzett: az IP-cím és lejátszási adatok USA-ba továbbítása — ellenőrizendő a Mux aktuális DPF-tanúsítási státusza és DPA-ja; ha nincs DPF, SCC + transzfer-hatásvizsgálat (TIA) szükséges. Ugyanez Twilio SendGrid és Vercel esetén.
 4. Megőrzési idők: a c) sor 5 éves (Ptk. elévülés) és a j) sor Fgytv. 17/A. § szerinti 5 éves ideje megerősítendő; az exportnapló és a consent-rekordok megőrzése arányosítandó.
-5. Cookie-szakasz (7. pont): a „nincs süti-sáv, mert csak feltétlenül szükséges tárolás van" álláspont ellenőrizendő az Eht. 155. § (4) és a NAIH gyakorlata szerint, különös tekintettel a Mux-lejátszó és a Stripe technikai tárolására.
+5. Cookie-szakasz (7. pont): a feltétlenül szükséges tárolás (7.2) hozzájárulás-mentessége ellenőrizendő az Eht. 155. § (4) és a NAIH gyakorlata szerint, különös tekintettel a Mux-lejátszó és a Stripe technikai tárolására.
 6. A 30 napos törlési türelmi idő (6.3): a GDPR 17. cikkével való összhang (indokolatlan késedelem nélküli törlés vs. visszavonási ablak) — a jelenlegi gyakorlatban a fiók azonnal zárolásra kerül, ez rögzítve; megerősítendő, hogy ez elegendő.
 7. Adatvédelmi tisztviselő kijelölésének szükségessége (37. cikk) — a rendszeres, nagymértékű nyomon követés kérdése a haladáskövetés fényében.
 8. Az e-mail-emlékeztetők Grtv. (2008. évi XLVIII. tv.) 6. § szerinti minősítése: a megújulási/fizetési e-mailek tranzakciósak, de a motivációs/edzés-emlékeztetők reklámnak minősülhetnek → a hozzájárulás szövegezése a beállítási felületen ellenőrizendő.
+
+--- A 2026-08-13-i analitikai frissítéssel bekerült pontok ---
+
+9. **ELŐZMÉNY, AMIT JOGÁSZNAK ÉRTÉKELNIE KELL:** a Google Analytics 4 és a Google Tag
+   Manager 2026-08-09 óta (a `4eaf2b7` deploy óta) él a Weboldalon, hozzájárulás-alapú
+   sávval együtt. E tájékoztató **2026-08-13-ig ezzel ellentétesen** azt állította, hogy
+   az Adatkezelő nem végez analitikai követést és hogy „a weboldalon nincs
+   süti-hozzájárulási sáv". A jelen módosítás ezt az ellentmondást szünteti meg.
+   Értékelendő, hogy a ~4 napos időszak igényel-e bármilyen további lépést
+   (a mérés maga végig hozzájáruláshoz volt kötve, tehát az érintettektől hozzájárulás
+   nélkül adat nem került a Google-höz — a hiba a tájékoztatás, nem a gyakorlat oldalán
+   állt fenn).
+10. **A hozzájárulás visszavonásának módja (7.4) — a legfontosabb nyitott pont.** A
+    hozzájárulás megadása egy kattintás, a visszavonás viszont jelenleg a böngésző helyi
+    tárolójának manuális törlését igényli. A GDPR 7. cikk (3) bekezdése szerint a
+    visszavonásnak **ugyanolyan egyszerűnek kell lennie**, mint a megadásnak.
+    Javasolt fejlesztés: a süti-beállítások újranyitására szolgáló link az oldal
+    láblécében vagy az adatvédelmi oldalon. Amíg ez nincs meg, a 7.4. pont szövegezése
+    megfelelőségi kockázatot hordoz.
+11. GA4 adatmegőrzési idő (3.1 k) sor): a Google Analytics tulajdonban ténylegesen
+    beállított érték (2 vagy 14 hónap) ellenőrizendő és a táblázatba konkrétan
+    beírandó.
+12. A 7.3. táblázat sütilistája a jelenlegi tag-készletet tükrözi. Ha a GTM
+    konténerbe további mérőkód kerül (tervezett: Meta Pixel), a lista és a 2.3., 5. és
+    7.5. pont **a bevezetés előtt** frissítendő; ekkor a hirdetési célú adatkezelés
+    jogalapja és az 5. pont „hirdetési célra nem ad át" fordulata is felülvizsgálandó.
+13. Mérlegelendő a Google Consent Mode és az IP-anonimizálás beállítása, valamint hogy
+    a süti-sáv jelenlegi szövege („Sütiket használunk a látogatottság méréséhez (Google
+    Analytics)") a tag-készlet bővülésekor pontatlanná válik.
 -->
