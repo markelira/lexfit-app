@@ -1,6 +1,6 @@
 # Meta Pixel — beállítási útmutató
 
-**Pixel:** LEXFIT.HU · **ID:** `1046558821070494` · létrehozva 2026-08-13
+**Pixel:** LEXFIT.HU · **ID:** `938411635181898` · létrehozva 2026-08-13
 **Elhelyezés:** a GTM konténerben, **nem** a kódban (döntés: 2026-08-13)
 
 ---
@@ -52,7 +52,7 @@ A GTM konténerben (`NEXT_PUBLIC_GTM_ID`, a Vercel env-ben van beállítva):
 1. **Tags → New → Tag Configuration → Custom HTML**
    (A GTM-nek nincs beépített Meta-sablonja; a Community Template Gallery
    „Facebook Pixel" sablonja is használható, de a Custom HTML kevesebb meglepetés.)
-2. Illeszd be a Meta által adott alap Pixel-kódot a `1046558821070494` azonosítóval.
+2. Illeszd be a Meta által adott alap Pixel-kódot a `938411635181898` azonosítóval.
    A Meta felületén: **Events Manager → LEXFIT.HU → Add events → From a new website →
    Install code manually** — onnan másolható.
 3. **Triggering → All Pages**
@@ -150,7 +150,7 @@ lowercase normalizálás a Meta elvárása szerint), a nyers cím soha.
 1. **Access token:** *Events Manager → Conversions API → Set up direct integration →
    Generate access token.* Titkos.
 2. **Vercel env** (mindhárom környezetre):
-   `META_PIXEL_ID=1046558821070494` és `META_CAPI_TOKEN=<a token>`
+   `META_PIXEL_ID=938411635181898` és `META_CAPI_TOKEN=<a token>`
    Amíg ez a kettő nincs beállítva, a CAPI **néma** — a fizetés és a webhook
    érintetlen marad.
 3. Ellenőrzés: *Events Manager → Test events* — ott a szerveroldali események is
