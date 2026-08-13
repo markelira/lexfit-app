@@ -1,4 +1,5 @@
 import "server-only";
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { getAuth } from "firebase-admin/auth";
 import { adminApp, adminDb, adminStorage } from "@/lib/firebase-admin";
@@ -34,6 +35,7 @@ export async function GET(req: Request) {
       console.log(`[purge-accounts] purged ${uid}`);
     } catch (e) {
       console.error(`[purge-accounts] failed ${uid}`, e);
+      Sentry.captureException(e, { tags: { cron: "purge-accounts" } });
     }
   }
 

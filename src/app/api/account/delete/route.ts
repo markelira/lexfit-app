@@ -38,14 +38,20 @@ export async function POST(req: Request) {
 
   const email = token.email ?? (await getAuth(adminApp).getUser(uid).then((u) => u.email).catch(() => null));
   if (email) {
-    await sendEmail({
-      to: email,
-      subject: "LEXFIT - elindítottuk a fiókod törlését",
-      text:
-        "Elindítottuk a fiókod törlését. Az edzéseid, a sorozatod és a fotóid 30 napon " +
-        "belül véglegesen törlődnek.\n\nHa meggondolnád magad, a 30 napon belül írj " +
-        "Alexának a Súgóban, és visszavonjuk a törlést.",
-    });
+    // Best-effort: the deletion is already staged above - a failed
+    // confirmation email must not surface as a 500 for a succeeded request.
+    try {
+      await sendEmail({
+        to: email,
+        subject: "LEXFIT - elindítottuk a fiókod törlését",
+        text:
+          "Elindítottuk a fiókod törlését. Az edzéseid, a sorozatod és a fotóid 30 napon " +
+          "belül véglegesen törlődnek.\n\nHa meggondolnád magad, a 30 napon belül írj " +
+          "Alexának a Súgóban, és visszavonjuk a törlést.",
+      });
+    } catch (e) {
+      console.error("[account delete email]", e);
+    }
   }
 
   return NextResponse.json({ ok: true });

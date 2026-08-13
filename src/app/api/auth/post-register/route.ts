@@ -3,20 +3,13 @@ import { NextResponse } from "next/server";
 import { getAuth } from "firebase-admin/auth";
 import { adminApp, adminDb } from "@/lib/firebase-admin";
 import { verifyRequest } from "@/lib/auth-server";
-import { COLLECTIONS, milestoneDocId } from "@/lib/pricing/keys";
+import { milestoneClear, milestoneOnce } from "@/lib/milestones";
 import { sendVerifyEmail, sendWelcome } from "@/lib/mailer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const FRESH_ACCOUNT_MS = 48 * 3600_000;
-
-async function milestoneOnce(uid: string, kind: string): Promise<boolean> {
-  const ref = adminDb.collection(COLLECTIONS.milestones).doc(milestoneDocId(uid, kind));
-  if ((await ref.get()).exists) return false;
-  await ref.set({ userId: uid, kind, firedAt: Date.now() });
-  return true;
-}
 
 /**
  * Fired (fire-and-forget) by the register flows right after ensureUserDoc
@@ -39,13 +32,19 @@ export async function POST(req: Request) {
 
   const results: Record<string, boolean> = {};
 
+  // deliver() never throws - it returns { sent } (see mailer.ts). Roll the
+  // milestone back on a definite failure so a later register-flow call inside
+  // the 48h fresh-account window retries, and report `results` honestly.
   if (await milestoneOnce(token.uid, "welcome_email_sent")) {
     const firstName =
       (await adminDb.doc(`users/${token.uid}`).get()).data()?.displayName ??
       user.displayName?.split(" ")[0] ??
       null;
-    await sendWelcome(user.email, firstName).catch((e) => console.error("[welcome email]", e));
-    results.welcome = true;
+    if ((await sendWelcome(user.email, firstName)).sent) {
+      results.welcome = true;
+    } else {
+      await milestoneClear(token.uid, "welcome_email_sent");
+    }
   }
 
   // P5.4: verification is informational, never an access gate - but the email
@@ -57,9 +56,14 @@ export async function POST(req: Request) {
         const link = await getAuth(adminApp).generateEmailVerificationLink(user.email, {
           url: `${base}/app`,
         });
-        await sendVerifyEmail(user.email, link);
-        results.verification = true;
+        if ((await sendVerifyEmail(user.email, link)).sent) {
+          results.verification = true;
+        } else {
+          await milestoneClear(token.uid, "verify_email_sent");
+        }
       } catch (e) {
+        // generateEmailVerificationLink threw - roll back so a retry can send.
+        await milestoneClear(token.uid, "verify_email_sent");
         console.error("[verify email]", e);
       }
     }

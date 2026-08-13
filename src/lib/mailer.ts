@@ -1,7 +1,8 @@
 import "server-only";
+import * as Sentry from "@sentry/nextjs";
 import type { ReactElement } from "react";
 import { render } from "react-email";
-import { sendEmail } from "@/lib/email";
+import { EmailTransportError, sendEmail } from "@/lib/email";
 import { unsubUrl, type UnsubKind } from "@/lib/email-unsub";
 import { formatHuf, perWeekHuf } from "@/lib/pricing/display";
 import {
@@ -17,6 +18,21 @@ import {
 // the SendGrid category, and attaches the one-click unsubscribe header for
 // every non-transactional send. Callers own idempotency (milestone docs /
 // dunning flags) - mailer functions just send.
+//
+// deliver() NEVER throws: a vendor failure becomes a return value + a Sentry
+// report. The crons iterate many users - one rejected send once aborted a
+// whole run mid-loop (2026-08-10, SendGrid "Maximum credits exceeded"),
+// starving every user after the failure.
+//
+// The `sent` flag answers "may the caller mark this delivered?", chosen so a
+// retry can never double-send:
+//   - definite rejection (SendGrid returned an error status: quota, bad key)
+//     → { sent: false }: the mail was NOT queued; callers roll back their
+//     idempotency marker so the user is retried on the next run.
+//   - ambiguous transport failure (timeout / dropped connection - the POST may
+//     already be queued at SendGrid) → { sent: true }: retrying could deliver
+//     the mail twice, so callers keep their marker; Sentry still records it.
+// Callers that mark idempotency must check `sent` before writing the marker.
 
 import AnnualNudge, { subject as annualNudgeSubject } from "../../emails/annual-nudge";
 import AnnualRenewalReminder, { subjectFor as annualRenewalSubject } from "../../emails/annual-renewal-reminder";
@@ -47,16 +63,24 @@ async function deliver(opts: {
   category: "auth" | "billing" | "habit" | "recap" | "marketing";
   unsub?: { uid: string; kind: UnsubKind };
 }): Promise<{ sent: boolean }> {
-  const html = await render(opts.make());
-  const text = await render(opts.make(), { plainText: true });
-  return sendEmail({
-    to: opts.to,
-    subject: opts.subject,
-    text,
-    html,
-    categories: [opts.category],
-    ...(opts.unsub ? { listUnsubscribeUrl: unsubUrl(opts.unsub.uid, opts.unsub.kind) } : {}),
-  });
+  try {
+    const html = await render(opts.make());
+    const text = await render(opts.make(), { plainText: true });
+    return await sendEmail({
+      to: opts.to,
+      subject: opts.subject,
+      text,
+      html,
+      categories: [opts.category],
+      ...(opts.unsub ? { listUnsubscribeUrl: unsubUrl(opts.unsub.uid, opts.unsub.kind) } : {}),
+    });
+  } catch (e) {
+    console.error(`[mailer] ${opts.category} send failed: ${opts.subject}`, e);
+    Sentry.captureException(e, { tags: { mailer_category: opts.category } });
+    // Ambiguous transport failure → sent:true (see module comment: the mail
+    // may already be queued; a rollback-driven retry could double-send).
+    return { sent: e instanceof EmailTransportError };
+  }
 }
 
 /** "2026. szeptember 9." - Budapest calendar date from epoch ms. */

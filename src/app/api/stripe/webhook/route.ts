@@ -82,9 +82,11 @@ async function maybeDunning(event: Stripe.Event): Promise<void> {
 
   const payUrl = inv.hosted_invoice_url ?? "";
   const email = await emailForUid(uid);
-  if (email && payUrl) {
-    await sendDunningDay0(email, payUrl).catch((e) => console.error("[dunning day0]", e));
-  }
+  // Flag only after an actual successful send (deliver() never throws - it
+  // returns { sent }): an unset flag lets Stripe's redeliveries of this event
+  // retry the day-0 email instead of silently ending the episode's dunning.
+  if (!email || !payUrl) return;
+  if (!(await sendDunningDay0(email, payUrl)).sent) return;
   await ref.set({ dunningDay0Sent: true }, { merge: true });
   await logEvent("dunning_started", { uid });
 }
@@ -112,9 +114,10 @@ async function maybeSubscriptionStarted(
   );
   const email = await emailForUid(write.uid);
   if (display && email) {
-    await sendSubscriptionStarted(email, display).catch((e) =>
-      console.error("[sub started email]", e),
-    );
+    // A definite send failure leaves the milestone unclaimed so a Stripe
+    // redelivery retries; deliberate skips (no display/email) still claim it
+    // below - redelivering the same event could never change those.
+    if (!(await sendSubscriptionStarted(email, display)).sent) return;
   }
   await mRef.set({ userId: write.uid, kind: "sub_started", sessionId: session.id, firedAt: Date.now() });
 }

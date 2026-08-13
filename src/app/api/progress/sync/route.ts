@@ -312,7 +312,10 @@ export async function POST(req: Request) {
         ((prefsPlan.weekdays ?? []) as number[]),
         todayWeekday,
       );
-      await sendFirstWorkout(email, uid, nextDay);
+      // deliver() never throws - a definite failure returns { sent: false }.
+      // Skip the marker then, so the next progress sync retries the one-shot
+      // "első edzés" email instead of losing it forever.
+      if (!(await sendFirstWorkout(email, uid, nextDay)).sent) return;
       await mRef.set({ userId: uid, kind: "first_workout_email_sent", firedAt: Date.now() });
     })().catch((e) => console.error("[first workout email]", e));
   }

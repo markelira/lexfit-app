@@ -1,4 +1,5 @@
 import "server-only";
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
@@ -47,48 +48,61 @@ export async function GET(req: Request) {
     .get();
 
   let sent = 0;
+  let failed = 0;
   for (const doc of snap.docs) {
     if (doc.id !== "prefs") continue;
     const uid = doc.ref.parent.parent?.id;
     if (!uid) continue;
-    const prefs = doc.data() as {
-      plan?: { weekdays?: number[] };
-      reminders?: { workout?: { time?: string; weekdays?: number[] }; streakRisk?: boolean };
-    };
-    const workout = prefs.reminders?.workout;
-    const [rh] = (workout?.time ?? "07:15").split(":").map(Number);
+    // Per-user isolation: one failing user (Firestore read, vendor reject) must
+    // never abort the rest of the run - a single SendGrid 401 once starved
+    // every user after it (2026-08-10).
+    try {
+      const prefs = doc.data() as {
+        plan?: { weekdays?: number[] };
+        reminders?: { workout?: { time?: string; weekdays?: number[] }; streakRisk?: boolean };
+      };
+      const workout = prefs.reminders?.workout;
+      const [rh] = (workout?.time ?? "07:15").split(":").map(Number);
 
-    const dailyDue = rh === hour && (workout?.weekdays ?? []).includes(weekday);
-    const streakDue = hour === 20 && !!prefs.reminders?.streakRisk;
-    if (!dailyDue && !streakDue) continue;
+      const dailyDue = rh === hour && (workout?.weekdays ?? []).includes(weekday);
+      const streakDue = hour === 20 && !!prefs.reminders?.streakRisk;
+      if (!dailyDue && !streakDue) continue;
 
-    // Never remind someone who already trained today.
-    const progress = (await adminDb.doc(`users/${uid}/progress/state`).get()).data() as
-      | { lastCompletedDate?: string | null; streak?: number }
-      | undefined;
-    if (progress?.lastCompletedDate === day) continue;
+      // Never remind someone who already trained today.
+      const progress = (await adminDb.doc(`users/${uid}/progress/state`).get()).data() as
+        | { lastCompletedDate?: string | null; streak?: number }
+        | undefined;
+      if (progress?.lastCompletedDate === day) continue;
 
-    // One message per user per day, across both passes.
-    const mRef = adminDb.collection(COLLECTIONS.milestones).doc(milestoneDocId(uid, `workout_reminder_${day}`));
-    if ((await mRef.get()).exists) continue;
+      // One message per user per day, across both passes.
+      const mRef = adminDb.collection(COLLECTIONS.milestones).doc(milestoneDocId(uid, `workout_reminder_${day}`));
+      if ((await mRef.get()).exists) continue;
 
-    // Streak-risk pass only fires with a live streak + a workout planned today.
-    const streakOnly = streakDue && !dailyDue;
-    if (streakOnly) {
-      const streak = progress?.streak ?? 0;
-      const plannedToday = (prefs.plan?.weekdays ?? []).includes(weekday);
-      if (streak <= 0 || !plannedToday) continue;
+      // Streak-risk pass only fires with a live streak + a workout planned today.
+      const streakOnly = streakDue && !dailyDue;
+      if (streakOnly) {
+        const streak = progress?.streak ?? 0;
+        const plannedToday = (prefs.plan?.weekdays ?? []).includes(weekday);
+        if (streak <= 0 || !plannedToday) continue;
+      }
+
+      const email = await getAuth(adminApp).getUser(uid).then((u) => u.email).catch(() => null);
+      if (!email) continue;
+
+      const res = streakOnly
+        ? await sendStreakRisk(email, uid, progress?.streak ?? 0)
+        : await sendWorkoutReminder(email, uid);
+      // No marker on failure → the user is retried on the next hourly run.
+      if (!res.sent) { failed += 1; continue; }
+      await mRef.set({ kind: streakOnly ? "streak_risk" : "workout_reminder", day, sentAt: FieldValue.serverTimestamp() });
+      sent += 1;
+      console.log(`[workout-reminders] ${streakOnly ? "streak" : "daily"} → ${uid}`);
+    } catch (e) {
+      failed += 1;
+      console.error(`[workout-reminders] failed ${uid}`, e);
+      Sentry.captureException(e, { tags: { cron: "workout-reminders" } });
     }
-
-    const email = await getAuth(adminApp).getUser(uid).then((u) => u.email).catch(() => null);
-    if (!email) continue;
-
-    if (streakOnly) await sendStreakRisk(email, uid, progress?.streak ?? 0);
-    else await sendWorkoutReminder(email, uid);
-    await mRef.set({ kind: streakOnly ? "streak_risk" : "workout_reminder", day, sentAt: FieldValue.serverTimestamp() });
-    sent += 1;
-    console.log(`[workout-reminders] ${streakOnly ? "streak" : "daily"} → ${uid}`);
   }
 
-  return NextResponse.json({ sent });
+  return NextResponse.json({ sent, failed });
 }

@@ -21,6 +21,17 @@ export interface EmailInput {
   listUnsubscribeUrl?: string;
 }
 
+/** Transport-level failure (timeout, dropped connection): the POST may or may
+ *  not have reached SendGrid, so the message MAY already be queued. Callers
+ *  must NOT retry these - a retry can double-send. Definite rejections (an
+ *  HTTP error status came back) throw a plain Error and are safe to retry. */
+export class EmailTransportError extends Error {
+  constructor(cause: unknown) {
+    super(`SendGrid transport failure: ${cause instanceof Error ? cause.message : String(cause)}`);
+    this.name = "EmailTransportError";
+  }
+}
+
 export async function sendEmail(msg: EmailInput): Promise<{ sent: boolean }> {
   const key = process.env.SENDGRID_API_KEY;
   const from = process.env.EMAIL_FROM;
@@ -36,30 +47,38 @@ export async function sendEmail(msg: EmailInput): Promise<{ sent: boolean }> {
     return { sent: false };
   }
   const fromName = process.env.EMAIL_FROM_NAME; // e.g. "Alexa"
-  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      personalizations: [{ to: [{ email: msg.to }] }],
-      from: fromName ? { email: from, name: fromName } : { email: from },
-      subject: msg.subject,
-      content: [
-        { type: "text/plain", value: msg.text },
-        ...(msg.html ? [{ type: "text/html", value: msg.html }] : []),
-      ],
-      ...(msg.categories?.length ? { categories: msg.categories } : {}),
-      ...(msg.listUnsubscribeUrl
-        ? {
-            headers: {
-              "List-Unsubscribe": `<${msg.listUnsubscribeUrl}>`,
-              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-            },
-          }
-        : {}),
-    }),
-  });
-  // SendGrid returns 202 Accepted on success.
-  if (res.status !== 202) {
+  let res: Response;
+  try {
+    res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      // Bounded: the crons call this in per-user loops inside a 60s lambda - a
+      // hung SendGrid connection must not eat the whole budget.
+      signal: AbortSignal.timeout(10_000),
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: msg.to }] }],
+        from: fromName ? { email: from, name: fromName } : { email: from },
+        subject: msg.subject,
+        content: [
+          { type: "text/plain", value: msg.text },
+          ...(msg.html ? [{ type: "text/html", value: msg.html }] : []),
+        ],
+        ...(msg.categories?.length ? { categories: msg.categories } : {}),
+        ...(msg.listUnsubscribeUrl
+          ? {
+              headers: {
+                "List-Unsubscribe": `<${msg.listUnsubscribeUrl}>`,
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+              },
+            }
+          : {}),
+      }),
+    });
+  } catch (e) {
+    throw new EmailTransportError(e);
+  }
+  // SendGrid returns 202 Accepted on success; take any 2xx as delivered.
+  if (!res.ok) {
     throw new Error(`SendGrid ${res.status}: ${await res.text().catch(() => "")}`);
   }
   return { sent: true };
