@@ -219,7 +219,21 @@ async function maybeReportPurchase(event: Stripe.Event): Promise<void> {
     return;
   }
 
-  if (mkt.adConsent !== "granted" || !id) return;
+  // Deliberate silent skips until now. Log the decision so a missing Purchase
+  // can be diagnosed from the Vercel log alone - "no error" is not "reported".
+  if (mkt.adConsent !== "granted" || !id) {
+    console.log(
+      "[meta-capi] skipped: not reportable",
+      JSON.stringify({
+        eventType: event.type,
+        // The literal value matters: "denied" is a working consent gate,
+        // undefined means the browser never wrote metadata onto the session.
+        adConsent: mkt.adConsent ?? null,
+        hasEventId: !!id,
+      }),
+    );
+    return;
+  }
   await sendPurchase({
     eventId: id,
     eventTime: when,

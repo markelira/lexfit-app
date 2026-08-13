@@ -9,11 +9,11 @@
 
 ## E1. Melyik böngészőben tesztelj?
 
-A tulajdonos Chromeja **blokkolja a Facebookot**. A mérés alapján ez **bővítmény**,
-nem DNS-szűrés (az `fbevents.js` kérése lefutott, csak üresen tért vissza; DNS-blokknál
-el sem indult volna). Ezért **nem kell telefon** — elég egy tiszta böngésző.
+**Bármelyikben** — a tulajdonos Chromeja **nem blokkolja** a Facebookot. (2026-08-13-án
+felmerült, hogy egy ad-blocker az oka a nem tüzelő Pixelnek; ez **tévedés volt**, lásd
+alább.)
 
-**Gyorsteszt, hogy melyik böngésződ tiszta.** Nyisd meg bármelyikben ezt a címet:
+Ha mégis gyanakszol blokkolásra, ez a gyorsteszt dönti el. Nyisd meg a böngészőben:
 
 ```
 https://connect.facebook.net/en_US/fbevents.js
@@ -21,15 +21,38 @@ https://connect.facebook.net/en_US/fbevents.js
 
 | Amit látsz | Jelentés |
 |---|---|
-| Hosszú JavaScript-kód | ✅ **tiszta böngésző** — ebben tesztelj |
-| Üres oldal / hibaüzenet / „blokkolva" | 🔴 ez is blokkol — próbálj másikat |
+| Hosszú JavaScript-kód | ✅ tiszta böngésző |
+| Üres oldal / hibaüzenet / „blokkolva" | 🔴 blokkol — próbálj Safarit vagy új profilt |
 
-Sorrendben érdemes próbálni: **Safari** → **Chrome inkognitó bővítmények nélkül**
-(`chrome://extensions` → kapcsold ki mind) → **új Chrome-profil** → telefon mobilneten.
+### ⚠️ A leggyakoribb téves diagnózis: a GTM cache
 
-> Chrome inkognitóban a bővítmények alapból ki vannak kapcsolva, **de** sok
-> ad-blockert a felhasználó engedélyez inkognitóra is. Ezért a fenti gyorsteszt
-> fontosabb, mint a feltételezés.
+A GTM konténer `cache-control: private, max-age=900` fejléccel érkezik, tehát a
+böngésző **15 percig a régi verziót** használja. Publikálás után ez pontosan úgy néz
+ki, mintha a Pixel nem működne — és könnyű ad-blockerre gyanakodni.
+
+**Minden GTM-publikálás után: `Cmd + Shift + R` (hard reload), mielőtt bármit
+diagnosztizálnál.**
+
+Ez a mérés dönti el, hogy tényleg a Pixelt látod-e (konzol a `www.lexfit.hu`-n,
+sütik elfogadása után):
+
+```js
+({
+  scriptTag: [...document.querySelectorAll('script[src*="connect.facebook.net"]')].map(s => s.src),
+  valodiPixel: typeof fbq !== 'undefined' && typeof fbq.getState === 'function',
+  queue: typeof fbq !== 'undefined' ? (fbq.queue || []).length : null,
+  fbp: document.cookie.split('; ').find(c => c.startsWith('_fbp=')) || null,
+})
+```
+
+| Kimenet | Diagnózis |
+|---|---|
+| `valodiPixel: true`, `queue: 0`, van `_fbp` | ✅ a Pixel él és fut |
+| `scriptTag: []` | a GTM tag nem szúrta be a scriptet — tag- vagy trigger-hiba |
+| van `scriptTag`, de `valodiPixel: false` | a script nem futott le — **először hard reload**, utána Network fül |
+
+Kulcs: `typeof fbq === "function"` **önmagában semmit nem bizonyít** — az alap-stub is
+függvény. Csak az `fbq.getState` megléte igazolja, hogy a valódi könyvtár lefutott.
 
 ## E2. A Meta Test Events fül megnyitása
 
@@ -110,7 +133,7 @@ A Meta **Test events** fület tartsd nyitva egy másik ablakban.
 
 ### 2/a — PageView
 
-1. Nyiss **inkognitó ablakot a tiszta böngészőben**
+1. Nyiss **inkognitó ablakot**
 2. `https://www.lexfit.hu`
 3. Süti-sáv: **„Elfogadom"**
 
@@ -118,11 +141,15 @@ A Meta **Test events** fület tartsd nyitva egy másik ablakban.
 
 **Konzolban ellenőrizhető:**
 ```js
-typeof fbq          // "function"
+typeof fbq.getState === 'function'   // true = a valódi Pixel fut
 ```
 
-Ha `undefined` marad: a böngésző is blokkol (vissza az E1-hez), **vagy** a GTM
-konténer 15 perces cache-e miatt régi verziót töltött → `Cmd + Shift + R` (hard reload).
+> ⚠️ **Ne a `typeof fbq`-t nézd.** Az akkor is `"function"`, ha csak a GTM-be
+> illesztett alap-stub futott le, a valódi `fbevents.js` viszont nem — pontosan ez
+> vezetett félrediagnózishoz 2026-08-13-án. A `getState` az igazi jelző.
+
+Ha `false`: szinte biztosan a **GTM 15 perces cache-e** → `Cmd + Shift + R`.
+Ha hard reload után is `false`, menj az E1 mérésre.
 
 ### 2/b — Lead (a kérdőív indítása)
 
@@ -222,6 +249,11 @@ fizetésbe kerül, de ez a legerősebb megfelelőségi bizonyíték.
 1. Új inkognitó ablak → **„Elutasítom"**
 2. Új friss e-mail-cím → végig a tölcséren → fizess (490 Ft)
 3. **Test events:** **NEM szabad `Purchase`-nek megjelennie**
+4. **Vercel Runtime Logs**, szűrés `[meta-capi]`: meg kell jelennie ennek a sornak:
+   `skipped: not reportable {"adConsent":"denied",…}`
+
+A 4. pont a lényeg: az esemény hiánya önmagában nem bizonyíték (hálózati hiba is
+okozhatná), a log-sor viszont megmutatja, hogy a **hozzájárulási kapu** állította meg.
 
 **Miért működik:** a böngésző a checkout-session létrehozásakor ráírja a döntést a
 Stripe metadatájára (`adConsent: "denied"`), és a webhook csak explicit `"granted"`
@@ -232,10 +264,37 @@ nincs döntés / hamisított érték / üres metadata) — ez az élő megerős�
 
 # HA VALAMI NEM JÖN MEG
 
+## `Purchase` diagnózis — a Vercel log a forrás
+
+A `sendPurchase()` **három esetben némán kihagyja** a jelentést (nincs env, nincs
+azonosító, nincs hozzájárulás). Ezért a „nincs Sentry-hiba" **nem** jelenti azt, hogy
+elment. Minden döntés egy sort ír a Vercel logba.
+
+*Vercel → Deployments → a futó deploy → Runtime Logs* → szűrés: **`[meta-capi]`**
+
+| Log-sor | Jelentés | Teendő |
+|---|---|---|
+| `sent {"eventsReceived":1,…}` | ✅ a Meta befogadta | kész |
+| `sent {"eventsReceived":0,…}` | elfogadta a kérést, de eldobta az eseményt | rossz Pixel ID vagy hibás mező |
+| `sent {"testMode":true,…}` | ⚠️ teszt-kóddal ment → **nem számít** a hirdetés-optimalizálásba | töröld a `META_CAPI_TEST_CODE`-ot |
+| `skipped: not reportable {"adConsent":"denied"}` | a vevő elutasította a sütiket — **helyes működés** | semmi |
+| `skipped: not reportable {"adConsent":null}` | a böngésző nem írt metaadatot a session-re | a checkout-hívás oldalán van baj |
+| `skipped: env missing` | nincs `META_PIXEL_ID` / `META_CAPI_TOKEN` a Vercelben | állítsd be + redeploy |
+| `skipped: no identifiers` | se e-mail, se `_fbp`, se `_fbc` | a Meta nem tudná párosítani |
+| `purchase report failed …` | a Meta elutasította | a sor tartalmazza a Meta pontos hibáját (token, jogosultság) — Sentryben is |
+
+**Egyetlen `[meta-capi]` sor sincs?** Akkor a `maybeReportPurchase` el sem indult: vagy
+nem érkezett webhook (Stripe → Webhooks → delivery log), vagy előfizetésnél a
+`checkout.session.completed` helyett az `invoice.paid` a mérvadó.
+
+---
+
+## Minden egyéb
+
 | Tünet | Hol keresd |
 |---|---|
-| `Purchase` nem érkezik | **Sentry** → keresés `integration:meta-capi` címkére. Ott a Meta pontos hibaüzenete: rossz/lejárt token, hiányzó azonosító, hibás Pixel ID |
-| Semmilyen böngésző-esemény, `fbq` undefined elfogadás után | Ad-blocker az adott böngészőben (E1), vagy a GTM 15 perces cache → hard reload |
+| `Purchase` nem érkezik | a fenti `[meta-capi]` log-tábla — az mindig megmondja, melyik ágon állt meg |
+| Semmilyen böngésző-esemény elfogadás után | **először hard reload** (GTM 15 perces cache), utána az E1 mérés |
 | `lx_*` esemény sincs a `dataLayer`-ben | Az app oldalán van baj — ez kódhiba, szólj |
 | `lx_*` megvan, de Meta-esemény nincs | A GTM trigger neve nem betűre egyezik. Kis-nagybetű számít: `lx_onboarding_start` |
 | `Purchase` jön, de rossz összeggel | A `valueHuf` a Stripe `amount_paid`-ből jön, 100-zal osztva. Ha eltér, a Stripe-oldali összeg más |

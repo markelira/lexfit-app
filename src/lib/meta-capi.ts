@@ -39,6 +39,16 @@ function hash(value: string): string {
   return createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
 }
 
+// Every exit from this module emits exactly one greppable line, because
+// "no Sentry error" does NOT mean "reported": three of the exits below are
+// deliberate silent skips, and without this you cannot tell success from skip
+// while debugging a live funnel. Search Vercel logs for `[meta-capi]`.
+//
+// NEVER put PII here - only whether a field was present, never its value.
+function log(outcome: string, detail: Record<string, unknown>): void {
+  console.log(`[meta-capi] ${outcome}`, JSON.stringify(detail));
+}
+
 export interface PurchaseInput {
   /** Stable id for this purchase (Stripe invoice or payment-intent id). Meta
    *  dedupes on it, so a Stripe webhook retry cannot double-count. */
@@ -58,14 +68,29 @@ export interface PurchaseInput {
  * Returns true when Meta accepted the event.
  */
 export async function sendPurchase(p: PurchaseInput): Promise<boolean> {
-  if (!PIXEL_ID || !TOKEN) return false;
+  if (!PIXEL_ID || !TOKEN) {
+    log("skipped: env missing", {
+      eventId: p.eventId,
+      hasPixelId: !!PIXEL_ID,
+      hasToken: !!TOKEN,
+    });
+    return false;
+  }
 
   // At least one identifier is required, else Meta cannot match the event.
   const user_data: Record<string, unknown> = {};
   if (p.email) user_data.em = [hash(p.email)];
   if (p.fbp) user_data.fbp = p.fbp;
   if (p.fbc) user_data.fbc = p.fbc;
-  if (Object.keys(user_data).length === 0) return false;
+  if (Object.keys(user_data).length === 0) {
+    log("skipped: no identifiers", {
+      eventId: p.eventId,
+      hasEmail: !!p.email,
+      hasFbp: !!p.fbp,
+      hasFbc: !!p.fbc,
+    });
+    return false;
+  }
 
   try {
     const res = await fetch(
@@ -95,6 +120,18 @@ export async function sendPurchase(p: PurchaseInput): Promise<boolean> {
       const detail = await res.text().catch(() => "");
       throw new Error(`Meta CAPI ${res.status}: ${detail.slice(0, 300)}`);
     }
+    // Meta answers 200 with {"events_received":N,...}. A 200 with N=0 means it
+    // accepted the request but dropped the event - which looks identical to
+    // success unless we read the body, so read it.
+    const body = (await res.json().catch(() => null)) as { events_received?: number } | null;
+    log("sent", {
+      eventId: p.eventId,
+      valueHuf: p.valueHuf,
+      eventsReceived: body?.events_received ?? "unknown",
+      // A test-coded event does NOT count towards ad optimisation. If this is
+      // ever true in production, META_CAPI_TEST_CODE was left set.
+      testMode: !!TEST_CODE,
+    });
     return true;
   } catch (e) {
     console.error("[meta-capi] purchase report failed", e);
