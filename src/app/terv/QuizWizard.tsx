@@ -9,7 +9,7 @@ import { canSubmit, normalizeFirstName, validateEmail, validateFirstName } from 
 import type { QuizProgram } from "@/lib/quiz/catalog.server";
 import {
   trackQuizStart, trackQuizStep, trackQuizEmailView, trackQuizLead,
-  trackQuizResultView, trackQuizCtaClick,
+  trackQuizResultView, trackQuizCtaClick, marketingContext, newEventId,
 } from "@/lib/track";
 import type {
   QuizAnswers, Goal, Sex, AgeBand, DailyMove, StepsNow,
@@ -170,11 +170,11 @@ export default function QuizWizard({ programs }: { programs: Record<string, Quiz
               answers={complete}
               lead={lead}
               setLead={setLead}
-              onDone={() => {
+              onDone={(eventId) => {
                 // The program slug is catalogue content, not personal data -
                 // safe to carry, and it is what makes the campaign report
                 // which profile actually converts.
-                trackQuizLead(resolve(recommend(complete), publishedSet).program);
+                trackQuizLead(eventId, resolve(recommend(complete), publishedSet).program);
                 setStep("result");
               }}
             />
@@ -397,7 +397,7 @@ function Capture({
   answers: QuizAnswers;
   lead: { firstName: string; email: string };
   setLead: (v: { firstName: string; email: string }) => void;
-  onDone: () => void;
+  onDone: (eventId: string) => void;
 }) {
   const [health, setHealth] = useState(false);
   const [marketing, setMarketing] = useState(false);
@@ -414,6 +414,9 @@ function Capture({
     if (!ready || busy) return;
     setBusy(true);
     setNetError(false);
+    // Minted here so the Pixel event and the server's CAPI call share it -
+    // without that, Meta counts this lead twice.
+    const eventId = newEventId();
     try {
       const res = await fetch("/api/quiz-lead", {
         method: "POST",
@@ -426,13 +429,17 @@ function Capture({
           answers,
           utm: readUtm(),
           hp_field: "",
+          event_id: eventId,
+          // The visitor's own cookie decision. Reporting a lead to Meta is
+          // advertising measurement, so a refusal must travel with the request.
+          marketing_context: marketingContext(),
         }),
       });
       // A 503 means the quiz is not switched on yet. The filler still earned
       // their result, so show it - only the lead is lost, and that is our
       // problem, not theirs.
       if (!res.ok && res.status !== 503) throw new Error(String(res.status));
-      onDone();
+      onDone(eventId);
     } catch {
       setNetError(true);
       setBusy(false);

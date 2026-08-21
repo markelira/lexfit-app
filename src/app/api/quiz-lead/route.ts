@@ -4,6 +4,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { allowRequest, HOUR_MS } from "@/lib/rate-limit";
 import { loadQuizCatalog } from "@/lib/quiz/catalog.server";
 import { sendQuizResult } from "@/lib/mailer";
+import { sendLead } from "@/lib/meta-capi";
 import {
   buildLead, leadId, parseAnswers, parseUtm, retakePatch, validateIdentity,
   type LeadDoc,
@@ -135,6 +136,32 @@ export async function POST(req: Request) {
     });
   } catch (e) {
     console.error("[quiz-lead] E1 send failed", e);
+  }
+
+  // 8. Report the lead to Meta, server-side. This is the campaign's
+  // optimisation signal, and the server is the only place that knows the lead
+  // was actually stored - an ad blocker can stop the Pixel, but not this.
+  //
+  // Two guards that are not optional:
+  //  - CONSENT. Reporting a lead is advertising measurement, not something the
+  //    person asked for, so a visitor who declined cookies is never reported.
+  //  - THE SHARED event_id. The Pixel fires `Lead` too; Meta only collapses the
+  //    pair on a matching id, so a missing one double-counts every lead.
+  const mkt = (body.marketing_context ?? {}) as { consent?: string; fbp?: string; fbc?: string };
+  const eventId = typeof body.event_id === "string" ? body.event_id : "";
+  if (mkt.consent === "granted" && eventId) {
+    try {
+      await sendLead({
+        eventId,
+        eventTime: Math.floor(now / 1000),
+        email: fresh.email,
+        fbp: mkt.fbp ?? null,
+        fbc: mkt.fbc ?? null,
+        programCode: fresh.computed.program,
+      });
+    } catch (e) {
+      console.error("[quiz-lead] CAPI report failed", e);
+    }
   }
 
   return NextResponse.json({

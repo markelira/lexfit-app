@@ -180,7 +180,7 @@ A kvíz hat új, vendor-semleges eseményt tol a `dataLayer`-be (`src/lib/track.
 | `lx_quiz_start` | az S0 CTA-ra kattintás | *(egyedi)* |
 | `lx_quiz_step` | minden képernyőváltás · paraméter: **csak `step_id`** | *(egyedi, opcionális)* |
 | `lx_quiz_email_view` | az adatbekérő megjelenik | *(egyedi)* |
-| `lx_quiz_lead` | **sikeres e-mail-submit** · `program_code` | **`Lead`** |
+| `lx_quiz_lead` | **sikeres e-mail-submit** · `program_code`, **`event_id`** | **`Lead`** |
 | `lx_quiz_result_view` | az eredményoldal megjelenik | `ViewContent` |
 | `lx_quiz_cta_click` | az eredményoldal fő CTA-ja | *(egyedi)* |
 
@@ -195,6 +195,24 @@ e-mail-submitjára optimalizál, tehát:
 Enélkül két, gyökeresen eltérő minőségű esemény keveredik egy optimalizálási célban:
 egy kvíz-kitöltő, aki megadta az e-mailjét, nem ugyanaz, mint egy látogató, aki elhagyta
 a welcome képernyőt.
+
+### ⚠️ Deduplikáció — enélkül MINDEN lead duplán számít
+
+A `Lead` esemény **két helyről** megy ki: a Pixelből (GTM) **és** a szerverről
+(Conversions API). A Meta csak akkor vonja össze a kettőt, ha **azonos `event_id`-t**
+visznek.
+
+A kliens generálja az azonosítót, beleteszi a `dataLayer`-be **és** elküldi a
+szervernek is. A GTM-tagben tehát:
+
+> **Meta Pixel — Lead** tag → `Event ID` mező = `{{DLV - event_id}}`
+> (Data Layer Variable a `event_id` kulcsra)
+
+Ha ez a mező üresen marad, a Pixel és a CAPI **két külön leadként** jelenik meg, és a
+kampány kétszeres konverziószámra optimalizál.
+
+*A Purchase-nél ez nem probléma, mert az kizárólag szerveroldalról megy — nincs mivel
+ütköznie.*
 
 ### ⚠️ Amit SOHA nem szabad átküldeni
 

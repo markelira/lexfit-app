@@ -68,9 +68,26 @@ export function trackQuizEmailView(): void {
   push("lx_quiz_email_view");
 }
 
-/** The email was submitted - the real lead. (Meta: Lead) */
-export function trackQuizLead(programCode?: string): void {
-  push("lx_quiz_lead", programCode ? { program_code: programCode } : undefined);
+/**
+ * The email was submitted - the real lead. (Meta: Lead)
+ *
+ * `eventId` is NOT optional bookkeeping. This event is reported twice - by the
+ * Pixel here and by the server's Conversions API call - and Meta only collapses
+ * the pair when both carry the same id. The GTM tag MUST map `event_id` to the
+ * Pixel's eventID field, or every lead counts twice.
+ */
+export function trackQuizLead(eventId: string, programCode?: string): void {
+  push("lx_quiz_lead", { event_id: eventId, ...(programCode ? { program_code: programCode } : {}) });
+}
+
+/** A fresh id for one lead submission, shared by the Pixel and the server. */
+export function newEventId(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    // Older in-app browsers lack randomUUID; collisions here only cost dedup.
+    return `q-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  }
 }
 
 export function trackQuizResultView(programCode?: string): void {

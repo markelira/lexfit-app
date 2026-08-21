@@ -2,7 +2,17 @@ import "server-only";
 import { createHash } from "node:crypto";
 import * as Sentry from "@sentry/nextjs";
 
-// Meta Conversions API - server-side purchase reporting.
+// Meta Conversions API - server-side conversion reporting (Purchase and Lead).
+//
+// ⚠️ THE TWO EVENTS DEDUPE DIFFERENTLY, and getting this wrong inflates the
+// numbers the campaign optimises on:
+//
+//   Purchase - server-only. There is no browser Purchase event, so nothing can
+//     collide and `event_id` exists purely for Stripe-retry safety.
+//   Lead     - fires in BOTH places: the Pixel (via GTM, on `lx_quiz_lead`) and
+//     here. Meta only collapses the pair if they carry the SAME `event_id`, so
+//     the browser mints one, uses it for the Pixel event, and posts it with the
+//     lead. Without that, every quiz lead counts twice.
 //
 // WHY SERVER-SIDE, AND ONLY SERVER-SIDE:
 // the browser cannot be trusted to report a purchase. After the embedded Stripe
@@ -135,6 +145,83 @@ export async function sendPurchase(p: PurchaseInput): Promise<boolean> {
     return true;
   } catch (e) {
     console.error("[meta-capi] purchase report failed", e);
+    Sentry.captureException(e, { tags: { integration: "meta-capi" } });
+    return false;
+  }
+}
+
+export interface LeadInput {
+  /** MUST be the same id the browser gave the Pixel event - see the dedup note
+   *  at the top of this file. A fresh id here double-counts the lead. */
+  eventId: string;
+  eventTime: number;
+  email: string;
+  fbp?: string | null;
+  fbc?: string | null;
+  /** Recommended programme slug. Catalogue content, never personal data. */
+  programCode?: string | null;
+}
+
+/**
+ * Report a quiz lead. Best-effort: never throws, so a Meta outage cannot fail
+ * the submit that the person is waiting on.
+ *
+ * ⚠️ `custom_data` carries the programme slug and NOTHING else. The quiz
+ * collects body metrics and a life-stage answer; sending those to an ad
+ * platform would breach Meta's own Business Tools terms as well as this repo's
+ * rule that measurement never carries personal data. The email leaves only as a
+ * SHA-256 hash, exactly as for Purchase.
+ *
+ * The caller must have checked consent first - reporting a lead is advertising
+ * measurement, not performance of anything the person asked for.
+ */
+export async function sendLead(p: LeadInput): Promise<boolean> {
+  if (!PIXEL_ID || !TOKEN) {
+    log("skipped: env missing", { eventId: p.eventId, hasPixelId: !!PIXEL_ID, hasToken: !!TOKEN });
+    return false;
+  }
+
+  const user_data: Record<string, unknown> = { em: [hash(p.email)] };
+  if (p.fbp) user_data.fbp = p.fbp;
+  if (p.fbc) user_data.fbc = p.fbc;
+
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/${API_VERSION}/${PIXEL_ID}/events`,
+      {
+        method: "POST",
+        signal: AbortSignal.timeout(8000),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_token: TOKEN,
+          ...(TEST_CODE ? { test_event_code: TEST_CODE } : {}),
+          data: [
+            {
+              event_name: "Lead",
+              event_time: p.eventTime,
+              event_id: p.eventId,
+              action_source: "website",
+              event_source_url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu"}/terv`,
+              user_data,
+              ...(p.programCode ? { custom_data: { content_name: p.programCode } } : {}),
+            },
+          ],
+        }),
+      },
+    );
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      throw new Error(`Meta CAPI ${res.status}: ${detail.slice(0, 300)}`);
+    }
+    const body = (await res.json().catch(() => null)) as { events_received?: number } | null;
+    log("lead sent", {
+      eventId: p.eventId,
+      eventsReceived: body?.events_received ?? "unknown",
+      testMode: !!TEST_CODE,
+    });
+    return true;
+  } catch (e) {
+    console.error("[meta-capi] lead report failed", e);
     Sentry.captureException(e, { tags: { integration: "meta-capi" } });
     return false;
   }
