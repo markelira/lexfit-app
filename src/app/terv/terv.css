@@ -1,0 +1,337 @@
+/* LEXFIT lead magnet quiz (/terv). Everything is scoped under `.lxq` so the
+   generic class names here never leak into the app screens, which share the
+   global stylesheet layer - same convention as the landing's `.lxl`.
+
+   Mobile-first by construction: this page is served almost entirely to phones
+   arriving from a Meta ad, so the phone layout is the base and the desktop
+   rules are the exception. */
+
+.lxq {
+  --q-max: 560px;
+  --q-gap: var(--sp-4);
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Chrome: progress + back ─────────────────────────────────────────────── */
+
+.lxq .q-top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: var(--sp-3) var(--sp-4) var(--sp-2);
+  background: color-mix(in oklch, var(--bg) 86%, transparent);
+  backdrop-filter: blur(12px) saturate(160%);
+}
+.lxq .q-topline {
+  max-width: var(--q-max);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 32px;
+}
+.lxq .q-back {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 14px;
+  padding: 6px 8px;
+  margin-left: -8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  /* Feedback belongs on the press, not the release. */
+  transition: transform var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.lxq .q-back:active { transform: scale(0.94); color: var(--ink); }
+.lxq .q-back[hidden] { visibility: hidden; }
+.lxq .q-count {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+.lxq .q-bar {
+  max-width: var(--q-max);
+  margin: var(--sp-2) auto 0;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.lxq .q-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-2);
+  transform-origin: left center;
+  transition: transform var(--dur-slow) var(--ease);
+}
+
+/* ── Screen shell ────────────────────────────────────────────────────────── */
+
+.lxq .q-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-5) var(--sp-4) calc(var(--sp-10) + env(safe-area-inset-bottom));
+}
+.lxq .q-screen {
+  width: 100%;
+  max-width: var(--q-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--q-gap);
+  /* Each screen arrives along the same short path it will leave by. */
+  animation: q-in var(--dur-base) var(--ease) both;
+}
+@keyframes q-in {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+.lxq .q-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--accent-2);
+  text-transform: uppercase;
+}
+.lxq h1 {
+  margin: 0;
+  font-size: clamp(24px, 6vw, 32px);
+  font-weight: 300;
+  line-height: 1.15;
+  /* Large type reads too loose at default tracking. */
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.lxq .q-micro {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ── Options ─────────────────────────────────────────────────────────────── */
+
+.lxq .q-opts { display: flex; flex-direction: column; gap: var(--sp-2); }
+.lxq .q-opt {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+@media (hover: hover) {
+  .lxq .q-opt:hover { border-color: var(--accent); background: var(--accent-soft); }
+}
+.lxq .q-opt:active { transform: scale(0.985); }
+.lxq .q-opt[aria-pressed="true"] {
+  border-color: var(--accent-2);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent-2);
+}
+.lxq .q-opt:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+/* ── Inputs ──────────────────────────────────────────────────────────────── */
+
+.lxq .q-fields { display: flex; flex-direction: column; gap: var(--sp-4); }
+.lxq .q-field { display: flex; flex-direction: column; gap: 6px; }
+.lxq .q-field > label { font-size: 13px; color: var(--ink-2); }
+.lxq .q-field input {
+  font: inherit;
+  font-size: 17px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  width: 100%;
+}
+.lxq .q-field input:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.lxq .q-field.bad input { border-color: var(--danger); }
+.lxq .q-err { color: var(--danger); font-size: 13px; margin: 0; }
+.lxq .q-warn {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  background: var(--accent-soft);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.lxq .q-cta {
+  appearance: none;
+  border: 0;
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent-2);
+  border-radius: 999px;
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+.lxq .q-cta:active { transform: scale(0.98); }
+.lxq .q-cta:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.lxq .q-cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.lxq .q-link {
+  display: inline-block;
+  color: var(--ink-2);
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+  padding: 10px;
+}
+
+/* ── Interstitial ────────────────────────────────────────────────────────── */
+
+.lxq .q-fact {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.lxq .q-fact p { margin: 0; line-height: 1.6; }
+.lxq .q-fact .big { font-size: 18px; }
+.lxq .q-src { font-size: 12px; color: var(--ink-3); }
+
+/* ── Loader ──────────────────────────────────────────────────────────────── */
+
+.lxq .q-load { display: flex; flex-direction: column; gap: var(--sp-3); margin-top: var(--sp-6); }
+.lxq .q-load li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  list-style: none;
+  font-size: 15px;
+  color: var(--ink-3);
+  transition: color var(--dur-base) var(--ease);
+}
+.lxq .q-load li.on { color: var(--ink); }
+.lxq .q-tick {
+  width: 20px; height: 20px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: #fff;
+  transition: background var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
+}
+.lxq .q-load li.on .q-tick { background: var(--ok); border-color: var(--ok); }
+
+/* ── Consents ────────────────────────────────────────────────────────────── */
+
+.lxq .q-consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.lxq .q-consent input {
+  flex: none;
+  width: 20px; height: 20px;
+  margin-top: 1px;
+  accent-color: var(--accent-2);
+}
+
+/* ── Result ──────────────────────────────────────────────────────────────── */
+
+.lxq .q-result { gap: var(--sp-6); }
+.lxq .q-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.lxq .q-card h2 {
+  margin: 0;
+  font-size: 13px;
+  font-family: var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  font-weight: 500;
+}
+.lxq .q-card p { margin: 0; line-height: 1.6; }
+.lxq .q-kcals { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+.lxq .q-kcal .k {
+  font-size: 12px;
+  color: var(--ink-3);
+  display: block;
+}
+.lxq .q-kcal .v {
+  font-size: clamp(24px, 7vw, 32px);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.lxq .q-arrow { color: var(--ink-3); font-size: 20px; }
+.lxq .q-fine { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+.lxq .q-progline {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.lxq .q-progline > i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+.lxq .q-bonus {
+  background: var(--accent-soft);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.lxq .q-closer { text-align: center; font-size: 17px; line-height: 1.5; }
+.lxq .q-legal { font-size: 12px; color: var(--ink-3); line-height: 1.55; }
+
+@media (min-width: 720px) {
+  .lxq .q-main { padding-top: var(--sp-8); }
+  .lxq .q-opt { padding: 18px 20px; }
+}
+
+/* Reduced motion: keep the meaning, drop the travel. The tick-list still
+   changes colour, the bar still fills - nothing moves through space. */
+@media (prefers-reduced-motion: reduce) {
+  .lxq .q-screen { animation: none; }
+  .lxq .q-bar > i { transition: none; }
+  .lxq .q-opt:active,
+  .lxq .q-cta:active,
+  .lxq .q-back:active { transform: none; }
+}
