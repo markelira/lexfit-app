@@ -2,7 +2,12 @@
 
 **LEXFIT — online otthoni edzésprogram-szolgáltatás**
 
-Hatályos: 2026. augusztus 11. napjától.
+Hatályos: 2026. augusztus 21. napjától. · Verzióazonosító: **2026-08-21**
+
+*(Korábbi hatályos változat: 2026. augusztus 11. — a jelen módosítás a lead-kérdőívvel
+[„kvíz"] összefüggő adatkezelést, az abban megadott egészséggel összefüggő adatok
+kezelését és a marketingcélú e-mailezést vezeti be. A meglévő felhasználók adatkezelését
+a módosítás nem érinti.)*
 
 A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete (általános adatvédelmi rendelet, **GDPR**) 13–14. cikke, valamint az információs önrendelkezési jogról és az információszabadságról szóló 2011. évi CXII. törvény (**Infotv.**) alapján készült.
 
@@ -26,7 +31,9 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 
 2.3. Az Adatkezelő a Weboldalon webanalitikai és hirdetésmérési célú mérést végez (Google Analytics 4, Google Tag Manager, Meta Pixel), **kizárólag a látogató előzetes, önkéntes hozzájárulása alapján**: hozzájárulás hiányában egyetlen mérőkód sem töltődik be és analitikai vagy hirdetési süti nem kerül elhelyezésre (részletesen a 7. pont). Az Adatkezelő a személyes adatokat nem értékesíti.
 
-2.4. Az Adatkezelő nem hoz a GDPR 22. cikke szerinti, kizárólag automatizált adatkezelésen alapuló, joghatással járó döntést. A szolgáltatáson belüli személyre szabás (pl. a regisztrációs kérdőív válaszai alapján ajánlott edzésbeosztás, aktivitásalapú kedvezményajánlatok) a szerződés teljesítésének része, és nem jár az érintettre nézve joghatással vagy hasonlóan jelentős hatással.
+2.4. Az Adatkezelő nem hoz a GDPR 22. cikke szerinti, kizárólag automatizált adatkezelésen alapuló, joghatással járó döntést. A szolgáltatáson belüli személyre szabás (pl. a regisztrációs kérdőív válaszai alapján ajánlott edzésbeosztás, aktivitásalapú kedvezményajánlatok) a szerződés teljesítésének része, és nem jár az érintettre nézve joghatással vagy hasonlóan jelentős hatással. **Ugyanez irányadó a lead-kérdőív automatikusan előálló eredményére (kalóriabecslés, programajánlás, lépéscél) is: az kizárólag tájékoztató jellegű iránymutatás, amelyhez semmilyen joghatás vagy az érintettre nézve hasonlóan jelentős következmény nem kapcsolódik.**
+
+2.5. Az Adatkezelő a Weboldalon **kitöltési kötelezettség nélküli, ingyenes kérdőívet („kvíz")** tesz elérhetővé, amely a kitöltő válaszai alapján tájékoztató jellegű becslést és programajánlást ad. A kvíz kitöltéséhez regisztráció nem szükséges. **A kérdőívre adott válaszok a kitöltés ideje alatt kizárólag a látogató saját böngészőjében tárolódnak; az Adatkezelő szervereire semmilyen adat nem kerül mindaddig, amíg a kitöltő az utolsó lépésben az e-mail címét meg nem adja és a hozzájárulást kifejezetten meg nem adja.** A kvíz eredménye tájékoztató jellegű, **nem minősül orvosi tanácsnak vagy diagnózisnak**, és nem helyettesíti egészségügyi szakember véleményét.
 
 ## 3. Az egyes adatkezelési célok
 
@@ -45,8 +52,10 @@ A jelen tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendele
 | **i) „Finish Share" — edzés utáni megosztókép** | (1) b) — szerződés teljesítése (kizárólag a statisztikákra) | Lásd 3.3. pont — **a szelfi nem kerül feltöltésre** | A telefon–számítógép átadási munkamenet adatai (kizárólag edzésstatisztika) **15 perc** után lejárnak és törlődnek |
 | **j) Panaszkezelés, érintetti kérelmek** | (1) c) — jogi kötelezettség; f) — jogos érdek (igényérvényesítés) | A panasz/kérelem tartalma, a válasz, azonosító adatok; az adatexport-kérések napi darabszámát rögzítő technikai napló | Fgytv. szerinti panasznyilvántartás: 5 év; érintetti kérelmek dokumentálása: 5 év |
 | **k) Webanalitika (látogatottságmérés)** | (1) a) — hozzájárulás (süti-sáv) | A Google Analytics 4 által kezelt adatok: álnevesített ügyfél-azonosító (süti), IP-cím, eszköz- és böngészőadatok, megtekintett oldalak és események. **Kizárólag a hozzájáruló látogatókra terjed ki.** | A Google Analytics tulajdonban beállított adatmegőrzési idő szerint, illetve a hozzájárulás visszavonásáig |
-| **l) Hirdetésmérés és -optimalizálás (Meta Pixel)** | (1) a) — hozzájárulás (süti-sáv) | Álnevesített hirdetési azonosító (süti), IP-cím, eszköz- és böngészőadatok, a megtekintett oldal címe és tartalmi jellemzői, valamint a tölcsér eseményei (kérdőív indítása, regisztráció, fizetési lépés elérése). **Kizárólag a hozzájáruló látogatókra terjed ki.** A Meta „automatikus haladó párosítás" (hashelt e-mail/telefonszám küldése) funkciója **kikapcsolva**. | A Meta adatmegőrzési szabályai szerint, illetve a hozzájárulás visszavonásáig |
-| **m) Vásárlás visszajelzése a hirdetési rendszernek (Meta Conversions API)** | (1) a) — hozzájárulás (süti-sáv) | A sikeres fizetés ténye, összege és időpontja, valamint a párosításhoz a vásárló e-mail-címének **egyirányú kivonata (SHA-256 hash)** és a Meta saját sütiazonosítói. Az e-mail-cím maga **nem** kerül továbbításra. A továbbítás szerveroldalon történik, és **kizárólag akkor, ha a vásárló a sütikhez hozzájárult** — a hozzájárulás hiánya esetén elmarad. | A Meta adatmegőrzési szabályai szerint |
+| **l) Hirdetésmérés és -optimalizálás (Meta Pixel)** | (1) a) — hozzájárulás (süti-sáv) | Álnevesített hirdetési azonosító (süti), IP-cím, eszköz- és böngészőadatok, a megtekintett oldal címe és tartalmi jellemzői, valamint a tölcsér eseményei (**a lead-kérdőív indítása, lépésenkénti előrehaladása — a válaszok tartalma nélkül —, a lead-adatok megadása,** regisztráció, fizetési lépés elérése). **Kizárólag a hozzájáruló látogatókra terjed ki. A kérdőívre adott válaszok, így különösen a testadatok és az élethelyzetre vonatkozó válasz, a hirdetési rendszerek felé semmilyen formában nem kerülnek továbbításra.** A Meta „automatikus haladó párosítás" (hashelt e-mail/telefonszám küldése) funkciója **kikapcsolva**. | A Meta adatmegőrzési szabályai szerint, illetve a hozzájárulás visszavonásáig |
+| **m) Konverzió visszajelzése a hirdetési rendszernek (Meta Conversions API)** | (1) a) — hozzájárulás (süti-sáv) | A sikeres fizetés **, illetve a lead-kérdőív kitöltésének** ténye, összege és időpontja, valamint a párosításhoz a felhasználó e-mail-címének **egyirányú kivonata (SHA-256 hash)** és a Meta saját sütiazonosítói. **A kérdőív esetében kizárólag az esemény ténye, az ajánlott program azonosítója és az e-mail-cím kivonata kerül továbbításra — a kérdőív válaszai és az azokból számított eredmény nem.** Az e-mail-cím maga **nem** kerül továbbításra. A továbbítás szerveroldalon történik, és **kizárólag akkor, ha a vásárló a sütikhez hozzájárult** — a hozzájárulás hiánya esetén elmarad. | A Meta adatmegőrzési szabályai szerint |
+| **n) Lead-kérdőív („kvíz") kitöltése és a személyes eredmény elkészítése, elküldése** | (1) **a) — kifejezett hozzájárulás**; az egészségi állapottal összefüggő adatok tekintetében a **9. cikk (2) a) pontja szerinti kifejezett hozzájárulás** | Keresztnév, e-mail-cím; a kérdőívre adott válaszok: cél, biológiai nem, korsáv, **testmagasság, testsúly, cél-testsúly**, napközbeni mozgás, becsült napi lépésszám, edzési gyakoriság, **élethelyzet**, vállalható edzésidő, fő akadály; a válaszokból számított eredmény (becsült napi energiaigény, ajánlott program, napi lépéscél); a hozzájárulás időbélyege, a tájékoztató elfogadott változatának azonosítója, a kitöltés technikai adatai (IP-cím, böngészőazonosító a visszaélés-védelemhez), valamint a kampányazonosítók (UTM-paraméterek) | **A hozzájárulás visszavonásáig, ennek hiányában a kitöltéstől számított 24 hónapig.** Az egészségi állapottal összefüggő adatok (testadatok, élethelyzet) és az azokból számított kalóriaértékek **12 hónap** után automatikusan törlésre kerülnek, akkor is, ha a lead egyébként aktív marad. Regisztráció esetén az adatok a fiókhoz kapcsolódnak, és a továbbiakban az a) sor szerint kezelendők |
+| **o) Marketing- (hírlevél-) e-mailek** | (1) a) — hozzájárulás; a gazdasági reklámtevékenységről szóló 2008. évi XLVIII. tv. (Grtv.) 6. §-a szerinti **kifejezett, előzetes hozzájárulás** | E-mail-cím, keresztnév; a szegmentáláshoz a kérdőív **nem egészségügyi** válaszai (cél, fő akadály, ajánlott program); a küldés és a leiratkozás technikai adatai | A hozzájárulás visszavonásáig (leiratkozás), ennek hiányában legfeljebb az n) sor szerinti megőrzési időig |
 
 ### 3.2. Külön figyelmet érdemlő adatkör: haladási fotók
 
@@ -68,9 +77,23 @@ Az edzés befejezése után a felhasználó opcionálisan megosztóképet (szelf
 - ez a munkamenet-bejegyzés **15 perc elteltével lejár** és törlődik;
 - az elkészült kép megosztása (pl. közösségi médiában) a felhasználó saját döntése és felelőssége.
 
+### 3.4. Külön figyelmet érdemlő adatkör: a lead-kérdőív egészséggel összefüggő adatai
+
+A kérdőív olyan adatokat is bekér (testmagasság, testsúly, cél-testsúly, élethelyzet, mozgási és edzési szokások), amelyek a GDPR 9. cikke szerinti, egészségi állapottal összefüggő különleges adatnak minősülhetnek. Az Adatkezelő ezeket kiemelt védelemmel kezeli:
+
+- a kitöltés **teljesen önkéntes**, és a Weboldal, valamint a szolgáltatás a kérdőív kitöltése nélkül is teljes értékűen használható;
+- az adatkezelés jogalapja **kizárólag az érintett kifejezett hozzájárulása** (GDPR 9. cikk (2) a)), amelyet a kitöltő **külön, előre be nem jelölt jelölőnégyzetben** ad meg; ez a hozzájárulás **nem vonható össze** a marketingcélú hozzájárulással, és annak megadása nem feltétele a marketing-hozzájárulásnak (és fordítva);
+- **az adatok az Adatkezelő szervereire kizárólag a hozzájárulás megadásával egyidejűleg kerülnek** — a kérdőív kitöltése közben minden válasz a látogató saját böngészőjében marad;
+- az adatokhoz kizárólag az Adatkezelő erre feljogosított munkatársa fér hozzá; az adatbázis hozzáférési szabályai a lead-adatokat a Weboldal felől **olvashatatlanná** teszik;
+- az egészséggel összefüggő adatok és az azokból számított kalóriaértékek **12 hónap** után automatikusan törlésre kerülnek (3.1. n) pont);
+- **az Adatkezelő ezeket az adatokat harmadik félnek nem adja át, és hirdetési célra — így a hirdetési rendszerek (Google, Meta) felé — semmilyen formában nem továbbítja**;
+- az adatokból képzett eredmény **tájékoztató jellegű becslés**, nem orvosi tanács; krónikus betegség, szülés utáni időszak vagy egyéb egészségi kockázat esetén az Adatkezelő orvosi konzultációt javasol, amire a kérdőív eredményoldala figyelmeztet.
+
+A hozzájárulás bármikor, indokolás nélkül visszavonható (6.8. pont).
+
 ## 4. Az adatok forrása
 
-Az adatok forrása minden esetben az érintett (regisztráció, kérdőív, használat), illetve a választott bejelentkezési szolgáltató (Google / Apple) által a bejelentkezéskor átadott alapadatok (név, e-mail-cím), valamint a szolgáltatás használata során technikailag keletkező adatok (pl. videomegtekintési események).
+Az adatok forrása minden esetben az érintett (regisztráció, kérdőív, használat), illetve a választott bejelentkezési szolgáltató (Google / Apple) által a bejelentkezéskor átadott alapadatok (név, e-mail-cím), valamint a szolgáltatás használata során technikailag keletkező adatok (pl. videomegtekintési események). **A lead-kérdőívet kitöltő, fiókkal nem rendelkező érintettek esetében az adatok forrása kizárólag maga az érintett (a kérdőívre adott válaszok és a megadott elérhetőség), valamint a hirdetési kampányazonosítók, amelyek arról tájékoztatnak, hogy a látogató melyik hirdetésről érkezett.**
 
 ## 5. Adatfeldolgozók, címzettek, adattovábbítás harmadik országba
 
@@ -78,11 +101,11 @@ Az Adatkezelő az alábbi adatfeldolgozókat, illetve önálló adatkezelőként
 
 | Szolgáltató | Szerep | Kezelt adatok | Adattovábbítás / garanciák |
 |---|---|---|---|
-| **Google Ireland Ltd. / Google LLC — Firebase** (Firestore, Authentication, Cloud Storage) | adatbázis, bejelentkezés, fájltárolás | fiókadatok, haladási adatok, fotók | Tárolás: **EU (Frankfurt, europe-west3)**. A Google LLC az EU–USA adatvédelmi keret (EU–U.S. Data Privacy Framework, DPF) tanúsított résztvevője; kiegészítésként általános szerződési feltételek (SCC) |
+| **Google Ireland Ltd. / Google LLC — Firebase** (Firestore, Authentication, Cloud Storage) | adatbázis, bejelentkezés, fájltárolás | fiókadatok, haladási adatok, fotók, **a lead-kérdőív adatai** | Tárolás: **EU (Frankfurt, europe-west3)**. A Google LLC az EU–USA adatvédelmi keret (EU–U.S. Data Privacy Framework, DPF) tanúsított résztvevője; kiegészítésként általános szerződési feltételek (SCC) |
 | **Mux, Inc.** (USA) | videó-streaming és lejátszási statisztika | lejátszási események; néző-azonosítóként a Firebase uid (álnevesített azonosító), megtekintett videó, lejátszási idő, technikai adatok (böngésző, IP-cím a szolgáltatásnyújtáshoz) | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
 | **Stripe Payments Europe, Ltd. / Stripe, Inc.** | fizetések lebonyolítása | fizetési és kártyaadatok (kizárólag a Stripe-nál), tranzakcióadatok, e-mail | EU-s szerződő fél; USA-ba történő továbbításra DPF/SCC. A kártyaadatok tekintetében a Stripe önálló adatkezelőként is eljár |
 | **Billingo Technologies Zrt.** (Magyarország) | NAV-kompatibilis e-számla kiállítása és megküldése | számlázási név, cím, e-mail, vásárlási adatok | EU-n (Magyarországon) belül; a számlaadatok jogszabály alapján a NAV részére továbbításra kerülnek |
-| **Twilio Inc. — SendGrid** (USA) | tranzakciós és emlékeztető e-mailek kiküldése | e-mail-cím, név, az üzenet tartalma | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
+| **Twilio Inc. — SendGrid** (USA) | tranzakciós, emlékeztető **és — kizárólag hozzájárulás alapján — marketingcélú** e-mailek kiküldése | e-mail-cím, név, az üzenet tartalma | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
 | **Vercel Inc.** (USA) | webalkalmazás-tárhely és -kiszolgálás | a kiszolgáláshoz szükséges technikai adatok (IP-cím, kérésnaplók) | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC |
 | **Google LLC — reCAPTCHA (Firebase App Check)** | visszaélés- és botvédelem (a kérések valódi alkalmazásból való származásának ellenőrzése) | eszköz- és böngészőadatok, IP-cím, felhasználói interakciós jelek; a feldolgozás a Google reCAPTCHA feltételei szerint történik | Harmadik országbeli (USA) szolgáltató; DPF-tanúsítás, illetve SCC. A reCAPTCHA használatára a Google [Adatvédelmi irányelvei](https://policies.google.com/privacy) és [Szolgáltatási feltételei](https://policies.google.com/terms) irányadók |
 | **Google Ireland Ltd. / Google LLC — Google Analytics 4, Google Tag Manager** | webanalitika (látogatottságmérés), mérőkód-kezelés | álnevesített ügyfél-azonosító, IP-cím, eszköz- és böngészőadatok, oldalmegtekintési és eseményadatok | **Kizárólag a látogató hozzájárulása esetén.** A Google LLC az EU–USA adatvédelmi keret (DPF) tanúsított résztvevője; kiegészítésként SCC |
@@ -114,6 +137,14 @@ Az érintettet a GDPR 15–21. cikke alapján az alábbi jogok illetik meg; a k�
 
 6.7. A kérelmek benyújthatók az alkalmazáson belül, illetve az info@amstudios.hu címen. Az Adatkezelő a kérelmezőt szükség esetén azonosítja (a fiókhoz tartozó e-mail-címről érkező, illetve bejelentkezett kérelem elfogadott azonosítás).
 
+6.8. **Fiókkal nem rendelkező érintettek (a lead-kérdőív kitöltői).** A kérdőívet kitöltő, de fiókot nem regisztráló érintettek ugyanazokkal a jogokkal rendelkeznek, mint a felhasználók; mivel esetükben az alkalmazás önkiszolgáló felületei (6.1–6.3.) nem elérhetők, a jogok gyakorlásának módja a következő:
+
+- **Leiratkozás / a marketing-hozzájárulás visszavonása:** minden marketingcélú e-mail alján egyetlen kattintással elérhető leiratkozási hivatkozás található, amely azonnal és automatikusan hatályosul. A leiratkozás nem igényel bejelentkezést vagy azonosítást.
+- **Törlés, hozzáférés, helyesbítés, adathordozhatóság:** az **info@amstudios.hu** címre küldött kérelemmel, **a kérdőívben megadott e-mail-címről**. Az Adatkezelő a kérelmet indokolatlan késedelem nélkül, **legkésőbb egy hónapon belül** teljesíti. A törlés ebben az esetben **a személyes adatok végleges és helyreállíthatatlan törlését jelenti**; a 6.3. pont szerinti 30 napos visszavonhatósági időszak fiók hiányában nem alkalmazandó.
+- **Az egészséggel összefüggő adatokra vonatkozó hozzájárulás visszavonása** ugyanezen a címen kérhető; a visszavonás esetén az Adatkezelő ezeket az adatokat haladéktalanul törli, és a korábban elkészített eredményt nem használja fel újra.
+
+Az azonosítás módja: a kérelem elfogadott azonosításnak minősül, ha az a kérdőívben megadott e-mail-címről érkezik.
+
 ## 7. Sütik (cookie-k) és helyi tárolás
 
 7.1. A LEXFIT kétféle tárolást alkalmaz: a szolgáltatás működéséhez **feltétlenül szükséges** technikai tárolást (7.2. pont), amelyhez az ePrivacy szabályok szerint nem szükséges hozzájárulás, valamint **kizárólag hozzájárulás alapján** működő analitikai mérést (7.3. pont).
@@ -129,6 +160,7 @@ A Weboldal első látogatásakor süti-sáv jelenik meg. **A látogató döntés
 | Süti-hozzájárulási döntés (`lx-consent`) | localStorage | a látogató süti-döntésének megőrzése (elfogadás vagy elutasítás), hogy a sáv ne jelenjen meg újra | a böngészőben történő törlésig |
 | A Stripe fizetési oldal saját sütijei | süti (a Stripe domainjén) | biztonságos fizetés, csalásmegelőzés | a Stripe tájékoztatója szerint |
 | A Mux videolejátszó technikai tárolása | helyi tárolás | a lejátszás működése és minősége | munkamenethez kötött |
+| A lead-kérdőív kitöltés közbeni állapota | localStorage | a megkezdett kérdőív válaszainak megőrzése, hogy az oldal frissítésekor ne vesszenek el; **az Adatkezelő szerveréhez nem továbbítódik** | a kitöltés befejezéséig, illetve a böngészőben történő törlésig |
 
 7.3. Hozzájárulás alapján működő analitikai és hirdetésmérési eszközök (GDPR 6. cikk (1) a)):
 
@@ -171,3 +203,5 @@ Az Adatkezelő a GDPR 32. cikke szerinti technikai és szervezési intézkedése
 ## 10. A tájékoztató módosítása
 
 Az Adatkezelő a jelen tájékoztatót jogosult módosítani (pl. új funkció vagy szolgáltató bevezetésekor). A lényeges módosításokról a felhasználók e-mailben vagy az alkalmazásban kapnak értesítést; a mindenkor hatályos változat a Weboldalon érhető el.
+
+Az Adatkezelő a tájékoztató mindenkori változatát **verzióazonosítóval** látja el (a hatálybalépés dátuma, `ÉÉÉÉ-HH-NN` formátumban, lásd a dokumentum fejlécében). A hozzájárulás megadásakor a rendszer rögzíti, hogy az érintett a tájékoztató **melyik változatát** fogadta el — ez az elszámoltathatóság (GDPR 5. cikk (2)) igazolását szolgálja.

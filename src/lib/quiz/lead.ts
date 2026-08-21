@@ -32,10 +32,11 @@ import {
 // The client's arithmetic is never trusted: everything under `computed` is
 // recalculated here from `answers`.
 
-/** MUST match the effective date of the published privacy policy (§9 of the
- *  amendment draft). Bump this the day the amended policy goes live - the
- *  consent log is worthless if it names the wrong version. */
-export const CONSENT_POLICY_VERSION = process.env.QUIZ_POLICY_VERSION ?? "2026-08-11";
+/** MUST match the effective date in the header of the published privacy policy
+ *  (docs/legal/adatkezelesi-tajekoztato.md). Bump BOTH together - a consent log
+ *  naming a version that was never published proves nothing.
+ *  Current: the 2026-08-21 amendment that introduced the quiz. */
+export const CONSENT_POLICY_VERSION = process.env.QUIZ_POLICY_VERSION ?? "2026-08-21";
 
 export const QUIZ_VERSION = "3.0";
 

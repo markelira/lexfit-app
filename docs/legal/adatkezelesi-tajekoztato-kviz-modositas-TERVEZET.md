@@ -1,5 +1,19 @@
 # TERVEZET — az adatkezelési tájékoztató módosítása a lead magnet kvízhez
 
+> # ✅ ÁTVEZETVE — 2026-08-21
+>
+> **Az ügyvéd a tervezetet változtatás nélkül jóváhagyta**, és a módosítás
+> beépült a hatályos `adatkezelesi-tajekoztato.md`-be (hatályos 2026. augusztus
+> 21-től, verzióazonosító `2026-08-21`). **Ez a fájl ettől kezdve csak
+> munkanapló** — a hatályos szöveg a másik fájlban van, azt kell olvasni.
+>
+> A 11. pont nyolc kérdésének elfogadott válasza a tervezet minden
+> alapértelmezése: **a 9. cikk alkalmazandó (A változat)**, 12/24 hónapos
+> megőrzés, dátum-alapú verziószámozás, a kvíz localStorage-a feltétlenül
+> szükséges tárolás, a hozzájáruló szöveg elegendő, a `life_stage` kérdés marad.
+>
+> ---
+>
 > **⚠️ EZ NEM HATÁLYOS SZÖVEG.** Ez egy **ügyvédi felülvizsgálatra szánt szövegtervezet**,
 > amelyet fejlesztői oldalról állítottunk össze abból, amit a rendszer ténylegesen csinálni
 > fog. Nem jogi tanács. **Élesítés előtt ügyvédi jóváhagyás kötelező.**
