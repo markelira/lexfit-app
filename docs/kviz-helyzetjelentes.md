@@ -1052,3 +1052,73 @@ is megtagadja az írást.
   nem kód.
 - A 4 hetes kontrollpont „kb. −1 kg"-ot ír „−1,0" helyett. A spec 1 tizedest kér;
   egész értéknél a magyar tipográfia szerint a „−1 kg" a helyes.
+
+---
+
+## 14. Levelek (E1–E6 + W1) és az admin-javítás — 2026-08-21
+
+### 14.1 A `tartasjavito` synopsis javítva a prodban
+
+| Előtte | Utána |
+|---|---|
+| „Négy hét, **heti 3 edzés**, alkalmanként 10–15 perc. …" | „Négy hét, **hetente egy új edzés, amit a héten többször ismételsz meg** — alkalmanként 10–15 perc. …" |
+
+**Szándékosan nem írtam „háromszor".** A tulajdonosi tisztázás annyit mondott, hogy a heti
+edzést ismételni kell — a *hányszor* nem hangzott el, és nem találok ki számot egy
+felhasználónak látható állításba. A „többször" biztosan igaz, és ha van pontos szám,
+egy szó cseréje.
+
+`title`, `totalSessions`, `facts` és a 4 `sessions` érintetlen. **A többi 6 published
+program leírása és edzésszáma egyezik** — csak ez az egy tért el.
+
+### 14.2 Hét sablon a meglévő react-email stacken
+
+| # | Fájl | Időzítés | Kategória |
+|---|---|---|---|
+| E1 | `emails/quiz-result.tsx` | azonnal, a submit route-ból | **tranzakciós** |
+| E2 | `emails/quiz-obstacle.tsx` | +36 óra, **5 variáns** az akadály szerint | marketing |
+| E3 | `emails/quiz-how-it-works.tsx` | +3 nap | marketing |
+| E4 | `emails/quiz-offer.tsx` | +6 nap | marketing |
+| E5 | `emails/quiz-objections.tsx` | +10 nap | marketing |
+| E6 | `emails/quiz-last-call.tsx` | +14 nap | marketing |
+| W1 | `emails/quiz-winback.tsx` | +45 nap | marketing |
+
+Az **E1 tranzakciós**, tehát a marketing-pipától függetlenül megy — ezt kérte a lead az
+e-mail-címéért cserébe. A többi hatra a pipa a feltétel, és mind visz **működő,
+egykattintásos leiratkozót a lead-azonosítóra kulcsolva** (Grtv. §6).
+
+### 14.3 ⚠️ Három pont, ahol a spec §12 vázlatát NEM lehetett szó szerint követni
+
+Mindhárom esetben azért, mert hamis állítást tett volna a vásárló elé.
+
+1. **E3 — „magyar sikersztori".** Nincs valós ügyfél-történetünk, és kitalálni egy
+   **koholt vélemény** lenne valós emberekről. Ehelyett a levél azt mutatja be, amit a
+   termék bizonyíthatóan tud. *Amikor lesznek valódi vélemények, ez a helyük.*
+2. **E4 — „ingyenes próba / kedvezményes első hónap, határidővel".** Nincs ingyenes
+   próba és nincs havi kedvezmény — a belépő **490 Ft/első hét** —, és **valódi határidő
+   sincs**, tehát a visszaszámláló dark pattern lenne. A levél a tényleges ajánlatot
+   mondja, és őszintén sürget. *Ha kell valódi, időzített ajánlat, az előbb árazási
+   döntés (új Stripe price valós dátumokkal), és a copy követi.*
+3. **E5 — „garancia".** A saját **ÁSZF §10.3 szó szerint kimondja**, hogy a visszatérítést
+   „nem »pénzvisszafizetési garanciaként« hirdeti: ez a Fogyasztót jogszabály alapján
+   megillető jog" — ráadásul **időarányos**, nem teljes összegű. A levél pontosan ezt írja.
+
+### 14.4 Ellenőrzés
+
+`tsc` tiszta · `next build` sikeres · `test:quiz` ✅ 19 blokk · **mind a 26 sablon
+renderel** mintaadattal (`node --import tsx scripts/render-email-previews.ts`).
+A kimeneten ellenőrizve: az E1-ben **nincs** leiratkozó lábléc (0 találat), mind a hat
+marketing-levélben **van**, `kind=leadMarketing` kulccsal; az E4-ben a **490 Ft és
+1 990 Ft a configból** jön, és nem szerepel benne az „ingyenes"/„próbaidő" szó.
+
+Az **E1 be van kötve** a `/api/quiz-lead` route-ba (a korábbi `TODO` megszűnt).
+
+### 14.5 Ami még hátravan
+
+| Tétel | Állapot |
+|---|---|
+| Szekvencia-motor (E2–E6, W1 léptetése) | ⏳ a sablonok készen állnak, a napi cron-szekció nincs megírva |
+| Firestore-index a `nextEmailAt` lekérdezéshez | ⏳ |
+| Purge-cron (a két megőrzési óra érvényesítése) | ⏳ |
+| `convertedAt` visszajelölés regisztrációkor | ⏳ |
+| GTM-átcímkézés + CAPI lead-ág | ⏳ |
