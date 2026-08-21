@@ -917,7 +917,7 @@ function PlayerScreen({ code }: { code: string }) {
         <div className="pf-mbody">
           <div className="pf-yttitle">
             <div className="tt">{video.title} <LxIcon d={lxPaths.chevronDown} size={16} /></div>
-            <div className="mt">Foundation · {video.theme} · {video.mins} perc · {video.format ?? "eszköz nélkül"}</div>
+            <div className="mt">Lexfit Start · {video.theme} · {video.mins} perc · {video.format ?? "eszköz nélkül"}</div>
           </div>
           <div className="pf-nowstrip">
             <div className="cd">{countdown}</div>

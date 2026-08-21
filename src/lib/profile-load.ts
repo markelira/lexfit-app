@@ -113,7 +113,7 @@ export async function loadProfile(uid: string): Promise<ProfileData> {
     },
     programme: {
       slug: fnd?.program?.slug ?? "foundation",
-      label: fnd?.program?.title ?? "Foundation",
+      label: fnd?.program?.title ?? "Lexfit Start",
       step,
       total: fnd?.program?.totalSessions || fnd?.playlist.length || 0,
       nextRetestStep,

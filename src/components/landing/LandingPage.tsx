@@ -159,7 +159,7 @@ const FAQ: [string, string][] = [
   ],
   [
     "Teljesen kezdő vagyok. Nekem való?",
-    "Igen - a Foundation pontosan ide készült: lassú tempó, alapgyakorlatok, bőséges módosításokkal. A saját tempódban haladsz, és a pihenőnap nálunk a terv része.",
+    "Igen - a Lexfit Start pontosan ide készült: lassú tempó, alapgyakorlatok, bőséges módosításokkal. A saját tempódban haladsz, és a pihenőnap nálunk a terv része.",
   ],
   [
     "Férfiként is használhatom?",
@@ -362,7 +362,7 @@ function Journey({ catalog, onPick }: { catalog: LandingCatalog; onPick: (w: Lan
       <div className="jglow" />
       <div className="journey-inner">
         <div className="j-left j-anim" key={bi}>
-          <div className="j-eyebrow">{phase ? `${phase.icon} ${phase.name} fázis` : "Foundation"}</div>
+          <div className="j-eyebrow">{phase ? `${phase.icon} ${phase.name} fázis` : "Lexfit Start"}</div>
           <div className="j-weeknum">{String(bi + 1).padStart(2, "0")}</div>
           <div className="j-week">{block.from}–{block.to}. edzés</div>
           <p className="j-desc">{phase?.desc ?? catalog.entry?.synopsis ?? ""}</p>

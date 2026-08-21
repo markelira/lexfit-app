@@ -73,7 +73,7 @@ export function defaultTrio(d: FinishData): Slot[] {
 export function posterContent(d: FinishData) {
   const lead = resultLead(d);
   return {
-    headline: d.week ? `Foundation · ${d.week}. hét` : "Ma",
+    headline: d.week ? `Lexfit Start · ${d.week}. hét` : "Ma",
     big: lead.v,
     unit: lead.k.toLowerCase(),
     footnote: `${d.mins} perc · ${d.streak}. nap\nsorozatban`,

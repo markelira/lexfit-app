@@ -751,7 +751,7 @@ function Reveal({
             <span className="flag mono">1. NAP</span>
             <span className="dur mono tabular">{fw.mins} PERC</span>
           </div>
-          <div className="wtitle">Foundation · {fw.title}</div>
+          <div className="wtitle">Lexfit Start · {fw.title}</div>
         </div>
 
         <p className="reveal-social mono rv-i">{r.social}</p>

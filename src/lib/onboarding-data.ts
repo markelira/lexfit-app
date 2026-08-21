@@ -99,7 +99,7 @@ export const STEP_COPY: Record<string, { hd: string; sub: string; alexa: string 
   },
   schedule: {
     hd: "Hány nap egy héten?",
-    sub: "A Foundation program 5 napra épül + 2 pihenő, de a tiéd is lehet kevesebb.",
+    sub: "A Lexfit Start program 5 napra épül + 2 pihenő, de a tiéd is lehet kevesebb.",
     alexa: "Válaszd a tarthatót - a heti ritmus visz előre, nem az egyszeri hajtás.",
   },
   env: {
@@ -120,7 +120,7 @@ export const WELCOME = {
 export const REVEAL = {
   eyebrow: "KÉSZ - ITT A HETED",
   hd: "Itt a heted, {n}.",
-  sub: "Ez az 1. heted a Foundation programban. Nem kell kitalálnod semmit - csak kezdd el.",
+  sub: "Ez az 1. heted a Lexfit Start programban. Nem kell kitalálnod semmit - csak kezdd el.",
   cta: "Aktiválom a programom",
   alexa: "Összeraktam az első heted. Most már csak el kell kezdened - ott leszek végig.",
 };

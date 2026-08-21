@@ -205,7 +205,7 @@ export const MOCK_FIRST_ENTRY = {
   hero: {
     kicker: "Kezdjük az elsőt",
     whisper: "„Itt vagyok. Az első nap a legnehezebb - utána már csak csináljuk.”",
-    workout: { flag: "1. NAP", duration: "22 PERC", title: "Foundation · alapozás" },
+    workout: { flag: "1. NAP", duration: "22 PERC", title: "Lexfit Start · alapozás" },
   },
   reminder: {
     label: "Beállítanál egy emlékeztetőt?",

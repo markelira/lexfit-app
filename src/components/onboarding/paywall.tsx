@@ -21,7 +21,7 @@ export interface PayPlan {
 
 // USPs: [0] is the hero (full-width, emphasised); [1..] are the 2-col chip grid.
 export const PAYWALL_FEATURES: { icon: string | string[]; title: string; sub: string }[] = [
-  { icon: lxPaths.calendarCheck, title: "Vezetett programok", sub: "Foundation és több - végigvezetve, a te tempódban" },
+  { icon: lxPaths.calendarCheck, title: "Vezetett programok", sub: "Lexfit Start és több - végigvezetve, a te tempódban" },
   { icon: lxPaths.layoutGrid, title: "Teljes videótár", sub: "200+ edzés" },
   { icon: lxPaths.users, title: "Heti kihívások", sub: "Szavazz Magadra" },
   { icon: lxPaths.chartColumn, title: "Haladáskövetés", sub: "hétről hétre" },

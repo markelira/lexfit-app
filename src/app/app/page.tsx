@@ -121,7 +121,7 @@ export default function KezdolapPage() {
   }
 
   if (loading) return <HomeSkeleton />;
-  if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>A Foundation program még nem érhető el.</p>;
+  if (!data) return <p style={{ color: "var(--ink-2)", marginTop: 40 }}>A Lexfit Start program még nem érhető el.</p>;
 
   const { program, playlist, joined, doneCount, currentIndex, todayCode } = data;
   // The program is an ordered pool; "this week" is the user's own cadence.
