@@ -13,6 +13,10 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { buildLead, leadId, parseAnswers, retakePatch, validateIdentity } from "../src/lib/quiz/lead";
 import { verifyRightsToken } from "../src/lib/quiz/lead-token";
+import {
+  dueAt, healthDueAt, leadDueAt, nextStep, scheduleAfter, stopReason,
+  HEALTH_FIELDS, type SequenceStep,
+} from "../src/lib/quiz/sequence";
 import { calories, steps, round50, round500, round005, bmr, activityMultiplier } from "../src/lib/quiz/calc";
 import { recommend, resolve, SLUG, PLANNED } from "../src/lib/quiz/recommend";
 import {
@@ -388,6 +392,73 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.equal(verifyRightsToken(leadId("b@c.hu"), "erase", exp, t("erase"), now), false, "bound to one lead");
   assert.equal(verifyRightsToken(id, "erase", exp, "", now), false);
   ok("jogérvényesítési token - lejár, akcióhoz és leadhez kötött");
+}
+
+// ─── Nurture sequence: schedule + stop conditions ────────────────────────────
+{
+  const lead = buildLead({
+    firstName: "Anna", email: "anna@pelda.hu", consentHealth: true,
+    consentMarketing: true, answers: A(), utm: {}, ip: null, userAgent: null,
+    published: PUBLISHED, now: 1_000_000,
+  });
+
+  // Every step is timed from createdAt, so a missed cron run catches up
+  // instead of dragging the whole sequence later.
+  const steps: SequenceStep[] = [2, 3, 4, 5, 6, 7];
+  let prev = 0;
+  for (const s of steps) {
+    const d = dueAt(lead.createdAt, s);
+    assert.ok(d > lead.createdAt, `step ${s} is after acquisition`);
+    assert.ok(d > prev, `step ${s} is after step ${s - 1}`);
+    prev = d;
+  }
+  assert.equal(dueAt(lead.createdAt, 2), lead.createdAt + 36 * 3600_000);
+  assert.equal(lead.nextEmailStep, 2, "E1 goes inline; the cron starts at E2");
+  assert.equal(lead.nextEmailAt, dueAt(lead.createdAt, 2));
+
+  // Walking the chain ends, and ending clears the scheduling fields - which is
+  // also what removes the lead from the cron's query.
+  let step: SequenceStep | null = 2;
+  let hops = 0;
+  while (step) {
+    const patch = scheduleAfter(lead, step);
+    step = nextStep(step);
+    if (step) assert.equal(patch.nextEmailStep, step);
+    else assert.deepEqual(patch, { nextEmailAt: null, nextEmailStep: null }, "sequence terminates");
+    if (++hops > 10) throw new Error("sequence does not terminate");
+  }
+  assert.equal(hops, 6, "six scheduled mails: E2-E6 + W1");
+
+  // Stop conditions.
+  assert.equal(stopReason(lead, 3), null, "a consenting, unconverted lead continues");
+  assert.equal(stopReason({ ...lead, unsubscribedAt: 5 }, 3), "unsubscribed");
+  assert.equal(
+    stopReason({ ...lead, consents: { ...lead.consents, marketing: false } }, 3),
+    "no_consent",
+    "Grtv. §6: no marketing consent, no marketing mail",
+  );
+  // Conversion stops EVERYTHING, not just the win-back: E4/E6 pitch the entry
+  // price, which is the wrong mail for somebody who already paid.
+  for (const s of steps) {
+    assert.equal(stopReason({ ...lead, convertedAt: 9 }, s), "converted", `step ${s} stops on conversion`);
+  }
+  ok("szekvencia - createdAt-hoz kötött ütemezés, terminál, és minden leállási ok fog");
+}
+
+// ─── Retention: the two clocks ───────────────────────────────────────────────
+{
+  const created = 1_000_000;
+  assert.ok(healthDueAt(created) < leadDueAt(created), "Art. 9 data expires first");
+  // The purge must strip the body metrics AND the figures derived from them,
+  // while leaving the non-health answers that drive segmentation.
+  const f = HEALTH_FIELDS as readonly string[];
+  for (const must of [
+    "answers.height_cm", "answers.weight_kg", "answers.target_weight_kg",
+    "answers.life_stage", "computed.maintenanceKcal", "computed.goalKcal",
+  ]) assert.ok(f.includes(must), `${must} must be purged`);
+  for (const keep of ["answers.goal", "answers.obstacle", "computed.program", "email", "firstName"])
+    assert.ok(!f.includes(keep), `${keep} must survive the health purge`);
+  ok("megőrzés - a 9. cikkes mezők törlődnek, a szegmentáló válaszok maradnak");
 }
 
 console.log(`\nAll quiz self-tests passed (${n} blocks).`);

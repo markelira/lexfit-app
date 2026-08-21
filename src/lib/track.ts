@@ -42,6 +42,45 @@ export function trackCheckoutStart(plan?: string): void {
   push("lx_checkout_start", plan ? { plan } : undefined);
 }
 
+// ── Lead magnet quiz (/terv) ────────────────────────────────────────────────
+//
+// The quiz submit is the campaign's optimisation signal, so it - not
+// `lx_onboarding_start` - is what the GTM container should map to Meta's
+// `Lead`. Retagging that is a container change, which is the whole reason this
+// layer is vendor-neutral.
+//
+// HARD RULE, and it is stricter here than anywhere else in this file: a quiz
+// ANSWER may never be a parameter. The answers include body metrics and a
+// life-stage question, so shipping them to an ad platform would breach both
+// the module rule above and Meta's own Business Tools terms. Only `step_id`
+// travels - never what was chosen.
+
+export function trackQuizStart(): void {
+  push("lx_quiz_start");
+}
+
+/** `stepId` is the SCREEN, e.g. "goal" or "body" - never the answer. */
+export function trackQuizStep(stepId: string): void {
+  push("lx_quiz_step", { step_id: stepId });
+}
+
+export function trackQuizEmailView(): void {
+  push("lx_quiz_email_view");
+}
+
+/** The email was submitted - the real lead. (Meta: Lead) */
+export function trackQuizLead(programCode?: string): void {
+  push("lx_quiz_lead", programCode ? { program_code: programCode } : undefined);
+}
+
+export function trackQuizResultView(programCode?: string): void {
+  push("lx_quiz_result_view", programCode ? { program_code: programCode } : undefined);
+}
+
+export function trackQuizCtaClick(programCode?: string): void {
+  push("lx_quiz_cta_click", programCode ? { program_code: programCode } : undefined);
+}
+
 /** What the SERVER needs to report a purchase to Meta's Conversions API.
  *
  *  Why it is collected here, in the browser, and carried through Stripe:

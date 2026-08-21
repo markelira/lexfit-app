@@ -7,6 +7,10 @@ import { calories, steps } from "@/lib/quiz/calc";
 import { recommend, resolve } from "@/lib/quiz/recommend";
 import { canSubmit, normalizeFirstName, validateEmail, validateFirstName } from "@/lib/quiz/validate";
 import type { QuizProgram } from "@/lib/quiz/catalog.server";
+import {
+  trackQuizStart, trackQuizStep, trackQuizEmailView, trackQuizLead,
+  trackQuizResultView, trackQuizCtaClick,
+} from "@/lib/track";
 import type {
   QuizAnswers, Goal, Sex, AgeBand, DailyMove, StepsNow,
   TrainingNow, LifeStage, SessionMin, Obstacle,
@@ -62,6 +66,14 @@ export default function QuizWizard({ programs }: { programs: Record<string, Quiz
     try { sessionStorage.setItem(STORE_KEY, JSON.stringify({ a, step })); } catch { /* ignore */ }
   }, [a, step, hydrated]);
 
+  // Measurement lives here rather than in each screen, so a new screen cannot
+  // be added without one. Only the screen id travels - never the answer.
+  useEffect(() => {
+    if (!hydrated) return;
+    if (step === "capture") trackQuizEmailView();
+    else if (step !== "intro" && step !== "result") trackQuizStep(step);
+  }, [step, hydrated]);
+
   // ── Which screens actually apply to this filler ───────────────────────────
   //
   // Two screens are conditional. The spec skips the life-stage screen when the
@@ -113,6 +125,7 @@ export default function QuizWizard({ programs }: { programs: Record<string, Quiz
   };
 
   const complete = isComplete(a, order);
+  const publishedSet = useMemo(() => new Set(Object.keys(programs)), [programs]);
 
   return (
     <div className="lxq">
@@ -132,7 +145,7 @@ export default function QuizWizard({ programs }: { programs: Record<string, Quiz
 
       <main className="q-main">
         <div className="q-screen" key={step}>
-          {step === "intro" && <Intro onStart={() => go(1)} />}
+          {step === "intro" && <Intro onStart={() => { trackQuizStart(); go(1); }} />}
 
           {step === "goal" && <Single hd={C.Q_GOAL.hd} opts={C.Q_GOAL.options} sel={a.goal} on={(v: Goal) => pick("goal", v)} />}
           {step === "sex" && <Single hd={C.Q_SEX.hd} micro={C.Q_SEX.micro} opts={C.Q_SEX.options} sel={a.sex} on={(v: Sex) => pick("sex", v)} />}
@@ -157,7 +170,13 @@ export default function QuizWizard({ programs }: { programs: Record<string, Quiz
               answers={complete}
               lead={lead}
               setLead={setLead}
-              onDone={() => setStep("result")}
+              onDone={() => {
+                // The program slug is catalogue content, not personal data -
+                // safe to carry, and it is what makes the campaign report
+                // which profile actually converts.
+                trackQuizLead(resolve(recommend(complete), publishedSet).program);
+                setStep("result");
+              }}
             />
           )}
           {step === "result" && complete && (
@@ -481,6 +500,9 @@ function Result({
   const next = rec.nextStep ? programs[rec.nextStep] : null;
   const name = normalizeFirstName(firstName);
 
+  // Fires once per mount; the result screen is terminal, so there is no rerun.
+  useEffect(() => { trackQuizResultView(rec.program); }, [rec.program]);
+
   // Exactly one calorie line renders (spec §7 R1).
   const calLine =
     cal.note === "maintain" ? C.RESULT.maintainLine
@@ -552,7 +574,12 @@ function Result({
       </section>
 
       <p className="q-closer">{C.RESULT.closer}</p>
-      <a className="q-cta" href="/register" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>
+      <a
+        className="q-cta"
+        href="/register"
+        style={{ display: "block", textAlign: "center", textDecoration: "none" }}
+        onClick={() => trackQuizCtaClick(rec.program)}
+      >
         {C.RESULT.cta}
       </a>
       <a className="q-link" href="/">{C.RESULT.secondary}</a>

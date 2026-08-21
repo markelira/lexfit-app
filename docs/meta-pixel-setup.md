@@ -167,3 +167,38 @@ lowercase normalizálás a Meta elvárása szerint), a nyers cím soha.
 - Beállítási döntések (2026-08-13): *Automatic advanced matching* marad **KI**;
   a *„detailed page and product info"* marad **BE** (a tájékoztató 7.3. pontja
   emiatt említi a tartalmi jellemzők továbbítását).
+
+---
+
+## Lead magnet kvíz (`/terv`) — GTM-teendők
+
+A kvíz hat új, vendor-semleges eseményt tol a `dataLayer`-be (`src/lib/track.ts`).
+**Mindegyik konténer-munka, nem deploy.**
+
+| `lx_*` esemény | Mikor | Javasolt Meta-megfelelő |
+|---|---|---|
+| `lx_quiz_start` | az S0 CTA-ra kattintás | *(egyedi)* |
+| `lx_quiz_step` | minden képernyőváltás · paraméter: **csak `step_id`** | *(egyedi, opcionális)* |
+| `lx_quiz_email_view` | az adatbekérő megjelenik | *(egyedi)* |
+| `lx_quiz_lead` | **sikeres e-mail-submit** · `program_code` | **`Lead`** |
+| `lx_quiz_result_view` | az eredményoldal megjelenik | `ViewContent` |
+| `lx_quiz_cta_click` | az eredményoldal fő CTA-ja | *(egyedi)* |
+
+### ⚠️ A `Lead` átcímkézése (G3 döntés)
+
+Ma az **`lx_onboarding_start` → `Lead`** (a fenti 73. sor). A kampány viszont a kvíz
+e-mail-submitjára optimalizál, tehát:
+
+1. az `lx_quiz_lead` kapja meg a **`Lead`** standard eseményt;
+2. az `lx_onboarding_start` **kerüljön át** egy egyedi eseménybe (vagy `ViewContent`-be).
+
+Enélkül két, gyökeresen eltérő minőségű esemény keveredik egy optimalizálási célban:
+egy kvíz-kitöltő, aki megadta az e-mailjét, nem ugyanaz, mint egy látogató, aki elhagyta
+a welcome képernyőt.
+
+### ⚠️ Amit SOHA nem szabad átküldeni
+
+A `lx_quiz_step` **kizárólag `step_id`-t** visz, a választ nem. A kvíz válaszai
+testadatot és élethelyzet-kérdést tartalmaznak, tehát a hirdetési rendszerbe küldésük
+egyszerre sértené a `src/lib/track.ts` saját szabályát és vélhetően a Meta Business
+Tools feltételeit. **A GTM-ben se építs olyan változót, ami a válaszra hivatkozik.**

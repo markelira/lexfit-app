@@ -185,6 +185,11 @@ export interface LeadDoc {
   /** Drives the nurture sequence; null when marketing consent was withheld. */
   nextEmailAt: number | null;
   nextEmailStep: number | null;
+  /** Bookkeeping for the sequence cron - what went out and when. */
+  lastEmailAt?: number;
+  lastEmailStep?: number;
+  /** Set once the Art. 9 fields have been stripped (12-month clock). */
+  healthPurgedAt?: number;
   /** True when the client's own arithmetic disagreed with ours (monitoring). */
   clientMismatch?: boolean;
 }

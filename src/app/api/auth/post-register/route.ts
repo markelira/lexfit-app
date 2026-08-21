@@ -5,6 +5,7 @@ import { adminApp, adminDb } from "@/lib/firebase-admin";
 import { verifyRequest } from "@/lib/auth-server";
 import { milestoneClear, milestoneOnce } from "@/lib/milestones";
 import { sendVerifyEmail, sendWelcome } from "@/lib/mailer";
+import { leadId } from "@/lib/quiz/lead";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -67,6 +68,23 @@ export async function POST(req: Request) {
         console.error("[verify email]", e);
       }
     }
+  }
+
+  // Close the quiz funnel's measurement loop: if this address came in as a
+  // lead, stamp the conversion. It also STOPS the nurture sequence - E4 and E6
+  // pitch "your first week is 490 Ft", which is the wrong mail for someone who
+  // just registered. Best-effort: a lead-side failure must not break signup.
+  try {
+    const ref = adminDb.doc(`quizLeads/${leadId(user.email)}`);
+    if ((await ref.get()).exists) {
+      await ref.set(
+        { convertedAt: Date.now(), nextEmailAt: null, nextEmailStep: null },
+        { merge: true },
+      );
+      results.leadConverted = true;
+    }
+  } catch (e) {
+    console.error("[post-register] lead conversion marker", e);
   }
 
   return NextResponse.json({ ok: true, ...results });
