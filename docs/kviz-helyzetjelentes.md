@@ -1187,7 +1187,10 @@ törli, a szegmentálókat meghagyja.
 
 ### 15.6 Ami a kvízből még hátravan
 
-**Fejlesztői oldalon semmi.** A maradék három tétel nem kód:
+> ⚠️ **Javítás (2026-08-21):** ez a pont eredetileg azt állította, „fejlesztői oldalon
+> semmi" — **tévesen**. A szerveroldali **CAPI lead-ág**, amit az 5. fejezet az 1.0
+> részeként rögzít, akkor még nem készült el; csak a böngészőoldali `dataLayer`
+> események. Azóta megépült — lásd a **16. fejezetet**. A maradék valóban nem kód:
 
 | Tétel | Kié |
 |---|---|
@@ -1195,3 +1198,38 @@ törli, a szegmentálókat meghagyja.
 | `QUIZ_POLICY_VERSION`, majd `QUIZ_ENABLED=true` (ebben a sorrendben) | tulajdonos |
 | GTM: a `Lead` átcímkézése | marketing |
 | Deploy | tulajdonos |
+
+---
+
+## 16. Szerveroldali CAPI lead-ág (2026-08-21)
+
+A 15.6 pont téves „nincs több fejlesztői munka" állítását javítja.
+
+### 16.1 Miért kell
+
+A kampány a `Lead`-re optimalizál. A Pixelt egy hirdetésblokkoló megállítja — a szervert
+nem —, és a **szerver az egyetlen hely, ami tudja, hogy a lead ténylegesen elmentődött.**
+
+### 16.2 ⚠️ A deduplikáció, ami a Purchase-nél nem volt kérdés
+
+| Esemény | Honnan megy | `event_id` szerepe |
+|---|---|---|
+| `Purchase` | **csak szerver** | Stripe-újraküldés elleni védelem; nincs mivel ütköznie |
+| `Lead` | **Pixel ÉS szerver** | **a Meta csak azonos `event_id` mellett vonja össze a kettőt** |
+
+A kliens generálja az azonosítót, ugyanazt adja a `dataLayer`-nek és a szervernek.
+**Ha ez hiányzik, minden kvíz-lead kétszer számít**, és a kampány felfújt konverziószámra
+optimalizál. A GTM-oldali teendő (`Event ID` mező = `{{DLV - event_id}}`) a
+`docs/meta-pixel-setup.md`-ben.
+
+### 16.3 Két guard, ami nem opcionális
+
+1. **Hozzájárulás.** A lead jelentése hirdetésmérés, nem olyasmi, amit a kitöltő kért —
+   aki elutasította a sütiket, arról **nem megy jelentés**.
+2. **A `custom_data` kizárólag a program-slugot viszi.** A kvíz testadatot és
+   élethelyzet-választ gyűjt; ezek nem kerülhetnek hirdetési rendszerbe. Az e-mail csak
+   **SHA-256 kivonatként** hagyja el a szervert, ugyanúgy, mint a Purchase-nél.
+
+### 16.4 Ellenőrzés
+
+`tsc` tiszta · `next build` sikeres · `test:quiz` ✅ 21 blokk.
