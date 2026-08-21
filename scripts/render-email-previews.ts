@@ -16,7 +16,15 @@ import DunningDay0 from "../emails/dunning-day0";
 import DunningDay3 from "../emails/dunning-day3";
 import EarnedUnlocked from "../emails/earned-unlocked";
 import FirstWorkout from "../emails/first-workout";
+import LeadRightsConfirm from "../emails/lead-rights-confirm";
 import PasswordReset from "../emails/password-reset";
+import QuizHowItWorks from "../emails/quiz-how-it-works";
+import QuizLastCall from "../emails/quiz-last-call";
+import QuizObjections from "../emails/quiz-objections";
+import QuizObstacle from "../emails/quiz-obstacle";
+import QuizOffer from "../emails/quiz-offer";
+import QuizResult from "../emails/quiz-result";
+import QuizWinback from "../emails/quiz-winback";
 import PauseResuming from "../emails/pause-resuming";
 import StreakRisk from "../emails/streak-risk";
 import SubscriptionStarted from "../emails/subscription-started";
@@ -38,7 +46,15 @@ const templates: Record<string, Template> = {
   "dunning-day3": DunningDay3 as Template,
   "earned-unlocked": EarnedUnlocked as Template,
   "first-workout": FirstWorkout as Template,
+  "lead-rights-confirm": LeadRightsConfirm as Template,
   "password-reset": PasswordReset as Template,
+  "quiz-result": QuizResult as Template,
+  "quiz-obstacle": QuizObstacle as Template,
+  "quiz-how-it-works": QuizHowItWorks as Template,
+  "quiz-offer": QuizOffer as Template,
+  "quiz-objections": QuizObjections as Template,
+  "quiz-last-call": QuizLastCall as Template,
+  "quiz-winback": QuizWinback as Template,
   "pause-resuming": PauseResuming as Template,
   "streak-risk": StreakRisk as Template,
   "subscription-started": SubscriptionStarted as Template,

@@ -43,6 +43,13 @@ import DunningDay3, { subject as dunning3Subject } from "../../emails/dunning-da
 import EarnedUnlocked, { subject as earnedSubject } from "../../emails/earned-unlocked";
 import FirstWorkout, { subject as firstWorkoutSubject } from "../../emails/first-workout";
 import LeadRightsConfirm, { subject as leadRightsSubject } from "../../emails/lead-rights-confirm";
+import QuizResult, { subject as quizResultSubject } from "../../emails/quiz-result";
+import QuizObstacle, { subjectFor as quizObstacleSubject, type Obstacle as QuizObstacleKind } from "../../emails/quiz-obstacle";
+import QuizHowItWorks, { subject as quizHowSubject } from "../../emails/quiz-how-it-works";
+import QuizOffer, { subject as quizOfferSubject } from "../../emails/quiz-offer";
+import QuizObjections, { subject as quizObjectionsSubject } from "../../emails/quiz-objections";
+import QuizLastCall, { subject as quizLastCallSubject } from "../../emails/quiz-last-call";
+import QuizWinback, { subject as quizWinbackSubject } from "../../emails/quiz-winback";
 import PasswordReset, { subject as pwResetSubject } from "../../emails/password-reset";
 import PauseResuming, { subject as pauseSubject } from "../../emails/pause-resuming";
 import StreakRisk, { subjectFor as streakSubject } from "../../emails/streak-risk";
@@ -138,6 +145,18 @@ export function planDisplay(
   };
 }
 
+/**
+ * The entry offer, formatted. Read from PRICES so the quiz mails can never
+ * quote a stale figure - the F0.5 hard rule (no pricing number outside config)
+ * matters most in marketing copy, where a wrong price is a false claim.
+ */
+function introAndStdPrice(): { introPrice: string; stdPrice: string } {
+  return {
+    introPrice: formatHuf(PRICES.week_intro.amountHuf),
+    stdPrice: formatHuf(PRICES.week_std.amountHuf),
+  };
+}
+
 // ── Account & auth (transactional) ──────────────────────────────────────────
 
 export const sendWelcome = (to: string, name?: string | null) =>
@@ -148,6 +167,86 @@ export const sendVerifyEmail = (to: string, verifyUrl: string) =>
 
 export const sendPasswordReset = (to: string, resetUrl: string) =>
   deliver({ to, subject: pwResetSubject, category: "auth", make: () => PasswordReset({ resetUrl }) });
+
+// ── Lead magnet quiz ────────────────────────────────────────────────────────
+//
+// E1 is TRANSACTIONAL - it is the result the lead asked for by handing over
+// their address, so it ships regardless of the marketing box. Everything after
+// it is marketing: gated on consent, and carrying a working one-click opt-out
+// keyed on the LEAD id, because these people have no account to unsubscribe in
+// (Grtv. §6 - no soft opt-in in Hungary).
+
+export type { QuizObstacleKind };
+
+export const sendQuizResult = (
+  to: string,
+  p: {
+    firstName: string; maintenanceKcal: number; goalKcal: number;
+    programTitle: string; stepsTarget: number; bonusTitle?: string | null;
+  },
+) => deliver({ to, subject: quizResultSubject, category: "habit", make: () => QuizResult(p) });
+
+/** Every nurture send needs the lead id: it keys the unsubscribe token. */
+const leadUnsub = (leadId: string) => ({
+  unsub: { uid: leadId, kind: "leadMarketing" as UnsubKind },
+  href: unsubUrl(leadId, "leadMarketing"),
+});
+
+export const sendQuizObstacle = (
+  to: string, leadId: string, p: { firstName: string; obstacle: QuizObstacleKind },
+) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: quizObstacleSubject(p.obstacle), category: "marketing",
+    unsub: u.unsub, make: () => QuizObstacle({ ...p, unsubHref: u.href }),
+  });
+};
+
+export const sendQuizHowItWorks = (
+  to: string, leadId: string, p: { firstName: string; programTitle: string },
+) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: quizHowSubject, category: "marketing",
+    unsub: u.unsub, make: () => QuizHowItWorks({ ...p, unsubHref: u.href }),
+  });
+};
+
+export const sendQuizOffer = (to: string, leadId: string, p: { firstName: string }) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: quizOfferSubject, category: "marketing", unsub: u.unsub,
+    make: () => QuizOffer({ ...p, ...introAndStdPrice(), unsubHref: u.href }),
+  });
+};
+
+export const sendQuizObjections = (
+  to: string, leadId: string, p: { firstName: string; obstacle: QuizObstacleKind },
+) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: quizObjectionsSubject, category: "marketing",
+    unsub: u.unsub, make: () => QuizObjections({ ...p, unsubHref: u.href }),
+  });
+};
+
+export const sendQuizLastCall = (
+  to: string, leadId: string, p: { firstName: string; programTitle: string },
+) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: quizLastCallSubject, category: "marketing", unsub: u.unsub,
+    make: () => QuizLastCall({ ...p, introPrice: introAndStdPrice().introPrice, unsubHref: u.href }),
+  });
+};
+
+export const sendQuizWinback = (to: string, leadId: string, p: { firstName: string }) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: quizWinbackSubject, category: "marketing", unsub: u.unsub,
+    make: () => QuizWinback({ ...p, introPrice: introAndStdPrice().introPrice, unsubHref: u.href }),
+  });
+};
 
 /** A quiz lead exercising a GDPR right. Transactional: no consent gate, no
  *  unsubscribe footer - it answers a request they just made. */

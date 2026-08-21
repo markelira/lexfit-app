@@ -29,12 +29,19 @@ export function EmailLayout({
   preview,
   footer = "transactional",
   reason,
+  unsubHref,
   children,
 }: {
   preview: string;
   footer?: FooterKind;
   /** Overrides the default "why you got this" line. */
   reason?: string;
+  /**
+   * Where the marketing footer's unsubscribe link points. Required for quiz
+   * leads: they have no account, so the default in-app settings link would be
+   * a dead end - and Grtv. §6 makes a working opt-out non-negotiable.
+   */
+  unsubHref?: string;
   children: React.ReactNode;
 }) {
   const settingsUrl = `${APP_URL}/app/profile/settings`;
@@ -108,7 +115,7 @@ export function EmailLayout({
             {footer === "marketing" && (
               <Text style={styles.small}>
                 <Link
-                  href={settingsUrl}
+                  href={unsubHref ?? settingsUrl}
                   style={{ color: color.accentInk, textDecoration: "underline" }}
                 >
                   Leiratkozás

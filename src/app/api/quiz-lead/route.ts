@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 import { allowRequest, HOUR_MS } from "@/lib/rate-limit";
 import { loadQuizCatalog } from "@/lib/quiz/catalog.server";
+import { sendQuizResult } from "@/lib/mailer";
 import {
   buildLead, leadId, parseAnswers, parseUtm, retakePatch, validateIdentity,
   type LeadDoc,
@@ -118,9 +119,23 @@ export async function POST(req: Request) {
   }
 
   // 7. E1 is transactional (it is the result the lead asked for), so it goes
-  // out regardless of the marketing checkbox. Sending must never fail the
-  // request - the lead is saved either way.
-  // TODO(E1): wire the result email once its copy exists (docs §7.6).
+  // out regardless of the marketing checkbox. `deliver()` never throws, but the
+  // await is still guarded: the lead is already saved, and a mail problem must
+  // not turn a successful submission into an error for the person waiting.
+  try {
+    const prog = catalog.bySlug[fresh.computed.program];
+    const bonus = fresh.computed.bonus ? catalog.bySlug[fresh.computed.bonus] : null;
+    await sendQuizResult(fresh.email, {
+      firstName: fresh.firstName,
+      maintenanceKcal: fresh.computed.maintenanceKcal,
+      goalKcal: fresh.computed.goalKcal,
+      programTitle: prog?.title ?? "Lexfit Start",
+      stepsTarget: fresh.computed.stepsTarget,
+      bonusTitle: bonus?.title ?? null,
+    });
+  } catch (e) {
+    console.error("[quiz-lead] E1 send failed", e);
+  }
 
   return NextResponse.json({
     ok: true,
