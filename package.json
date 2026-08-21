@@ -20,6 +20,7 @@
     "test:pricing": "node --import tsx scripts/pricing-selftest.ts",
     "test:funnel": "node --import tsx scripts/funnel-selftest.ts",
     "test:onboarding-draft": "node --import tsx scripts/onboarding-draft-selftest.ts",
+    "test:quiz": "node --import tsx scripts/quiz-selftest.ts",
     "healthcheck": "node --env-file=.env.local scripts/firebase-healthcheck.mjs",
     "email:dev": "email dev --dir emails --port 3001"
   },
