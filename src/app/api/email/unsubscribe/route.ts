@@ -22,6 +22,16 @@ function parse(req: Request): { uid: string; kind: UnsubKind } | null {
 }
 
 async function apply(uid: string, kind: UnsubKind): Promise<void> {
+  // A quiz lead has no account, so the opt-out lives on the lead document.
+  // Clearing nextEmailAt is what actually stops the sequence - the cron picks
+  // leads by that field, so a flag alone would not be enough.
+  if (kind === "leadMarketing") {
+    await adminDb.doc(`quizLeads/${uid}`).set(
+      { unsubscribedAt: Date.now(), nextEmailAt: null, nextEmailStep: null, "consents.marketing": false },
+      { merge: true },
+    );
+    return;
+  }
   if (kind === "marketing") {
     await adminDb.doc(`users/${uid}`).set({ marketingOptIn: false }, { merge: true });
     return;
@@ -40,6 +50,7 @@ const KIND_LABEL: Record<UnsubKind, string> = {
   streakRisk: "a sorozat-figyelmeztetéseket",
   weeklyRecap: "a heti összefoglalót",
   marketing: "az újdonságokat és ajánlatokat",
+  leadMarketing: "a tippeket és ajánlatokat",
 };
 
 export async function POST(req: Request) {
@@ -54,6 +65,14 @@ export async function GET(req: Request) {
   if (!p) return NextResponse.json({ error: "invalid" }, { status: 400 });
   await apply(p.uid, p.kind);
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
+  // A lead has no account, so pointing them at in-app settings would be a dead
+  // end. They get the erasure route instead - the only self-service they have.
+  const isLead = p.kind === "leadMarketing";
+  const tail = isLead
+    ? `<p style="color:#44544d;font-size:15px;line-height:1.6;margin:0 0 20px">Ha azt is szeretnéd, hogy a kvíznél megadott adataidat töröljük, szólj az alábbi címen - egy megerősítő levelet küldünk.</p>
+<a href="mailto:info@amstudios.hu?subject=Adattörlési%20kérelem" style="color:#355c4d">Adataim törlését kérem</a>`
+    : `<p style="color:#44544d;font-size:15px;line-height:1.6;margin:0 0 20px">Ha meggondolnád magad, a beállításokban bármikor visszakapcsolhatod.</p>
+<a href="${base}/app/profile/settings" style="color:#355c4d">Beállítások megnyitása</a>`;
   const html = `<!doctype html><html lang="hu"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Leiratkozva - LEXFIT</title></head>
@@ -61,8 +80,8 @@ export async function GET(req: Request) {
 <div style="max-width:440px;margin:80px auto;padding:38px 32px;background:#fff;border:1px solid #d8e0dd;border-radius:20px;text-align:center">
 <p style="font-weight:900;letter-spacing:0.04em;margin:0 0 18px">LEX<span style="color:#496c5e">FIT</span></p>
 <h1 style="font-weight:300;font-size:24px;margin:0 0 12px">Rendben, kikapcsoltuk.</h1>
-<p style="color:#44544d;font-size:15px;line-height:1.6;margin:0 0 20px">Többé nem küldjük neked ${KIND_LABEL[p.kind]}. Ha meggondolnád magad, a beállításokban bármikor visszakapcsolhatod.</p>
-<a href="${base}/app/profile/settings" style="color:#355c4d">Beállítások megnyitása</a>
+<p style="color:#44544d;font-size:15px;line-height:1.6;margin:0 0 12px">Többé nem küldjük neked ${KIND_LABEL[p.kind]}.</p>
+${tail}
 </div></body></html>`;
   return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
 }

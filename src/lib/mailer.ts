@@ -42,6 +42,7 @@ import DunningDay0, { subject as dunning0Subject } from "../../emails/dunning-da
 import DunningDay3, { subject as dunning3Subject } from "../../emails/dunning-day3";
 import EarnedUnlocked, { subject as earnedSubject } from "../../emails/earned-unlocked";
 import FirstWorkout, { subject as firstWorkoutSubject } from "../../emails/first-workout";
+import LeadRightsConfirm, { subject as leadRightsSubject } from "../../emails/lead-rights-confirm";
 import PasswordReset, { subject as pwResetSubject } from "../../emails/password-reset";
 import PauseResuming, { subject as pauseSubject } from "../../emails/pause-resuming";
 import StreakRisk, { subjectFor as streakSubject } from "../../emails/streak-risk";
@@ -147,6 +148,19 @@ export const sendVerifyEmail = (to: string, verifyUrl: string) =>
 
 export const sendPasswordReset = (to: string, resetUrl: string) =>
   deliver({ to, subject: pwResetSubject, category: "auth", make: () => PasswordReset({ resetUrl }) });
+
+/** A quiz lead exercising a GDPR right. Transactional: no consent gate, no
+ *  unsubscribe footer - it answers a request they just made. */
+export const sendLeadRightsConfirm = (
+  to: string,
+  p: { action: "erase" | "export"; confirmUrl: string },
+) =>
+  deliver({
+    to,
+    subject: leadRightsSubject,
+    category: "auth",
+    make: () => LeadRightsConfirm(p),
+  });
 
 // ── Billing & subscription (transactional) ──────────────────────────────────
 
