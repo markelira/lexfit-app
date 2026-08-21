@@ -1122,3 +1122,76 @@ Az **E1 be van kötve** a `/api/quiz-lead` route-ba (a korábbi `TODO` megszűnt
 | Purge-cron (a két megőrzési óra érvényesítése) | ⏳ |
 | `convertedAt` visszajelölés regisztrációkor | ⏳ |
 | GTM-átcímkézés + CAPI lead-ág | ⏳ |
+
+---
+
+## 15. Szekvencia-motor, megőrzés, mérés — MEGÉPÜLT (2026-08-21)
+
+A 12.6 táblázat minden nyitott tétele lezárva.
+
+### 15.1 Új és módosított fájlok
+
+| Fájl | Szerep |
+|---|---|
+| `src/lib/quiz/sequence.ts` | az ütemezés és a leállási okok — **tiszta függvények**, tehát tesztelhetők adatbázis nélkül |
+| `src/app/api/cron/quiz-leads/route.ts` | napi cron: szekvencia + **két megőrzési óra** |
+| `src/app/api/auth/post-register/route.ts` | `convertedAt` visszajelölés |
+| `src/lib/track.ts` | hat `lx_quiz_*` esemény |
+| `vercel.json` | a napi cron 9:00-ra |
+| `docs/meta-pixel-setup.md` | a GTM-teendők (`Lead` átcímkézés) |
+
+### 15.2 Négy döntés, ami magyarázatot érdemel
+
+1. **Külön cron, nem a `reminders` bővítése.** A meglévő napi job **fizető ügyfeleket**
+   szolgál ki (megújulás, dunning, szokás-levelek). Egy lead-oldali hiba nem éheztetheti ki
+   — a szekciók egymástól is izoláltak, ugyanezért.
+2. **Minden lépés a `createdAt`-hoz van kötve, nem az előző küldéshez.** Ha az előzőhöz
+   láncolnánk, egyetlen lassú futás **egyre későbbre tolná** az egész szekvenciát; így egy
+   kimaradt nap utólag behozza magát.
+3. **A konverzió a TELJES szekvenciát leállítja**, nem csak a win-backet (amiből a spec
+   kizárja a konvertálókat). Az E4 és az E6 azt mondja: „az első heted 490 Ft" — ez rossz
+   levél annak, aki **már fizetett**.
+4. **A lekérdezés `> 0` alsó korlátja nem felesleges.** A Firestore a `null`-t a **számok
+   ELÉ** rendezi, tehát a puszta `<= now` minden befejezett és leiratkozott leadet
+   beszippantana.
+
+### 15.3 A megőrzés két órája — most már érvényesítve
+
+| Óra | Mikor | Mi történik |
+|---|---|---|
+| `healthPurgeAt` | **12 hónap** | a 9. cikkes mezők törlődnek: testadatok **és a belőlük számolt kalóriaértékek**; a szegmentáló válaszok (cél, akadály, ajánlott program) maradnak |
+| `purgeAt` | **24 hónap** | a teljes lead-dokumentum törlődik |
+
+Ez pontosan az, amit a jogi tervezet 3.1/n) sora ígér — eddig **csak mező volt**, most
+futó folyamat.
+
+### 15.4 Mérés
+
+Hat `lx_quiz_*` esemény, **egyetlen effectből** kibocsátva, hogy új képernyőt ne lehessen
+mérés nélkül hozzáadni.
+
+> ⚠️ **A `lx_quiz_step` kizárólag `step_id`-t visz, a választ soha.** A kvíz válaszai
+> testadatot és élethelyzet-kérdést tartalmaznak; a hirdetési rendszerbe küldésük
+> egyszerre sértené a `track.ts` saját szabályát és vélhetően a Meta Business Tools
+> feltételeit.
+
+A `Lead` átcímkézése (`lx_onboarding_start` → `lx_quiz_lead`) **GTM-konténer-munka, nem
+deploy** — a lépések a `docs/meta-pixel-setup.md` végén.
+
+### 15.5 Ellenőrzés
+
+`tsc` tiszta · `next build` sikeres (`/api/cron/quiz-leads` és `/terv` regisztrálva) ·
+**`test:quiz` ✅ 21 blokk** — a két új: a szekvencia `createdAt`-hoz kötött ütemezése,
+terminálása és mind a négy leállási oka; valamint hogy a megőrzés a 9. cikkes mezőket
+törli, a szegmentálókat meghagyja.
+
+### 15.6 Ami a kvízből még hátravan
+
+**Fejlesztői oldalon semmi.** A maradék három tétel nem kód:
+
+| Tétel | Kié |
+|---|---|
+| Ügyvédi jóváhagyás + a tájékoztató publikálása | tulajdonos |
+| `QUIZ_POLICY_VERSION`, majd `QUIZ_ENABLED=true` (ebben a sorrendben) | tulajdonos |
+| GTM: a `Lead` átcímkézése | marketing |
+| Deploy | tulajdonos |
