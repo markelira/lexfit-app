@@ -996,3 +996,59 @@ a lead upsert-kulcs és a kettős megőrzési óra, a lejáró jogérvényesít�
 | **Purge-cron** | a `healthPurgeAt` / `purgeAt` ma csak mezők; a lejárat érvényesítéséhez cron-szekció kell |
 | **`convertedAt` jelölés** | a regisztráció utáni visszajelölés (a funnel-mérés zárása) nincs bekötve |
 | **Firestore index** | a szekvencia-cron `nextEmailAt` szerinti lekérdezéséhez kell majd egy index (`firestore.indexes.json` ma egy indexet tartalmaz) |
+
+---
+
+## 13. Kvíz-UI (S0–S15) — MEGÉPÜLT ÉS VÉGIGJÁRVA (2026-08-21)
+
+A 7.5 sorrend **3. lépésének** hátralévő fele. Route: **`/terv`** (a G1 döntés szerint
+a meglévő appban), publikus és anonim.
+
+### 13.1 Új fájlok
+
+| Fájl | Szerep |
+|---|---|
+| `src/app/terv/page.tsx` | szerver-shell: beolvassa a katalógust, `robots: noindex` (fizetett forgalom, ne versenyezzen a landinggel) |
+| `src/app/terv/QuizWizard.tsx` | a 16 képernyős wizard |
+| `src/app/terv/quiz-copy.ts` | **minden felhasználónak látható szöveg egy helyen** |
+| `src/app/terv/terv.css` | `.lxq` alá scope-olva, a landing `.lxl` konvenciója szerint |
+
+### 13.2 Három elv, amit a kód kikényszerít
+
+1. **A submit előtt semmi nem hagyja el a böngészőt.** Nincs autosave, nincs
+   részleges beküldés — a félkész válaszok `sessionStorage`-ban élnek. Ez a copyban
+   és a jogi tervezetben tett ígéret, nem implementációs részlet.
+2. **A copy egy helyen van.** A kockázatos rész a számok: a KSH-adatok most **a forrás
+   szóhasználatával** szerepelnek, a hibásan forrásolt „15 perc" mondat helyén a
+   szám nélküli átfogalmazás áll, a CTA pedig a valós 490 Ft-os ajánlatot mondja.
+3. **A betöltő 3,6 mp**, és `prefers-reduced-motion` mellett teljesen kimarad.
+
+### 13.3 Végigjárva a valós production katalógussal
+
+Lokális dev, prod Firestore-ból olvasva. A **T1 teszteset** végigvitele:
+
+| Elvárt (spec §14) | Amit a képernyő mutatott |
+|---|---|
+| kb. 1 850 → kb. 1 600 kcal | ✅ „kb. 1850 → kb. 1600" |
+| heti kb. 0,25 kg | ✅ |
+| program: Első Lépés | ✅ „Első Lépés - 7 napos kezdő program" **a valós prod `synopsis`-ával** |
+| next_step: a fő program | ✅ „Lexfit Start" — **az átnevezés végigment** |
+| bónusz: Láb & Fenék | ✅ |
+| lépéscél 8 000, „+1 000 az első héten" ág | ✅ 8000, jelenlegi 5500 |
+
+**Egyéb ellenőrzött viselkedés:** a haladásjelző és a Vissza gomb; a feltételes
+cél-testsúly képernyő csak `fat_loss`-nál; a **D5 élethelyzet-szűrés** (férfinál 2 opció,
+nőnél 30–39-ben 3 — szülés utáni igen, változókor nem); a keresztnév normalizálása
+(„anna" → „Anna"); a CTA pontosan a három feltétel együttes teljesülésekor aktiválódik,
+marketing-pipa nélkül is; oldalfrissítés után a válaszok megmaradnak.
+
+**A production érintetlen maradt:** `POST /api/quiz-lead` → `503 {"error":"not_enabled"}`,
+a `quizLeads` kollekció **0 dokumentum**. A kikapcsolt állapot tehát nem elmélet — élőben
+is megtagadja az írást.
+
+### 13.4 Két apróság, amit szándékosan nem javítottam
+
+- A `🎁` emoji utáni szóköz szűknek látszik egyes rendereléseken — betűtípus-kérdés,
+  nem kód.
+- A 4 hetes kontrollpont „kb. −1 kg"-ot ír „−1,0" helyett. A spec 1 tizedest kér;
+  egész értéknél a magyar tipográfia szerint a „−1 kg" a helyes.
