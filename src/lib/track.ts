@@ -12,6 +12,8 @@
 // Because of that, these calls need no consent check of their own - but they
 // must NEVER carry personal data (no e-mail, no name, no uid, no answers).
 
+import { PRICES, type PriceRole } from "@/lib/pricing/config";
+
 declare global {
   interface Window {
     dataLayer?: Record<string, unknown>[];
@@ -37,9 +39,19 @@ export function trackRegistrationComplete(): void {
 }
 
 /** The embedded Stripe Checkout step was reached.
- *  `plan` is the chosen package, never a person. (Meta: InitiateCheckout) */
+ *  `plan` is the chosen package, never a person. (Meta: InitiateCheckout)
+ *
+ *  Carries the price too: both TikTok and Meta flag a commerce event that
+ *  arrives without a value, and value-based bidding cannot work without one.
+ *  The number is resolved from PRICES rather than written here, so it can never
+ *  drift from what we actually charge - the same rule that keeps every other
+ *  price out of the codebase's body. */
 export function trackCheckoutStart(plan?: string): void {
-  push("lx_checkout_start", plan ? { plan } : undefined);
+  const spec = plan && plan in PRICES ? PRICES[plan as PriceRole] : undefined;
+  push("lx_checkout_start", {
+    ...(plan ? { plan } : {}),
+    ...(spec ? { value: spec.amountHuf, currency: "HUF" } : {}),
+  });
 }
 
 // ── Lead magnet quiz (/terv) ────────────────────────────────────────────────

@@ -14,10 +14,10 @@
 
 import { JWT } from "google-auth-library";
 
-const ACCOUNT = "6370552280";
-const CONTAINER = "260779505";
-const WORKSPACE = "6";
-const WS = `accounts/${ACCOUNT}/containers/${CONTAINER}/workspaces/${WORKSPACE}`;
+const CONTAINER_PATH = "accounts/6370552280/containers/260779505";
+// Resolved at run time, never hardcoded: publishing FREEZES a workspace ("already
+// submitted") and GTM opens a fresh one, so a pinned id breaks on the next run.
+let WS;
 
 const APPLY = process.argv.includes("--apply");
 
@@ -41,6 +41,16 @@ async function api(path, method = "GET", body) {
   const text = await res.text();
   if (!res.ok) throw new Error(`${method} ${path} → ${res.status}: ${text.slice(0, 300)}`);
   return text ? JSON.parse(text) : null;
+}
+
+
+// Pick the workspace GTM is currently accepting edits into.
+{
+  const list = await api(`${CONTAINER_PATH}/workspaces`);
+  const w = (list.workspace ?? [])[0];
+  if (!w) throw new Error("Nincs szerkeszthető workspace — hozz létre egyet a GTM-ben.");
+  WS = `${CONTAINER_PATH}/workspaces/${w.workspaceId}`;
+  console.log(`workspace: "${w.name}" (id=${w.workspaceId})`);
 }
 
 const log = (icon, msg) => console.log(`${icon} ${msg}`);
