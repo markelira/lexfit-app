@@ -172,6 +172,10 @@ lowercase normalizálás a Meta elvárása szerint), a nyers cím soha.
 
 ## Lead magnet kvíz (`/terv`) — GTM-teendők
 
+> 📋 **A kattintásról kattintásra követhető leírás külön fájlban van:**
+> `docs/gtm-setup-tiktok-kviz.md` — az tartalmazza a TikTok Pixel bekötését is.
+> Az alábbi szakasz a *miértet* rögzíti, az a fájl a *hogyant*.
+
 A kvíz hat új, vendor-semleges eseményt tol a `dataLayer`-be (`src/lib/track.ts`).
 **Mindegyik konténer-munka, nem deploy.**
 
