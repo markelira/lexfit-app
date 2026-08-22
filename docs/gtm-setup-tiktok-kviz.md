@@ -249,3 +249,56 @@ Events Managerben lehet generálni a pixel beállításainál.
 - [ ] Preview: mindkét platform tüzel a `lx_quiz_lead`-re, az event_id nem üres
 - [ ] Meta Test events: **egy** Lead jelenik meg, nem kettő
 - [ ] Submit + Publish
+
+
+---
+
+## Napló — mérési eredmények (2026-08-22)
+
+A GTM felülete ezen a munkán **háromszor** mutatott „beállítva" állapotot olyasmire,
+ami nem működött. Az itt rögzített módszer az, ami eldöntötte a kérdéseket: **a tényleges
+kimenő kérés elolvasása**, nem a felület.
+
+### A TikTok payload önellenőrző jele
+
+A sablon minden eseménybe beleteszi a saját konfigurációs kódját:
+
+```js
+gtm_version: version + ':' + getConfigHash(data)
+```
+
+A kód második fele elárulja, melyik ág fut:
+
+| Hash vége | Mit jelent |
+|---|---|
+| `:00` | egyik ág sem illeszkedik — **a paraméterek figyelmen kívül maradnak** |
+| `:01` | `enhance_ecomm=false` + `single_multi_product="empty"` → value/currency megy |
+| `:02` | `enhance_ecomm=false` + `single_multi_product="single"` → **+ content_id, content_type** |
+
+Ez a leggyorsabb módja annak, hogy megmondd, a böngésződ a friss konténert futtatja-e.
+A `gtm.js` cache-e `max-age=900`, tehát **15 percig** régit szolgálhat ki.
+
+### Három hiba, amit ez a módszer talált
+
+1. **A `value` sosem ért célba**, pedig a paraméter be volt állítva. Ok: a sablon csak
+   akkor olvassa, ha a `single_multi_product` is be van állítva — az pedig hiányzott,
+   tehát egyetlen feltételes ág sem futott le. *(Jel: a hash `00` maradt.)*
+2. **A Meta tag idézőjel nélküli behelyettesítést használt.** `{value: {{DLV - value}}}`
+   üres változónál `{value: , …}`-t renderel, ami szintaktikai hiba — és nem csak az árat,
+   hanem **az egész taget** megölte volna.
+3. **A `content_id` elérhetetlen volt a `"empty"` módban.** A sablon
+   `enablingConditions`-e a `"single"` módhoz köti.
+
+### A content_id kísérlet
+
+A live taghez hozzá sem nyúlva, közvetlenül a TikTok SDK-t hívtuk azokkal a mezőkkel,
+amiket a `"single"` mód állítana elő — előbb ellenőrizve, hogy a böngésző teszt módban
+van (`tt_test_id` jelen van, tehát nem szennyezi az éles adatot):
+
+| Változat | Eredmény |
+|---|---|
+| jelenlegi (`currency` + `value`) | `content_id: null` |
+| javasolt (`content_id`, `content_type`, `content_name`, `price`, `quantity`) | mind megérkezett, és a TikTok **szerveroldalon összeállította a teljes `contents` bejegyzést**, figyelmeztetés nélkül |
+
+Ezért lett a `content_id` a `dataLayer`-ben már meglévő **`plan`** (pl. `week_intro`) —
+katalógusadat, nem személyes adat, és ingyen ad csomag szerinti bontást a riportokban.
