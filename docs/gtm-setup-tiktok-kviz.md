@@ -3,6 +3,19 @@
 **Konténer:** `GTM-MPPRKGZ7` (a `NEXT_PUBLIC_GTM_ID` env értéke)
 **Készült:** 2026-08-22
 
+> ## ✅ A workspace beállítása 2026-08-22-én ELKÉSZÜLT
+>
+> A 1–4. lépést a `scripts/gtm-setup.mjs` script végezte el a Tag Manager API-n
+> keresztül (a service account **Edit** joggal). **Semmi nem élesedett** — a
+> konténer publikálása hátravan.
+>
+> **Ami még rád vár: az 5. lépés (Preview-ellenőrzés) és a 6. (Submit).**
+>
+> A script két olyan hibát is javított, ami eredetileg nem volt a tervben:
+> a **duplikált Meta alappixelt** (minden oldalmegtekintés kétszer számított) és a
+> TikTok varázslójának **catch-all event-tagjét** (minden custom eseményre tüzelt volna).
+> Mindkettő **szüneteltetve**, nem törölve.
+
 Ez egy **kattintásról kattintásra** követhető leírás. Két dolgot rendez el egyszerre:
 
 1. **Meta — javítás.** A `Lead` esemény ma rossz helyre van kötve, és hiányzik a
