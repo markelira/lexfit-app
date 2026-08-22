@@ -1,5 +1,18 @@
 # TERVEZET — az adatkezelési tájékoztató módosítása a TikTok Pixelhez
 
+> # ✅ ÁTVEZETVE — 2026-08-22
+>
+> **Jóváhagyva és beépítve** a hatályos `adatkezelesi-tajekoztato.md`-be (hatályos
+> 2026. augusztus 22-től, verzióazonosító `2026-08-22`). **Ez a fájl innentől csak
+> munkanapló** — a hatályos szöveg a másik fájlban van.
+>
+> Az elfogadott válaszok: **SCC-alapú** garancia-szövegezés (nem a 49. cikk (1) a) út,
+> tehát a süti-sáv változatlan), a **DPC-határozatra utaló mondat marad**, a 3.1. l) sor
+> **kiterjesztve** (nem külön sor), DPIA nem kell, `_ttp` élettartam nem kell,
+> felhasználói értesítés nem kell.
+>
+> ---
+>
 > **⚠️ EZ NEM HATÁLYOS SZÖVEG.** Ügyvédi felülvizsgálatra szánt szövegtervezet, amelyet
 > fejlesztői oldalról állítottunk össze abból, amit a rendszer ténylegesen csinálni fog.
 > Nem jogi tanács. **Élesítés előtt ügyvédi jóváhagyás kötelező.**

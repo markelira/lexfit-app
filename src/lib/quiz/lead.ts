@@ -35,8 +35,8 @@ import {
 /** MUST match the effective date in the header of the published privacy policy
  *  (docs/legal/adatkezelesi-tajekoztato.md). Bump BOTH together - a consent log
  *  naming a version that was never published proves nothing.
- *  Current: the 2026-08-21 amendment that introduced the quiz. */
-export const CONSENT_POLICY_VERSION = process.env.QUIZ_POLICY_VERSION ?? "2026-08-21";
+ *  Current: the 2026-08-22 amendment that added the TikTok Pixel. */
+export const CONSENT_POLICY_VERSION = process.env.QUIZ_POLICY_VERSION ?? "2026-08-22";
 
 export const QUIZ_VERSION = "3.0";
 
