@@ -37,7 +37,11 @@ export async function POST(req: Request) {
     embedded?: boolean; // E2 - embedded Checkout (return clientSecret instead of a redirect url)
     // Ad-measurement context from the browser, carried to the webhook on the
     // session metadata (the webhook can see neither cookies nor consent).
-    marketing?: { consent?: string; fbp?: string; fbc?: string };
+    marketing?: {
+      consent?: string;
+      fbp?: string; fbc?: string;      // Meta
+      ttp?: string; ttclid?: string;   // TikTok
+    };
   };
   const role = body.role;
   if (!role || !isCheckoutRole(role)) {
@@ -102,6 +106,9 @@ export async function POST(req: Request) {
     // per-value metadata limit.
     ...(adConsent === "granted" && mkt.fbp ? { fbp: String(mkt.fbp).slice(0, 200) } : {}),
     ...(adConsent === "granted" && mkt.fbc ? { fbc: String(mkt.fbc).slice(0, 200) } : {}),
+    // TikTok's equivalents, carried the same way and under the same gate.
+    ...(adConsent === "granted" && mkt.ttp ? { ttp: String(mkt.ttp).slice(0, 200) } : {}),
+    ...(adConsent === "granted" && mkt.ttclid ? { ttclid: String(mkt.ttclid).slice(0, 200) } : {}),
   };
 
   const embedded = body.embedded === true;

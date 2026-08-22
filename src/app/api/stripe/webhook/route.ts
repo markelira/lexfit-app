@@ -14,6 +14,7 @@ import { issueInvoice, type InvoiceParty } from "@/lib/pricing/invoice";
 import { budapestDay } from "@/lib/pricing/keys";
 import { planDisplay, sendDunningDay0, sendSubscriptionStarted } from "@/lib/mailer";
 import { sendPurchase } from "@/lib/meta-capi";
+import { sendTikTokPurchase } from "@/lib/tiktok-capi";
 import { getAuth } from "firebase-admin/auth";
 import { adminApp } from "@/lib/firebase-admin";
 import {
@@ -185,13 +186,19 @@ async function maybeReportPurchase(event: Stripe.Event): Promise<void> {
     adConsent: m?.adConsent,
     fbp: m?.fbp,
     fbc: m?.fbc,
+    ttp: m?.ttp,
+    ttclid: m?.ttclid,
+    priceRole: m?.priceRole,
   });
 
   let id: string | null = null;
   let valueHuf = 0;
   let email: string | null = null;
   let when = 0;
-  let mkt: { adConsent?: string; fbp?: string; fbc?: string } = {};
+  let mkt: {
+    adConsent?: string; fbp?: string; fbc?: string;
+    ttp?: string; ttclid?: string; priceRole?: string;
+  } = {};
 
   if (event.type === "invoice.paid") {
     const inv = event.data.object as Stripe.Invoice;
@@ -223,7 +230,7 @@ async function maybeReportPurchase(event: Stripe.Event): Promise<void> {
   // can be diagnosed from the Vercel log alone - "no error" is not "reported".
   if (mkt.adConsent !== "granted" || !id) {
     console.log(
-      "[meta-capi] skipped: not reportable",
+      "[capi] skipped: not reportable (Meta + TikTok)",
       JSON.stringify({
         eventType: event.type,
         // The literal value matters: "denied" is a working consent gate,
@@ -234,14 +241,27 @@ async function maybeReportPurchase(event: Stripe.Event): Promise<void> {
     );
     return;
   }
-  await sendPurchase({
-    eventId: id,
-    eventTime: when,
-    valueHuf,
-    email,
-    fbp: mkt.fbp,
-    fbc: mkt.fbc,
-  });
+  // Both platforms, independently: one vendor being down or misconfigured must
+  // not stop the other from hearing about the sale. Neither call throws.
+  await Promise.all([
+    sendPurchase({
+      eventId: id,
+      eventTime: when,
+      valueHuf,
+      email,
+      fbp: mkt.fbp,
+      fbc: mkt.fbc,
+    }),
+    sendTikTokPurchase({
+      eventId: id,
+      eventTime: when,
+      valueHuf,
+      email,
+      contentId: mkt.priceRole ?? null,
+      ttp: mkt.ttp,
+      ttclid: mkt.ttclid,
+    }),
+  ]);
 }
 
 /**

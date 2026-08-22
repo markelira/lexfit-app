@@ -124,11 +124,16 @@ export function trackQuizCtaClick(programCode?: string): void {
  *  - `fbp`/`fbc` — Meta's own first-party cookies, set by the Pixel. They are
  *    the strongest match signal available and only exist if the visitor
  *    accepted (no Pixel → no cookies), so they cannot leak from a refusal.
+ *  - `ttp`/`ttclid` — the same idea on TikTok's side: `_ttp` is its first-party
+ *    cookie and `ttclid` the click id it appends to an ad landing URL. Both
+ *    only exist once the TikTok pixel has run, which needs consent too.
  */
 export interface MarketingContext {
   consent: "granted" | "denied";
   fbp?: string;
   fbc?: string;
+  ttp?: string;
+  ttclid?: string;
 }
 
 function readCookie(name: string): string | undefined {
@@ -146,5 +151,11 @@ export function marketingContext(): MarketingContext {
     // refusal. Failing closed is the only safe default for a consent check.
   }
   if (consent !== "granted") return { consent };
-  return { consent, fbp: readCookie("_fbp"), fbc: readCookie("_fbc") };
+  return {
+    consent,
+    fbp: readCookie("_fbp"),
+    fbc: readCookie("_fbc"),
+    ttp: readCookie("_ttp"),
+    ttclid: readCookie("ttclid") ?? readCookie("_ttclid"),
+  };
 }
