@@ -74,7 +74,15 @@ async function goto(u) {
   evts.length = 0;
   await send("Page.navigate", { url: u });
   for (let i = 0; i < 80; i++) { if (evts.some((e) => e.method === "Page.loadEventFired")) break; await sleep(100); }
-  await sleep(1000);
+  // Wait for the step to actually render rather than guessing a delay. Against a
+  // remote origin a fixed 1000ms probed an empty document and reported every
+  // measurement as null — a harness artifact that read exactly like a layout bug.
+  for (let i = 0; i < 60; i++) {
+    const ready = await ev(`!!document.querySelector('.fnl-sheet') && !!document.querySelector('.bp-stage')`);
+    if (ready) break;
+    await sleep(200);
+  }
+  await sleep(350);
 }
 
 // Everything is measured from real geometry, so "looks fine" is never assumed.

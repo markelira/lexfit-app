@@ -1236,7 +1236,10 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    overflow: hidden;
+    /* NOT `overflow: hidden`. It clipped the ::before contrast plate to the
+       caption's own box, turning a full-bleed wash into a visible rectangle
+       with hard vertical edges. The text is already bounded by the line clamp
+       below, so nothing here needs clipping. */
   }
   .fnl-wiz .bp-cap .bp-eyebrow {
     font-size: 10px; letter-spacing: 0.14em; margin-bottom: 6px;
