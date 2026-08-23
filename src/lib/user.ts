@@ -39,6 +39,14 @@ export interface SignupExtra {
   firstName?: string;
   /** Marketing opt-in - GDPR opt-in, defaults to false when not provided. */
   marketing?: boolean;
+  /**
+   * The campaign that brought this person, snapshotted from the ad's landing
+   * URL (src/lib/attribution.ts). Written once, at account creation, so paid
+   * acquisition can be measured against real subscribers rather than only
+   * against the ad platform's own reporting. UTM labels only - advertising
+   * click identifiers are never written here.
+   */
+  attribution?: Record<string, string | number>;
 }
 
 /** Create users/{uid} on first sign-in (idempotent). Returns true if created. */
@@ -53,6 +61,7 @@ export async function ensureUserDoc(user: User, extra?: SignupExtra): Promise<bo
     provider: user.providerData[0]?.providerId ?? null,
     locale: "hu",
     marketingOptIn: extra?.marketing ?? false,
+    ...(extra?.attribution ? { attribution: extra.attribution } : {}),
     createdAt: serverTimestamp(),
   });
   return true;

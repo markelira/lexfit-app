@@ -6,6 +6,7 @@ import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 import { ensureUserDoc, saveOnboarding, BLANK_ONBOARDING } from "@/lib/user";
 import { readDraft, clearDraft } from "@/lib/onboarding-draft";
+import { readAttribution } from "@/lib/attribution";
 import { trackRegistrationComplete } from "@/lib/track";
 import { authErrorHu, GoogleMark, EyeIcon } from "@/app/login/AuthScreen";
 
@@ -54,7 +55,14 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
     if (!user) return;
     let active = true;
     (async () => {
-      const created = await ensureUserDoc(user, pendingRef.current ?? undefined);
+      // Attribution rides along with the signup extras so it lands on the user
+      // doc in the same write that creates it - no second round trip, and no
+      // window where an account exists without knowing where it came from.
+      const attribution = readAttribution() ?? undefined;
+      const created = await ensureUserDoc(user, {
+        ...(pendingRef.current ?? {}),
+        ...(attribution ? { attribution: { ...attribution } } : {}),
+      });
       pendingRef.current = null;
       if (created) {
         // `created` is true only for a brand-new account - a returning

@@ -13,6 +13,7 @@
 // must NEVER carry personal data (no e-mail, no name, no uid, no answers).
 
 import { PRICES, type PriceRole } from "@/lib/pricing/config";
+import { readClickIds } from "@/lib/attribution";
 
 declare global {
   interface Window {
@@ -151,11 +152,17 @@ export function marketingContext(): MarketingContext {
     // refusal. Failing closed is the only safe default for a consent check.
   }
   if (consent !== "granted") return { consent };
+  // The click ids fall back to the landing-URL snapshot. The cookies only exist
+  // once the pixel has run, and the pixel only runs after consent - so someone
+  // who accepts partway through the funnel has already lost the id from the
+  // URL, which the first navigation rewrote. readClickIds() applies the same
+  // consent check itself, so this cannot leak from a refusal.
+  const snapshot = readClickIds();
   return {
     consent,
     fbp: readCookie("_fbp"),
     fbc: readCookie("_fbc"),
     ttp: readCookie("_ttp"),
-    ttclid: readCookie("ttclid") ?? readCookie("_ttclid"),
+    ttclid: readCookie("ttclid") ?? readCookie("_ttclid") ?? snapshot.ttclid,
   };
 }

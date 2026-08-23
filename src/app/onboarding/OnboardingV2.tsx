@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { hasOnboarded } from "@/lib/user";
 import { paidDestination } from "@/lib/billing";
 import { readDraft, writeDraft, clearDraft, type DraftAnswers } from "@/lib/onboarding-draft";
+import { captureAttribution } from "@/lib/attribution";
 import { trackCheckoutStart, trackOnboardingStart } from "@/lib/track";
 import { FIRST_WORKOUT } from "@/lib/foundation-preview";
 import { LxIcon } from "@/components/LxIcon";
@@ -158,8 +159,21 @@ export function OnboardingV2() {
   const isMobile = useIsMobile("(max-width: 767.98px)");
 
   const goto = useCallback((next: StepId, replace = false) => {
+    // Preserve whatever else is on the URL and only move `q`.
+    //
+    // This used to build the URL from scratch (`/register?q=${q}`), which meant
+    // the first tap of the funnel silently deleted the ad's tracking
+    // parameters - utm_*, ttclid, fbclid, everything. Verified in production:
+    // landing on ?utm_source=tiktok&…&ttclid=… and tapping once left ?q=1 and
+    // nothing else. Attribution is snapshotted on mount as well (see
+    // captureAttribution), so this is belt and braces - but a URL that quietly
+    // discards its own query string is a trap for anything added later.
+    const params = new URLSearchParams(window.location.search);
     const q = Q_OF[next];
-    const url = q ? `/register?q=${q}` : "/register"; // the wizard lives at /register (E1.3)
+    if (q) params.set("q", q);
+    else params.delete("q");
+    const qs = params.toString();
+    const url = qs ? `/register?${qs}` : "/register"; // the wizard lives at /register (E1.3)
     window.history[replace ? "replaceState" : "pushState"]({}, "", url);
     window.dispatchEvent(new Event(NAV_EVENT));
   }, []);
@@ -180,6 +194,12 @@ export function OnboardingV2() {
       active = false;
     };
   }, [user, router]);
+
+  // Snapshot the ad's campaign parameters before ANYTHING can navigate. This
+  // must run ahead of the resume effect below, which is itself a navigation.
+  useEffect(() => {
+    captureAttribution();
+  }, []);
 
   // Resume once, on cold open: if a draft has a step past welcome and the URL is
   // at welcome, jump to where they left off (P3, path 2). goto() updates the URL

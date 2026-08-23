@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/auth-context";
 import { ensureUserDoc, hasOnboarded, saveOnboarding, BLANK_ONBOARDING } from "@/lib/user";
 import { paidDestination } from "@/lib/billing";
 import { readDraft, clearDraft } from "@/lib/onboarding-draft";
+import { readAttribution } from "@/lib/attribution";
 import { AuthBrand } from "@/components/auth/AuthBrand";
 import { Loader } from "@/components/Protected";
 
@@ -86,7 +87,14 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
     if (loading || !user) return;
     let active = true;
     (async () => {
-      const created = await ensureUserDoc(user, pendingRef.current ?? undefined);
+      // Attribution rides along with the signup extras so it lands on the user
+      // doc in the same write that creates it - no second round trip, and no
+      // window where an account exists without knowing where it came from.
+      const attribution = readAttribution() ?? undefined;
+      const created = await ensureUserDoc(user, {
+        ...(pendingRef.current ?? {}),
+        ...(attribution ? { attribution: { ...attribution } } : {}),
+      });
       pendingRef.current = null;
       if (created) {
         // Fire-and-forget: welcome + (password accounts) branded verification
