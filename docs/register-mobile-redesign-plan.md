@@ -524,6 +524,85 @@ ages and both men and women: the positioning is no longer women-first.
 
 ---
 
+## 7e. Real-device round — what one screenshot from a phone exposed
+
+Shipped `5cc33a3`, then a photo from an iPhone 15 Pro showed the question title
+missing entirely and the caption sliced in half. Both were invisible to every check
+run before that, and for the same underlying reason: **the whole thing had been
+verified at one viewport size, in one engine.**
+
+### The two bugs
+
+**1. The title never rendered in WebKit.** `StepFrame` used `<fieldset>` +
+`<legend>`. WebKit paints a `<legend>` at the fieldset's border edge rather than as
+an in-flow block, so with `overflow-y: auto` on the fieldset the title landed
+outside the scrollport and the sheet clipped it away — leaving its reserved space
+as an empty gap above the sub-line. Blink honours `display: block` on a legend and
+rendered it correctly, which is why it survived every check here. Now a plain
+`<h2>`; the options keep their own labelled radiogroup and focus still moves to
+the heading, so nothing is lost.
+
+**Not reproduced locally.** `safaridriver` needs interactive enabling and there is
+no WebKit in this environment, so the fix is reasoned rather than observed. It does
+remove the entire class of bug — there is no longer a `<legend>` to mis-paint.
+
+**2. The layout was authored against a viewport that does not exist.** The sheet was
+a flat `82dvh`, tuned at 402×874. A real iPhone 15 Pro in Safari gives **393×622** —
+both toolbars take ~230px. At 82% of 622 the caption had 38px to draw two 22px
+lines in.
+
+### The fix: a height ladder
+
+Vertical layout is now derived from a reserved band (`--fnl-band`) that steps down
+with the viewport, and the caption is *constrained* to that band — bottom-aligned,
+line-clamped, `overflow: hidden` — rather than positioned at a fixed offset and
+left to overflow. Ranges come from real CSS viewport heights **with browser
+chrome**, not spec sheets:
+
+| Viewport height | Band | Caption | Real devices |
+|---|---|---|---|
+| ≥820 | 228px | 23px | installed PWA, chrome hidden |
+| 700–819 | 200px | 22px | iPhone Plus/Max Safari (~716), Android Chrome (~730) |
+| 600–699 | 176px | 20px | **iPhone 15/16 Pro Safari (~622) — the reported bug** |
+| 520–599 | 148px | 18px | iPhone SE Safari (~553) |
+| <520 | 46px | hidden | landscape phone — no honest way to spend space on a photo |
+
+Plus a narrow-width band (<360px) that tightens option rows and gutters.
+
+`scripts/register-mobile-viewports.mjs` checks 11 viewports × 4 steps and asserts
+from real geometry that the title is visible, the caption finishes above the sheet,
+nothing overflows, and the photo still covers at full parallax travel. **44/44.**
+
+### A design error the matrix caught
+
+The photo plane was parallaxing at **30% — the same rate as the under layer.** Two
+consequences: the depth was flat (a background moving as fast as the midground is
+not parallax), and at full travel the layer slid off its own left edge and exposed a
+~120px band of shell that animated shut on every advance. Now **14%**, with the
+stage oversized to 134% so it can travel without uncovering, and the caption moved
+out of `.bp-stage` so it no longer rides along.
+
+---
+
+## 7f. Second review round (9 findings, all fixed)
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | On a back nav the **incoming** screen was the `inert` layer, so focus silently went nowhere and then fell to `<body>` | Layers keyed by step id; `inert` follows "not current", never "underneath" |
+| 2 | Destination **unmounted and remounted** when the transition ended — scroll, state, effects, stagger all reset | Same fix; the current step keeps its identity throughout |
+| 3 | Parallax uncovered the photo (see §7e) | Rate 30%→14%, stage oversized |
+| 4 | Going back from `pay` mounted a **fresh Stripe checkout** just to animate it away | `pay` excluded as an outgoing step too |
+| 5 | Grabbing a *back* animation mid-flight swaps both layers' content | Known, documented; only the forward→drag conversion is seamless |
+| 6 | Blur guard released on pointerup, so the 350ms settle spring — the fastest frames — ran with blur on | Released on rest instead |
+| 7 | `.fnl-wiz .authx-brand` (0,2,0) lost to `.lx .authx-brand.bp-img` (0,3,0); the dark fallback never applied | Specificity matched |
+| 8 | `PayStep` had no `.fnl-sheet`, so the pay handoff rules were dead | Wrapped; dead `.fnl-foot` rules removed |
+| 9 | `display: none` does not stop a fetch — mobile still downloaded all 7 mockups | `sizes="(max-width: 767px) 1px"`; verified `currentSrc: ""`, 0 bytes |
+
+Finding 5 is the one left as-is: it is a real discontinuity, but it needs a
+two-step-back model the stage does not have, and the window is 400ms after tapping ‹.
+
+---
+
 ## 8. Risks
 
 1. **`backdrop-filter` + `transform` on iOS Safari — OPEN, will not be closed by this

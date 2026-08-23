@@ -10,7 +10,8 @@ import { haptic } from "@/lib/spring-haptics";
 // Two layers, exactly as UIKit does a push/pop:
 //
 //   forward   incoming rides in from the right ON TOP;
-//             outgoing slides 28% left UNDERNEATH and dims
+//             outgoing slides 28% left UNDERNEATH and dims;
+//             the photo behind both trails at 14% (slowest plane furthest back)
 //   back      outgoing slides right OFF THE TOP;
 //             incoming returns from 28% left and un-dims
 //
@@ -24,6 +25,13 @@ import { haptic } from "@/lib/spring-haptics";
 // 768px and children render bare, so the finished desktop layout is untouched.
 
 const OFFSET = 0.28; // how far the underlying screen sits to the left
+// How far the PHOTO plane travels, as a fraction of the sheet's travel.
+// Deliberately much less than OFFSET: the photo is a third plane sitting behind
+// both screens, and a background that moves as fast as the midground is not
+// parallax, it is just a moving background. It was 0.3 — the same rate as the
+// under layer — which both flattened the depth and slid the photo off its own
+// edge, exposing a ~120px band of shell down the left on every advance.
+const PHOTO_PARALLAX = 0.14;
 const DIM = 0.35; // how much the underlying screen is dimmed
 const HYSTERESIS = 10; // px before a drag commits to an axis (§10)
 const FLICK = 500; // px/s rightward that commits a back regardless of distance
@@ -100,7 +108,14 @@ export function StepStage({
     } else {
       // Reduced motion cross-fades a single layer, so there is no second screen
       // to mount - don't build one just to leave it invisible behind the first.
-      const twoUp = enabled && !prefersReducedMotion();
+      //
+      // `pay` is excluded as an OUTGOING step too. It is excluded from the
+      // gesture (enabled=false) but leaving it flips enabled back to true in
+      // the same render, so the outgoing layer would mount a fresh PayStep -
+      // tearing down Stripe's live embedded checkout and replacing it with a
+      // blank consent state for the 400ms of the pop. The screen you watch
+      // slide away must be the one you were looking at.
+      const twoUp = enabled && shown.key !== "pay" && !prefersReducedMotion();
       setMove(twoUp ? { kind: "anim", from: shown.key, dir } : null);
       if (!twoUp && enabled) setFading(true);
     }
@@ -121,9 +136,9 @@ export function StepStage({
         under.style.transform = `translate3d(${-OFFSET * w * underP}px,0,0)`;
         under.style.setProperty("--fnl-dim", String(DIM * underP));
       }
-      // The photo parallaxes at 30% of the sheet's travel — the depth cue iOS
-      // uses on every push/pop.
-      onParallax?.(topX * 0.3);
+      // The photo plane trails the sheet — the depth cue iOS uses on every
+      // push/pop, with the background moving slowest of the three planes.
+      onParallax?.(topX * PHOTO_PARALLAX);
     },
     [onParallax],
   );
@@ -287,9 +302,12 @@ export function StepStage({
     const finish = (e: PointerEvent, cancelled = false) => {
       if (e.pointerId !== pointerId) return;
       pointerId = null;
-      host.classList.remove("is-dragging");
-      if (!dragging) return;
+      if (!dragging) { host.classList.remove("is-dragging"); return; }
       dragging = false;
+      // NB: `is-dragging` is deliberately NOT removed here. It gates the
+      // backdrop-filter guard, and the 350ms settle spring below is the phase
+      // where the blurred surface is transformed fastest - exactly the cost the
+      // guard exists to avoid. Released on rest instead.
 
       const w = width();
       // Decide from where the screen actually IS, not from how far the finger
@@ -315,6 +333,7 @@ export function StepStage({
       // rubber-banded leftward drag ends at negative progress, and starting the
       // spring at 0 would visibly jump (§3).
       const sp = new Spring(lastP, (p) => paint(p, -1), () => {
+        host.classList.remove("is-dragging"); // restore the blur on settle
         if (commit) {
           // Navigate FIRST: the screens are already where they belong (the old
           // one fully off to the right, the destination at rest), so the
@@ -368,32 +387,45 @@ export function StepStage({
   // carries the attribute without existing as a box - desktop is unaffected.
   if (!enabled) return <div className="fnl-solo" data-step={stepKey}>{render(stepKey)}</div>;
 
-  // Which screen is on top, and which sits underneath. Four cases, written out
-  // rather than nested — the layering IS the transition, so it should be
-  // readable at a glance.
-  let topKey = shown.key;
-  let underKey: string | null = null;
-  if (move?.kind === "anim" && move.dir === 1) {
-    topKey = shown.key; // the arriving screen rides in over
-    underKey = move.from; // the one it is covering
-  } else if (move?.kind === "anim" && move.dir === -1) {
-    topKey = move.from; // the leaving screen slides off
-    underKey = shown.key; // revealing the one behind it
-  } else if (move?.kind === "drag") {
-    topKey = shown.key; // the finger is pushing this one aside
-    underKey = move.to; // to reveal where it is going
-  }
+  // The CURRENT step and, during a transition, the OTHER one. Keyed by step id
+  // and rendered in a fixed slot order, with stacking decided by z-index rather
+  // than DOM order. Two bugs came out of doing it the other way round:
+  //
+  //   • On a back navigation the incoming screen was the `under` layer, which
+  //     carried aria-hidden/inert — so the parent's focus effect called
+  //     .focus() into an inert subtree, it silently did nothing, and 400ms
+  //     later the focused element was removed and focus fell to <body>.
+  //   • When the transition ended, the destination moved from the under slot to
+  //     the top slot. Different slot, same position, so React unmounted and
+  //     remounted it: scroll position reset, component state reset, effects
+  //     re-ran, and the row stagger replayed after the slide had landed.
+  //
+  // Keying on the step id fixes both: the current step keeps its identity for
+  // the whole transition, and `inert` follows "not the current step" instead of
+  // "underneath", so the screen being navigated TO is never inert.
+  const otherKey =
+    move?.kind === "anim" ? move.from
+    : move?.kind === "drag" ? move.to
+    : null;
+  // Only a back animation puts the current step underneath.
+  const currentOnTop = !(move?.kind === "anim" && move.dir === -1);
+
+  const layer = (key: string, isCurrent: boolean) => (
+    <div
+      key={key}
+      className={`fnl-layer ${isCurrent === currentOnTop ? "top" : "under"}`}
+      data-step={key}
+      ref={isCurrent === currentOnTop ? topRef : underRef}
+      {...(isCurrent ? {} : { "aria-hidden": true as const, inert: true })}
+    >
+      {render(key)}
+    </div>
+  );
 
   return (
     <div className="fnl-nav" ref={hostRef}>
-      {underKey && (
-        <div className="fnl-layer under" data-step={underKey} ref={underRef} aria-hidden="true" inert>
-          {render(underKey)}
-        </div>
-      )}
-      <div className="fnl-layer top" data-step={topKey} ref={topRef}>
-        {render(topKey)}
-      </div>
+      {otherKey && layer(otherKey, false)}
+      {layer(shown.key, true)}
     </div>
   );
 }

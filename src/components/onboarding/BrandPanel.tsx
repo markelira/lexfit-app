@@ -145,6 +145,14 @@ const CAP: Record<PanelKey, { eyebrow?: string; line: React.ReactNode; slogan?: 
 // ~50% slower on first request, and buys ~20% on top of an already 6-8x win).
 const SIZES = "(max-width: 767px) 100vw, 50vw";
 
+// For a panel that mobile renders as a designed ground, the image is still in
+// the DOM for desktop but must not cost anything on a phone. `display: none`
+// does NOT prevent a fetch - the browser has already run srcset selection - so
+// the saving has to come from `sizes`: claim 1px under the mobile breakpoint
+// and the browser picks the smallest candidate (a few KB) instead of the
+// device-width one (~200KB). Desktop still asks for 50vw and is unaffected.
+const SIZES_GROUND = "(max-width: 767px) 1px, 50vw";
+
 
 export function BrandPanel({ step, ref }: { step: string; ref?: React.Ref<HTMLElement> }) {
   const k = panelFor(step);
@@ -161,15 +169,20 @@ export function BrandPanel({ step, ref }: { step: string; ref?: React.Ref<HTMLEl
           src={PHOTO[k]}
           alt=""
           fill
-          sizes={SIZES}
+          sizes={ART[k] === "photo" ? SIZES : SIZES_GROUND}
           placeholder="blur"
           priority={k === "welcome"}
         />
         <div className="bp-scrim" aria-hidden="true" />
-        <div className="bp-cap">
-          {c.eyebrow && <span className="bp-eyebrow mono">{c.eyebrow}</span>}
-          <span className={c.slogan ? "bp-slogan" : "bp-line"}>{c.line}</span>
-        </div>
+      </div>
+
+      {/* Outside .bp-stage on purpose. On mobile the stage is oversized and
+          parallaxed; the caption must neither inherit that offset nor drift
+          off-screen with it. On desktop the stage is inset:0 inside this same
+          element, so the caption's geometry is unchanged. */}
+      <div className="bp-cap">
+        {c.eyebrow && <span className="bp-eyebrow mono">{c.eyebrow}</span>}
+        <span className={c.slogan ? "bp-slogan" : "bp-line"}>{c.line}</span>
       </div>
 
       {/* Prefetch the next step's photo at the exact same optimized URL the next

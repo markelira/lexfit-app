@@ -85,7 +85,10 @@ async function drag(label, xs, pause, expect) {
         // NB: match inside translate3d(...) - a bare /-?[\\d.]+/ picks up the
         // "3" in "translate3d" and silently reports every offset as 3px.
         var num=function(el){ if(!el) return null; var m=el.style.transform.match(/translate3d\\(\\s*(-?[\\d.]+)px/); return m?Number(m[1]):0; };
-        return { topX:num(t), underX:num(u), photoX:num(b),
+        // The photo plane is driven through a custom property, not a transform
+        // on the panel — reading .style.transform here silently returned 0.
+        var px=function(el){ return el ? (parseFloat(el.style.getPropertyValue('--fnl-px')) || 0) : null; };
+        return { topX:num(t), underX:num(u), photoX:px(b),
                  dragging: s && s.classList.contains('is-dragging'),
                  blurDropped: getComputedStyle(document.querySelector('.fnl-sheet')).backdropFilter === 'none' };
       })()`);
@@ -98,11 +101,12 @@ async function drag(label, xs, pause, expect) {
   if (!ok) failures++;
   console.log(`${ok ? "✅" : "❌"} ${label.padEnd(26)} → ${String(step).padEnd(7)}${ok ? "" : ` (expected ${expect})`}`);
   if (mid) {
-    // The photo must track at exactly 30% of the sheet's travel.
+    // The photo plane must trail the sheet at exactly PHOTO_PARALLAX, and must
+    // be slower than the under layer's 28% or it is not parallax at all.
     const ratio = mid.topX ? mid.photoX / mid.topX : 0;
-    const parallaxOk = Math.abs(ratio - 0.3) < 0.01;
+    const parallaxOk = Math.abs(ratio - 0.14) < 0.01;
     if (!parallaxOk) failures++;
-    console.log(`   ${parallaxOk ? "✅" : "❌"} parallax ${(ratio * 100).toFixed(1)}% of travel (expect 30%)` +
+    console.log(`   ${parallaxOk ? "✅" : "❌"} parallax ${(ratio * 100).toFixed(1)}% of travel (expect 14%)` +
       ` · dragging=${mid.dragging} · blur dropped mid-drag=${mid.blurDropped}`);
     if (!mid.dragging || !mid.blurDropped) failures++;
   }

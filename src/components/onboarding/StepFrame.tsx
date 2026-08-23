@@ -1,12 +1,24 @@
 "use client";
 
+import { useId } from "react";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { StepProgress } from "./StepProgress";
 
 // The question-screen chrome (40 §40.4): back · progress · counter, a scrolling
-// <fieldset> body whose <legend> is the visible heading (40 §40.12), and a
-// bottom-anchored CTA. Welcome and the reveal use their own layouts.
+// body, and a bottom-anchored action.
+//
+// NOT a <fieldset>/<legend>, deliberately. It was, and on iOS Safari the
+// question title vanished on every step: WebKit paints a <legend> at the
+// fieldset's border edge rather than as an in-flow block, so with
+// `overflow-y: auto` on the fieldset the title landed outside the scrollport
+// and was clipped away by the sheet — leaving its reserved space as an empty
+// gap above the sub-line. Blink honours `display: block` on a legend and
+// rendered it fine, which is why it survived every non-WebKit check.
+//
+// A plain <h2> loses nothing: the options carry their own labelled radiogroup
+// (OptionList), the step change is announced through the live region in
+// OnboardingV2, and focus still moves here on every step (40 §40.12).
 export function StepFrame({
   onBack,
   progressCurrent,
@@ -22,10 +34,11 @@ export function StepFrame({
   counter?: string; // "3 / 5" · "Kész"
   heading: string;
   sub?: string;
-  headingRef?: React.Ref<HTMLLegendElement>;
+  headingRef?: React.Ref<HTMLHeadingElement>;
   children: React.ReactNode;
   cta: React.ReactNode;
 }) {
+  const headingId = useId();
   return (
     <div className="fnl-main fnl">
       <div className="fnl-top">
@@ -47,13 +60,13 @@ export function StepFrame({
           stay direct flex children of .fnl-main exactly as before, so the
           desktop layout is untouched. */}
       <div className="fnl-sheet">
-        <fieldset className="fnl-scroll">
-          <legend className="fnl-q" ref={headingRef} tabIndex={-1}>
+        <div className="fnl-scroll" role="group" aria-labelledby={headingId}>
+          <h2 className="fnl-q" id={headingId} ref={headingRef} tabIndex={-1}>
             {heading}
-          </legend>
+          </h2>
           {sub && <p className="fnl-sub">{sub}</p>}
           <div className="fnl-fields">{children}</div>
-        </fieldset>
+        </div>
 
         <div className="fnl-foot">{cta}</div>
       </div>

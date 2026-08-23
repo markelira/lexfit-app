@@ -1054,6 +1054,37 @@
    ══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 767.98px) {
 
+  /* ── The height ladder ──────────────────────────────────────────────────
+     Everything vertical is derived from these, so the composition adapts to
+     the viewport it actually gets rather than to percentages picked against
+     one test device.
+
+       --fnl-chrome      the back/progress/counter row
+       --fnl-band        chrome + caption: the space reserved ABOVE the sheet
+       --fnl-band-tight  the same, for content-dense steps (reveal/plan/account)
+       --fnl-cap-size    caption type size
+       --fnl-cap-lines   how many caption lines the band can afford
+
+     Why a ladder and not one `dvh` number: a phone's CSS viewport in Safari is
+     ~230px shorter than its nominal height once both toolbars show. An iPhone
+     15 Pro is 393x852 on paper and 393x622 in practice, and a percentage tuned
+     for the former leaves the caption 38px to draw two 22px lines in. Real
+     portrait heights this has to survive, browser chrome included:
+
+       ~553   iPhone SE in Safari
+       ~622   iPhone 15/16 Pro in Safari   ← the reported bug
+       ~716   iPhone 14/15 Plus in Safari
+       ~730   Android Chrome, common
+       ~852+  installed PWA / chrome hidden after scroll
+  */
+  .fnl-wiz {
+    --fnl-chrome: 56px;
+    --fnl-band: 200px;
+    --fnl-band-tight: 132px;
+    --fnl-cap-size: 22px;
+    --fnl-cap-lines: 2;
+  }
+
   /* ── Layering ───────────────────────────────────────────────────────────
      The brand photo and the content column are assigned the SAME grid cell,
      so they stack instead of sitting side by side. No JSX branch does this. */
@@ -1066,7 +1097,10 @@
   .fnl-wiz .authx-brand,
   .fnl-wiz .fnl-col { grid-area: 1 / 1; min-width: 0; }
 
-  .fnl-wiz .authx-brand {
+  /* .bp-img in the selector on purpose: `.lx .authx-brand.bp-img` sets
+     background:#16201b at (0,3,0) and silently outranked a (0,2,0) rule here,
+     so the "a failed image reads as night" fallback never actually applied. */
+  .fnl-wiz .authx-brand.bp-img {
     display: block;              /* was `display: none` — the photo IS the design now */
     order: 0;
     padding: 0;
@@ -1081,7 +1115,23 @@
     overflow: visible;
   }
 
-  .fnl-wiz .bp-stage { position: absolute; inset: 0; }
+  /* Oversized on purpose. The parallax translates this layer by 30% of the
+     sheet's travel, which at the first frame of a push is 0.3 x viewport width
+     — around 120px. At exactly viewport width the layer slid off its own left
+     edge and exposed a band of shell background that animated shut on every
+     single advance. 34% wide, offset -17%, covers the full +/-120px of travel
+     with margin. */
+  .fnl-wiz .bp-stage {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -17%;
+    width: 134%;
+    transform: translate3d(var(--fnl-px, 0px), 0, 0);
+    /* Opacity-only on mobile: the desktop `bpImgIn` keyframes animate transform
+       too, which would fight the parallax for its first 560ms. */
+    animation: bpFadeIn 380ms ease both;
+  }
+  @keyframes bpFadeIn { from { opacity: 0; } to { opacity: 1; } }
   .fnl-wiz .bp-photo { object-position: 50% 30%; }  /* faces sit high; keep them out of the sheet */
 
   /* Scrim (plan §3.1). Darken the top so the white chrome reads, stay light
@@ -1171,20 +1221,39 @@
      Anchored under the chrome, NOT to the top of the sheet — the sheet's
      height is content-driven, so hugging it would make the caption jump
      between steps. Own zone, one line, never competing with the question. */
+  /* The caption is CONSTRAINED to the band, not merely positioned in it. It
+     used to be `top: 74px` with no height, which meant that whenever the band
+     was shorter than the text the sheet simply sliced the caption in half —
+     which is what every real phone did. Now it occupies the band exactly,
+     bottom-aligns inside it, and clamps its lines rather than overflowing. */
   .fnl-wiz .bp-cap {
-    top: calc(env(safe-area-inset-top) + 74px);
+    top: calc(env(safe-area-inset-top) + var(--fnl-chrome));
+    height: calc(var(--fnl-band) - env(safe-area-inset-top) - var(--fnl-chrome) - 14px);
     bottom: auto;
     left: 20px;
     right: 20px;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
   }
-  .fnl-wiz .bp-cap .bp-eyebrow { font-size: 10px; letter-spacing: 0.14em; margin-bottom: 8px; }
+  .fnl-wiz .bp-cap .bp-eyebrow {
+    font-size: 10px; letter-spacing: 0.14em; margin-bottom: 6px;
+    flex: none;
+  }
   .fnl-wiz .bp-cap .bp-line,
   .fnl-wiz .bp-cap .bp-slogan {
-    font-size: 22px;
+    font-size: var(--fnl-cap-size);
     line-height: 1.15;
     letter-spacing: -0.02em;
     text-shadow: 0 1px 20px rgba(0, 0, 0, 0.45);
+    /* Never taller than the band allows. Two lines where there is room, one
+       where there is not - clamped, not clipped mid-glyph. */
+    display: -webkit-box;
+    -webkit-line-clamp: var(--fnl-cap-lines);
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .fnl-wiz .bp-cap .bp-line { font-weight: 600; }
   .fnl-wiz .bp-cap .bp-slogan { font-weight: 300; }
@@ -1209,7 +1278,13 @@
     flex-direction: column;
     min-height: 0;
     margin-top: auto;
-    max-height: 82dvh;
+    /* Sized from the band we actually reserve for chrome + caption, NOT from a
+       percentage of the viewport. `82dvh` was authored against a 402x874 test
+       viewport; real Safari on the same phone gives ~393x622 once both toolbars
+       are showing, and at 82% of that the caption had 38px to render two 22px
+       lines in. It was sliced in half on every device. See the height ladder at
+       the end of this file for how --fnl-band adapts. */
+    max-height: calc(100dvh - var(--fnl-band));
     border-radius: 28px 28px 0 0;
     background: rgba(16, 22, 19, 0.72);
     -webkit-backdrop-filter: blur(30px) saturate(140%);
@@ -1222,9 +1297,9 @@
   /* Content-dense steps need the room; the photo stays a band at the top. */
   .fnl-wiz [data-step="reveal"] .fnl-sheet,
   .fnl-wiz [data-step="plan"] .fnl-sheet,
-  .fnl-wiz [data-step="account"] .fnl-sheet { max-height: 88dvh; }
+  .fnl-wiz [data-step="account"] .fnl-sheet { --fnl-band: var(--fnl-band-tight); }
   /* The iOS keyboard must not bury the textarea on the `why` step. */
-  .fnl-wiz [data-step="why"] .fnl-sheet:focus-within { max-height: 92dvh; }
+  .fnl-wiz [data-step="why"] .fnl-sheet:focus-within { --fnl-band: var(--fnl-chrome); }
 
   /* The photo band never collapses to a stripe. */
   .fnl-wiz .fnl-sheet { flex-shrink: 1; }
@@ -1584,13 +1659,6 @@
     background: var(--surface-2);
     border-color: var(--line);
   }
-  .fnl-wiz [data-step="pay"] .fnl-foot,
-  .fnl-wiz [data-step="pay"] .fnl-foot::before {
-    background: var(--surface);
-  }
-  .fnl-wiz [data-step="pay"] .fnl-foot::before {
-    background: linear-gradient(to top, var(--surface), transparent);
-  }
   .fnl-wiz [data-step="pay"] .fnl-sub,
   .fnl-wiz [data-step="pay"] .fnl-scroll { color: var(--ink-2); }
 
@@ -1639,6 +1707,9 @@
   .fnl-wiz .fnl-layer {
     position: absolute;
     inset: 0;
+    /* Stacking is explicit because DOM order no longer reflects it: layers are
+       keyed by step id so they keep their identity across a transition. */
+    z-index: 1;
     display: flex;
     flex-direction: column;
     /* Only transform/opacity animate — compositor-friendly (§11). */
@@ -1647,6 +1718,7 @@
   }
   /* The screen underneath a push dims as it recedes, exactly as iOS does —
      depth you can read, not decoration. --fnl-dim is set per frame from JS. */
+  .fnl-wiz .fnl-layer.top { z-index: 2; }
   .fnl-wiz .fnl-layer.under::after {
     content: "";
     position: absolute;
@@ -1773,7 +1845,9 @@
   /* On a ground step the caption is the only thing in that space, so let it
      breathe — it is carrying the screen on its own. */
   .fnl-wiz .authx-brand[data-art="ground"] .bp-cap .bp-line,
-  .fnl-wiz .authx-brand[data-art="ground"] .bp-cap .bp-slogan { font-size: 24px; }
+  .fnl-wiz .authx-brand[data-art="ground"] .bp-cap .bp-slogan {
+    font-size: calc(var(--fnl-cap-size) + 2px);
+  }
 }
 
 /* The step-id carrier when <StepStage> is disabled (desktop, and `pay`).
@@ -1790,3 +1864,91 @@
    incoming step's rules — most visibly welcome→goal, where the sheet-less
    welcome screen slid out wearing a sheet it is explicitly styled not to have. */
 .lx .fnl-solo { display: contents; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOBILE — the height ladder
+   docs/register-mobile-redesign-plan.md §7e
+
+   The first cut sized the sheet at a flat 82dvh, authored against a 402x874
+   test viewport. No phone gives you that in a browser: an iPhone 15 Pro is
+   393x852 on paper and 393x622 in Safari once both toolbars are showing. At
+   82% of 622 the caption had 38px to draw two 22px lines in, so it was sliced
+   in half on a real device while passing every check here.
+
+   So the vertical layout is driven by a reserved band, and the band steps down
+   with the viewport. Ranges are chosen from real CSS viewport heights WITH
+   browser chrome, not from spec sheets.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tall: installed PWA, or chrome hidden after a scroll. Room to breathe. */
+@media (max-width: 767.98px) and (min-height: 820px) {
+  .fnl-wiz { --fnl-band: 228px; --fnl-band-tight: 148px; --fnl-cap-size: 23px; }
+}
+
+/* 700–819: iPhone Plus/Max in Safari (~716), Android Chrome (~730). */
+@media (max-width: 767.98px) and (min-height: 700px) and (max-height: 819.98px) {
+  .fnl-wiz { --fnl-band: 200px; --fnl-band-tight: 132px; --fnl-cap-size: 22px; }
+}
+
+/* 600–699: the reported case — iPhone 15/16 Pro in Safari (~622). */
+@media (max-width: 767.98px) and (min-height: 600px) and (max-height: 699.98px) {
+  .fnl-wiz { --fnl-band: 176px; --fnl-band-tight: 116px; --fnl-cap-size: 20px; }
+  .fnl-wiz .fnl-q { font-size: 25px; }
+  .fnl-wiz .fnl-scroll { padding-top: 20px; }
+}
+
+/* 520–599: iPhone SE in Safari (~553). The caption keeps both lines but the
+   type comes down and the option rows tighten, so five options still fit. */
+@media (max-width: 767.98px) and (min-height: 520px) and (max-height: 599.98px) {
+  .fnl-wiz { --fnl-band: 148px; --fnl-band-tight: 104px; --fnl-cap-size: 18px; }
+  .fnl-wiz { --fnl-chrome: 50px; }
+  .fnl-wiz .fnl-q { font-size: 23px; }
+  .fnl-wiz .fnl-sub { font-size: 13.5px; }
+  .fnl-wiz .fnl-scroll { padding: 16px 20px 4px; }
+  .fnl-wiz .fnl-fields { margin-top: 14px; }
+  .fnl-wiz .fnl-opt { min-height: 58px; padding: 10px 13px; }
+  .fnl-wiz .fnl-opt.has-sub { min-height: 62px; }
+  .fnl-wiz .fnl-opt .ic { width: 32px; height: 32px; }
+  .fnl-wiz .fnl-cta { min-height: 48px; height: 48px; }
+  .fnl-wiz .fnl-foot { padding: 10px 20px calc(12px + env(safe-area-inset-bottom)); }
+}
+
+/* Under 520 tall — a phone on its side, or a very small window. There is no
+   honest way to spend space on a photo band here, so the caption goes and the
+   sheet takes the screen. This also catches the 768–1023 tablet band, which a
+   landscape phone falls into by width. */
+@media (max-height: 519.98px) {
+  .fnl-wiz { --fnl-chrome: 46px; --fnl-band: 46px; --fnl-band-tight: 46px; }
+  .fnl-wiz .bp-cap { display: none; }
+  .fnl-wiz .fnl-sheet { border-radius: 0; }
+  .fnl-wiz .fnl-top { height: 46px; }
+  .fnl-wiz .fnl-back { width: 36px; height: 36px; }
+  .fnl-wiz .fnl-q { font-size: 21px; }
+  .fnl-wiz .fnl-sub { font-size: 13px; }
+  .fnl-wiz .fnl-scroll { padding: 12px 20px 4px; }
+  .fnl-wiz .fnl-fields { margin-top: 12px; }
+  .fnl-wiz .fnl-opt { min-height: 54px; }
+  .fnl-wiz .fnl-opt.has-sub { min-height: 58px; }
+  .fnl-wiz .fnl-cta { min-height: 46px; height: 46px; }
+  /* Landscape phones land in the 768–1023 tablet rules by width; keep that
+     column from running off a 400px-tall screen. */
+  .fnl-wiz .fnl-main { max-height: none; }
+  .fnl-wiz[data-step="welcome"] .welcome-hd { font-size: 26px; }
+}
+
+/* Narrow: 320–359 (iPhone SE 1st gen, and any 320px window). The option row is
+   the tightest thing here — icon + label + mark against a 320px page. */
+@media (max-width: 359.98px) {
+  .fnl-wiz .fnl-scroll { padding-left: 14px; padding-right: 14px; }
+  .fnl-wiz .fnl-foot { padding-left: 14px; padding-right: 14px; }
+  .fnl-wiz .bp-cap { left: 14px; right: 14px; }
+  .fnl-wiz .fnl-top { padding: 0 12px; }
+  .fnl-wiz .fnl-q { font-size: 22px; }
+  .fnl-wiz .fnl-opt { padding: 10px 12px; gap: 9px; }
+  .fnl-wiz .fnl-opt .ic { width: 30px; height: 30px; }
+  .fnl-wiz .fnl-opt .tx b { font-size: 15px; }
+  .fnl-wiz .fnl-opt .tx small { font-size: 12.5px; }
+  .fnl-wiz .fnl-opt .mk { width: 21px; height: 21px; }
+  .fnl-wiz .fnl-seg .seg-cell .v { font-size: 13px; }
+  .fnl-wiz .fnl-day .d { font-size: 9px; }
+}

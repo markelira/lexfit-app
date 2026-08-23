@@ -137,7 +137,7 @@ export function OnboardingV2() {
   const router = useRouter();
   const step = useSyncExternalStore(subscribeNav, stepFromUrl, () => "welcome" as StepId);
   const [answers, setAnswers] = useState<FunnelAnswers>(initialAnswers);
-  const headingRef = useRef<HTMLLegendElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const revealHeadRef = useRef<HTMLHeadingElement>(null);
   const sectionHeadRef = useRef<HTMLHeadingElement>(null); // plan / account / pay headings
   const startedAtRef = useRef<number>(0); // stamped in the persist effect (post-render)
@@ -146,9 +146,12 @@ export function OnboardingV2() {
   // here, because this component owns that element - the stage never reaches
   // into a ref it does not own.
   const brandRef = useRef<HTMLElement>(null);
+  // Publishes the offset as a custom property rather than transforming the
+  // panel itself: only the photo stage should move. Transforming the whole
+  // panel dragged the caption along with it and pushed it off-screen.
   const setParallax = useCallback((x: number) => {
     const el = brandRef.current;
-    if (el) el.style.transform = x ? `translate3d(${x}px,0,0)` : "";
+    if (el) el.style.setProperty("--fnl-px", `${x}px`);
   }, []);
   // The immersive mobile composition (and its gestures) exist below 768px only;
   // this must match the CSS breakpoint in onbv2.css, not the app-wide 840px.
@@ -433,7 +436,7 @@ function QuestionStep({
   onBack: () => void;
   onNext: () => void;
   canNext: boolean;
-  headingRef: React.Ref<HTMLLegendElement>;
+  headingRef: React.Ref<HTMLHeadingElement>;
 }) {
   const no = QUESTION_NO[step]!;
   const q =
@@ -601,7 +604,7 @@ function WhyStep({
   onChange: (v: string) => void;
   onBack: () => void;
   onNext: () => void;
-  headingRef: React.Ref<HTMLLegendElement>;
+  headingRef: React.Ref<HTMLHeadingElement>;
 }) {
   const w = MOCK.why;
   return (
@@ -986,15 +989,20 @@ function PayStep({
         </button>
         <button className="fnl-later" onClick={onExit}>Később</button>
       </div>
-      <div className="fnl-scroll">
-        <h1 className="fnl-q" ref={headRef} tabIndex={-1}>Már csak egy lépés</h1>
-        {outcome && (
-          <p className="fnl-paygoal">
-            <span className="mono">Amit megnyitsz</span>
-            <strong>{outcome}</strong>
-          </p>
-        )}
-        <EmbeddedPay plans={PAYWALL_PLANS} role={plan} onRoleChange={onPlanChange} />
+      {/* .fnl-sheet like every other step: without it the mobile pay rules
+          keyed on `.fnl-sheet` were dead, so the documented dark→light
+          cross-fade never ran - only the column background moved. */}
+      <div className="fnl-sheet">
+        <div className="fnl-scroll">
+          <h1 className="fnl-q" ref={headRef} tabIndex={-1}>Már csak egy lépés</h1>
+          {outcome && (
+            <p className="fnl-paygoal">
+              <span className="mono">Amit megnyitsz</span>
+              <strong>{outcome}</strong>
+            </p>
+          )}
+          <EmbeddedPay plans={PAYWALL_PLANS} role={plan} onRoleChange={onPlanChange} />
+        </div>
       </div>
     </div>
   );
