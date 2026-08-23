@@ -13,6 +13,9 @@ import { FIRST_WORKOUT } from "@/lib/foundation-preview";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { StepFrame } from "@/components/onboarding/StepFrame";
+import { StepStage } from "@/components/onboarding/StepStage";
+import { useIsMobile } from "@/lib/useIsMobile";
+import { haptic } from "@/lib/spring-haptics";
 import { EmbeddedPay } from "@/components/onboarding/EmbeddedPay";
 import { PAYWALL_PLANS, PaywallOffer } from "@/components/onboarding/paywall";
 import { RegisterForm } from "@/components/auth/RegisterForm";
@@ -139,6 +142,17 @@ export function OnboardingV2() {
   const sectionHeadRef = useRef<HTMLHeadingElement>(null); // plan / account / pay headings
   const startedAtRef = useRef<number>(0); // stamped in the persist effect (post-render)
   const resumedRef = useRef(false);
+  // The photo layer. <StepStage> reports a per-frame offset and we apply it
+  // here, because this component owns that element - the stage never reaches
+  // into a ref it does not own.
+  const brandRef = useRef<HTMLElement>(null);
+  const setParallax = useCallback((x: number) => {
+    const el = brandRef.current;
+    if (el) el.style.transform = x ? `translate3d(${x}px,0,0)` : "";
+  }, []);
+  // The immersive mobile composition (and its gestures) exist below 768px only;
+  // this must match the CSS breakpoint in onbv2.css, not the app-wide 840px.
+  const isMobile = useIsMobile("(max-width: 767.98px)");
 
   const goto = useCallback((next: StepId, replace = false) => {
     const q = Q_OF[next];
@@ -196,10 +210,27 @@ export function OnboardingV2() {
   }, [step, answers]);
 
   const idx = STEPS.indexOf(step);
-  const go = (delta: number) => {
-    const n = STEPS[Math.max(0, Math.min(STEPS.length - 1, idx + delta))];
-    goto(n);
-  };
+
+  // Navigate relative to a NAMED step, never to an ambient index.
+  //
+  // This used to be `go(delta)` closing over `idx`. That was safe while the step
+  // JSX was inline in the render body - `go` was rebuilt every render, so `idx`
+  // was always current. It stopped being safe the moment the JSX moved into a
+  // memoized `renderStep`: on a step change where `answers` and `canNext` happen
+  // to be unchanged, the callback is not recreated and every onNext/onBack inside
+  // it still points at the PREVIOUS step's index. That dead-ended the funnel on
+  // `days` (Tovább did nothing) and made ‹ skip a step.
+  //
+  // Anchoring on the step id removes the class of bug entirely, and is also what
+  // the under layer needs: during a back-drag the destination screen is rendered
+  // too, and its buttons must navigate from ITSELF, not from the step on top.
+  const goFrom = useCallback(
+    (id: StepId, delta: number) => {
+      const i = STEPS.indexOf(id);
+      goto(STEPS[Math.max(0, Math.min(STEPS.length - 1, i + delta))]);
+    },
+    [goto],
+  );
 
   // The paywall was reached. Keyed on `step` so a back-and-forth to `account`
   // and again to `pay` does not double-count within one mount.
@@ -223,13 +254,21 @@ export function OnboardingV2() {
   const set = <K extends keyof FunnelAnswers>(k: K, v: FunnelAnswers[K]) =>
     setAnswers((a) => ({ ...a, [k]: v }));
 
-  const canNext = useMemo(() => {
-    if (step === "goal") return answers.goal != null;
-    if (step === "focus") return answers.focus != null;
-    if (step === "level") return answers.level != null;
-    if (step === "days") return answers.weekdays.length >= 1;
-    return true; // time/env/obstacle/why are non-blocking
-  }, [step, answers]);
+  // Per-STEP, not for "the current step": the under layer renders the back-drag
+  // destination, and a screen you are navigating toward must show its own state.
+  // Computed for the live step this greyed out an already-answered `goal`'s
+  // Tovább for the whole drag, then flipped it on commit - misrepresenting the
+  // destination during the exact moment the gesture exists to preview it.
+  const canAdvance = useCallback(
+    (id: StepId) => {
+      if (id === "goal") return answers.goal != null;
+      if (id === "focus") return answers.focus != null;
+      if (id === "level") return answers.level != null;
+      if (id === "days") return answers.weekdays.length >= 1;
+      return true; // time/env/obstacle/why are non-blocking
+    },
+    [answers],
+  );
 
   // Polite step-change announcement (40 §40.12) - reliable across screen readers
   // regardless of whether a focused <legend> is spoken.
@@ -251,72 +290,99 @@ export function OnboardingV2() {
     [answers.weekdays],
   );
 
+  // Stable, so it does not re-arm <StepStage>'s pointer listeners. As an inline
+  // arrow it landed in that effect's dep array, and ANY parent re-render mid-drag
+  // (the auth listener firing, a matchMedia change, the onboarded check
+  // resolving) tore the listeners down and re-attached them with fresh closure
+  // state - the in-flight pointerup then failed its id check, `finish` never ran,
+  // and the screen was left permanently half-swiped with the blur disabled.
+  const stageBack = useCallback(() => goFrom(step, -1), [goFrom, step]);
+
+  // Render ANY step by id. <StepStage> needs this because a back-swipe shows the
+  // destination screen underneath the one being dragged - you have to be able to
+  // see where you are going for the gesture to mean anything (skill §1/§2).
+  // `pay` is deliberately absent from the gesture path: it mounts Stripe's
+  // embedded checkout, which should not be built speculatively mid-drag.
+  const renderStep = useCallback(
+    (id: string): React.ReactNode => {
+      const s = id as StepId;
+      if (s === "welcome") return <Welcome onStart={() => goto("goal")} />;
+      if (QUESTION_NO[s]) {
+        return (
+          <QuestionStep
+            key={s} step={s} answers={answers} set={set}
+            onBack={() => goFrom(s, -1)} onNext={() => goFrom(s, 1)}
+            canNext={canAdvance(s)} headingRef={headingRef}
+          />
+        );
+      }
+      if (s === "why") {
+        return (
+          <WhyStep
+            value={answers.why} onChange={(v) => set("why", v)}
+            onBack={() => goFrom(s, -1)} onNext={() => goFrom(s, 1)} headingRef={headingRef}
+          />
+        );
+      }
+      if (s === "reveal") {
+        return (
+          <Reveal
+            a={answers} weekCells={weekCells}
+            onBack={() => goFrom(s, -1)} onNext={() => goto("plan")} headRef={revealHeadRef}
+          />
+        );
+      }
+      if (s === "plan") {
+        return (
+          <PlanStep
+            value={answers.plan} onChange={(role) => set("plan", role)}
+            onBack={() => goFrom(s, -1)} onNext={() => goto("account")} headRef={sectionHeadRef}
+          />
+        );
+      }
+      if (s === "account") {
+        return <AccountStep onBack={() => goFrom(s, -1)} onNext={() => goto("pay")} headRef={sectionHeadRef} />;
+      }
+      if (s === "pay") {
+        return (
+          <PayStep
+            plan={answers.plan} goal={answers.goal} onBack={() => goFrom(s, -1)}
+            onPlanChange={(r) => set("plan", r)} onExit={() => router.push("/")}
+            headRef={sectionHeadRef}
+          />
+        );
+      }
+      return null;
+    },
+    // NO eslint-disable here on purpose. The suppression that used to sit on
+    // this line is exactly what hid the stale-`go` regression; every value the
+    // callback closes over is now either listed or provably stable.
+    [answers, canAdvance, goFrom, goto, router, weekCells],
+  );
+
   return (
-    <div className="lx authx fnl-wiz">
+    // data-step drives the mobile layer's per-step rules (welcome has no sheet;
+    // reveal/plan/account get a taller one; pay drops the photo entirely).
+    <div className="lx authx fnl-wiz" data-step={step}>
       <div className="authx-shell">
-        <BrandPanel step={step} />
+        <BrandPanel step={step} ref={brandRef} />
         <main className="fnl-col">
           <div className="fnl-sr" role="status" aria-live="polite">
             {liveLabel}
           </div>
-          {/* each step IS the one 480px content column (header · body · action). */}
-          {step === "welcome" && <Welcome onStart={() => goto("goal")} />}
-            {QUESTION_NO[step] && (
-              <QuestionStep
-                key={step}
-                step={step}
-                answers={answers}
-                set={set}
-                onBack={() => go(-1)}
-                onNext={() => go(1)}
-                canNext={canNext}
-                headingRef={headingRef}
-              />
-            )}
-            {step === "why" && (
-              <WhyStep
-                value={answers.why}
-                onChange={(v) => set("why", v)}
-                onBack={() => go(-1)}
-                onNext={() => go(1)}
-                headingRef={headingRef}
-              />
-            )}
-            {step === "reveal" && (
-              <Reveal
-                a={answers}
-                weekCells={weekCells}
-                onBack={() => go(-1)}
-                onNext={() => goto("plan")}
-                headRef={revealHeadRef}
-              />
-            )}
-            {step === "plan" && (
-              <PlanStep
-                value={answers.plan}
-                onChange={(role) => set("plan", role)}
-                onBack={() => go(-1)}
-                onNext={() => goto("account")}
-                headRef={sectionHeadRef}
-              />
-            )}
-            {step === "account" && (
-              <AccountStep
-                onBack={() => go(-1)}
-                onNext={() => goto("pay")}
-                headRef={sectionHeadRef}
-              />
-            )}
-            {step === "pay" && (
-              <PayStep
-                plan={answers.plan}
-                goal={answers.goal}
-                onBack={() => go(-1)}
-                onPlanChange={(r) => set("plan", r)}
-                onExit={() => router.push("/")}
-                headRef={sectionHeadRef}
-              />
-            )}
+          {/* Each step IS the one 480px content column (header · body · action).
+              On mobile <StepStage> wraps them in the iOS push/pop transition and
+              the swipe-back gesture; on desktop it renders children bare, so the
+              finished desktop layout is untouched. */}
+          <StepStage
+            stepKey={step}
+            stepIndex={idx}
+            backKey={idx > 0 && step !== "pay" ? STEPS[idx - 1] : null}
+            render={renderStep}
+            onBack={stageBack}
+            enabled={isMobile && step !== "pay"}
+            onParallax={setParallax}
+          />
         </main>
       </div>
     </div>
@@ -331,25 +397,27 @@ function Welcome({ onStart }: { onStart: () => void }) {
   const w = MOCK.welcome;
   return (
     <div className="fnl-main fnl fnl-welcome">
-      <div className="fnl-scroll center">
-        <div className="eyebrow mono">{w.eyebrow}</div>
-        <h1 className="welcome-hd">
-          {w.line1}
-          <br />
-          {w.line2}
-        </h1>
-        <p className="welcome-sub">{w.sub}</p>
-      </div>
-      <div className="fnl-foot">
-        <button className="fnl-cta" onClick={onStart}>
-          {w.cta}
-        </button>
-        <p className="fnl-alt">
-          {w.loginPrompt}{" "}
-          <a href="/login" className="link">
-            {w.loginCta}
-          </a>
-        </p>
+      <div className="fnl-sheet">
+        <div className="fnl-scroll center">
+          <div className="eyebrow mono">{w.eyebrow}</div>
+          <h1 className="welcome-hd">
+            {w.line1}
+            <br />
+            {w.line2}
+          </h1>
+          <p className="welcome-sub">{w.sub}</p>
+        </div>
+        <div className="fnl-foot">
+          <button className="fnl-cta" onClick={onStart}>
+            {w.cta}
+          </button>
+          <p className="fnl-alt">
+            {w.loginPrompt}{" "}
+            <a href="/login" className="link">
+              {w.loginCta}
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -384,7 +452,14 @@ function QuestionStep({
   const pick = <K extends keyof FunnelAnswers>(k: K, v: FunnelAnswers[K] | null) => {
     set(k, v as FunnelAnswers[K]);
     if (advanceRef.current) clearTimeout(advanceRef.current);
-    if (v != null) advanceRef.current = setTimeout(onNext, 240);
+    if (v != null) {
+      // Haptic on the causal event, same frame as the checkmark (skill §13).
+      haptic("select");
+      // 240ms is the confirmation beat - long enough to SEE the choice land
+      // before the screen moves, and deliberately not longer: §1 says be
+      // vigilant about every latency on the input path.
+      advanceRef.current = setTimeout(onNext, 240);
+    }
   };
 
   return (
@@ -707,6 +782,7 @@ function Reveal({
           <LxIcon d={lxPaths.chevronLeft} size={18} />
         </button>
       </div>
+      <div className="fnl-sheet">
       <div className="fnl-scroll rv2">
         {/* Hero - the ring is the signature; count = days/week, legend = which days. */}
         <div className="rv-hero">
@@ -759,24 +835,27 @@ function Reveal({
       <div className="fnl-foot">
         <button className="fnl-cta" onClick={onNext}>{r.cta}</button>
       </div>
+      </div>
     </div>
   );
 }
 
 // A selectable plan row (reference PlanRow): radio/check · name+sub · price+unit.
 function PlanRow({
-  p, selected, onSelect, tabIndex, onKeyDown,
+  p, selected, onSelect, tabIndex, index, onKeyDown,
 }: {
   p: (typeof PAYWALL_PLANS)[number];
   selected: boolean;
   onSelect: () => void;
   tabIndex: number;
+  index: number; // drives the mobile entrance stagger
   onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
 }) {
   return (
     <button
       type="button" role="radio" aria-checked={selected}
       className={`pw-plan${selected ? " on" : ""}`}
+      style={{ "--i": index } as React.CSSProperties}
       onClick={onSelect} tabIndex={tabIndex} onKeyDown={onKeyDown}
     >
       {p.badge && <span className="pw-badge">{p.badge}</span>}
@@ -829,6 +908,7 @@ function PlanStep({
           <LxIcon d={lxPaths.chevronLeft} size={18} />
         </button>
       </div>
+      <div className="fnl-sheet">
       <div className="fnl-scroll pw-scroll">
         <PaywallOffer headRef={headRef} />
         <div className="pw-plans" role="radiogroup" aria-label="Csomag" ref={groupRef}>
@@ -837,6 +917,7 @@ function PlanStep({
               key={p.role} p={p}
               selected={value === p.role}
               onSelect={() => onChange(p.role)}
+              index={i}
               tabIndex={i === rovingIdx ? 0 : -1}
               onKeyDown={onKeyDown(i)}
             />
@@ -852,6 +933,7 @@ function PlanStep({
           <a href="/aszf">Feltételek</a>
           <a href="/adatvedelem">Adatvédelem</a>
         </div>
+      </div>
       </div>
     </div>
   );
@@ -872,10 +954,12 @@ function AccountStep({
           <LxIcon d={lxPaths.chevronLeft} size={18} />
         </button>
       </div>
-      <div className="fnl-scroll">
-        <h1 className="fnl-q" ref={headRef} tabIndex={-1}>Készítsd el a fiókod</h1>
-        <p className="fnl-sub">A válaszaidat a fiókodhoz mentem - így bármikor folytathatod.</p>
-        <RegisterForm onAuthed={onNext} />
+      <div className="fnl-sheet">
+        <div className="fnl-scroll">
+          <h1 className="fnl-q" ref={headRef} tabIndex={-1}>Készítsd el a fiókod</h1>
+          <p className="fnl-sub">A válaszaidat a fiókodhoz mentem - így bármikor folytathatod.</p>
+          <RegisterForm onAuthed={onNext} />
+        </div>
       </div>
     </div>
   );

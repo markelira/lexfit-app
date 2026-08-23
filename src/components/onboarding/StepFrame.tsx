@@ -40,15 +40,23 @@ export function StepFrame({
         {counter && <span className="fnl-counter mono">{counter}</span>}
       </div>
 
-      <fieldset className="fnl-scroll">
-        <legend className="fnl-q" ref={headingRef} tabIndex={-1}>
-          {heading}
-        </legend>
-        {sub && <p className="fnl-sub">{sub}</p>}
-        <div className="fnl-fields">{children}</div>
-      </fieldset>
+      {/* .fnl-sheet groups body+action into ONE object so the mobile layer can
+          make it the dark glass sheet that floats over the step photo
+          (docs/register-mobile-redesign-plan.md §2.2). On desktop it is
+          `display: contents` - the box disappears and .fnl-scroll/.fnl-foot
+          stay direct flex children of .fnl-main exactly as before, so the
+          desktop layout is untouched. */}
+      <div className="fnl-sheet">
+        <fieldset className="fnl-scroll">
+          <legend className="fnl-q" ref={headingRef} tabIndex={-1}>
+            {heading}
+          </legend>
+          {sub && <p className="fnl-sub">{sub}</p>}
+          <div className="fnl-fields">{children}</div>
+        </fieldset>
 
-      <div className="fnl-foot">{cta}</div>
+        <div className="fnl-foot">{cta}</div>
+      </div>
     </div>
   );
 }

@@ -92,6 +92,7 @@ export function OptionList(props: SingleProps | MultiProps) {
           item={it}
           multi={multi}
           selected={isSelected(it.v)}
+          index={i}
           tabIndex={multi ? 0 : i === rovingIdx ? 0 : -1}
           onSelect={() => onSelect(it.v)}
           onKeyDown={onKeyDown(i)}

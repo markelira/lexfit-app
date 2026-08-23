@@ -756,32 +756,10 @@
   .fnl-wiz .fnl-scroll { padding-top: 28px; }
 }
 
-/* Mobile <768: single column, sticky action bar, safe-area, brand dropped */
-@media (max-width: 767.98px) {
-  .fnl-wiz .authx-shell { grid-template-columns: 1fr; height: 100dvh; }
-  .fnl-wiz .authx-brand { display: none; }
-  .fnl-wiz .fnl-col { padding: 0; }
-  .fnl-wiz .fnl-main { width: 100%; max-width: none; max-height: none; margin: 0; flex: 1; min-height: 0; height: auto; }
-  .fnl-wiz .fnl-top {
-    height: 56px; padding: 0 20px; border-bottom: 1px solid var(--line); background: var(--surface);
-  }
-  .fnl-wiz .fnl-scroll {
-    padding: 20px 20px 0; gap: 10px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
-  }
-  .fnl-wiz .fnl-foot {
-    margin-top: 0; padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--line); background: var(--surface);
-  }
-  .fnl-wiz .fnl-q { font-size: 24px; line-height: 1.2; }
-  .fnl-wiz .fnl-sub { font-size: 14px; }
-  .fnl-wiz .fnl-cta { min-height: 52px; height: 52px; }
-  .fnl-wiz .fnl-opts { gap: 8px; }
-  .fnl-wiz .fnl-opt { min-height: 64px; padding: 12px 14px; border-radius: 12px; }
-  .fnl-wiz .fnl-opt .ic { width: 36px; height: 36px; border-radius: 9px; }
-  .fnl-wiz .fnl-opt .tx b { font-size: 15px; }
-  .fnl-wiz .fnl-opt .tx small { font-size: 13px; }
-  .fnl-wiz .fnl-mark { display: none; }
-}
+/* Mobile <768 is no longer a shrunk desktop - it is its own composition
+   (immersive full-bleed photo + glass sheet). The whole layer lives at the END
+   of this file so it wins the cascade over the .bp-* rules below.
+   See: "MOBILE < 768px" + docs/register-mobile-redesign-plan.md */
 
 /* ── Days step: interactive week selector (wireframe .day/.dot 1:1). ── */
 .lx .fnl-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: var(--sp-3); }
@@ -959,17 +937,28 @@
 .lx .bp-cap .bp-slogan b { font-weight: 700; }
 .lx .bp-cap .bp-by { font-weight: 400; opacity: 0.72; font-size: 0.58em; letter-spacing: 0.02em; }
 
-/* Mobile: the panel collapses under the content - show it as a photo banner. */
-@media (max-width: 768px) {
-  .lx .authx-brand.bp-img { min-height: 240px; }
-  .lx .authx-brand.bp-img .bp-mark { top: 22px; left: 24px; }
-  .lx .bp-cap { left: 24px; right: 24px; bottom: 22px; }
-  .lx .bp-cap .bp-line { font-size: 20px; }
-  .lx .bp-cap .bp-slogan { font-size: 26px; }
-}
+/* (The old <768px "photo banner" treatment is gone - on mobile this panel is
+   now the full-viewport background. See the MOBILE layer at the end of file.) */
 @media (prefers-reduced-motion: reduce) {
   .lx .bp-stage { animation: none; }
 }
+
+/* The next step's photo, fetched early and kept out of layout entirely (plan
+   §6). Not `display:none` - that can skip the fetch; this is measurably offscreen. */
+.lx .bp-prefetch {
+  position: absolute;
+  width: 1px; height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  left: -9999px; top: 0;
+}
+
+/* .fnl-sheet groups the step's body+action so the mobile layer can turn them
+   into one glass object. On desktop the box disappears (`display: contents`),
+   leaving .fnl-scroll/.fnl-foot as direct flex children of .fnl-main exactly as
+   before - which is why the desktop layout is untouched by this redesign. */
+.lx .fnl-sheet { display: contents; }
 
 /* ════════════════════════════════════════════════════════════════════════
    Subscription offer ("A teljes LEXFIT") - iOS-paywall reference
@@ -1038,3 +1027,766 @@
 .lx .pw-links { display: flex; justify-content: center; gap: 18px; }
 .lx .pw-links a { font-size: 12px; color: var(--accent-2); font-weight: 500; text-decoration: none; }
 .lx .pw-links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOBILE < 768px — immersive full-bleed
+   docs/register-mobile-redesign-plan.md · skill: apple-design
+
+   Mobile is NOT a shrunk desktop here. The step photo becomes the viewport
+   background and the question rides above it on a dark glass sheet:
+
+       ┌───────────────────────────┐
+       │ ‹    ▬▬▬▬▭▭▭      3 / 7   │  chrome  (floating, no bar, no divider)
+       │  A KÖZÖSSÉG               │  caption (from BrandPanel, on the scrim)
+       │  1 200+ csoporttag…       │
+       │                           │  elastic gap
+       │ ╭─────────────────────────╮
+       │ │ Mit szeretnél elérni?   │  sheet   (dark glass, hugs the bottom)
+       │ │ [options] [Tovább]      │
+       └─┴─────────────────────────┘
+
+   EVERY rule below is scoped `.fnl-wiz` AND inside this media query, so
+   /login, /subscribe and the shared <RegisterForm> are untouched.
+
+   Material rule that must not be broken (skill §12): ONLY the sheet carries
+   backdrop-filter. Option rows are flat tint fills painted on the already
+   blurred sheet — never light translucency stacked on light translucency.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+
+  /* ── Layering ───────────────────────────────────────────────────────────
+     The brand photo and the content column are assigned the SAME grid cell,
+     so they stack instead of sitting side by side. No JSX branch does this. */
+  .fnl-wiz .authx-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  .fnl-wiz .authx-brand,
+  .fnl-wiz .fnl-col { grid-area: 1 / 1; min-width: 0; }
+
+  .fnl-wiz .authx-brand {
+    display: block;              /* was `display: none` — the photo IS the design now */
+    order: 0;
+    padding: 0;
+    z-index: 0;
+    background: #0a0e0c;         /* a failed image reads as night, never as sage */
+  }
+  .fnl-wiz .fnl-col {
+    z-index: 1;
+    order: 0;
+    background: none;            /* the photo has to show through */
+    padding: 0;
+    overflow: visible;
+  }
+
+  .fnl-wiz .bp-stage { position: absolute; inset: 0; }
+  .fnl-wiz .bp-photo { object-position: 50% 30%; }  /* faces sit high; keep them out of the sheet */
+
+  /* Scrim (plan §3.1). Darken the top so the white chrome reads, stay light
+     through the middle so the photo is actually visible, darken the bottom so
+     the sheet doesn't cut against a bright edge. */
+  .fnl-wiz .bp-scrim {
+    background:
+      linear-gradient(180deg,
+        rgba(10, 14, 12, 0.62) 0%,
+        rgba(10, 14, 12, 0.28) 38%,
+        rgba(10, 14, 12, 0.66) 100%);
+  }
+
+  /* A local wash behind the caption only.
+     MEASURED, not guessed: with the page scrim alone, white caption text came
+     in at 2.70–3.17:1 across the eight step photos — every one a WCAG failure,
+     because several of these images are near-blown-out wall/sky in exactly the
+     band the caption occupies. Darkening the whole top instead would have cost
+     the photo everywhere to fix a problem that only exists behind ~90px of
+     text. This plate fades out at its own edges so it merges into the image
+     rather than reading as a box. Re-measure with scratch/shots.mjs if the
+     caption geometry or the photography changes. */
+  .fnl-wiz .bp-cap::before {
+    content: "";
+    position: absolute;
+    inset: -18px -20px -26px;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg,
+        rgba(8, 11, 10, 0) 0%,
+        rgba(8, 11, 10, 0.40) 22%,
+        rgba(8, 11, 10, 0.40) 70%,
+        rgba(8, 11, 10, 0) 100%);
+  }
+
+  /* ── The step column ────────────────────────────────────────────────────
+     flex column, chrome pinned top, sheet pinned bottom, elastic gap between
+     (the caption shows through that gap from the layer underneath). */
+  .fnl-wiz .fnl-main {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Chrome: back · progress · counter ──────────────────────────────────
+     No background, no border. skill §12: floating chrome uses a scroll-edge
+     fade, never a 1px divider strip. */
+  .fnl-wiz .fnl-top {
+    flex: none;
+    height: 56px;
+    padding: 0 16px;
+    padding-top: env(safe-area-inset-top);
+    box-sizing: content-box;
+    background: none;
+    border: 0;
+    gap: 14px;
+    align-items: center;
+    z-index: 2;
+  }
+  .fnl-wiz .fnl-back,
+  .fnl-wiz .fnl-later {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+  }
+  .fnl-wiz .fnl-back { width: 40px; height: 40px; }
+  .fnl-wiz .fnl-later { height: 34px; padding: 0 14px; font-size: 13px; font-weight: 600; }
+  .fnl-wiz .fnl-back-spacer { width: 40px; flex: none; }
+
+  /* Progress: one hairline track, not seven boxed segments. */
+  .fnl-wiz .fnl-prog { gap: 4px; }
+  .fnl-wiz .fnl-prog .seg {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.24);
+    border: 0;
+  }
+  .fnl-wiz .fnl-prog .seg.on { background: #fff; }
+  .fnl-wiz .fnl-counter { color: rgba(255, 255, 255, 0.72); font-size: 11px; letter-spacing: 0.08em; }
+
+  /* ── Caption (plan §2.3) ────────────────────────────────────────────────
+     Anchored under the chrome, NOT to the top of the sheet — the sheet's
+     height is content-driven, so hugging it would make the caption jump
+     between steps. Own zone, one line, never competing with the question. */
+  .fnl-wiz .bp-cap {
+    top: calc(env(safe-area-inset-top) + 74px);
+    bottom: auto;
+    left: 20px;
+    right: 20px;
+    z-index: 2;
+  }
+  .fnl-wiz .bp-cap .bp-eyebrow { font-size: 10px; letter-spacing: 0.14em; margin-bottom: 8px; }
+  .fnl-wiz .bp-cap .bp-line,
+  .fnl-wiz .bp-cap .bp-slogan {
+    font-size: 22px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 20px rgba(0, 0, 0, 0.45);
+  }
+  .fnl-wiz .bp-cap .bp-line { font-weight: 600; }
+  .fnl-wiz .bp-cap .bp-slogan { font-weight: 300; }
+
+  /* The wordmark belongs to `welcome`, where there is no chrome to carry the
+     eye. Everywhere else the back button and progress own that row. */
+  .fnl-wiz .authx-brand.bp-img .bp-mark { display: none; }
+  .fnl-wiz[data-step="welcome"] .authx-brand.bp-img .bp-mark {
+    display: flex;
+    top: calc(env(safe-area-inset-top) + 22px);
+    left: 20px;
+  }
+  .fnl-wiz .bmark-ico { width: 34px; height: 34px; border-radius: 10px; }
+  .fnl-wiz .bmark .wm { font-size: 17px; }
+
+  /* ── The sheet ──────────────────────────────────────────────────────────
+     One dark glass object holding body + action. `margin-top: auto` pins it
+     to the bottom and leaves the caption's gap above. This is the ONLY
+     element with backdrop-filter (skill §12). */
+  .fnl-wiz .fnl-sheet {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-top: auto;
+    max-height: 82dvh;
+    border-radius: 28px 28px 0 0;
+    background: rgba(16, 22, 19, 0.72);
+    -webkit-backdrop-filter: blur(30px) saturate(140%);
+    backdrop-filter: blur(30px) saturate(140%);
+    /* bright top edge = light catching the material (skill §12) */
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 -24px 60px -24px rgba(0, 0, 0, 0.7);
+    z-index: 2;
+  }
+  /* Content-dense steps need the room; the photo stays a band at the top. */
+  .fnl-wiz [data-step="reveal"] .fnl-sheet,
+  .fnl-wiz [data-step="plan"] .fnl-sheet,
+  .fnl-wiz [data-step="account"] .fnl-sheet { max-height: 88dvh; }
+  /* The iOS keyboard must not bury the textarea on the `why` step. */
+  .fnl-wiz [data-step="why"] .fnl-sheet:focus-within { max-height: 92dvh; }
+
+  /* The photo band never collapses to a stripe. */
+  .fnl-wiz .fnl-sheet { flex-shrink: 1; }
+
+  .fnl-wiz .fnl-scroll {
+    flex: 1;
+    min-height: 0;
+    padding: 24px 20px 4px;
+    gap: 8px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* `account` has no .fnl-foot, so nothing else supplies the bottom inset and
+     the legal line ran into the home indicator. */
+  .fnl-wiz [data-step="account"] .fnl-scroll {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  /* ── Type on dark (plan §3.2, skill §15) ────────────────────────────────
+     Vibrancy: over a translucent surface, text goes higher-contrast and a
+     touch heavier — never flat grey. Tracking is size-specific: the heading
+     tightens, the small print opens up. */
+  .fnl-wiz .fnl-q {
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: -0.028em;
+    line-height: 1.14;
+    color: #fff;
+  }
+  .fnl-wiz .fnl-sub {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.72);
+    max-width: none;
+  }
+  .fnl-wiz .fnl .eyebrow { color: rgba(255, 255, 255, 0.72); }
+  .fnl-wiz .fnl-fields { margin-top: 18px; }
+
+  /* ── Option rows ────────────────────────────────────────────────────────
+     Flat tints on the blurred sheet — deliberately NO backdrop-filter here. */
+  .fnl-wiz .fnl-opts { gap: 8px; }
+  .fnl-wiz .fnl-opt {
+    min-height: 64px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .fnl-wiz .fnl-opt.has-sub { min-height: 68px; }
+  .fnl-wiz .fnl-opt:hover { transform: none; border-color: rgba(255, 255, 255, 0.28); }
+  /* Feedback on pointer-DOWN, not on release (skill §1). */
+  .fnl-wiz .fnl-opt:active {
+    transform: scale(0.975);
+    background: rgba(255, 255, 255, 0.16);
+    transition: transform 100ms ease-out, background 100ms ease-out;
+  }
+  .fnl-wiz .fnl-opt:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .fnl-wiz .fnl-opt.on {
+    background: rgba(73, 108, 94, 0.92);          /* --accent-2, opaque enough to own the row */
+    border-color: var(--accent);
+  }
+  .fnl-wiz .fnl-opt .tx b { font-size: 16px; font-weight: 600; color: #fff; }
+  .fnl-wiz .fnl-opt .tx small {
+    font-size: 13.5px;
+    letter-spacing: 0.005em;
+    color: rgba(255, 255, 255, 0.64);
+  }
+  .fnl-wiz .fnl-opt.on .tx b,
+  .fnl-wiz .fnl-opt.on .tx small { color: #fff; }
+  .fnl-wiz .fnl-opt .ic {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+  .fnl-wiz .fnl-opt.on .ic { background: rgba(255, 255, 255, 0.20); border-color: rgba(255, 255, 255, 0.3); }
+  .fnl-wiz .fnl-opt .mk {
+    width: 24px; height: 24px;
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.34);
+  }
+  .fnl-wiz .fnl-opt.on .mk { background: #fff; border-color: #fff; color: var(--accent-2); }
+  .fnl-wiz .fnl-flames .off { color: rgba(255, 255, 255, 0.26); }
+  .fnl-wiz .fnl-flames .on { color: #fff; }
+
+  /* ── Action ─────────────────────────────────────────────────────────────
+     Solid white (D10): on dark glass the primary action should be the
+     brightest object on screen. 8.4:1 against the sheet. */
+  .fnl-wiz .fnl-foot {
+    flex: none;
+    margin-top: 0;
+    padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+    border: 0;
+    background: none;
+    gap: 10px;
+  }
+  /* Scroll-edge fade instead of a divider (skill §12). Taller and opaque at the
+     base, because the sheet itself is translucent — a weak fade let the last
+     option row read straight through the action bar.
+     The action bar is deliberately a HEAVIER material than the sheet it sits on
+     (skill §12: material weight encodes hierarchy) — dark on dark, so the
+     "never stack light translucency" rule still holds. */
+  .fnl-wiz .fnl-foot { position: relative; background: rgba(11, 16, 14, 0.82); }
+  .fnl-wiz .fnl-foot::before {
+    top: -40px; height: 40px;
+    background: linear-gradient(to top, rgba(11, 16, 14, 0.82), rgba(11, 16, 14, 0));
+  }
+  .fnl-wiz .fnl-cta,
+  .fnl-wiz .pw .fnl-cta {
+    min-height: 54px; height: 54px;
+    border-radius: 14px;
+    background: #fff;
+    border-color: #fff;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: none;
+  }
+  .fnl-wiz .fnl-cta:hover,
+  .fnl-wiz .pw .fnl-cta:hover { background: #fff; }
+  .fnl-wiz .fnl-cta:active { transform: scale(0.985); }
+  .fnl-wiz .fnl-cta[disabled] { background: rgba(255, 255, 255, 0.30); border-color: transparent; color: rgba(255, 255, 255, 0.55); opacity: 1; }
+  .fnl-wiz .fnl-skip { color: rgba(255, 255, 255, 0.64); font-size: 12.5px; }
+  .fnl-wiz .fnl-skip:hover { color: #fff; }
+  .fnl-wiz .fnl-alt { color: rgba(255, 255, 255, 0.68); font-size: 13px; }
+  .fnl-wiz .fnl-alt .link { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── welcome: no sheet at all ───────────────────────────────────────────
+     There are no options to hold, so the slogan and CTA sit straight on the
+     scrim. This is the ad-landing frame — it should read as a cover, not a
+     form. The BrandPanel caption is suppressed here because welcome's own
+     headline already says it. */
+  .fnl-wiz[data-step="welcome"] .bp-cap { display: none; }
+  .fnl-wiz [data-step="welcome"] .fnl-sheet {
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 0;
+    box-shadow: none;
+    max-height: none;
+  }
+  .fnl-wiz [data-step="welcome"] .fnl-scroll.center {
+    flex: none;
+    justify-content: flex-end;
+    padding: 0 20px 20px;
+  }
+  .fnl-wiz [data-step="welcome"] .welcome-hd {
+    font-size: 38px;
+    font-weight: 300;
+    letter-spacing: -0.032em;
+    line-height: 1.06;
+    color: #fff;
+    text-shadow: 0 1px 24px rgba(0, 0, 0, 0.5);
+  }
+  .fnl-wiz [data-step="welcome"] .welcome-sub {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 15px;
+    max-width: 30ch;
+    text-shadow: 0 1px 16px rgba(0, 0, 0, 0.5);
+  }
+  .fnl-wiz [data-step="welcome"] .fnl-foot::before { content: none; }
+
+  /* ── Long steps: the caption has no room above an 88dvh sheet ─────────── */
+  .fnl-wiz[data-step="reveal"] .bp-cap,
+  .fnl-wiz[data-step="plan"] .bp-cap,
+  .fnl-wiz[data-step="account"] .bp-cap { display: none; }
+
+  /* ── days: segmented + week card on dark ────────────────────────────────*/
+  .fnl-wiz .fnl-seg { background: rgba(255, 255, 255, 0.10); border-color: rgba(255, 255, 255, 0.16); }
+  .fnl-wiz .fnl-seg .seg-cell .v { color: rgba(255, 255, 255, 0.72); }
+  .fnl-wiz .fnl-seg .seg-cell.on { background: #fff; box-shadow: none; }
+  .fnl-wiz .fnl-seg .seg-cell.on .v { color: var(--ink); }
+  .fnl-wiz .fnl-reco { color: rgba(255, 255, 255, 0.62); }
+  .fnl-wiz .fnl-reco.on { color: #fff; }
+  .fnl-wiz .fnl-weekcard {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  .fnl-wiz .fnl-weekcard .wc-hd { color: #fff; }
+  .fnl-wiz .fnl-weekcard .wc-note { color: rgba(255, 255, 255, 0.6); }
+  .fnl-wiz .fnl-day .d { color: rgba(255, 255, 255, 0.6); }
+  .fnl-wiz .fnl-day .dot {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .fnl-wiz .fnl-day.done .dot { background: var(--accent-2); border-color: var(--accent); color: #fff; }
+  .fnl-wiz .fnl-day.done .d { color: #fff; }
+
+  /* ── why: textarea on dark ──────────────────────────────────────────────*/
+  .fnl-wiz .fnl-textarea {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    caret-color: var(--accent);
+    min-height: 104px;
+    border-radius: 14px;
+  }
+  .fnl-wiz .fnl-textarea::placeholder { color: rgba(255, 255, 255, 0.42); }
+  .fnl-wiz .fnl-textarea:focus { border-color: rgba(255, 255, 255, 0.44); }
+  .fnl-wiz .fnl-charcount { color: rgba(255, 255, 255, 0.5); }
+  .fnl-wiz .fnl-whisper { color: rgba(255, 255, 255, 0.56); }
+
+  /* ── reveal on dark ─────────────────────────────────────────────────────
+     The green week ring gains from the dark ground — this is the signature
+     frame of the funnel, so everything around it stays quiet. */
+  .fnl-wiz .fnl-reveal .reveal-hd { font-size: 27px; font-weight: 700; color: #fff; letter-spacing: -0.028em; }
+  .fnl-wiz .wr-track { stroke: rgba(255, 255, 255, 0.16); }
+  .fnl-wiz .wr-n { color: #fff; }
+  .fnl-wiz .wr-l { color: rgba(255, 255, 255, 0.62); }
+  /* Rest days need their own dark pill — inheriting the light --surface-2 left
+     them as bright chips with grey text, which read as the SELECTED state. */
+  .fnl-wiz .rv-ld { background: rgba(255, 255, 255, 0.10); color: rgba(255, 255, 255, 0.5); }
+  .fnl-wiz .rv-ld.on { background: var(--accent-2); color: #fff; }
+  .fnl-wiz .rv-card,
+  .fnl-wiz .fnl-pace,
+  .fnl-wiz .fnl-workout {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  /* The stat grid's dividers are 1px --line (a light token) — invisible intent
+     on white, bright scratches on dark. */
+  .fnl-wiz .rv-stat { border-bottom-color: rgba(255, 255, 255, 0.12); }
+  .fnl-wiz .rv-stat:nth-child(odd) { border-right-color: rgba(255, 255, 255, 0.12); }
+  .fnl-wiz .rv-k { color: rgba(255, 255, 255, 0.6); }
+  .fnl-wiz .rv-v,
+  .fnl-wiz .rv-pace strong,
+  .fnl-wiz .fnl-workout .wtitle { color: #fff; }
+  .fnl-wiz .rv-pace span,
+  .fnl-wiz .rv-coach { color: rgba(255, 255, 255, 0.72); }
+  .fnl-wiz .reveal-social,
+  .fnl-wiz .reveal-wl { color: rgba(255, 255, 255, 0.55); }
+  .fnl-wiz .fnl-quote {
+    background: rgba(255, 255, 255, 0.08);
+    border-left-color: var(--accent);
+  }
+  .fnl-wiz .fnl-quote .fq-l { color: rgba(255, 255, 255, 0.66); }
+  .fnl-wiz .fnl-quote blockquote { color: #fff; }
+  .fnl-wiz .fnl-quote figcaption { color: rgba(255, 255, 255, 0.62); }
+  .fnl-wiz .fnl-chip { background: rgba(255, 255, 255, 0.10); border-color: rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.82); }
+  .fnl-wiz .fnl-buildstatus .bs-line { color: #fff; }
+  .fnl-wiz .fnl-buildbar { background: rgba(255, 255, 255, 0.16); }
+
+  /* ── plan (paywall) on dark ─────────────────────────────────────────────
+     PaywallOffer is shared with /subscribe and is built entirely from light
+     tokens — its title was rendering near-black on the dark sheet, and its
+     feature tiles were solid white blocks pasted onto glass. */
+  .fnl-wiz .pw-title { color: #fff; }
+  .fnl-wiz .pw-sub { color: rgba(255, 255, 255, 0.72); }
+  .fnl-wiz .pw-hero {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .fnl-wiz .pw-tile {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  .fnl-wiz .pw-ftx b { color: #fff; }
+  .fnl-wiz .pw-ftx span { color: rgba(255, 255, 255, 0.66); }
+  .fnl-wiz .pw-fic { background: rgba(255, 255, 255, 0.14); color: #fff; }
+  .fnl-wiz .pw-hero .pw-fic { background: var(--accent-2); color: #fff; }
+  .fnl-wiz .pw-badge { background: var(--accent-2); color: #fff; }
+
+  .fnl-wiz .pw-plan {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  .fnl-wiz .pw-plan.on { background: rgba(73, 108, 94, 0.92); border-color: var(--accent); }
+  .fnl-wiz .pw-pname, .fnl-wiz .pw-pnum { color: #fff; }
+  .fnl-wiz .pw-psub, .fnl-wiz .pw-punit { color: rgba(255, 255, 255, 0.68); }
+  .fnl-wiz .pw-plan.on .pw-psub, .fnl-wiz .pw-plan.on .pw-punit { color: rgba(255, 255, 255, 0.85); }
+  .fnl-wiz .pw-radio { border-color: rgba(255, 255, 255, 0.34); }
+  .fnl-wiz .pw-plan.on .pw-radio { background: #fff; border-color: #fff; color: var(--accent-2); }
+  .fnl-wiz .pw-fine { color: rgba(255, 255, 255, 0.58); }
+  .fnl-wiz .pw-links a { color: rgba(255, 255, 255, 0.82); }
+
+  /* ── account: the shared <RegisterForm> on dark ─────────────────────────
+     Scoped to .fnl-wiz so /login keeps its light form untouched. The Google
+     and Apple buttons stay WHITE on purpose — Google's brand guidelines
+     require it, and they read correctly as bright chips on a dark sheet. */
+  .fnl-wiz .inp input {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    caret-color: var(--accent);
+  }
+  .fnl-wiz .inp input::placeholder { color: rgba(255, 255, 255, 0.42); }
+  .fnl-wiz .inp input:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+  }
+  .fnl-wiz .field label { color: #fff; }
+  .fnl-wiz .field.bad input { border-color: #ff9d9b; }
+  .fnl-wiz .err, .fnl-wiz .formerr { color: #ff9d9b; }
+  .fnl-wiz .hint { color: rgba(255, 255, 255, 0.6); }
+  .fnl-wiz .eye { color: rgba(255, 255, 255, 0.62); }
+  .fnl-wiz .eye:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+  .fnl-wiz .eye.on { color: #fff; }
+  .fnl-wiz .check { color: rgba(255, 255, 255, 0.76); }
+  .fnl-wiz .legal, .fnl-wiz .fnl-legal { color: rgba(255, 255, 255, 0.58); }
+  .fnl-wiz .legal a, .fnl-wiz .fnl-legal a { color: #fff; }
+  .fnl-wiz .notice, .fnl-wiz .fnl-notice { color: #fff; }
+  .fnl-wiz .fnl-authtoggle { color: #fff; }
+  .fnl-wiz .lab-row a, .fnl-wiz .lab-row .lnk { color: #fff; }
+  .fnl-wiz .topline { color: rgba(255, 255, 255, 0.7); }
+  .fnl-wiz .topline a, .fnl-wiz .topline .lnk { color: #fff; }
+  /* The "vagy" rule between OAuth and the form. */
+  .fnl-wiz .div { color: rgba(255, 255, 255, 0.6); }
+  .fnl-wiz .div::before, .fnl-wiz .div::after { background: rgba(255, 255, 255, 0.18); }
+  /* Email submit is the primary action on this step → same solid white as the
+     wizard CTA, so "continue" looks identical everywhere in the funnel. */
+  .fnl-wiz .submit {
+    background: #fff;
+    border-color: #fff;
+    color: var(--ink);
+    border-radius: 14px;
+    height: 54px;
+  }
+  .fnl-wiz .submit:hover:not(:disabled) { background: #fff; }
+  .fnl-wiz .submit .sp { border-color: rgba(24, 32, 29, 0.3); border-top-color: var(--ink); }
+
+  /* ── pay: back to light (plan §5) ───────────────────────────────────────
+     The one screen that stays as it is (D3). Crossing from the dark immersive
+     surface to a white one is the only brightness jump in the funnel, and §14
+     warns against abrupt ones — so the photo fades out and the sheet's fill and
+     text interpolate on the same clock. It reads as the room lights coming up,
+     not as a different website. Reverses on back.
+     Everything here transitions the same 260ms; the properties are colours and
+     opacity only, so this is one of the few places a CSS transition is the
+     right tool — nothing about it is gesture-driven. */
+  .fnl-wiz .authx-brand { transition: opacity 260ms ease; }
+  .fnl-wiz .fnl-col,
+  .fnl-wiz .fnl-sheet,
+  .fnl-wiz .fnl-q,
+  .fnl-wiz .fnl-back,
+  .fnl-wiz .fnl-later,
+  .fnl-wiz .fnl-foot {
+    transition: background-color 260ms ease, color 260ms ease, border-color 260ms ease;
+  }
+  .fnl-wiz[data-step="pay"] .authx-brand { opacity: 0; }
+  .fnl-wiz[data-step="pay"] .fnl-col { background: var(--surface); }
+  .fnl-wiz [data-step="pay"] .fnl-sheet {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 0;
+    box-shadow: none;
+    max-height: none;
+    flex: 1;
+    margin-top: 0;
+    border-radius: 0;
+  }
+  .fnl-wiz [data-step="pay"] .fnl-q { color: var(--ink); }
+  .fnl-wiz [data-step="pay"] .fnl-back,
+  .fnl-wiz [data-step="pay"] .fnl-later {
+    color: var(--ink);
+    background: var(--surface-2);
+    border-color: var(--line);
+  }
+  .fnl-wiz [data-step="pay"] .fnl-foot,
+  .fnl-wiz [data-step="pay"] .fnl-foot::before {
+    background: var(--surface);
+  }
+  .fnl-wiz [data-step="pay"] .fnl-foot::before {
+    background: linear-gradient(to top, var(--surface), transparent);
+  }
+  .fnl-wiz [data-step="pay"] .fnl-sub,
+  .fnl-wiz [data-step="pay"] .fnl-scroll { color: var(--ink-2); }
+
+  /* ── Accessibility (skill §14) ──────────────────────────────────────────*/
+  @media (prefers-reduced-transparency: reduce) {
+    .fnl-wiz .fnl-sheet {
+      background: #141a17;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    .fnl-wiz .fnl-opt { background: #1e2621; }
+    .fnl-wiz .fnl-foot::before { background: linear-gradient(to top, #141a17, transparent); }
+  }
+  @media (prefers-contrast: more) {
+    .fnl-wiz .fnl-sheet { background: #0d1210; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .fnl-wiz .fnl-opt { background: #1b2320; border-width: 1.5px; border-color: rgba(255, 255, 255, 0.55); }
+    .fnl-wiz .fnl-sub, .fnl-wiz .fnl-opt .tx small { color: rgba(255, 255, 255, 0.92); }
+    .fnl-wiz .bp-cap { background: rgba(10, 14, 12, 0.8); padding: 12px 14px; border-radius: 14px; }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOTION — the iOS push/pop stage + micro-interactions (MOBILE ONLY)
+   docs/register-mobile-redesign-plan.md §4 · skill: apple-design
+
+   <StepStage> renders nothing above 768px (`enabled={isMobile}`), so none of
+   this can reach the finished desktop layout. Transforms are driven from JS by
+   src/lib/spring.ts — deliberately NOT by CSS transitions, which cannot be
+   grabbed and reversed mid-flight (§3) and so are disqualified for anything a
+   finger can touch.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* NOT `.fnl-stage` - that name is already taken by a legacy full-screen layout
+   rule at the top of this file which carries `background: var(--bg)`, and
+   inheriting it painted a light panel straight over the step photo. */
+.lx .fnl-nav { display: contents; }
+
+@media (max-width: 767.98px) {
+  .fnl-wiz .fnl-nav {
+    display: block;
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;          /* the outgoing screen leaves, it does not scroll the page */
+    touch-action: pan-y;       /* we own horizontal; the browser keeps vertical */
+  }
+  .fnl-wiz .fnl-layer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    /* Only transform/opacity animate — compositor-friendly (§11). */
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+  /* The screen underneath a push dims as it recedes, exactly as iOS does —
+     depth you can read, not decoration. --fnl-dim is set per frame from JS. */
+  .fnl-wiz .fnl-layer.under::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    pointer-events: none;
+    background: #000;
+    opacity: var(--fnl-dim, 0);
+  }
+
+  /* MEASURED PERF GUARD (plan §8.1): a large backdrop-filter surface being
+     transformed every frame is a known iOS Safari repaint cost. Mid-drag the
+     blur is imperceptible anyway, so drop it while the finger is down and
+     restore it on settle. This is the mitigation; it is NOT a substitute for
+     testing on a real device. */
+  .fnl-wiz .fnl-nav.is-dragging .fnl-sheet {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(16, 22, 19, 0.9);
+  }
+  .fnl-wiz .fnl-nav.is-dragging * { cursor: grabbing; }
+
+  /* ── Option entrance ────────────────────────────────────────────────────
+     Rows materialise in sequence when a step arrives. Capped at ~160ms total
+     so it never becomes a queue the user waits behind (§1). */
+  .fnl-wiz .fnl-layer.top .fnl-opt,
+  .fnl-wiz .fnl-layer.top .pw-plan {
+    animation: fnlRowIn 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 26ms);
+  }
+  @keyframes fnlRowIn {
+    from { opacity: 0; transform: translate3d(0, 10px, 0); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* The selection checkmark springs in — a little overshoot is right here
+     because it is a landing, not a fade (§4). */
+  .fnl-wiz .fnl-opt.on .mk > svg,
+  .fnl-wiz .pw-plan.on .pw-radio > svg {
+    animation: fnlCheckIn 300ms cubic-bezier(0.34, 1.42, 0.64, 1) both;
+  }
+  @keyframes fnlCheckIn {
+    from { opacity: 0; transform: scale(0.4); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Progress fill eases to its new width rather than stepping. */
+  .fnl-wiz .fnl-prog .seg {
+    transition: background 380ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ── Reduced motion (§14) ───────────────────────────────────────────────
+     A gentler equivalent, not the absence of feedback: the stage cross-fades
+     (handled in StepStage), rows appear without travel, the check does not
+     overshoot. The swipe gesture still works — it simply commits without a
+     spring. */
+  @media (prefers-reduced-motion: reduce) {
+    .fnl-wiz .fnl-layer.top .fnl-opt,
+    .fnl-wiz .fnl-layer.top .pw-plan {
+      animation: fnlFadeIn 160ms ease both;
+      animation-delay: 0ms;
+    }
+    .fnl-wiz .fnl-opt.on .mk > svg,
+    .fnl-wiz .pw-plan.on .pw-radio > svg { animation: fnlFadeIn 140ms ease both; }
+    @keyframes fnlFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fnl-wiz .fnl-prog .seg { transition: none; }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOBILE — designed ground for the steps with no real photograph
+   docs/register-mobile-redesign-plan.md §7b/§7d
+
+   Seven of the eleven step assets are product mockups or key art, not
+   photographs. In the desktop side panel that is fine — a device shot in a
+   device-shot-shaped slot. As a full-viewport background behind a glass sheet
+   it is not: the top ~40% is blank white and the middle is a band of cropped,
+   unreadable UI. Those panels get this instead — a deep eucalyptus ground with
+   two soft light sources, which reads as deliberate rather than as a screenshot
+   someone forgot to crop.
+
+   MOBILE ONLY, and keyed off data-art, so restoring a panel to photography is a
+   one-word change in BrandPanel (ART: "ground" → "photo") with nothing here to
+   undo. This is a stopgap for missing assets, not a design preference.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+  .fnl-wiz .authx-brand[data-art="ground"] .bp-photo { display: none; }
+
+  /* Runs DARK at the top and LIGHTER toward the bottom — the opposite of the
+     photo scrim, and deliberately so. Two things need it: the caption sits at
+     the top and wants a dark backdrop, and the sheet is a dark translucent
+     panel that has to be legible as an edge. A ground that darkened downward
+     (the first attempt) let the sheet dissolve into it — the rounded top corner
+     was the only thing separating them. */
+  .fnl-wiz .authx-brand[data-art="ground"] .bp-stage {
+    background:
+      /* a soft high light top-right, away from the caption */
+      radial-gradient(110% 60% at 84% 6%, rgba(150, 186, 170, 0.28) 0%, rgba(150, 186, 170, 0) 60%),
+      /* the light the sheet sits against, so its edge always reads */
+      radial-gradient(120% 62% at 18% 96%, rgba(122, 168, 146, 0.42) 0%, rgba(122, 168, 146, 0) 68%),
+      linear-gradient(168deg, #16211c 0%, #1f302a 48%, #2d4439 100%);
+  }
+  /* A touch more edge on the ground steps: against a photo the sheet separates
+     on its own, against the ground it needs the help. */
+  .fnl-wiz .authx-brand[data-art="ground"] ~ .fnl-col .fnl-sheet {
+    border-top-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 -28px 60px -20px rgba(0, 0, 0, 0.8);
+  }
+  /* The scrim is tuned for photographs; over the ground it only muddies. */
+  .fnl-wiz .authx-brand[data-art="ground"] .bp-scrim { background: none; }
+  /* Ditto the caption plate — the ground is already dark and even, and the
+     measured contrast there is ~12:1 without it. */
+  .fnl-wiz .authx-brand[data-art="ground"] .bp-cap::before { content: none; }
+
+  /* Vary the light per step so the ground steps are not seven identical walls.
+     Rotating the hue/angle costs nothing and keeps the flow moving. */
+  .fnl-wiz .authx-brand[data-art="ground"][data-panel="level"] .bp-stage { filter: hue-rotate(-8deg); }
+  .fnl-wiz .authx-brand[data-art="ground"][data-panel="days"] .bp-stage { filter: hue-rotate(6deg) brightness(1.04); }
+  .fnl-wiz .authx-brand[data-art="ground"][data-panel="env"] .bp-stage { filter: hue-rotate(-4deg) brightness(0.96); }
+  .fnl-wiz .authx-brand[data-art="ground"][data-panel="alone"] .bp-stage { filter: brightness(0.9); }
+  .fnl-wiz .authx-brand[data-art="ground"][data-panel="promise"] .bp-stage { filter: hue-rotate(4deg) brightness(1.06); }
+  .fnl-wiz .authx-brand[data-art="ground"][data-panel="reassure"] .bp-stage { filter: hue-rotate(8deg); }
+
+  /* On a ground step the caption is the only thing in that space, so let it
+     breathe — it is carrying the screen on its own. */
+  .fnl-wiz .authx-brand[data-art="ground"] .bp-cap .bp-line,
+  .fnl-wiz .authx-brand[data-art="ground"] .bp-cap .bp-slogan { font-size: 24px; }
+}
+
+/* The step-id carrier when <StepStage> is disabled (desktop, and `pay`).
+   `display: contents` means it holds the attribute for the [data-step="…"]
+   rules above without introducing a box, so no layout changes.
+
+   Two scopes exist on purpose:
+     .fnl-wiz[data-step]   (root)  → the photo panel and the column, which are
+                                     SIBLINGS of the stage and therefore always
+                                     follow the step actually being navigated to
+     .fnl-wiz [data-step]  (layer) → the sheet and its contents, which must
+                                     follow the step THAT LAYER renders
+   Keying the second group off the root painted the outgoing screen with the
+   incoming step's rules — most visibly welcome→goal, where the sheet-less
+   welcome screen slid out wearing a sheet it is explicitly styled not to have. */
+.lx .fnl-solo { display: contents; }

@@ -20,10 +20,11 @@ export const OptionRow = forwardRef<
     selected: boolean;
     multi: boolean;
     tabIndex: number;
+    index?: number; // position in the group; drives the mobile entrance stagger
     onSelect: () => void;
     onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
   }
->(function OptionRow({ item, selected, multi, tabIndex, onSelect, onKeyDown }, ref) {
+>(function OptionRow({ item, selected, multi, tabIndex, index = 0, onSelect, onKeyDown }, ref) {
   return (
     <button
       ref={ref}
@@ -31,6 +32,9 @@ export const OptionRow = forwardRef<
       role={multi ? "checkbox" : "radio"}
       aria-checked={selected}
       tabIndex={tabIndex}
+      // --i is the stagger index. Capped at 6 so a long list never makes the
+      // last row feel like a queue the user is waiting behind (skill §1).
+      style={{ "--i": Math.min(index, 6) } as React.CSSProperties}
       className={`fnl-opt${multi ? " multi" : ""}${item.sub ? " has-sub" : ""}${selected ? " on" : ""}`}
       onClick={onSelect}
       onKeyDown={onKeyDown}
