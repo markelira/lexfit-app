@@ -215,6 +215,24 @@ nil — but it lands on `/register`, on the same iOS-webview surface as the L2 n
 if it ever fires before sign-in completes it would drop auth persistence. Watch it; only
 1 event so far.
 
+**Update 2026-08-24 — recurred, and fixed at the root.** A second event of the same
+family landed on `/register` (iOS, TikTok campaign traffic, release `e9cc99d`):
+`UnknownError: Database deleted by request of the user`, same
+`onunhandledrejection` mechanism, same `@firebase/auth` IDB layer. Both come from
+`getAuth()` choosing `indexedDBLocalPersistence`, whose `startPolling()` fires
+`_poll()` every 800 ms as a floating promise — nothing catches it, so each tick after
+iOS drops the connection (ITP eviction, storage pressure, webview teardown) is one
+unhandled rejection. The retry note above was too optimistic: `_withRetries` gives up
+after 3 attempts, and the same dead handle is what sign-in writes through, so a
+`/register` submit can fail outright for that user.
+`src/lib/firebase.ts` now initializes auth with `browserLocalPersistence` first
+(IndexedDB kept in the hierarchy purely as a migration source). Verified against the
+emulator: sessions land in `localStorage`, the IDB store stays empty, an IDB-only
+session still migrates instead of logging the user out, and `signInWithPopup` still
+resolves. **If this error class reappears post-deploy it is no longer Auth** — the
+remaining IDB users are App Check / `@firebase/installations`, and those are
+non-actionable browser-eviction noise worth filtering in `instrumentation-client.ts`.
+
 ## 15. `TypeError: Failed to set the 'currentTime' property on 'HTMLMediaElement': The provided double value is non-finite`
 
 - **Short ID:** JAVASCRIPT-NEXTJS-5 · **Issue:** `139701519` ·

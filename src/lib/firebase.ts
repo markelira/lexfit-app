@@ -1,7 +1,16 @@
 // Firebase Web SDK (client). Safe for the browser - uses NEXT_PUBLIC_* config.
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
-import { connectAuthEmulator, getAuth, type Auth } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  browserPopupRedirectResolver,
+  browserSessionPersistence,
+  connectAuthEmulator,
+  getAuth,
+  indexedDBLocalPersistence,
+  initializeAuth,
+  type Auth,
+} from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore, type Firestore } from "firebase/firestore";
 import { connectStorageEmulator, getStorage, type FirebaseStorage } from "firebase/storage";
 
@@ -68,7 +77,46 @@ export function initAppCheck() {
   });
 }
 
-export const auth: Auth = getAuth(app);
+// Auth persistence: localStorage FIRST, IndexedDB only as a migration source.
+// This is getAuth()'s own hierarchy with the first two entries swapped (and its
+// popup/redirect resolver kept, which initializeAuth does NOT default to -
+// without it signInWithPopup throws auth/argument-error).
+//
+// Why: getAuth() picks indexedDBLocalPersistence, and that layer runs a 800ms
+// poll loop whose promise nobody catches. On iOS Safari the browser can drop an
+// open IDB connection under it at any time (7-day ITP eviction, storage
+// pressure, "clear website data", webview teardown), and every tick then
+// rejects with "UnknownError: Database deleted by request of the user" /
+// "IDBDatabase: The database connection is closing" - unhandled, once per tick.
+// Worse than the Sentry noise: with a dead IDB, the persistence write inside
+// sign-in rejects, so a /register submit fails for that user (both live
+// sightings were /register on iOS - Sentry 2026-08-12 and 2026-08-24).
+// localStorage is synchronous, cannot be yanked mid-transaction, and is already
+// where every RegisterForm/AuthScreen session ends up (both call
+// setPersistence(browserLocalPersistence) before signing in - now a no-op).
+// indexedDBLocalPersistence stays in the list so PersistenceUserManager.create
+// still finds and migrates sessions written by the old hierarchy; it is never
+// selected while localStorage is available, so nothing polls it.
+//
+// getAuth() covers the two cases this hierarchy can't serve:
+//   - SSR: `firebase/auth` resolves to its NODE build on the server, where the
+//     browser persistence/resolver exports don't exist. Passing those undefineds
+//     to initializeAuth logs "INTERNAL ASSERTION FAILED: Expected a class
+//     definition" on every render (seen in dev before this guard).
+//   - This module re-evaluating (dev hot reload) against an app that already has
+//     an auth instance - same reason `app` above reuses getApps()[0].
+function initAuth(): Auth {
+  if (typeof window === "undefined") return getAuth(app);
+  try {
+    return initializeAuth(app, {
+      popupRedirectResolver: browserPopupRedirectResolver,
+      persistence: [browserLocalPersistence, indexedDBLocalPersistence, browserSessionPersistence],
+    });
+  } catch {
+    return getAuth(app);
+  }
+}
+export const auth: Auth = initAuth();
 export const db: Firestore = getFirestore(app);
 export const storage: FirebaseStorage = getStorage(app);
 
