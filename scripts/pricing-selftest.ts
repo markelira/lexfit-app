@@ -35,6 +35,12 @@ function accessMatrix() {
     [{ status: "CANCELED", accessUntil: past }, false, "CANCELED after period end"],
     [{ status: "PAUSED", accessUntil: future }, false, "PAUSED (hard deny)"],
     [{ status: "EXPIRED", accessUntil: future }, false, "EXPIRED (hard deny)"],
+    // Comp (staff/admin/press) outranks everything Stripe wrote - including the
+    // two hard denials and an elapsed/absent accessUntil.
+    [{ comp: true }, true, "comp, no other fields"],
+    [{ comp: true, status: "EXPIRED", accessUntil: past }, true, "comp beats EXPIRED + elapsed"],
+    [{ comp: true, status: "PAUSED", accessUntil: past }, true, "comp beats PAUSED"],
+    [{ comp: false, status: "EXPIRED", accessUntil: past }, false, "comp revoked → normal rules"],
   ];
   for (const [doc, expected, label] of cases) {
     assert.equal(hasAccessFromData(doc, now), expected, `access: ${label}`);

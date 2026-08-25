@@ -40,6 +40,16 @@ export interface SubscriptionDoc {
   founderLockApplied?: boolean;
   /** The 490 Ft weekly intro is once per user - set true once consumed. */
   weekIntroUsed?: boolean;
+  /**
+   * Comped access - staff/admin/press, granted outside Stripe by
+   * `scripts/grant-comp-access.mjs`. Deliberately a flag and NOT a long
+   * `accessUntil`: the Stripe webhook merges its own status/accessUntil over
+   * this doc, so a date-based comp would be silently revoked the next time the
+   * account touched checkout. `hasAccessFromData` honours the flag first.
+   */
+  comp?: boolean;
+  compReason?: string | null;
+  compGrantedAt?: number | null; // epoch ms
   /** Total days spent paused - F4.3 founder-lock tenure is shifted by this. */
   pausedDaysTotal?: number;
   /** Pause bookkeeping (F2.3). Set while PAUSED, cleared on resume. */
@@ -86,11 +96,16 @@ export interface OfferDoc {
  *
  * Access iff `accessUntil` is in the future AND the status is not a no-access
  * status. PAUSED/EXPIRED are hard-denied even if `accessUntil` hasn't elapsed.
+ *
+ * One exception outranks all of it: a comped account (`comp: true`) always has
+ * access, whatever Stripe last wrote into the doc. Only the grant script sets
+ * that flag.
  */
 export function hasAccessFromData(
   sub: SubscriptionDoc | null | undefined,
   nowMs: number,
 ): boolean {
+  if (sub?.comp === true) return true;
   if (!sub || sub.accessUntil == null) return false;
   if (sub.status === "PAUSED" || sub.status === "EXPIRED") return false;
   return sub.accessUntil > nowMs;

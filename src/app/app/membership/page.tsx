@@ -223,10 +223,15 @@ function Membership() {
     <Shell onBack={() => router.push("/app/profile")}>
       <p className={styles.eyebrow}>TAGSÁG</p>
       <h1 className={styles.title}>Mit szeretnél?</h1>
-      {accessUntil && (
+      {accessUntil && !sub?.comp && (
         <p className={styles.sub}>A hozzáférésed {fmtDate(accessUntil)}-ig aktív.</p>
       )}
-      {!recurring ? (
+      {sub?.comp ? (
+        <p className={styles.sub}>
+          Korlátlan hozzáférésed van - nincs mögötte fizetős tagság, így nincs mit
+          szüneteltetni vagy lemondani.
+        </p>
+      ) : !recurring ? (
         <p className={styles.sub}>Egyszeri hozzáférésed van - nincs mit lemondani, a végén magától lejár.</p>
       ) : (
         <div className={styles.options}>
