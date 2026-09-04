@@ -28,17 +28,21 @@ export const PAYWALL_FEATURES: { icon: string | string[]; title: string; sub: st
   { icon: lxPaths.house, title: "Otthon, bárhol", sub: "eszköz nélkül" },
 ];
 
-// Reference-format plan rows; Heti is the highlighted default (490 Ft entry).
+// Reference-format plan rows. The BADGE follows the landing band (offer v3 §4.4
+// centres Havi as "Legnépszerűbb"): a visitor who taps the Havi card on / must
+// not arrive at a paywall recommending Heti. Heti stays the low-friction
+// default selection - that is `INITIAL.plan`, not a badge.
 export const PAYWALL_PLANS: PayPlan[] = [
   {
     role: "week_intro", name: "Heti",
     sub: `Első hét ${formatHuf(PRICES.week_intro.amountHuf)} · utána ${formatHuf(PRICES.week_std.amountHuf)} / hét`,
     price: formatHuf(PRICES.week_intro.amountHuf), unit: "első hét",
-    badge: "Ajánlott indulás", cta: `${formatHuf(PRICES.week_intro.amountHuf)} · első hét`,
+    cta: `${formatHuf(PRICES.week_intro.amountHuf)} · első hét`,
   },
   {
     role: "month_std", name: "Havi", sub: "Havonta megújul",
     price: formatHuf(PRICES.month_std.amountHuf), unit: "/ hó",
+    badge: "Legnépszerűbb",
     cta: `${formatHuf(PRICES.month_std.amountHuf)} / hó`,
   },
   {

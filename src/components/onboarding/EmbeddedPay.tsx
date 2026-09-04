@@ -1,12 +1,16 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { fetchEmbeddedClientSecret, type Consents } from "@/lib/billing";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { type PayPlan } from "./paywall";
+import { PRICES } from "@/lib/pricing/config";
+import { formatHuf } from "@/lib/pricing/display";
+import { nextChargeLabel, type RenewalRole } from "@/lib/pricing/renewal";
+import { GARANCIA, GUARANTEE_LIVE, PAY_STEP } from "@/components/landing/offer-copy";
 
 // Stripe.js is loaded lazily, once, at module scope (publishable key is public).
 const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -16,6 +20,32 @@ const stripePromise = pk ? loadStripe(pk) : null;
 // start); the single compact checkbox below covers both, and the server records
 // the consent before the session is created.
 const CONSENTS: Consents = { autoRenew: true, immediateStart: true };
+
+/** The pre-payment renewal sentence for one plan.
+ *
+ *  The date is resolved AFTER mount on purpose: /register is a statically
+ *  prerendered route, so a date computed during render would be frozen at build
+ *  time and shown to every visitor forever. Until it resolves the sentence just
+ *  omits the date clause - shorter, never wrong. */
+function useRenewalLine(role: string): string {
+  const [today, setToday] = useState<number | null>(null);
+  useEffect(() => setToday(Date.now()), []);
+
+  const intro = formatHuf(PRICES.week_intro.amountHuf);
+  const weekStd = formatHuf(PRICES.week_std.amountHuf);
+  const month = formatHuf(PRICES.month_std.amountHuf);
+  const annual = formatHuf(PRICES.annual_std.amountHuf);
+
+  if (today == null) {
+    if (role === "month_std") return PAY_STEP.renewalPending.month_std(month);
+    if (role === "annual_std") return PAY_STEP.renewalPending.annual_std(annual);
+    return PAY_STEP.renewalPending.week_intro(intro, weekStd);
+  }
+  const date = nextChargeLabel(role as RenewalRole, today);
+  if (role === "month_std") return PAY_STEP.renewal.month_std(month, date);
+  if (role === "annual_std") return PAY_STEP.renewal.annual_std(annual, date);
+  return PAY_STEP.renewal.week_intro(intro, weekStd, date);
+}
 
 // Embedded Stripe Checkout mounted on the pay step (E2). The user can still
 // change the plan here (no need to go back) - the selection is controlled by the
@@ -35,6 +65,7 @@ export function EmbeddedPay({
   const [ready, setReady] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const selected = plans.find((p) => p.role === role) ?? plans[0];
+  const renewalLine = useRenewalLine(selected.role);
 
   const fetchClientSecret = useCallback(
     () =>
@@ -61,6 +92,15 @@ export function EmbeddedPay({
     <div className="fnl-pay">
       {!ready ? (
         <>
+          {/* The guarantee sits ABOVE the selector and is deliberately quiet:
+              it de-risks the choice, it must not compete with it, so it has no
+              CTA of its own (offer v3 §6 "one goal per screen"). */}
+          {GUARANTEE_LIVE && (
+            <p className="fnl-guarantee">
+              <b>{GARANCIA.shortLead}</b>{GARANCIA.shortBody}
+            </p>
+          )}
+
           {/* Same summary-card style - but all three are selectable here, so the
               user can switch plan without going back. */}
           <div className="fnl-payopts" role="radiogroup" aria-label="Csomag">
@@ -84,6 +124,10 @@ export function EmbeddedPay({
             })}
           </div>
 
+          {/* Hard rule 7: the renewal amount AND the next charge date are shown
+              before the visitor pays, not after, and not only inside Stripe. */}
+          <p className="fnl-renewal">{renewalLine}</p>
+
           <label className="fnl-check">
             <input type="checkbox" checked={consented} onChange={(e) => setConsented(e.target.checked)} />
             <span>
@@ -95,7 +139,10 @@ export function EmbeddedPay({
           <button className="fnl-cta" disabled={!consented} onClick={() => setReady(true)}>
             Tovább a fizetéshez
           </button>
-          <p className="fnl-alt">Bármikor lemondható · 14 napos elállási jog</p>
+          <p className="fnl-alt">{PAY_STEP.cancelLine}</p>
+          <div className="fnl-paytrust">
+            {PAY_STEP.trust.map((t) => <span key={t}>{t}</span>)}
+          </div>
         </>
       ) : (
         <>

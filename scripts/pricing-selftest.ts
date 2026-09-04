@@ -8,7 +8,8 @@
 import assert from "node:assert/strict";
 import { hasAccessFromData, type SubscriptionDoc } from "../src/lib/pricing/types";
 import { budapestDay, budapestHour, checkinDocId, offerDocId } from "../src/lib/pricing/keys";
-import { formatHuf, perWeekHuf, annualSavingsPct } from "../src/lib/pricing/display";
+import { formatHuf, perWeekHuf, perMonthHuf, annualSavingsPct } from "../src/lib/pricing/display";
+import { nextChargeDay, formatHuDate } from "../src/lib/pricing/renewal";
 import { computeRefundMinor, unusedFraction, type PaidPeriod } from "../src/lib/pricing/refund";
 import {
   earningWindowDays,
@@ -159,10 +160,70 @@ function eligibilityAndOfferState() {
   console.log("✓ eligibility (WEEK/MONTH only) + offer-state machine");
 }
 
+function perMonthDerivation() {
+  // The annual card's derived line. 39 900 / 12 is exact, and the savings figure
+  // is the ONE legitimate comparison (monthly-annualized vs annual).
+  assert.equal(perMonthHuf(39900), 3325, "39 900/év → 3 325 Ft/hó");
+  assert.equal(annualSavingsPct(5990, 39900), 44, "annual saves 44% vs 12x monthly");
+  // Grouping must match formatHuf's hand-rolled rule, not Intl's ICU-dependent
+  // one - a mismatched separator is what broke hydration on / before.
+  assert.equal(formatHuf(perMonthHuf(39900)), "3325 Ft", "4-digit stays solid");
+  assert.equal(formatHuf(39900), "39\u00A0900 Ft", "5-digit groups with NBSP");
+  console.log("✓ per-month derivation + grouping");
+}
+
+function renewalDates() {
+  // Hard rule 7: the next charge date is shown BEFORE payment, so it has to be
+  // right across a DST boundary. Budapest springs forward 2026-03-29 and falls
+  // back 2026-10-25; millisecond arithmetic lands an hour off on both and can
+  // move the displayed calendar day.
+  const midJan = Date.UTC(2026, 0, 15, 10);
+  assert.equal(nextChargeDay("week_intro", midJan), "2026-01-22", "weekly intro renews after 7 days");
+  assert.equal(nextChargeDay("month_std", midJan), "2026-02-15", "monthly renews same day next month");
+  assert.equal(nextChargeDay("annual_std", midJan), "2027-01-15", "annual renews same day next year");
+
+  // Across the autumn change: 25 Oct is the fall-back Sunday, so a purchase on
+  // the 22nd must still renew on the 29th - same weekday, not the 28th.
+  const preFallBack = Date.UTC(2026, 9, 22, 10);
+  assert.equal(nextChargeDay("week_intro", preFallBack), "2026-10-29", "weekly survives fall-back");
+  // And across the spring change (29 March 2026).
+  const preSpringFwd = Date.UTC(2026, 2, 25, 10);
+  assert.equal(nextChargeDay("week_intro", preSpringFwd), "2026-04-01", "weekly survives spring-forward");
+
+  // Late-evening UTC is already tomorrow in Budapest - the date shown must be
+  // the Budapest day, not the UTC one.
+  const lateUtc = Date.UTC(2026, 5, 30, 23, 30);
+  assert.equal(nextChargeDay("week_intro", lateUtc), "2026-07-08", "23:30 UTC counts as the Budapest tomorrow");
+
+  // Month-end CLAMPING, not overflow. JS setUTCMonth(+1) turns 31 Jan into
+  // 3 March; Stripe charges the last day of the month instead. A pre-payment
+  // disclosure that names a date Stripe will not use is worse than no date.
+  const jan31 = Date.UTC(2026, 0, 31, 10);
+  assert.equal(nextChargeDay("month_std", jan31), "2026-02-28", "31 Jan renews 28 Feb, not 3 Mar");
+  const jan31leap = Date.UTC(2028, 0, 31, 10);
+  assert.equal(nextChargeDay("month_std", jan31leap), "2028-02-29", "leap year clamps to the 29th");
+  const feb29 = Date.UTC(2028, 1, 29, 10);
+  assert.equal(nextChargeDay("annual_std", feb29), "2029-02-28", "29 Feb renews 28 Feb next year");
+  const may31 = Date.UTC(2026, 4, 31, 10);
+  assert.equal(nextChargeDay("month_std", may31), "2026-06-30", "31 May renews 30 Jun");
+  const jan15 = Date.UTC(2026, 0, 15, 10);
+  assert.equal(nextChargeDay("month_std", jan15), "2026-02-15", "a normal day is unaffected by the clamp");
+  const dec15 = Date.UTC(2026, 11, 15, 10);
+  assert.equal(nextChargeDay("month_std", dec15), "2027-01-15", "December rolls the year");
+  const dec31 = Date.UTC(2026, 11, 31, 10);
+  assert.equal(nextChargeDay("month_std", dec31), "2027-01-31", "31 Dec renews 31 Jan");
+
+  assert.equal(formatHuDate("2026-09-11"), "2026. szeptember 11.", "Hungarian long form");
+  assert.equal(formatHuDate("2026-01-01"), "2026. január 1.", "no zero padding in the display form");
+  console.log("✓ next-charge dates (DST, Budapest day, month-end) + hu format");
+}
+
 accessMatrix();
 budapestDays();
 docIds();
 displayNumbers();
+perMonthDerivation();
+renewalDates();
 withdrawalProRata();
 earningWindow();
 makeupCutoff();

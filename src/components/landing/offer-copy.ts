@@ -157,6 +157,26 @@ export const ARAK_FAQ_KEYS = [
 /** §4.6 — funnel strings that must read identically at the paywall and on the
  *  page. The rest of the funnel's copy stays in src/app/onboarding/_mock.ts. */
 export const PAY_STEP = {
+  /** Renewal disclosure, per plan (hard rule 7). Only the weekly line is given
+   *  verbatim in §4.6; the monthly and annual lines are its stated "analogue"
+   *  and follow the same shape. // COPY-REVIEW (Havi + Éves wording)
+   *  Amounts are injected by the caller from PRICES - never literals. */
+  renewal: {
+    week_intro: (intro: string, std: string, date: string) =>
+      `Az első hét ${intro}, utána ${std}/hét — a következő terhelés: ${date}.`,
+    month_std: (amount: string, date: string) =>
+      `${amount}/hó — a következő terhelés: ${date}.`,
+    annual_std: (amount: string, date: string) =>
+      `${amount}/év — a következő terhelés: ${date}.`,
+  },
+  /** Shown while the date is still being resolved on the client (see
+   *  renewal.ts - /register is prerendered, so the date cannot come from the
+   *  render pass). Never shows a wrong date, only a shorter sentence. */
+  renewalPending: {
+    week_intro: (intro: string, std: string) => `Az első hét ${intro}, utána ${std}/hét.`,
+    month_std: (amount: string) => `${amount}/hó, havonta megújul.`,
+    annual_std: (amount: string) => `${amount}/év, évente megújul.`,
+  },
   /** Under the CTA (P11). */
   cancelLine: "Bármikor lemondható egy kattintással — a lemondás nem büntet.",
   /** Trust row (P12). */
