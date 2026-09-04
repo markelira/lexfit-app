@@ -67,6 +67,44 @@ export const PRICING_BAND = {
   value: "A videó ingyen is megvan. A sorrend, a terv és a vezetés — az a tagság. Egy edzőóra ára ≈ egy hónap LEXFIT.",
   /** P13 / P14 — procrastination, answered at the moment of choosing. */
   hesitation: "Nem kell ma biztosnak lenned: az első 10 edzésre garancia van, és bármikor lemondhatod.",
+  /** Per-card copy. The price SENTENCES are built in PricingBand.tsx from
+   *  PRICES/display so no forint is ever a literal; what lives here is the
+   *  wording around them. Order and badges are §4.4's, which deliberately
+   *  centres Havi rather than Éves. */
+  cards: {
+    week: {
+      plan: "Heti",
+      badge: "Kipróbálom",
+      body: "Teljes hozzáférés az első naptól. Automatikusan megújul — a dátumát előre megmutatjuk. Bármikor lemondható.",
+      cta: (intro: string) => `Kezdem ${intro}-tal`,
+    },
+    month: {
+      plan: "Havi",
+      badge: "Legnépszerűbb",
+      tagline: "kevesebb, mint egy edzőóra",
+      /** The middle bullet is the guarantee, so it is dropped while the
+       *  guarantee is dark (see GUARANTEE_LIVE). */
+      bullets: ["Teljes hozzáférés", "10 edzés garancia", "bármikor lemondható, szüneteltethető"],
+      cta: "Havi tagságot kérek",
+    },
+    annual: {
+      plan: "Éves",
+      badge: "Legjobb ár",
+      body: "Egy döntés egy évre — pont az, ami az újrakezdésekből hiányzott.",
+      cta: "Éves tagságot kérek",
+    },
+  },
+  /** offer_v2 §4.5, unchanged - the honest disqualifier. */
+  notFor: {
+    heading: "Kinek nem való a LEXFIT?",
+    body: "Nem edzőterem-pótlék versenyzőknek, nem gyógytorna és nem orvosi kezelés. Ha kezelés alatt állsz vagy friss sérülésed van, előbb kérdezd meg az orvosod. Mindenki másnak: a nulláról is el lehet kezdeni.",
+  },
+  trust: [
+    "14 napos elállási jog",
+    "Bármikor lemondható vagy szüneteltethető",
+    "Elektronikus számla",
+    "Biztonságos bankkártyás fizetés · Visa · Mastercard",
+  ],
   includedHeading: "Ez van benne",
   included: [
     "LEXFIT Start (30 vezetett edzés)",

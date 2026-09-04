@@ -12,12 +12,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PRICES } from "@/lib/pricing/config";
-import { formatHuf, perWeekHuf, annualSavingsPct } from "@/lib/pricing/display";
+import { formatHuf, perWeekHuf } from "@/lib/pricing/display";
 import { NcardModal, type CardVideo } from "@/components/NcardModal";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { ProgramBanner, bannerChips, bannerEyebrow, CATEGORY_WORD } from "@/components/ProgramBanner";
 import { FinishExamples } from "@/components/finish/FinishExamples";
-import { CookieSettingsButton } from "@/components/Analytics";
 import { WeekPicker } from "@/components/landing/WeekPicker";
 import { FbGroupCard } from "@/components/landing/FbGroupCard";
 import { LexMark } from "@/components/LexMark";
@@ -26,6 +25,8 @@ import { ChallengeCard } from "@/components/ChallengeCard";
 import { useRouter } from "next/navigation";
 import { EMPTY_CATALOG, type LandingCatalog, type LandingWorkout } from "@/lib/landing-catalog";
 import { HERO, ISMEROS, HOGYAN_STEPS } from "@/components/landing/offer-copy";
+import { PricingBand } from "@/components/landing/PricingBand";
+import { LandingFooter } from "@/components/landing/LandingFooter";
 import {
   CSSProperties,
   ReactNode,
@@ -194,36 +195,6 @@ const FAQ: [string, string][] = [
     "Mi lesz a fotóimmal?",
     "A haladásfotóid csak a tieid. Nem látja őket más tag, nem kerülnek a közösségbe, és bármikor törölheted őket - ahogy a fiókodat és minden adatodat is, egy gombbal, a beállításokban.",
   ],
-];
-
-// Real HUF pricing - derived from the pricing config (single source of truth), so
-// the landing can never drift from what Stripe charges. Annual sits in the CENTER,
-// highlighted + pre-recommended.
-const PRICING: {
-  plan: string; role: string; amt: string; cur: string; badge?: string; save?: string; saveClass?: string; featured?: boolean; fine: ReactNode;
-}[] = [
-  {
-    plan: "Heti", role: "week_intro",
-    amt: formatHuf(PRICES.week_intro.amountHuf),
-    cur: "első 7 nap",
-    fine: <>utána {formatHuf(PRICES.week_std.amountHuf)}/hét, automatikusan megújul -<br />bármikor lemondhatod</>,
-  },
-  {
-    plan: "Éves", role: "annual_std",
-    amt: formatHuf(perWeekHuf(PRICES.annual_std.amountHuf)),
-    cur: "/ hét",
-    badge: "Legnépszerűbb",
-    save: `Spórolj ${annualSavingsPct()}%`,
-    saveClass: "cyan",
-    featured: true,
-    fine: <>{formatHuf(PRICES.annual_std.amountHuf)}/év, évente számlázva -<br />automatikusan megújul</>,
-  },
-  {
-    plan: "Havi", role: "month_std",
-    amt: formatHuf(PRICES.month_std.amountHuf),
-    cur: "/ hó",
-    fine: <>havonta automatikusan megújul -<br />bármikor lemondhatod</>,
-  },
 ];
 
 // One action, the whole page long: the 7-question funnel.
@@ -1034,52 +1005,13 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
       {/* ═══ 13 · ELŐFIZETÉS + FOOTER ═══════════════════════════════ */}
       <div className="band-sage pricing-band" id="elofizetes">
         <div className="wrap">
-          <Rise className="seq" style={{ textAlign: "center", marginBottom: 44 }}>
-            <span className="wordmark" style={{ color: "var(--ink)", justifyContent: "center", fontSize: 26, lineHeight: "33px" }}><LexMark />LEXFIT</span>
-            <div className="eyebrow" style={{ marginTop: 14 }}>Előfizetés</div>
-            <h3 className="cap-title" style={{ marginTop: 10 }}>Kezdjük.</h3>
-            <p className="cap-body">Egy előfizetés. Minden program, minden edzés, minden kihívás. Bármikor lemondhatod.</p>
-          </Rise>
-          <Rise className="price-grid">
-            {PRICING.map((p) => (
-              <Link
-                key={p.role}
-                href={CTA_START}
-                className={`price-card ${p.featured ? "featured" : ""}`}
-                aria-label={`${p.plan} csomag kiválasztása`}
-              >
-                {p.badge && <div className="price-badge">{p.badge}</div>}
-                <div className="plan">{p.plan}</div>
-                <div className="rule" />
-                <div className="amt">{p.amt}</div>
-                <div className="cur">{p.cur}</div>
-                <div className={`save ${p.saveClass ?? ""}`}>{p.save ?? " "}</div>
-                <div className="fine">{p.fine}</div>
-                <div className="price-pick">Ezt választom →</div>
-              </Link>
-            ))}
-          </Rise>
-          <div className="price-trust">
-            <span>14 napos elállási jog</span>
-            <span>Bármikor lemondható vagy szüneteltethető</span>
-            <span>Elektronikus számla</span>
-            <span>Biztonságos bankkártyás fizetés · Visa · Mastercard</span>
-          </div>
-          <div className="price-foot">
-            <Link className="pill pill-dark" href={CTA_START}>{CTA_LABEL}</Link>
-          </div>
-        </div>
-        <div className="foot">
-          <div className="help">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>
-            <span>Kérdésed van? Írj nekünk, és segítünk - <a href="mailto:hi@lexfit.hu">hi@lexfit.hu</a></span>
-          </div>
-          <div className="legal">
-            <a href="/aszf">Felhasználási feltételek</a> | <a href="/adatvedelem">Adatvédelem</a> |{" "}
-            <a href="/impresszum">Impresszum</a> | <CookieSettingsButton className="lx-cookie-btn" />
-          </div>
+          <PricingBand surface="landing" />
         </div>
       </div>
+
+      {/* The footer is no longer nested inside #elofizetes - #gyik now sits
+          below the pricing band, so a footer inside it would render mid-page. */}
+      <LandingFooter />
 
       {/* ═══ OVERLAY · workout detail ═══════════════════════════════ */}
       {open && (

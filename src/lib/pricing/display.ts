@@ -27,6 +27,14 @@ export function perWeekHuf(annualHuf: number = PRICES.annual_std.amountHuf): num
   return Math.round(annualHuf / 52);
 }
 
+/** Annual price expressed as Ft/month - the annual card's derived line
+ *  ("39 900 Ft / év - így 3 325 Ft / hónap"). 39 900 / 12 is exact, but the
+ *  rounding is kept so an env-overridden annual price can never render a
+ *  fractional forint. */
+export function perMonthHuf(annualHuf: number = PRICES.annual_std.amountHuf): number {
+  return Math.round(annualHuf / 12);
+}
+
 /**
  * Savings % of the annual plan vs paying the monthly plan for 12 months -
  * the one legitimate "Spórolj X%" comparison (monthly-annualized ↔ annual).
