@@ -11,6 +11,7 @@ import { PRICES } from "@/lib/pricing/config";
 import { formatHuf } from "@/lib/pricing/display";
 import { nextChargeLabel, type RenewalRole } from "@/lib/pricing/renewal";
 import { GARANCIA, GUARANTEE_LIVE, PAY_STEP } from "@/components/landing/offer-copy";
+import { trackGuaranciaView } from "@/lib/track";
 
 // Stripe.js is loaded lazily, once, at module scope (publishable key is public).
 const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -66,6 +67,13 @@ export function EmbeddedPay({
   const [err, setErr] = useState<string | null>(null);
   const selected = plans.find((p) => p.role === role) ?? plans[0];
   const renewalLine = useRenewalLine(selected.role);
+
+  // The pay step's guarantee box has no scroll to observe - reaching this step
+  // IS the view. Guarded so it does not re-fire when the user toggles back from
+  // the locked checkout.
+  useEffect(() => {
+    if (GUARANTEE_LIVE && !ready) trackGuaranciaView("pay");
+  }, [ready]);
 
   const fetchClientSecret = useCallback(
     () =>

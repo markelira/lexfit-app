@@ -111,6 +111,57 @@ export function trackQuizCtaClick(programCode?: string): void {
   push("lx_quiz_cta_click", programCode ? { program_code: programCode } : undefined);
 }
 
+// ── Offer v3 surfaces (landing · /arak · pay step) ─────────────────────────
+//
+// Same rules as everything above: `lx_` prefixed and vendor-neutral (the GTM
+// container maps them), no consent check of their own because nothing leaves
+// the browser until GTM loads, and never any personal data. Note in particular
+// that no ANSWER and no uid travels with these - only the surface and the plan.
+
+/** The guarantee block came into view. Fires once per session per surface: it
+ *  measures whether the objection was SEEN, and a scroll that re-crosses the
+ *  section is not new information. */
+export function trackGuaranciaView(surface: "landing" | "arak" | "pay"): void {
+  const key = `lx_garancia_view_${surface}`;
+  try {
+    if (sessionStorage.getItem(key) === "1") return;
+    sessionStorage.setItem(key, "1");
+  } catch {
+    // Private mode / storage disabled: emit rather than stay silent. A
+    // duplicate is a better failure than a missing view.
+  }
+  push("lx_garancia_view", { surface });
+}
+
+/** A plan card was chosen on a pricing surface. Carries the price for the same
+ *  reason trackCheckoutStart does - value-based bidding cannot work without
+ *  one - resolved from PRICES so it can never drift from what we charge. */
+export function trackPricingPlanSelect(plan: string, surface: "landing" | "arak"): void {
+  const spec = plan in PRICES ? PRICES[plan as PriceRole] : undefined;
+  push("lx_pricing_plan_select", {
+    plan,
+    surface,
+    ...(spec ? { value: spec.amountHuf, currency: "HUF" } : {}),
+  });
+}
+
+/** /arak pageview. `ref` is the referrer HOST only, never a full URL - a query
+ *  string can carry anything, including someone else's personal data. */
+export function trackArakView(): void {
+  let ref: string | undefined;
+  try {
+    if (document.referrer) ref = new URL(document.referrer).host;
+  } catch {
+    ref = undefined;
+  }
+  push("lx_arak_view", ref ? { ref } : undefined);
+}
+
+/** The forgiveness whisper after the `days` step was shown. */
+export function trackOnbWhisperView(): void {
+  push("lx_onb_whisper_view");
+}
+
 /** What the SERVER needs to report a purchase to Meta's Conversions API.
  *
  *  Why it is collected here, in the browser, and carried through Stripe:

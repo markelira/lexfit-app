@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { PRICES } from "@/lib/pricing/config";
 import { formatHuf, perMonthHuf, annualSavingsPct } from "@/lib/pricing/display";
 import { LexMark } from "@/components/LexMark";
 import { GARANCIA, GUARANTEE_LIVE, PRICING_BAND } from "@/components/landing/offer-copy";
+import { trackGuaranciaView, trackPricingPlanSelect } from "@/lib/track";
 
 // The offer v3 pricing band (§4.4). ONE component, two surfaces: the landing's
 // #elofizetes section and the /arak page. Extracting it is the point - the old
@@ -27,15 +29,7 @@ const planHref = (role: string) => `/register?plan=${role}`;
 
 export type PricingSurface = "landing" | "arak";
 
-export function PricingBand({
-  surface = "landing",
-  onPlanSelect,
-}: {
-  surface?: PricingSurface;
-  /** Analytics hook (PR7). Kept as a prop so this component stays free of any
-   *  tracking import and can be rendered from a server page unchanged. */
-  onPlanSelect?: (plan: string, surface: PricingSurface) => void;
-}) {
+export function PricingBand({ surface = "landing" }: { surface?: PricingSurface }) {
   const week = PRICING_BAND.cards.week;
   const month = PRICING_BAND.cards.month;
   const annual = PRICING_BAND.cards.annual;
@@ -111,7 +105,7 @@ export function PricingBand({
           <Link
             key={c.role}
             href={planHref(c.role)}
-            onClick={() => onPlanSelect?.(c.role, surface)}
+            onClick={() => trackPricingPlanSelect(c.role, surface)}
             className={`price-card pc${c.featured ? " featured" : ""}`}
             aria-label={`${c.plan} tagság kiválasztása`}
           >
@@ -166,10 +160,29 @@ export function PricingBand({
 /** §4.3 - the guarantee block. Lives here rather than in LandingPage because
  *  /arak renders it too, and the two must be the same words. Dark until the
  *  ÁSZF clause describing it is published. */
-export function GuaranteeBlock() {
+export function GuaranteeBlock({ surface = "landing" }: { surface?: PricingSurface }) {
+  const ref = useRef<HTMLDivElement>(null);
+  // 50% in view, once per session (§6 analytics table). The observer is set up
+  // unconditionally so the hook order is stable, and simply finds no node when
+  // the block is dark.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        trackGuaranciaView(surface);
+        io.disconnect();
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [surface]);
+
   if (!GUARANTEE_LIVE) return null;
   return (
-    <div className="band-cream sec-sm" id="garancia">
+    <div className="band-cream sec-sm" id="garancia" ref={ref}>
       <div className="wrap grc">
         <h2 className="h-bold grc-h">{GARANCIA.heading}</h2>
         <p className="cap-body grc-b">
