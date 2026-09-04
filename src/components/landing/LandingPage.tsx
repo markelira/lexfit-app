@@ -25,7 +25,7 @@ import { PhoneVideo } from "@/components/landing/PhoneVideo";
 import { ChallengeCard } from "@/components/ChallengeCard";
 import { useRouter } from "next/navigation";
 import { EMPTY_CATALOG, type LandingCatalog, type LandingWorkout } from "@/lib/landing-catalog";
-import { HERO } from "@/components/landing/offer-copy";
+import { HERO, ISMEROS, HOGYAN_STEPS } from "@/components/landing/offer-copy";
 import {
   CSSProperties,
   ReactNode,
@@ -573,8 +573,27 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
         </div>
       </header>
 
+      {/* ═══ 1b · ISMERŐS? ══════════════════════════════════════════
+          The empathy beat, and the page's first answer to "már fizettem ilyenre"
+          (P2) and "egy rossz hét nulláz" (P26). Deliberately NOT a full band: it
+          is a held breath between the hero and the mechanics, so it sits on the
+          same cream ground as #hogyan and carries its weight with a narrow
+          column plus the two-rule card. */}
+      <div className="band-cream sec-first" id="ismeros">
+        <Rise className="wrap seq ism">
+          <h2 className="h-bold ism-h">{ISMEROS.heading}</h2>
+          <p className="cap-body ism-b">{ISMEROS.body}</p>
+          <div className="ism-rules">
+            <b className="ism-lead">{ISMEROS.ruleLead}</b>
+            <ul>
+              {ISMEROS.rules.map((r) => <li key={r}>{r}</li>)}
+            </ul>
+          </div>
+        </Rise>
+      </div>
+
       {/* ═══ 2 · HOGYAN MŰKÖDIK ═════════════════════════════════════ */}
-      <div className="band-cream sec-first" id="hogyan">
+      <div className="band-cream sec-sm" id="hogyan">
         <div className="wrap">
           <Rise className="seq" style={{ textAlign: "center" }}>
             <div className="eyebrow">Hogyan működik</div>
@@ -589,19 +608,19 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
           <Rise className="steps seq">
             {[
               {
-                h: "Válaszolsz hét kérdésre",
+                h: HOGYAN_STEPS[0],
                 b: "Mi hozott ide, hol tartasz most, hány nap fér bele, mire figyeljek. Nagyjából egy perc.",
                 src: "/step-1-question.png",
                 alt: "A 6. kérdés: „Van bármi, amire figyeljek?” - csendben kell, van falam, kíméld a térdem, vigyázz a hátamra.",
               },
               {
-                h: "Összeáll a heted",
+                h: HOGYAN_STEPS[1],
                 b: "Annyi nappal, amennyi tényleg belefér. A pihenőnap is benne van - az is a terv része.",
                 src: "/step-2-plan.png",
                 alt: "A kész heti terv: 3 nap / hét, a kiválasztott napokkal, fókusszal és tempóval.",
               },
               {
-                h: "Megnyomod a playt",
+                h: HOGYAN_STEPS[2],
                 b: "Onnantól minden nap ott van, mi következik. Nem neked kell kitalálnod.",
                 src: "/step-3-player.png",
                 alt: "A lejátszó edzés közben: visszaszámláló, az aktuális gyakorlat és a mai menü listája.",
@@ -900,6 +919,9 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
       <div className="band-navy sec-sm" id="kihivasok">
         <Rise className="wrap seq">
           <h3 className="cap-title" style={{ color: "var(--tx-d1)" }}>Amit a csoportban kitaláltunk - mind megvan.</h3>
+          {/* P27 "unalom": the archive is not a fixed set - it grows every week.
+              Said here because the section headline reads as past tense. */}
+          <p className="kih-drop"><span className="kih-badge">Hetente új</span> Minden héten 5 új kihívás-videó.</p>
           {/* Short on purpose: the cover below already says "heti kihívás, együtt
               döntünk, együtt csináljuk", so spelling the mechanic out here twice
               only costs height. */}
@@ -974,7 +996,6 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
             keeps the whole column stacked at the bottom-left. */}
         <Rise className="wrap ax-head seq">
           <div className="ax-headin">
-            <div className="eyebrow" style={{ color: "#fff", opacity: 0.72 }}>Az alapító</div>
             {/* The pull quote is the hinge: her ten years and a missed Wednesday are the
                 same feeling - that stopping makes you a traitor. The account she lived
                 is the SOURCE of this copy, not its content: no incident is retold, only
@@ -1002,6 +1023,7 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
               <li>Nem ítéllek el, ha kimaradsz.</li>
               <li>Nem játszom, hogy tökéletes vagyok.</li>
             </ul>
+            <p className="aq-vow">Nem ígérek csodát. Egy rendszert ígérek, ami kibírja az életet.</p>
             <p className="aq-close">Egyedül nehéz.<br />Együtt muszáj.</p>
             <p className="aq-sign">- Alexa</p>
             <Link className="pill pill-sage aq-cta" href={CTA_START}>Kezdjük együtt →</Link>

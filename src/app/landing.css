@@ -431,6 +431,52 @@
 /* founder credential chips - left-aligned variant of .starter-facts */
 .lxl .founder-facts { justify-content: flex-start; margin-top: 20px; }
 
+/* ---- offer v3: #ismeros, weekly-drop badge, Alexa's vow ---- */
+
+/* The empathy beat. A narrow column on purpose - this paragraph is the one place
+   the page speaks in the visitor's own voice, and a full-width measure would
+   make it read as marketing rather than recognition. */
+.lxl .ism { max-width: 660px; margin-inline: auto; text-align: center; }
+.lxl .ism-h { margin-bottom: 14px; }
+.lxl .ism-b { margin-inline: auto; }
+.lxl .ism-rules {
+  margin: 26px auto 0; max-width: 560px; text-align: left;
+  background: #fff; border: 1px solid oklch(0 0 168/.07); border-radius: 16px;
+  padding: 22px 24px; box-shadow: 0 14px 34px -28px oklch(0 0 168/.4);
+}
+.lxl .ism-lead { display: block; font-size: 16px; line-height: 24px; margin-bottom: 12px; }
+.lxl .ism-rules ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.lxl .ism-rules li {
+  position: relative; padding-left: 26px; font-size: 15px; line-height: 24px;
+  color: oklch(.235 .014 168/.82); text-wrap: pretty;
+}
+/* A rule, not a bullet: these two lines are the mechanism, so they get a mark
+   with some weight rather than a dot. */
+.lxl .ism-rules li::before {
+  content: ""; position: absolute; left: 0; top: 9px;
+  width: 14px; height: 2px; border-radius: 2px; background: var(--accent);
+}
+
+/* #kihivasok - the archive grows every week, which the past-tense headline above
+   cannot say on its own. */
+.lxl .kih-drop {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 14px; font-size: 15px; line-height: 24px; color: var(--tx-d2);
+}
+.lxl .kih-badge {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--navy); background: var(--accent);
+  border-radius: 999px; padding: 5px 11px; white-space: nowrap;
+}
+
+/* Alexa's vow. Sits against the close, deliberately away from the story's own
+   "csodát nem ígérek" line so the two do not stack. */
+.lxl .aq-vow {
+  margin-top: 26px; max-width: 430px;
+  font-size: 18px; line-height: 28px; letter-spacing: -.01em;
+  color: oklch(1 0 168/.9); text-wrap: pretty;
+}
+
 /* ---- pricing ---- */
 .lxl .pricing-band { background: var(--sage-2); padding: 120px 0 90px; }
 .lxl .price-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 760px; margin: 0 auto; align-items: stretch; }

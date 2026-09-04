@@ -56,7 +56,7 @@ export function AuthBrand() {
         <div className="bav">
           <Image
             src="/trainer-underlayer.jpg"
-            alt="Alexa, a LEXFIT alapítója és edzője"
+            alt="Alexa, a LEXFIT edzője"
             width={44}
             height={44}
           />

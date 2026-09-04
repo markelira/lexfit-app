@@ -47,7 +47,12 @@ export function FinishExamples({ onPick }: { onPick: () => void }) {
           >
             <div className="fex-frame">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={e.img} alt="" style={{ objectPosition: e.pos }} loading="lazy" />
+              <img
+                src={e.img}
+                alt={`${e.name} a saját befejezett edzése után`}
+                style={{ objectPosition: e.pos }}
+                loading="lazy"
+              />
               <FinishOverlay dir={e.dir} data={e.data} scrim={e.scrim} />
             </div>
             <span className="fex-name">{e.name}</span>

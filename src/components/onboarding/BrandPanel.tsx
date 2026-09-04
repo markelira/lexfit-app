@@ -41,7 +41,7 @@ type PanelKey =
 // full-bleed it became obvious that the captions and the images disagreed.
 //   community  „1 200+ csoporttag, akik már csinálják."  showed a LAPTOP mockup,
 //              while story.jpg is an actual photograph of ~20 real people.
-//   story      „Az alapító - Alexa"                      showed that crowd.
+//   story      the signed Alexa quote                     showed that crowd.
 // So the crowd photo now carries the community line, and the founder quote sits
 // over a real photograph of someone training at home instead of a device shot.
 // (welcome.jpg is reused here; welcome and why sit 8 steps apart, so it reads as
@@ -127,7 +127,8 @@ const CAP: Record<PanelKey, { eyebrow?: string; line: React.ReactNode; slogan?: 
   player: { eyebrow: "A lejátszó", line: "Hang nélkül is végigvezet - TV-re is." },
   env: { eyebrow: "Minden helyzetre", line: "Bármi is az - van rá változat." },
   alone: { eyebrow: "Nem vagy egyedül", line: <>Egyedül nehéz. <b>Együtt muszáj.</b></>, slogan: true },
-  story: { eyebrow: "Az alapító", line: <>„Egyedül nem megy.” <span className="bp-by">- Alexa</span></>, slogan: true },
+  // No eyebrow: the quote signs itself, so a label above it only repeats her.
+  story: { line: <>„Egyedül nem megy.” <span className="bp-by">- Alexa</span></>, slogan: true },
   promise: { eyebrow: "A terved kész", line: "Innentől együtt csináljuk." },
   reassure: { eyebrow: "Itt a helyed", line: <>A terved kész - <b>már csak te hiányzol.</b></>, slogan: true },
 };
