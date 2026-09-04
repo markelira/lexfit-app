@@ -55,7 +55,19 @@ async function ensurePrice(productId: string, spec: PriceSpec): Promise<void> {
   if (existing.data[0]) {
     const p = existing.data[0];
     const same = p.unit_amount === unitAmount && p.currency === CURRENCY;
-    const note = same ? "unchanged" : `LIVE DIFFERS (live=${p.unit_amount}, config=${unitAmount}) — rotate manually`;
+    let note = same ? "unchanged" : `LIVE DIFFERS (live=${p.unit_amount}, config=${unitAmount}) — rotate manually`;
+
+    // Sync the NICKNAME when it has drifted from the catalog. An amount can
+    // never be edited on a live Stripe price (that is a rotation, flagged
+    // above), but the nickname is dashboard-facing metadata with no billing
+    // effect - and without this the script reports "unchanged" while Stripe
+    // keeps showing a name the config no longer uses. lookup_key, amount,
+    // currency and interval are untouched.
+    if (p.nickname !== spec.nickname) {
+      await stripe.prices.update(p.id, { nickname: spec.nickname });
+      note += ` · nickname → "${spec.nickname}"`;
+    }
+
     console.log(`✓ ${spec.lookupKey.padEnd(28)} exists (${p.id}) — ${note}`);
     return;
   }
