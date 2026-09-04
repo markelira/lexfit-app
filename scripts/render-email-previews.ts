@@ -33,6 +33,7 @@ import WeeklyDay5Reminder from "../emails/weekly-day5-reminder";
 import WeeklyRecap from "../emails/weekly-recap";
 import Welcome from "../emails/welcome";
 import WithdrawalConfirm from "../emails/withdrawal-confirm";
+import GuaranteeRefundConfirm from "../emails/guarantee-refund-confirm";
 import WorkoutReminder from "../emails/workout-reminder";
 
 type Template = React.ComponentType<never> & { PreviewProps?: object };
@@ -63,6 +64,7 @@ const templates: Record<string, Template> = {
   "weekly-recap": WeeklyRecap as Template,
   welcome: Welcome as Template,
   "withdrawal-confirm": WithdrawalConfirm as Template,
+  "guarantee-refund-confirm": GuaranteeRefundConfirm as Template,
   "workout-reminder": WorkoutReminder as Template,
 };
 

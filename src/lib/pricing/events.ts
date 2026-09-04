@@ -10,6 +10,8 @@ export type PricingEvent =
   | "checkout_started"
   | "checkout_completed"
   | "withdrawal_requested"
+  | "guarantee_refund_requested"
+  | "guarantee_refund_approved"
   | "canceled"
   | "pause_started"
   | "pause_resumed"

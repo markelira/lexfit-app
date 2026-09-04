@@ -59,6 +59,7 @@ import WeeklyDay5Reminder, { subject as day5Subject } from "../../emails/weekly-
 import WeeklyRecap, { subjectFor as recapSubject } from "../../emails/weekly-recap";
 import Welcome, { subject as welcomeSubject } from "../../emails/welcome";
 import WithdrawalConfirm, { subject as withdrawalSubject } from "../../emails/withdrawal-confirm";
+import GuaranteeRefundConfirm, { subject as guaranteeRefundSubject } from "../../emails/guarantee-refund-confirm";
 import WorkoutReminder, { subject as workoutSubject } from "../../emails/workout-reminder";
 import type { DayState } from "../../emails/components/Bits";
 
@@ -329,6 +330,14 @@ export const sendWithdrawalConfirm = (to: string, refundHuf: number) =>
     category: "billing",
     make: () =>
       WithdrawalConfirm({ refundAmount: formatHuf(refundHuf), zeroRefund: refundHuf <= 0 }),
+  });
+
+export const sendGuaranteeRefundConfirm = (to: string, refundHuf: number) =>
+  deliver({
+    to,
+    subject: guaranteeRefundSubject,
+    category: "billing",
+    make: () => GuaranteeRefundConfirm({ refundAmount: formatHuf(refundHuf) }),
   });
 
 export const sendPauseResuming = (to: string) =>

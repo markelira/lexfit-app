@@ -139,7 +139,7 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     type: "recurring",
     interval: "month",
     intervalCount: 1,
-    nickname: "Havi - alapító zárolás",
+    nickname: "Havi - hűség zárolás",
   },
   annual_renew: {
     role: "annual_renew",
@@ -197,6 +197,25 @@ export const ONEOFF_ACCESS_DAYS: Record<"week_oneoff" | "month_oneoff", number> 
 export const EARNING = {
   windowDays: envInt("PRICING_EARNING_WINDOW_DAYS", 7),
   requiredCheckins: envInt("PRICING_EARNING_REQUIRED_CHECKINS", 5),
+} as const;
+
+/**
+ * The 10 edzés garancia (offer v3). Complete `requiredWorkouts` within
+ * `windowDays` of the subscription start and, on request, every membership fee
+ * paid to date is refunded.
+ *
+ * The window is 35 days and is enforced EXACTLY as advertised - "öt héten
+ * belül" means five weeks, with no hidden grace. That is a deliberate owner
+ * decision, and it is tight: at the lowest cadence (2 days/week) ten workouts
+ * takes exactly five weeks, so a single missed session ends eligibility.
+ *
+ * Counts and windows are knobs for the same reason amounts are - so the
+ * threshold can move without a deploy - but moving `windowDays` without moving
+ * the copy in offer-copy.ts would make the page and the rule disagree.
+ */
+export const GUARANTEE = {
+  requiredWorkouts: envInt("PRICING_GUARANTEE_WORKOUTS", 10),
+  windowDays: envInt("PRICING_GUARANTEE_WINDOW_DAYS", 35),
 } as const;
 
 /** Grand Slam offer lifetime - a REAL, final deadline (J4). */

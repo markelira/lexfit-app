@@ -11,7 +11,10 @@ import { budapestDay, budapestHour, checkinDocId, offerDocId } from "../src/lib/
 import { formatHuf, perWeekHuf, perMonthHuf, annualSavingsPct } from "../src/lib/pricing/display";
 import { nextChargeDay, formatHuDate } from "../src/lib/pricing/renewal";
 import { planFromParam, planFromSearch } from "../src/lib/pricing/preselect";
-import { computeRefundMinor, unusedFraction, type PaidPeriod } from "../src/lib/pricing/refund";
+import {
+  computeRefundMinor, unusedFraction, fullRefundTotalMinor, guaranteeEligibility,
+  type PaidPeriod,
+} from "../src/lib/pricing/refund";
 import {
   earningWindowDays,
   isEarned,
@@ -245,6 +248,83 @@ function planPreselect() {
   console.log("✓ ?plan= preselect allow-list");
 }
 
+function guaranteeRules() {
+  // 2026-06-01 (summer, Budapest is +02:00). Window = 35 days → last day is
+  // 2026-07-06 inclusive.
+  const startedAt = Date.parse("2026-06-01T08:00:00+02:00");
+  const day = (n: number) => {
+    const d = new Date(Date.UTC(2026, 5, 1 + n, 12));
+    return d.toISOString().slice(0, 10);
+  };
+  const runs = (n: number, dayOffsets?: number[]) =>
+    Array.from({ length: n }, (_, i) => ({
+      code: `F${String(i + 1).padStart(3, "0")}`,
+      at: day(dayOffsets ? dayOffsets[i] : i),
+    }));
+
+  assert.equal(guaranteeEligibility({ completed: runs(9), startedAt }).eligible, false, "9 is not enough");
+  assert.equal(guaranteeEligibility({ completed: runs(10), startedAt }).eligible, true, "10 earns it");
+
+  // The boundary. Day 35 is the last day of the window and counts; day 36 does
+  // not - the copy says "öt héten belül" and it is enforced exactly.
+  const onLastDay = runs(10, [0, 1, 2, 3, 4, 5, 6, 7, 8, 35]);
+  assert.equal(guaranteeEligibility({ completed: onLastDay, startedAt }).eligible, true, "day 35 is inside");
+  const oneDayLate = runs(10, [0, 1, 2, 3, 4, 5, 6, 7, 8, 36]);
+  const late = guaranteeEligibility({ completed: oneDayLate, startedAt });
+  assert.equal(late.eligible, false, "day 36 is outside");
+  assert.equal(late.completedInWindow, 9, "the late one is not counted");
+  assert.equal(late.missedWindow, true, "did the work, missed the window - flagged for /admin");
+
+  // DISTINCT codes. Ten replays of one video are one workout, not ten - this is
+  // the case that would otherwise hand out refunds for watching day 1 all week.
+  const replays = Array.from({ length: 10 }, (_, i) => ({ code: "F001", at: day(i) }));
+  const r = guaranteeEligibility({ completed: replays, startedAt });
+  assert.equal(r.completedInWindow, 1, "same code counted once");
+  assert.equal(r.eligible, false, "replays do not earn the guarantee");
+
+  // Completions from BEFORE the subscription started do not count.
+  const early = runs(10, [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1]);
+  assert.equal(guaranteeEligibility({ completed: early, startedAt }).eligible, false, "pre-start does not count");
+
+  // Missing / malformed data must produce "no", never a throw.
+  for (const bad of [null, undefined, [], [{ code: "", at: "" }] as never]) {
+    const v = guaranteeEligibility({ completed: bad as never, startedAt });
+    assert.equal(v.eligible, false, "malformed completions → not eligible");
+  }
+  assert.equal(
+    guaranteeEligibility({ completed: runs(10), startedAt: null }).eligible,
+    false,
+    "no subscription start → not eligible",
+  );
+
+  // A winter start, to prove the day comparison is not offset-sensitive: the
+  // window must still be 35 calendar days across the CET/CEST changeover.
+  const winterStart = Date.parse("2026-03-01T08:00:00+01:00");
+  const acrossDst = Array.from({ length: 10 }, (_, i) => ({
+    code: `W${i}`,
+    at: new Date(Date.UTC(2026, 2, 1 + (i === 9 ? 35 : i), 12)).toISOString().slice(0, 10),
+  }));
+  assert.equal(
+    guaranteeEligibility({ completed: acrossDst, startedAt: winterStart }).eligible,
+    true,
+    "35 calendar days holds across the spring clock change",
+  );
+
+  // The guarantee refunds what was PAID, not what is unused - the opposite of
+  // the statutory withdrawal above it.
+  const periods: PaidPeriod[] = [
+    { amountPaid: 49_000, periodStart: 0, periodEnd: 100 },
+    { amountPaid: 199_000, periodStart: 100, periodEnd: 200 },
+  ];
+  assert.equal(fullRefundTotalMinor(periods), 248_000, "full refund is the sum of fees paid");
+  assert.ok(
+    fullRefundTotalMinor(periods) > computeRefundMinor(periods, 150),
+    "guarantee refunds more than a pro-rata withdrawal at the same moment",
+  );
+  assert.equal(fullRefundTotalMinor([]), 0, "no invoices → nothing to refund");
+  console.log("✓ 10 edzés garancia (boundary, distinct codes, DST, full vs pro-rata)");
+}
+
 accessMatrix();
 budapestDays();
 docIds();
@@ -252,6 +332,7 @@ displayNumbers();
 perMonthDerivation();
 renewalDates();
 planPreselect();
+guaranteeRules();
 withdrawalProRata();
 earningWindow();
 makeupCutoff();
