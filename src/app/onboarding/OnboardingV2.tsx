@@ -63,7 +63,7 @@ const HEADINGS: Partial<Record<StepId, string>> = {
 // ── The subscription offer ("A teljes LEXFIT"), styled to the iOS-paywall
 // reference (docs/LEXFIT Elofizetes iOS.html). Features + selectable plan rows +
 // a tucked CTA showing the selected price. Our real figures; NO fixed-length
-// claims (owner rule - no "8 hetes / 40 edzés / 5.–8. hét"). ──
+// claims (owner rule - the program is "a te tempódban", never a week count). ──
 // The offer data + header/features live in the shared paywall module (also used
 // by /subscribe): PAYWALL_FEATURES/PAYWALL_PLANS, LexMark, PaywallOffer.
 

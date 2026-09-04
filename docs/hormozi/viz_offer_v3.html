@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offer v3 — site restructure · LEXFIT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#161B18;--pine:#1D2320;--pine-2:#232B27;--sage:#6E9080;--sage-deep:#496C5E;--bone:#E9E6DD;--mist:#A9B8AF;--lumen:#CFE3D8;--line:rgba(110,144,128,.38)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--ink);color:var(--bone);font-family:"Schibsted Grotesk",system-ui,sans-serif;line-height:1.5}
+section.slide{min-height:100vh;scroll-snap-align:start;display:flex;align-items:center;padding:60px 5vw}
+.wrap{max-width:1160px;width:100%;margin:0 auto}
+h1{font-size:clamp(2.3rem,5.4vw,4rem);font-weight:800;line-height:1.03;letter-spacing:-.02em}
+h2{font-size:clamp(1.6rem,3.2vw,2.3rem);font-weight:700;letter-spacing:-.015em;margin-bottom:.45em}
+h3{font-size:1rem;font-weight:700;color:var(--lumen)}
+.eyebrow{color:var(--sage);font-weight:500;margin-bottom:12px}
+.lede{color:var(--mist);font-size:1.08rem;max-width:62ch}
+.hu{font-style:italic;color:var(--bone)}
+.tag{font-size:.72rem;color:var(--ink);background:var(--sage);border-radius:6px;padding:2px 8px;font-weight:700;display:inline-block}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.panel{background:var(--pine);border:1px solid var(--line);border-radius:14px;padding:18px}
+.kv{display:flex;gap:24px;flex-wrap:wrap;margin-top:24px}
+.kv div{border-left:2px solid var(--sage-deep);padding-left:13px}
+.kv .n{font-size:1.7rem;font-weight:800;color:var(--lumen)}
+.kv .l{color:var(--mist);font-size:.86rem}
+/* pricing */
+.cards{display:flex;gap:16px;flex-wrap:wrap;align-items:stretch}
+.pcard{background:var(--pine);border:1px solid var(--line);border-radius:16px;padding:18px;width:240px;font-size:.82rem;position:relative}
+.pcard.lead{border:1.5px solid var(--sage);background:linear-gradient(160deg,var(--pine-2),var(--pine))}
+.pcard .badge{background:var(--sage);color:var(--ink);font-weight:800;border-radius:7px;padding:2px 9px;font-size:.7rem;display:inline-block;margin-bottom:8px}
+.pcard .badge.alt{background:var(--lumen)}
+.pcard h4{font-size:1.05rem;margin-bottom:4px}
+.pcard .pr{font-size:1.45rem;font-weight:800;color:var(--lumen);margin:6px 0 2px}
+.pcard .pr small{font-size:.76rem;color:var(--mist);font-weight:500}
+.pcard .sub{color:var(--mist);font-size:.75rem;margin-top:5px}
+.pcard .btn{border:1px solid var(--sage);background:var(--sage-deep);border-radius:8px;text-align:center;padding:7px;font-weight:700;margin-top:10px}
+.bannermock{border:1px dashed var(--sage);border-radius:10px;padding:8px 14px;display:inline-block;margin-bottom:12px;color:var(--lumen);font-size:.88rem}
+.incl{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:.8rem;color:var(--mist);max-width:760px}
+.incl b{color:var(--bone)}
+/* page skeleton */
+.skel{display:flex;flex-direction:column;gap:7px;max-width:520px}
+.sec{border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--pine);display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.84rem}
+.sec.new{border-style:dashed;border-color:var(--sage)}
+.sec .nm{font-weight:700}
+.sec .nm span{color:var(--sage);font-weight:500;font-size:.74rem;margin-left:6px}
+.pb{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.pb i{font-style:normal;font-size:.66rem;border:1px solid var(--sage-deep);border-radius:6px;padding:1px 5px;color:var(--lumen)}
+.pb i.new{background:var(--sage);color:var(--ink);border-color:var(--sage);font-weight:700}
+/* onboarding strip */
+.steps{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
+.step{border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:.74rem;background:var(--pine);min-width:74px}
+.step b{display:block;color:var(--sage);font-size:.68rem}
+.step .pb{justify-content:flex-start;margin-top:3px}
+.step.hot{border-color:var(--sage);border-width:1.5px}
+/* flow */
+.fl{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fnode{background:var(--pine);border:1px solid var(--sage);border-radius:11px;padding:9px 12px;font-size:.82rem;max-width:230px}
+.farrow{color:var(--sage);font-size:1.05rem}
+.prog{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--pine);font-size:.78rem}
+.prog b{display:block;font-size:.86rem;margin-bottom:2px}
+.prog span{color:var(--sage);font-size:.7rem}
+.prog p{color:var(--mist);margin-top:4px}
+.check li{list-style:none;padding:6px 0 6px 28px;position:relative;border-bottom:1px dashed var(--line);max-width:74ch;font-size:.9rem}
+.check li::before{content:"";position:absolute;left:2px;top:12px;width:12px;height:12px;border:1.5px solid var(--sage);border-radius:4px}
+code{background:var(--pine-2);border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:.82em;color:var(--lumen)}
+.rail{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:5}
+.rail a{width:8px;height:8px;border-radius:50%;background:var(--line);display:block}
+.rail a.on{background:var(--lumen)}
+footer{position:fixed;left:18px;bottom:12px;color:var(--mist);font-size:.72rem;z-index:5}
+@media(max-width:720px){.rail{display:none}}
+</style>
+</head>
+<body>
+
+<section class="slide" id="s1"><div class="wrap">
+  <p class="eyebrow">Offer v3 · site restructure · companion to offer_v3.md → Claude Code</p>
+  <h1>The offer, put to practice</h1>
+  <p class="lede" style="margin-top:14px">lexfit.hu restructured so all 38 problems are mitigated where they occur — homepage, /arak, onboarding. Prices untouched; the strategy around them rebuilt.</p>
+  <div class="kv">
+    <div><div class="n">30</div><div class="l">Start workouts · a te tempódban (heti 2–4)</div></div>
+    <div><div class="n">10 / 5</div><div class="l">garancia: 10 edzés öt héten belül → díjak vissza</div></div>
+    <div><div class="n">1·5·10·15·30</div><div class="l">milestones · Alexa @ 5 és 15</div></div>
+    <div><div class="n">+5 / hét</div><div class="l">új kihívás-videó minden héten, mindenkinek</div></div>
+  </div>
+</div></section>
+
+<section class="slide" id="s2"><div class="wrap">
+  <h2>Pricing — same amounts, new architecture</h2>
+  <div class="bannermock hu">Szeptemberi Újrakezdés — a szeptemberi kör most indul.</div>
+  <p style="color:var(--mist);font-size:.9rem;margin-bottom:12px" class="hu">Egy tagság, minden benne: a Start program, az összes program, minden héten 5 új kihívás-videó.</p>
+  <div class="cards">
+    <div class="pcard hu">
+      <span class="badge alt">Kipróbálom</span>
+      <h4>Heti</h4>
+      <div class="pr">490 Ft <small>az első 7 nap</small></div>
+      <div class="sub">utána 1 990 Ft / hét · a megújulás dátumát előre megmutatjuk · bármikor lemondható</div>
+      <div class="btn">Kezdem 490 Ft-tal</div>
+    </div>
+    <div class="pcard lead hu">
+      <span class="badge">Legnépszerűbb</span>
+      <h4>Havi</h4>
+      <div class="pr">5 990 Ft <small>/ hónap</small></div>
+      <div class="sub">kevesebb, mint egy edzőóra · 10 edzés garancia · lemondható, szüneteltethető</div>
+      <div class="btn">Havi tagságot kérek</div>
+    </div>
+    <div class="pcard hu">
+      <span class="badge alt">Legjobb ár</span>
+      <h4>Éves</h4>
+      <div class="pr">39 900 Ft <small>/ év · 3 325 Ft/hó (–44%)</small></div>
+      <div class="sub">egy döntés egy évre — pont az, ami az újrakezdésekből hiányzott</div>
+      <div class="btn">Éves tagságot kérek</div>
+    </div>
+  </div>
+  <div class="incl hu"><b>Mindhárom tagságban ugyanaz van</b> — Start (30 vezetett edzés) · Reggeli rutinok · 7 napos kezdő · Has &amp; Mély Törzs · Láb &amp; Fenék · Esti rutinok · Tartásjavító · 16+ heti kihívás, hetente 5 új videóval · mérföldkövek, visszamérés · szünet 1–3 hónap. <span style="color:var(--sage)">Csak a ritmus más.</span></div>
+  <p style="color:var(--mist);font-size:.85rem;margin-top:10px">Renders twice from one component (<code>PricingBand.tsx</code>): landing <code>#elofizetes</code> + new <code>/arak</code>. No deadline, no counter — honest seasonal framing only.</p>
+</div></section>
+
+<section class="slide" id="s3"><div class="wrap">
+  <h2>Homepage — problem badges at their stations</h2>
+  <div style="display:flex;gap:34px;flex-wrap:wrap">
+  <div class="skel" style="margin-top:8px">
+    <div class="sec"><span class="nm">Hero + WeekPicker</span><span class="pb"><i>P3</i><i>P8</i><i>P9</i><i>P25</i></span></div>
+    <div class="sec new"><span class="nm">#ismeros <span>NEW</span></span><span class="pb"><i class="new">P2</i><i class="new">P26</i></span></div>
+    <div class="sec"><span class="nm">#hogyan <span>3 lépés</span></span><span class="pb"><i>P15</i><i>P16</i></span></div>
+    <div class="sec"><span class="nm">#programok <span>7 program grid</span></span><span class="pb"><i>P5</i><i>P6</i><i>P7</i><i>P23</i></span></div>
+    <div class="sec"><span class="nm">#valos <span>finish cards</span></span><span class="pb"><i>P4</i></span></div>
+    <div class="sec"><span class="nm">#heted <span>Journey + milestones</span></span><span class="pb"><i>P24</i><i>P31</i></span></div>
+    <div class="sec"><span class="nm">#kihivasok <span>+5/hét badge</span></span><span class="pb"><i>P27</i></span></div>
+    <div class="sec"><span class="nm">#alexa</span><span class="pb"><i>P10</i><i>P29</i></span></div>
+    <div class="sec new"><span class="nm">#garancia <span>NEW</span></span><span class="pb"><i class="new">P2</i><i class="new">P11</i><i class="new">P12</i><i class="new">P30</i></span></div>
+    <div class="sec"><span class="nm">#elofizetes <span>PricingBand</span></span><span class="pb"><i>P1</i><i>P13</i><i>P14</i><i>P36</i></span></div>
+    <div class="sec"><span class="nm">#gyik</span><span class="pb"><i>P7</i><i>P19</i><i>P34</i><i>P37</i><i>P38</i></span></div>
+  </div>
+  <div style="max-width:380px">
+    <h3>Two new sections carry the offer</h3>
+    <p style="color:var(--mist);font-size:.92rem;margin-top:8px" class="hu">#ismeros: „Nem az akaraterővel van baj — azzal, hogy minden kihagyás után nulláról kell kezdeni." A két szabály itt hangzik el először.</p>
+    <p style="color:var(--mist);font-size:.92rem;margin-top:10px" class="hu">#garancia: a 10 edzés garancia teljes szövege + „a lemondás nem büntet" + Stripe/e-számla bizalomsor — közvetlenül az árak előtt.</p>
+    <p style="color:var(--sage);font-size:.88rem;margin-top:12px">StickyNav gains #garancia · section order locked in offer_v3.md §2.1.</p>
+  </div>
+  </div>
+</div></section>
+
+<section class="slide" id="s4"><div class="wrap">
+  <h2>Onboarding — mitigation inside the flow</h2>
+  <p class="lede">Pay-to-join wizard (real step ids). Badges = where each objection dies.</p>
+  <div class="steps" style="margin-top:16px">
+    <div class="step"><b>welcome</b>indul</div>
+    <div class="step"><b>goal</b>Q1<div class="pb"><i>seg</i></div></div>
+    <div class="step"><b>focus</b>Q2<div class="pb"><i>P7</i></div></div>
+    <div class="step"><b>level</b>Q3<div class="pb"><i>P6</i></div></div>
+    <div class="step hot"><b>days</b>Q4 + Whisper<div class="pb"><i>P22</i><i>P25</i><i>P26</i></div></div>
+    <div class="step"><b>time</b>Q5<div class="pb"><i>P9</i></div></div>
+    <div class="step"><b>env</b>Q6<div class="pb"><i>P8</i><i>P20</i></div></div>
+    <div class="step"><b>obstacle</b>Q7<div class="pb"><i>P17</i></div></div>
+    <div class="step"><b>why</b></div>
+    <div class="step hot"><b>reveal</b>terv + 1·5·10·15·30<div class="pb"><i>P24</i></div></div>
+    <div class="step"><b>plan</b><div class="pb"><i>P3</i><i>P15</i></div></div>
+    <div class="step"><b>account</b></div>
+    <div class="step hot"><b>pay</b>garancia + díszkl.<div class="pb"><i>P2</i><i>P11</i><i>P12</i><i>P30</i></div></div>
+  </div>
+  <div class="grid g2" style="margin-top:22px">
+    <div class="panel"><h3>The pay step carries the close</h3><p style="color:var(--mist);font-size:.9rem;margin-top:4px" class="hu">Garancia-doboz a csomagválasztó fölött · „Az első hét 490 Ft, utána 1 990 Ft/hét — a megújulás dátumát előre megmutatjuk." · Stripe + e-számla + 14 nap elállás sor · „A lemondás nem büntet."</p></div>
+    <div class="panel"><h3>Whisper after days</h3><p style="color:var(--mist);font-size:.9rem;margin-top:4px" class="hu">„A terved pihenőnapokkal készül. A kihagyott hét nem nulláz." — a mechanizmus a kérdések közben, nem utólag.</p></div>
+  </div>
+</div></section>
+
+<section class="slide" id="s5"><div class="wrap">
+  <h2>10 edzés garancia — the machinery</h2>
+  <div class="fl" style="margin-top:14px">
+    <div class="fnode hu">10 edzés ≤ 5 hét<br><span style="color:var(--mist);font-size:.74rem;font-style:normal">könnyített változat is számít · heti 2 tempóval is pont kijön</span></div>
+    <span class="farrow">→</span>
+    <div class="fnode hu">„nem a tiéd?" — egy e-mail</div>
+    <span class="farrow">→</span>
+    <div class="fnode hu">Visszautaljuk az addig befizetett tagsági díjad<br><span style="color:var(--mist);font-size:.74rem;font-style:normal">refund.ts: all invoices to date · ≤14 nap</span></div>
+  </div>
+  <div class="grid g3" style="margin-top:22px">
+    <div class="panel"><h3>Why 10/5</h3><p style="color:var(--mist);font-size:.9rem;margin-top:4px">⅓ of the program; achievable at every cadence the user can pick; a real habit threshold, not a token.</p></div>
+    <div class="panel"><h3>Subscription-adapted</h3><p style="color:var(--mist);font-size:.9rem;margin-top:4px">Win-Your-Money-Back on fees paid (490 + renewals) — max exposure ≈ 490+1 990×4 heti, 5 990 havi. Bounded, honest.</p></div>
+    <div class="panel"><h3>Separate lanes</h3><p style="color:var(--mist);font-size:.9rem;margin-top:4px">14-day elállás own button/flow; pause 1–3 mo in cancel flow; goodwill refunds stay a human call.</p></div>
+  </div>
+</div></section>
+
+<section class="slide" id="s6"><div class="wrap">
+  <h2>The content engine behind the promise</h2>
+  <p class="lede hu">„Egy tagság, minden benne" — és minden héten több lesz.</p>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="prog hu"><span>ZÁSZLÓSHAJÓ · 30 EDZÉS</span><b>LEXFIT Start</b><p>Vezetett edzések, max 30 perc, eszköz nélkül — formától a záró visszamérésig. Mérföldkövek: 1·5·10·15·30.</p></div>
+    <div class="prog hu"><span>PROGRAM · 3</span><b>Reggeli rutinok</b><p>5–8 perc, pizsamában is — merev, energiaszegény vagy pörgős reggelre.</p></div>
+    <div class="prog hu"><span>PROGRAM · 7</span><b>7 napos kezdő</b><p>Napi 8–10 perc, csendes, ízület-kímélő — hétből hét a cél.</p></div>
+    <div class="prog hu"><span>PROGRAM · 5</span><b>Has &amp; Mély Törzs</b><p>Előbb stabilizálás, utána hasizom — fájdalommentes alap.</p></div>
+    <div class="prog hu"><span>PROGRAM · 5</span><b>Láb &amp; Fenék</b><p>Lassan, kontrollálva — hogy tényleg megérezd, mikor dolgozik.</p></div>
+    <div class="prog hu"><span>PROGRAM · 3</span><b>Esti rutinok</b><p>6–8 perc lefekvés előtt — hosszú tartások, átvezetés az alvásba.</p></div>
+    <div class="prog hu"><span>PROGRAM · 4 HÉT</span><b>Tartásjavító</b><p>A monitor előtti görnyedés két oka ellen — hetente egy új edzés.</p></div>
+    <div class="prog hu" style="border-style:dashed;border-color:var(--sage)"><span>MINDEN HÉTEN</span><b>+5 kihívás-videó</b><p>A 16 hetes archívum hétről hétre nő — az „unalom" ellenszere és a heti visszatérés oka.</p></div>
+  </div>
+</div></section>
+
+<section class="slide" id="s7"><div class="wrap">
+  <h2>Claude Code handoff</h2>
+  <ul class="check" style="margin-top:12px">
+    <li>Extract <code>PricingBand.tsx</code> from <code>#elofizetes</code> · copy per offer_v3 §3.5 · <code>?plan=</code> preselect → <code>EmbeddedPay</code></li>
+    <li><code>LandingPage.tsx</code>: add <code>#ismeros</code> + <code>#garancia</code>, reorder, StickyNav, hero/chips/#hogyan/#kihivasok edits</li>
+    <li><code>OnboardingV2.tsx</code>: days-Whisper, reveal milestone strip, pay-step guarantee + renewal disclosure + trust row</li>
+    <li>New route <code>/arak</code> (PricingBand + garancia + FAQ subset + elállási gomb)</li>
+    <li><code>refund.ts</code>: guarantee_10 path — refund all invoices to date (admin-triggered v1)</li>
+    <li>Grep-migrate: <code>40 edzés→30</code> · <code>12 edzés→10</code> · <code>hat hét→öt hét</code> · remove <code>12 990</code> · remove <code>szeptember 30-ig</code></li>
+    <li>Email deltas (funnel_v2 §6 of offer_v3): W12→W10, W20→W15, W40→W30, D6 subject, D10 cut</li>
+    <li>Acceptance: every P# visible at its mapped surface · Lighthouse mobile ≥90 · no stale strings</li>
+  </ul>
+  <p style="color:var(--sage);margin-top:18px">Spec of record: offer_v3.md · surfaces map §2 · copy §3 · live from Sep 6–7.</p>
+</div></section>
+
+<div class="rail" id="rail"></div>
+<footer>LEXFIT · Offer v3 — internal · ↑↓ to navigate</footer>
+<script>
+const slides=[...document.querySelectorAll('section.slide')],rail=document.getElementById('rail');
+slides.forEach((s,i)=>{const a=document.createElement('a');a.href='#'+s.id;a.title='Slide '+(i+1);rail.appendChild(a)});
+const dots=[...rail.children];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const i=slides.indexOf(e.target);dots.forEach((d,j)=>d.classList.toggle('on',j===i))}}),{threshold:.55});
+slides.forEach(s=>io.observe(s));
+addEventListener('keydown',e=>{const cur=dots.findIndex(d=>d.classList.contains('on'));
+if(e.key==='ArrowDown'||e.key==='PageDown'){e.preventDefault();slides[Math.min(cur+1,slides.length-1)].scrollIntoView()}
+if(e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();slides[Math.max(cur-1,0)].scrollIntoView()}});
+</script>
+</body>
+</html>

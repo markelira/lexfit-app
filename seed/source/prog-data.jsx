@@ -28,7 +28,7 @@ const PROG_SPLIT = [
   { d: "V",   name: "Vasárnap",  rest: true },
 ];
 
-// 40 edzés — [code, title, theme, level, format, types]
+// Foundation edzések — [code, title, theme, level, format, types]
 const _W = [
   // Hét 1 — 🌱 Alap
   ["F001","Láb alapokról","Alsótest",1,"Klasszikus circuit",[]],

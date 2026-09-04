@@ -79,10 +79,10 @@ const ONB_LIFESTAGE = [
 // matched no plan in PRICES. Pricing is derived from PRICES via the display
 // helpers on /subscribe — never a literal in prototype/seed source.
 const ONB_FEATURES = [
-  "8 hetes Foundation program — 40 vezetett edzés",
+  "LEXFIT Start — 30 vezetett edzés a te tempódban",
   "Teljes videótár · F·B·R·T·N·M kódrendszer",
   "Alexa végig veled — follow-along minden edzésen",
-  "Heti visszamérés — Hét 5 és Hét 8",
+  "Visszamérés a 15. és a 30. edzésnél",
   "Csendes és ízület-kímélő variációk",
   "Új edzések és kihívások havonta",
 ];
