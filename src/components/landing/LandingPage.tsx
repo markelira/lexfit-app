@@ -25,6 +25,7 @@ import { PhoneVideo } from "@/components/landing/PhoneVideo";
 import { ChallengeCard } from "@/components/ChallengeCard";
 import { useRouter } from "next/navigation";
 import { EMPTY_CATALOG, type LandingCatalog, type LandingWorkout } from "@/lib/landing-catalog";
+import { HERO } from "@/components/landing/offer-copy";
 import {
   CSSProperties,
   ReactNode,
@@ -226,8 +227,13 @@ const PRICING: {
 ];
 
 // One action, the whole page long: the 7-question funnel.
-const CTA_START = "/onboarding";
-const CTA_LABEL = "Összeállítom a tervem";
+//
+// This MUST be /register, not /onboarding. The funnel moved to /register (E1.3)
+// and /onboarding is a server-side redirect() - which drops the query string.
+// Pointing a marketing CTA at it silently discarded the ad's utm_*/fbclid AND
+// the ?plan= preselect the pricing cards now carry.
+const CTA_START = "/register";
+const CTA_LABEL = HERO.cta;
 
 // Fallback for `settings/challenges.fbGroupUrl`. The group card is the only place
 // the page explains what "a csoport" means, so it must not disappear because a
@@ -539,11 +545,14 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
           <div className="hero-body">
           <div className="hero-copy">
             <div className="hero-eyebrow">Otthoni edzésprogram, magyarul</div>
-            <h1>A változás<br /><b>otthon kezdődik</b></h1>
-            <p className="body">Napi 20–30 perc, eszköz nélkül - elég egy matrac. Egy program, ami tudja, hol tartasz, és valaki, aki végigcsinálja veled. Nőknek és férfiaknak, minden szinten.</p>
+            <h1>{HERO.headline[0]}<br /><b>{HERO.headline[1]}</b></h1>
+            <p className="body">{HERO.sub}</p>
             <div className="hero-row">
               <Link className="pill pill-dark" href={CTA_START}>{CTA_LABEL}</Link>
               <a className="hero-cta2" href="#hogyan">Hogyan működik →</a>
+            </div>
+            <div className="hero-chips">
+              {HERO.chips.map((c) => <span key={c}>{c}</span>)}
             </div>
             <div className="hero-price">
               Az első heted <b>{formatHuf(PRICES.week_intro.amountHuf)}</b> - utána {formatHuf(PRICES.week_std.amountHuf)}/hét. Bármikor lemondható.

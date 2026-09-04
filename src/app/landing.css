@@ -552,6 +552,7 @@
      Tightening the stack (not shrinking the type) brings both back above it. */
   .lxl .hero-copy .body { margin-top: 18px; font-size: 15.5px; }
   .lxl .hero-row { margin-top: 24px; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .lxl .hero-chips { justify-content: center; margin-top: 16px; }
   .lxl .hero-price { margin-top: 18px; }
   .lxl .hero-trust { margin-top: 16px; }
   /* One column: copy first, photo under it. `100svh` is released here - a phone
@@ -611,6 +612,16 @@
 }
 
 /* ── Pricing emphasis: hero price line, mid-page anchor band, trust row ── */
+/* Hero chips (offer v3 §4.1) - the three objections the hero answers before the
+   fold: length, equipment, cadence. Same pill vocabulary as .starter-facts, but
+   left-aligned with the copy column instead of centred under a section. */
+.lxl .hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.lxl .hero-chips span {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+  color: oklch(.235 .014 168/.72); background: oklch(1 0 168/.62);
+  border: 1px solid oklch(0 0 168/.08); border-radius: 999px; padding: 7px 13px;
+}
+
 .lxl .hero-price { font-family: var(--mono); font-size: 12.5px; letter-spacing: .03em; color: oklch(from var(--ink) l c h / .9); margin-top: 22px; }
 .lxl .hero-price b { font-weight: 500; }
 
