@@ -15,11 +15,13 @@ const DAYS: [string, string][] = [
   ["P", "Péntek"], ["SZO", "Szombat"], ["V", "Vasárnap"],
 ];
 
-// The app's own default split (prefs.ts DEFAULT_PREFS.plan.weekdays = [1,2,4,5,6]),
-// so the demo opens on exactly what a new member actually gets.
-const DEFAULT: number[] = [1, 2, 4, 5, 6];
-const MIN = 3;
-const MAX = 6;
+// The app's own default split (prefs.ts DEFAULT_PREFS.plan.weekdays), so the
+// demo opens on exactly what a new member actually gets. Offer v3 moves the
+// cadence domain to 2-4, which is what the hero promises - the picker has to
+// clamp to the same range or it demonstrates a week the funnel will not build.
+const DEFAULT: number[] = [1, 3, 5];
+const MIN = 2;
+const MAX = 4;
 
 export function WeekPicker() {
   const [picked, setPicked] = useState<number[]>(DEFAULT);
@@ -73,7 +75,7 @@ export function WeekPicker() {
         {picked.length >= MAX
           ? "Ennél többet nem ajánlok - a pihenés is építi."
           : picked.length <= MIN
-            ? "Három nap is elég. Ha az a három tényleg belefér."
+            ? "Két nap is elég. Ha az a kettő tényleg belefér."
             : "Koppints egy napra, és nézd, hogy változik."}
       </p>
 

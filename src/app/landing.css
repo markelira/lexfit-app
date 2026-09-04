@@ -431,6 +431,31 @@
 /* founder credential chips - left-aligned variant of .starter-facts */
 .lxl .founder-facts { justify-content: flex-start; margin-top: 20px; }
 
+/* ---- offer v3: milestone strip on the Journey band ---- */
+.lxl .ms-strip {
+  list-style: none; margin: 26px auto 0; padding: 0; max-width: 520px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 4px;
+  position: relative;
+}
+.lxl .ms-strip::before {
+  content: ""; position: absolute; left: 7%; right: 7%; top: 15px; height: 2px;
+  background: oklch(0 0 168/.12); z-index: 0;
+}
+.lxl .ms-strip li {
+  position: relative; z-index: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; flex: 1; min-width: 0;
+}
+.lxl .ms-n {
+  display: grid; place-items: center; width: 31px; height: 31px; border-radius: 50%;
+  background: var(--cream); border: 2px solid oklch(0 0 168/.14);
+  font-family: var(--mono); font-size: 12.5px; color: oklch(.235 .014 168/.8);
+}
+.lxl .ms-strip li.on .ms-n { background: var(--accent); border-color: var(--accent); color: var(--navy); }
+.lxl .ms-note {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .05em; text-transform: uppercase;
+  color: oklch(.235 .014 168/.6); text-align: center; line-height: 13px;
+}
+
 /* ---- offer v3: pricing band (§4.4) + guarantee block (§4.3) ---- */
 
 .lxl .pb { text-align: center; }

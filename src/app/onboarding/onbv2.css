@@ -406,6 +406,69 @@
 }
 .lx .fnl-skip:hover { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
 .lx .fnl-skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* ---- offer v3: flexible cadence, helper line, milestone strip ---- */
+
+/* "Ahogy jön" is not a fourth number, so it is not a fourth segment - it is a
+   separate toggle with its own shape. */
+.lx .fnl-flex {
+  display: block; width: 100%; margin-top: 12px; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 12px; background: transparent;
+  font: inherit; font-size: 14px; color: var(--ink-2); cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.lx .fnl-flex:hover { border-color: var(--ink-3); }
+.lx .fnl-flex.on {
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 42%, transparent);
+  color: var(--ink);
+}
+.lx .fnl-flexnote {
+  margin-top: 10px; font-size: 13px; line-height: 20px; color: var(--ink-3); text-wrap: pretty;
+}
+
+/* The quiet reassurance under a question's sub-line. */
+.lx .fnl-helper {
+  margin-top: 6px; font-size: 13px; line-height: 20px; color: var(--ink-3); text-wrap: pretty;
+}
+
+/* Milestone strip. Endowed progress - the first mark is drawn as reached,
+   because the plan IS ready; the reveal never shows an empty bar. */
+.lx .ms-strip {
+  list-style: none; margin: 18px 0 0; padding: 0;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 4px;
+  position: relative;
+}
+.lx .ms-strip::before {
+  content: ""; position: absolute; left: 6%; right: 6%; top: 13px; height: 2px;
+  background: var(--line); z-index: 0;
+}
+.lx .ms-strip li {
+  position: relative; z-index: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 5px; flex: 1; min-width: 0;
+}
+.lx .ms-n {
+  display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%;
+  background: var(--surface); border: 2px solid var(--line);
+  font-size: 12px; font-weight: 600; color: var(--ink-2);
+}
+.lx .ms-strip li.on .ms-n { background: var(--accent); border-color: var(--accent); color: var(--navy); }
+.lx .ms-note {
+  font-size: 10px; letter-spacing: .03em; text-transform: uppercase;
+  color: var(--ink-3); text-align: center; line-height: 13px;
+}
+
+/* The plan step's "already ready" line. */
+.lx .pw-ready {
+  margin: 10px 0 0; font-size: 13.5px; line-height: 21px;
+  color: var(--ink-2); text-align: center; text-wrap: pretty;
+}
+
+/* The reveal's rhythm label, where a weekday legend would be. */
+.lx .rv-flex {
+  margin-top: 10px; font-size: 12px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+
 /* ---- offer v3: pay-step guarantee, renewal disclosure, trust row ---- */
 
 /* The guarantee de-risks the plan choice, so it sits above the selector - and

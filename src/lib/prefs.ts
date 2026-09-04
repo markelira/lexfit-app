@@ -23,8 +23,13 @@ const REMINDER_HOUR: Record<string, string> = { reggel: "07:15", napkozben: "12:
 
 export const DEFAULT_PREFS: Prefs = {
   plan: {
-    daysPerWeek: 5,
-    weekdays: [1, 2, 4, 5, 6],
+    // Offer v3 moves the cadence domain to 2-4 days (the hero promises "heti
+    // 2, 3 vagy 4 nap"), so the default is the recommended 3 rather than 5.
+    // EXISTING members are unaffected: this is a default for a missing field,
+    // and clampDays below only ever sees fresh onboarding answers - a stored
+    // 5- or 6-day plan is read back untouched.
+    daysPerWeek: 3,
+    weekdays: [1, 3, 5],
     sessionLength: "20–30 perc",
     equipment: ["Szőnyeg"],
     restDayKeepsStreak: true,
@@ -33,7 +38,7 @@ export const DEFAULT_PREFS: Prefs = {
     // Workout reminders are a real OPT-IN (GDPR/launch-plan fix): seeded OFF,
     // switched on by the FirstEntry card ("Beállítanál egy emlékeztetőt?") or
     // the Beállítások toggle. Existing docs with an explicit true are untouched.
-    workout: { enabled: false, time: "07:15", weekdays: [1, 2, 4, 5, 6] },
+    workout: { enabled: false, time: "07:15", weekdays: [1, 3, 5] },
     streakRisk: true,
     weeklyRecap: true,
     community: false,
@@ -45,7 +50,7 @@ export const DEFAULT_PREFS: Prefs = {
 
 const clampDays = (d: unknown) => {
   const n = typeof d === "number" ? d : Number(d);
-  return Number.isFinite(n) ? Math.max(3, Math.min(6, Math.round(n))) : 5;
+  return Number.isFinite(n) ? Math.max(2, Math.min(4, Math.round(n))) : 3;
 };
 
 /** Workout weekdays for a given count: work days first, then rest days if needed. */

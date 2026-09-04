@@ -25,6 +25,7 @@ export function StepFrame({
   counter,
   heading,
   sub,
+  helper,
   headingRef,
   children,
   cta,
@@ -34,6 +35,10 @@ export function StepFrame({
   counter?: string; // "3 / 5" · "Kész"
   heading: string;
   sub?: string;
+  /** A quiet reassurance under the sub-line (offer v3 §4.6) - "van könnyített
+   *  változat", "van csendes változat". It answers the objection the question
+   *  itself provokes, so it belongs on the question, not a step later. */
+  helper?: string;
   headingRef?: React.Ref<HTMLHeadingElement>;
   children: React.ReactNode;
   cta: React.ReactNode;
@@ -65,6 +70,7 @@ export function StepFrame({
             {heading}
           </h2>
           {sub && <p className="fnl-sub">{sub}</p>}
+          {helper && <p className="fnl-helper">{helper}</p>}
           <div className="fnl-fields">{children}</div>
         </div>
 

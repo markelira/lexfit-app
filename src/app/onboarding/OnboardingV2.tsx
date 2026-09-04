@@ -10,8 +10,9 @@ import { paidDestination } from "@/lib/billing";
 import { readDraft, writeDraft, clearDraft, type DraftAnswers } from "@/lib/onboarding-draft";
 import { planFromSearch } from "@/lib/pricing/preselect";
 import { captureAttribution } from "@/lib/attribution";
-import { trackCheckoutStart, trackOnboardingStart } from "@/lib/track";
+import { trackCheckoutStart, trackOnboardingStart, trackOnbWhisperView } from "@/lib/track";
 import { FIRST_WORKOUT } from "@/lib/foundation-preview";
+import { MILESTONES } from "@/components/landing/offer-copy";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { StepFrame } from "@/components/onboarding/StepFrame";
@@ -74,6 +75,9 @@ interface FunnelAnswers {
   level: number | null;
   days: number;
   weekdays: number[];
+  /** "Ahogy jön" - the week has no fixed shape. Plans `days` sessions but pins
+   *  them to no weekday, so the reveal shows a rhythm instead of a legend. */
+  flexible: boolean;
   time: string | null;
   env: string[];
   obstacle: string | null; // "what stopped you before"
@@ -82,7 +86,7 @@ interface FunnelAnswers {
 }
 const INITIAL: FunnelAnswers = {
   goal: null, focus: null, level: null, days: MOCK.days.recommended,
-  weekdays: [...MOCK.days.defaults[MOCK.days.recommended]], time: null, env: [],
+  weekdays: [...MOCK.days.defaults[MOCK.days.recommended]], flexible: false, time: null, env: [],
   obstacle: null, why: "", plan: "week_intro", // highlighted default = Heti (low-friction 490)
 };
 
@@ -91,7 +95,8 @@ const INITIAL: FunnelAnswers = {
 function draftFromFunnel(a: FunnelAnswers): DraftAnswers {
   return {
     goal: a.goal, focus: a.focus ? [a.focus] : [], level: a.level, days: a.days,
-    weekdays: a.weekdays, time: a.time, env: a.env, obstacle: a.obstacle, motiv: a.why,
+    weekdays: a.weekdays, flexible: a.flexible, time: a.time, env: a.env,
+    obstacle: a.obstacle, motiv: a.why,
   };
 }
 function funnelFromDraft(a: DraftAnswers): FunnelAnswers {
@@ -102,6 +107,7 @@ function funnelFromDraft(a: DraftAnswers): FunnelAnswers {
     level: a.level ?? null,
     days,
     weekdays: a.weekdays ?? [...(MOCK.days.defaults[days] ?? INITIAL.weekdays)],
+    flexible: a.flexible ?? false,
     time: a.time ?? null,
     env: a.env ?? [],
     obstacle: a.obstacle ?? null,
@@ -297,7 +303,8 @@ export function OnboardingV2() {
       if (id === "goal") return answers.goal != null;
       if (id === "focus") return answers.focus != null;
       if (id === "level") return answers.level != null;
-      if (id === "days") return answers.weekdays.length >= 1;
+      // "Ahogy jön" deliberately picks NO weekdays, so it cannot be gated on one.
+      if (id === "days") return answers.flexible || answers.weekdays.length >= 1;
       return true; // time/env/obstacle/why are non-blocking
     },
     [answers],
@@ -502,6 +509,7 @@ function QuestionStep({
       counter={`${no} / ${QUESTION_TOTAL}`}
       heading={q.heading}
       sub={q.sub}
+      helper={"helper" in q ? (q.helper as string) : undefined}
       headingRef={headingRef}
       cta={
         <button className="fnl-cta" disabled={!canNext} onClick={onNext}>
@@ -546,20 +554,49 @@ function QuestionStep({
           <Segmented
             ariaLabel="Hány nap egy héten"
             options={MOCK.days.counts}
-            value={answers.days}
+            value={answers.flexible ? null : answers.days}
             onChange={(v) => {
               set("days", v);
               set("weekdays", [...MOCK.days.defaults[v]]);
+              set("flexible", false);
             }}
           />
-          <p className={`fnl-reco${answers.days === MOCK.days.recommended ? " on" : ""}`}>
-            {answers.days === MOCK.days.recommended
-              ? `ajánlott · heti ${answers.days} edzés`
-              : `heti ${answers.days} edzés`}
+          <p className={`fnl-reco${!answers.flexible && answers.days === MOCK.days.recommended ? " on" : ""}`}>
+            {answers.flexible
+              ? `heti ${answers.days} edzés · rugalmasan`
+              : answers.days === MOCK.days.recommended
+                ? `ajánlott · heti ${answers.days} edzés`
+                : `heti ${answers.days} edzés`}
           </p>
 
+          {/* "Ahogy jön" is not a fourth number, so it is not a fourth segment.
+              It is the answer for a week with no shape: we still plan the
+              recommended count, we just do not pin it to named days. */}
+          <button
+            type="button"
+            className={`fnl-flex${answers.flexible ? " on" : ""}`}
+            aria-pressed={answers.flexible}
+            onClick={() => {
+              const on = !answers.flexible;
+              set("flexible", on);
+              if (on) {
+                set("days", MOCK.days.recommended);
+                set("weekdays", []);
+              } else {
+                set("weekdays", [...MOCK.days.defaults[MOCK.days.recommended]]);
+              }
+              haptic("select");
+            }}
+          >
+            {MOCK.days.flexLabel}
+          </button>
+
+          {answers.flexible && <p className="fnl-flexnote">{MOCK.days.flexNote}</p>}
+
           {/* Week card - interactive check/moon day-boxes (wireframe 1:1); tap a
-              day to toggle it work/rest (P0.3 weekday picking). */}
+              day to toggle it work/rest (P0.3 weekday picking). Hidden under
+              "Ahogy jön": there are no named days to show. */}
+          {!answers.flexible && (
           <div className="fnl-weekcard">
             <span className="wc-hd mono">{MOCK.days.weekHeading}</span>
             <div className="fnl-week" role="group" aria-label={MOCK.days.weekdaysLabel}>
@@ -591,6 +628,11 @@ function QuestionStep({
             </div>
             <p className="wc-note">{MOCK.days.restNote}</p>
           </div>
+          )}
+
+          {/* P22/P26 - the forgiveness rule, said at the exact moment the
+              visitor is committing to a number they are afraid of missing. */}
+          <DaysWhisper />
         </div>
       )}
 
@@ -623,6 +665,29 @@ function QuestionStep({
         />
       )}
     </StepFrame>
+  );
+}
+
+// The forgiveness whisper after `days` (offer v3 §4.6). It attaches to the
+// existing step rather than adding one - nothing in this project may lengthen
+// the path to the first workout (§6).
+function DaysWhisper() {
+  useEffect(() => { trackOnbWhisperView(); }, []);
+  return <Whisper>{MOCK.days.whisper}</Whisper>;
+}
+
+// The milestone strip (1 · 5 · 10 · 15 · 30). Endowed progress: step 1 is drawn
+// as already reached, because the plan IS ready - the reveal never shows 0%.
+function MilestoneStrip({ compact = false }: { compact?: boolean }) {
+  return (
+    <ol className={`ms-strip${compact ? " compact" : ""}`} aria-label="Mérföldkövek">
+      {MILESTONES.map((m, i) => (
+        <li key={m.n} className={i === 0 ? "on" : ""}>
+          <span className="ms-n tabular">{m.n}</span>
+          {m.note && <span className="ms-note">{m.note}</span>}
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -821,9 +886,17 @@ function Reveal({
         <div className="rv-hero">
           <div className="eyebrow mono">{r.eyebrow}</div>
           <WeekRing days={a.days} />
-          <WeekdayLegend cells={weekCells} />
+          {/* "Ahogy jön" pinned no weekdays, so there is no legend to draw -
+              showing a default one would invent an answer they did not give. */}
+          {a.flexible
+            ? <p className="rv-flex mono">rugalmasan, ahogy jön</p>
+            : <WeekdayLegend cells={weekCells} />}
           <h1 className="reveal-hd" ref={headRef} tabIndex={-1}>{headline}</h1>
         </div>
+
+        {/* P24/P31 - the shape of the journey, before it starts. Endowed
+            progress: 1 is drawn as reached, because the plan IS ready. */}
+        <MilestoneStrip />
 
         {/* Their own words, quoted back - the emotional anchor. */}
         {why && (
@@ -944,6 +1017,9 @@ function PlanStep({
       <div className="fnl-sheet">
       <div className="fnl-scroll pw-scroll">
         <PaywallOffer headRef={headRef} />
+        {/* P3/P15 - the first workout already exists, and starting today or on
+            Monday is equally fine. Removes the "when do I begin" stall. */}
+        <p className="pw-ready">Az első edzésed készen áll — ma vagy hétfőn kezded, mindegy.</p>
         <div className="pw-plans" role="radiogroup" aria-label="Csomag" ref={groupRef}>
           {PAYWALL_PLANS.map((p, i) => (
             <PlanRow

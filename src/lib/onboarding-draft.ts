@@ -14,6 +14,8 @@ const KEY = "lexfit_onb_v1";
 // field in P3.4, so the draft carries it as an extension until then.
 export interface DraftAnswers extends Partial<OnboardingAnswers> {
   weekdays?: number[];
+  /** "Ahogy jön" - no fixed weekdays (offer v3 §4.6). */
+  flexible?: boolean;
 }
 
 export interface Draft {

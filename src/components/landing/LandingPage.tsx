@@ -24,7 +24,7 @@ import { PhoneVideo } from "@/components/landing/PhoneVideo";
 import { ChallengeCard } from "@/components/ChallengeCard";
 import { useRouter } from "next/navigation";
 import { EMPTY_CATALOG, type LandingCatalog, type LandingWorkout } from "@/lib/landing-catalog";
-import { HERO, ISMEROS, HOGYAN_STEPS, FAQ_NEW, GUARANTEE_LIVE } from "@/components/landing/offer-copy";
+import { HERO, ISMEROS, HOGYAN_STEPS, FAQ_NEW, GUARANTEE_LIVE, MILESTONES } from "@/components/landing/offer-copy";
 import { PricingBand, GuaranteeBlock } from "@/components/landing/PricingBand";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import {
@@ -805,7 +805,7 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
 
       {/* ═══ 7 · FOUNDATION ═════════════════════════════════════════ */}
       {entry && entry.sessions.length > 0 && (
-        <div className="band-cream sec-sm">
+        <div className="band-cream sec-sm" id="utad">
           <Rise className="wrap seq">
             <div className="starter-head">
               <span className="starter-badge">A kezdő program</span>
@@ -822,6 +822,17 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
               {entry.phases.length > 0 && <span>{entry.phases.length} fázis</span>}
               <span>a te napjaidon</span>
             </div>
+            {/* P24/P31 - the milestone strip belongs HERE, on the band that
+                actually walks the 30 sessions, not on #heted (which is the
+                cadence picker). Endowed progress: 1 is drawn as reached. */}
+            <ol className="ms-strip" aria-label="Mérföldkövek">
+              {MILESTONES.map((m, i) => (
+                <li key={m.n} className={i === 0 ? "on" : ""}>
+                  <span className="ms-n tabular">{m.n}</span>
+                  {m.note && <span className="ms-note">{m.note}</span>}
+                </li>
+              ))}
+            </ol>
             <Journey catalog={catalog} onPick={setOpen} />
           </Rise>
         </div>

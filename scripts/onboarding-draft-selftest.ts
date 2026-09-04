@@ -95,8 +95,47 @@ function privateMode() {
   console.log("✓ private-mode (localStorage throws) is non-fatal");
 }
 
+function flexibleCadence() {
+  // Offer v3 moves the cadence domain to 2-4 and adds "Ahogy jön", which is not
+  // a count: it plans the recommended number of sessions but pins them to no
+  // weekday. The draft has to survive that round-trip, or a visitor who picked
+  // it and came back a day later would silently get named weekdays instead.
+  clearDraft();
+  writeDraft({
+    v: 1,
+    idx: 4,
+    answers: { days: 3, weekdays: [], flexible: true },
+    startedAt: 1_700_000_000_000,
+  });
+  const back = readDraft();
+  assert.equal(back?.answers.flexible, true, "flexible survives the round-trip");
+  assert.deepEqual(back?.answers.weekdays, [], "flexible keeps an empty weekday set");
+
+  // A fixed-cadence draft must not come back flexible.
+  clearDraft();
+  writeDraft({
+    v: 1,
+    idx: 4,
+    answers: { days: 2, weekdays: [2, 5], flexible: false },
+    startedAt: 1_700_000_000_000,
+  });
+  const fixed = readDraft();
+  assert.equal(fixed?.answers.flexible, false, "fixed cadence stays fixed");
+  assert.deepEqual(fixed?.answers.weekdays, [2, 5], "2-day default weekdays round-trip");
+
+  // Drafts written BEFORE this field existed must still load - a visitor
+  // mid-funnel across the deploy must not be dead-ended.
+  clearDraft();
+  writeDraft({ v: 1, idx: 4, answers: { days: 3, weekdays: [1, 3, 5] }, startedAt: 1 });
+  const legacy = readDraft();
+  assert.equal(legacy?.answers.flexible, undefined, "pre-v3 draft has no flexible field");
+  assert.deepEqual(legacy?.answers.weekdays, [1, 3, 5], "pre-v3 draft still loads its weekdays");
+  console.log("✓ flexible cadence round-trip + pre-v3 draft compatibility");
+}
+
 roundTrip();
 guards();
 v2Isolation();
 privateMode();
+flexibleCadence();
 console.log("\nAll onboarding-draft self-tests passed.");

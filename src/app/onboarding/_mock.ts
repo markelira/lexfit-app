@@ -52,6 +52,7 @@ export const MOCK = {
   focus: {
     heading: "Hol szeretnél erősödni?",
     sub: "Egyet válassz - erre teszek majd külön hangsúlyt. Később módosítható.",
+    helper: "Minden gyakorlatnak van könnyített változata — az is teljes értékű.",
     options: [
       { v: "fenek", icon: lxPaths.flame, label: "Fenék, comb", sub: "Stabil, erős alsótest." },
       { v: "core", icon: lxPaths.gauge, label: "Has, törzs", sub: "Erős törzs, biztos tartás." },
@@ -72,21 +73,31 @@ export const MOCK = {
     ],
   },
 
+  // Offer v3 §4.1/§4.6: the cadence domain is 2-4 days, not 3-6. The hero
+  // promises "heti 2, 3 vagy 4 nap", and the whole offer is built on a pace an
+  // ordinary week can survive - so 5 and 6 are gone and 3 is the recommendation.
+  // "Ahogy jön" is NOT a count: it is the answer for someone whose week has no
+  // shape, and it plans 3 days without pinning them to named weekdays.
   days: {
     heading: "Hány nap fér bele?",
-    sub: "Ebből épül a heted. Bármikor változtathatod.",
+    sub: "Ebből épül a heted. Bármikor átállíthatod.",
     counts: [
-      { v: 3, label: "kényelmes" },
+      { v: 2, label: "kényelmes" },
+      { v: 3, label: "ajánlott" },
       { v: 4, label: "haladós" },
-      { v: 5, label: "ajánlott" },
-      { v: 6, label: "intenzív" },
     ],
-    recommended: 5,
+    recommended: 3,
+    /** The non-numeric fourth option (§2.2 P25). */
+    flexLabel: "Ahogy jön — legyen rugalmas",
+    flexNote: "Három napot tervezek be, de nem kötöm napokhoz. Bármikor átállíthatod.",
     weekHeading: "Így néz majd ki a heted",
     weekdaysLabel: "Mely napokon?",
     restNote: "A pihenőnap is a terv része - nem töri meg a sorozatot.",
-    // Sensible default weekday sets per count (1=Mon … 7=Sun).
-    defaults: { 3: [1, 3, 5], 4: [1, 2, 4, 5], 5: [1, 2, 4, 5, 6], 6: [1, 2, 3, 4, 5, 6] } as Record<number, number[]>,
+    /** The forgiveness whisper, shown after the choice (§4.6, P22/P26). */
+    whisper: "A terved pihenőnapokkal készül. A kihagyott hét nem nulláz.",
+    // Sensible default weekday sets per count (1=Mon … 7=Sun). Spread across the
+    // week rather than stacked, so a rest day always follows a training day.
+    defaults: { 2: [2, 5], 3: [1, 3, 5], 4: [1, 3, 5, 6] } as Record<number, number[]>,
   },
 
   time: {
@@ -102,6 +113,7 @@ export const MOCK = {
   env: {
     heading: "Van bármi, amire figyeljek?",
     sub: "Többet is választhatsz. Ehhez igazítom a variációkat.",
+    helper: "Van csendes változat.",
     exclusive: "none",
     options: [
       { v: "csendes", icon: lxPaths.volumeX, label: "Csendben kell", sub: "Szomszéd-barát, ugrálás nélkül." },
@@ -117,6 +129,7 @@ export const MOCK = {
   obstacle: {
     heading: "Mi állított meg eddig?",
     sub: "Hogy tudjam, mire figyeljek - és mikor bátorítsalak. Nincs rossz válasz.",
+    helper: "Minden gyakorlatnak van könnyített változata — az is teljes értékű.",
     options: [
       { v: "ido", icon: lxPaths.clock, label: "Nem volt rá időm", sub: "Sose jött ki a naptárból." },
       { v: "motiv", icon: lxPaths.rotateCcw, label: "Elfogyott a lendület", sub: "Elkezdtem, de abbamaradt." },
