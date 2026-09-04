@@ -6,6 +6,8 @@ import "./landing.css";
 import "./app/home.css";
 import "./app/programs/programs.css";
 import LandingPage from "@/components/landing/LandingPage";
+import { FaqJsonLd } from "@/components/landing/FaqJsonLd";
+import { FAQ_ALL } from "@/components/landing/offer-copy";
 import { loadLandingCatalog } from "@/lib/landing-catalog.server";
 
 const TITLE = "LEXFIT - otthoni edzésprogram, ami hozzád igazodik";
@@ -44,5 +46,12 @@ export const revalidate = 3600;
 // props. This also means the marketing page finally renders to crawlers.
 export default async function Home() {
   const catalog = await loadLandingCatalog();
-  return <LandingPage catalog={catalog} />;
+  return (
+    <>
+      {/* Server-rendered from the same array #gyik walks, so the rich result
+          and the visible page cannot diverge. */}
+      <FaqJsonLd entries={FAQ_ALL} />
+      <LandingPage catalog={catalog} />
+    </>
+  );
 }

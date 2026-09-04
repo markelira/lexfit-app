@@ -146,6 +146,56 @@ export const FAQ_NEW: [string, string][] = [
   ],
 ];
 
+/** The landing FAQ, in page order. Lives here rather than in LandingPage so
+ *  that #gyik, the /arak subset and the FAQPage JSON-LD all walk ONE array -
+ *  a hand-maintained schema block drifts from the visible page, and a rich
+ *  result that does not match the page is a violation, not a mistake. */
+export const FAQ_BASE: [string, string][] = [
+  [
+    "Miért fizessek, ha a YouTube-on ingyen is van edzésvideó?",
+    "A videó ingyen van - a sorrend nem. A LEXFIT egy felépített program: minden edzés tudja, mi jött előtte és mi jön utána, a haladásod magától követődik, és nem neked kell minden nap kitalálnod, mit csinálj. A lejátszóban ott a gyakorlatok listája időbélyeggel, teljes képernyőn látod, mi jön és mennyi van hátra, és ott folytatod, ahol abbahagytad.",
+  ],
+  [
+    "Teljesen kezdő vagyok. Nekem való?",
+    "Igen - a Lexfit Start pontosan ide készült: lassú tempó, alapgyakorlatok, bőséges módosításokkal. A saját tempódban haladsz, és a pihenőnap nálunk a terv része.",
+  ],
+  [
+    "Férfiként is használhatom?",
+    "Igen. A LEXFIT nőknek és férfiaknak készült - a gyakorlatok saját testsúlyra épülnek, te pedig a saját szinteden és tempódban követed őket.",
+  ],
+  [
+    "Milyen eszköz kell hozzá?",
+    "Semmi - elég egy matrac.",
+  ],
+  [
+    "Mennyi időm kell rá naponta?",
+    "A program edzései jellemzően 20–30 percesek. Az edzéstárban van 5–15 perces is - azokra való a „ha csak tíz perced van” kategória. Nem a hossz visz előre, hanem hogy hétből hetet megcsinálj.",
+  ],
+  [
+    "Mi van, ha kimaradok?",
+    "Semmi. Nem kezdődik elölről, nem veszítesz el semmit, és nem kapsz érte bűntudatkeltő üzenetet. A pihenőnap eleve a terv része - az nem töri meg a sorozatot. Ha egy hetet hagysz ki, ott veszed fel, ahol abbahagytad.",
+  ],
+  [
+    "Hogyan mondhatom le?",
+    "Bármikor, egy kattintással, a profilodból. Nincs hűségidő - a lemondás után a már kifizetett időszak végéig még minden elérhető. És ha csak most nincs rá időd, nem kell lemondanod: szüneteltetheted 1–3 hónapra, vagy válthatsz olcsóbb csomagra.",
+  ],
+  [
+    "Megy TV-n vagy laptopon is?",
+    "Igen. A LEXFIT a böngészőben fut - nem kell letölteni semmit. Telefonon, laptopon és asztali gépen működik, az edzést pedig AirPlay-jel vagy Chromecasttal a TV-re is kiküldheted.",
+  ],
+  [
+    "Kapok számlát?",
+    "Igen, minden fizetésről automatikusan kapsz elektronikus számlát e-mailben.",
+  ],
+  [
+    "Mi lesz a fotóimmal?",
+    "A haladásfotóid csak a tieid. Nem látja őket más tag, nem kerülnek a közösségbe, és bármikor törölheted őket - ahogy a fiókodat és minden adatodat is, egy gombbal, a beállításokban.",
+  ],
+];
+
+/** Everything #gyik renders: the pre-existing questions plus §4.5's additions. */
+export const FAQ_ALL: [string, string][] = [...FAQ_BASE, ...FAQ_NEW];
+
 /** The three FAQ questions /arak repeats (garancia · lemondás · szünet). Keyed
  *  by question text so the subset can never drift from the array above. */
 export const ARAK_FAQ_KEYS = [

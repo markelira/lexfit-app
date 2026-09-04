@@ -24,7 +24,7 @@ import { PhoneVideo } from "@/components/landing/PhoneVideo";
 import { ChallengeCard } from "@/components/ChallengeCard";
 import { useRouter } from "next/navigation";
 import { EMPTY_CATALOG, type LandingCatalog, type LandingWorkout } from "@/lib/landing-catalog";
-import { HERO, ISMEROS, HOGYAN_STEPS, FAQ_NEW, GUARANTEE_LIVE, MILESTONES } from "@/components/landing/offer-copy";
+import { HERO, ISMEROS, HOGYAN_STEPS, FAQ_ALL, GUARANTEE_LIVE, MILESTONES } from "@/components/landing/offer-copy";
 import { PricingBand, GuaranteeBlock } from "@/components/landing/PricingBand";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import {
@@ -154,49 +154,6 @@ function CountUp({ value }: { value: number }) {
 /* ------------------------------------------------------------------ */
 /* static copy                                                         */
 /* ------------------------------------------------------------------ */
-const FAQ: [string, string][] = [
-  [
-    "Miért fizessek, ha a YouTube-on ingyen is van edzésvideó?",
-    "A videó ingyen van - a sorrend nem. A LEXFIT egy felépített program: minden edzés tudja, mi jött előtte és mi jön utána, a haladásod magától követődik, és nem neked kell minden nap kitalálnod, mit csinálj. A lejátszóban ott a gyakorlatok listája időbélyeggel, teljes képernyőn látod, mi jön és mennyi van hátra, és ott folytatod, ahol abbahagytad.",
-  ],
-  [
-    "Teljesen kezdő vagyok. Nekem való?",
-    "Igen - a Lexfit Start pontosan ide készült: lassú tempó, alapgyakorlatok, bőséges módosításokkal. A saját tempódban haladsz, és a pihenőnap nálunk a terv része.",
-  ],
-  [
-    "Férfiként is használhatom?",
-    "Igen. A LEXFIT nőknek és férfiaknak készült - a gyakorlatok saját testsúlyra épülnek, te pedig a saját szinteden és tempódban követed őket.",
-  ],
-  [
-    "Milyen eszköz kell hozzá?",
-    "Semmi - elég egy matrac.",
-  ],
-  [
-    "Mennyi időm kell rá naponta?",
-    "A program edzései jellemzően 20–30 percesek. Az edzéstárban van 5–15 perces is - azokra való a „ha csak tíz perced van” kategória. Nem a hossz visz előre, hanem hogy hétből hetet megcsinálj.",
-  ],
-  [
-    "Mi van, ha kimaradok?",
-    "Semmi. Nem kezdődik elölről, nem veszítesz el semmit, és nem kapsz érte bűntudatkeltő üzenetet. A pihenőnap eleve a terv része - az nem töri meg a sorozatot. Ha egy hetet hagysz ki, ott veszed fel, ahol abbahagytad.",
-  ],
-  [
-    "Hogyan mondhatom le?",
-    "Bármikor, egy kattintással, a profilodból. Nincs hűségidő - a lemondás után a már kifizetett időszak végéig még minden elérhető. És ha csak most nincs rá időd, nem kell lemondanod: szüneteltetheted 1–3 hónapra, vagy válthatsz olcsóbb csomagra.",
-  ],
-  [
-    "Megy TV-n vagy laptopon is?",
-    "Igen. A LEXFIT a böngészőben fut - nem kell letölteni semmit. Telefonon, laptopon és asztali gépen működik, az edzést pedig AirPlay-jel vagy Chromecasttal a TV-re is kiküldheted.",
-  ],
-  [
-    "Kapok számlát?",
-    "Igen, minden fizetésről automatikusan kapsz elektronikus számlát e-mailben.",
-  ],
-  [
-    "Mi lesz a fotóimmal?",
-    "A haladásfotóid csak a tieid. Nem látja őket más tag, nem kerülnek a közösségbe, és bármikor törölheted őket - ahogy a fiókodat és minden adatodat is, egy gombbal, a beállításokban.",
-  ],
-  ...FAQ_NEW,
-];
 
 // One action, the whole page long: the 7-question funnel.
 //
@@ -513,7 +470,7 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
               <a href="#hogyan">Hogyan működik</a>
               <a href="#programok">Programok</a>
               <a href="#alexa">Alexa</a>
-              <a href="#elofizetes">Árak</a>
+              <Link href="/arak">Árak</Link>
               <Link href="/login">Belépés</Link>
             </nav>
           </div>
@@ -1021,7 +978,7 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
               continuation of the conversation rather than as admin. */}
           <p className="cap-body">Ezek jönnek a legtöbbször - a csoportban is, e-mailben is.</p>
           <div className="faq">
-            {FAQ.map(([q, a]) => (
+            {FAQ_ALL.map(([q, a]) => (
               <details key={q} className="faq-item">
                 <summary>{q}</summary>
                 <p>{a}</p>
