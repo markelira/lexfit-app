@@ -283,6 +283,45 @@ Run on a real phone, in the FB in-app browser (the ad's actual environment), bef
 
 ---
 
-*Execution log lives in the commit history of `offer-v3`. Anything I had to decide mid-build that
-was not covered by dev-plan §8 is recorded in the PR's commit message and flagged in the handoff
-summary.*
+## 6. Execution log — all 15 PRs shipped on `offer-v3` (2026-09-04)
+
+13 commits, `main..offer-v3`. `tsc` clean, `lint` at the pre-existing baseline (no new findings),
+all five self-test suites pass, `next build` succeeds, and the §3 grep returns zero across `src/`,
+`emails/` and `seed/`.
+
+Final section order on `/`, verified in the built output:
+`hero → #ismeros → #hogyan → #programok → price-anchor → #valos → cast → #utad (Journey + milestone
+strip) → #heted → finish → #kihivasok → #alexa → #garancia → #elofizetes → #gyik → footer`.
+
+**Three things I had to decide mid-build that §8 did not cover:**
+
+1. **The next-charge date was wrong twice before it was right** (PR6). Millisecond arithmetic lands
+   an hour off across both Budapest DST changeovers; then the mutating calendar form overflowed
+   (JS turns 31 Jan + 1 month into 3 March, and 29 Feb + 1 year into 1 March — after which reading
+   the month back to clamp reads the *wrong* month's length). Stripe clamps to month end. It is
+   built from date parts now, and the self-test pins both changeovers, leap years and the December
+   wrap. A pre-payment disclosure naming a date Stripe will not use is worse than naming none.
+2. **The guarantee eligibility check had the same class of bug** (PR12): it parsed the completion
+   day with a hardcoded `+01:00`, which is wrong for half the year. It compares Budapest calendar
+   days as ISO strings now — no offset to get wrong. It also counts DISTINCT workout codes, because
+   counting rows would let ten replays of day one earn a refund.
+3. **`seed:stripe` could not do what Q6b asked** (PR15). It is idempotent by `lookup_key` and only
+   ever *creates* missing prices, so re-running it reported every price "unchanged" while Stripe
+   kept the old nickname. It now syncs nicknames on existing prices (metadata only — amount,
+   lookup_key, currency and interval untouched).
+
+**Not done, and why:**
+
+- **LIVE Stripe re-seed.** This environment only has `sk_test`. Verified against test (renamed all
+  eleven, second run idempotent, `audit:stripe` still sees only the one known grandfathered item).
+  Running it with the live key is an owner step.
+- **`#garancia` ships dark.** `NEXT_PUBLIC_GUARANTEE_LIVE` is unset, so the section, the pay-step
+  box, the Havi guarantee bullet and the hesitation line do not render. Flipping it in Vercel is the
+  whole release step once the ÁSZF clause lands.
+- **`goal`-step weight-loss copy** is untouched, awaiting Márk's wording. `test:schema` enforces the
+  ban on the copy this project owns; widening that check to `_mock.ts` is what closes it out.
+- **`#programok` ordering** (7 napos kezdő first, Esti rutinok in the first four on mobile) is the
+  `order` field on `programs/{slug}` in /admin — content, not code.
+- **The §4.4 included list** names eight programs and must be checked against prod before launch.
+
+*Anything else decided mid-build is in the relevant commit message.*
