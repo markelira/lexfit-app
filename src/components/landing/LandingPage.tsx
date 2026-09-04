@@ -24,8 +24,8 @@ import { PhoneVideo } from "@/components/landing/PhoneVideo";
 import { ChallengeCard } from "@/components/ChallengeCard";
 import { useRouter } from "next/navigation";
 import { EMPTY_CATALOG, type LandingCatalog, type LandingWorkout } from "@/lib/landing-catalog";
-import { HERO, ISMEROS, HOGYAN_STEPS } from "@/components/landing/offer-copy";
-import { PricingBand } from "@/components/landing/PricingBand";
+import { HERO, ISMEROS, HOGYAN_STEPS, FAQ_NEW, GUARANTEE_LIVE } from "@/components/landing/offer-copy";
+import { PricingBand, GuaranteeBlock } from "@/components/landing/PricingBand";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import {
   CSSProperties,
@@ -195,6 +195,7 @@ const FAQ: [string, string][] = [
     "Mi lesz a fotóimmal?",
     "A haladásfotóid csak a tieid. Nem látja őket más tag, nem kerülnek a közösségbe, és bármikor törölheted őket - ahogy a fiókodat és minden adatodat is, egy gombbal, a beállításokban.",
   ],
+  ...FAQ_NEW,
 ];
 
 // One action, the whole page long: the 7-question funnel.
@@ -214,11 +215,14 @@ const FB_GROUP_URL = "https://www.facebook.com/groups/2385379795277618";
 /* ------------------------------------------------------------------ */
 /* sticky nav + scroll-spy                                             */
 /* ------------------------------------------------------------------ */
+// #garancia only exists while the guarantee is live, so the nav entry is gated
+// with it - a nav link that scrolls nowhere is worse than one fewer link.
 const NAV_LINKS: [string, string][] = [
   ["#hogyan", "Hogyan működik"],
   ["#programok", "Programok"],
   ["#heted", "A heted"],
   ["#kihivasok", "Kihívások"],
+  ...(GUARANTEE_LIVE ? ([["#garancia", "Garancia"]] as [string, string][]) : []),
   ["#elofizetes", "Árak"],
 ];
 
@@ -932,24 +936,6 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
         )}
       </div>
 
-      {/* ═══ 11 · GYIK ══════════════════════════════════════════════ */}
-      <div className="band-cream sec-sm" id="gyik">
-        <Rise className="wrap seq">
-          <h3 className="cap-title">Mielőtt belevágsz.</h3>
-          {/* Catches "csoport" from the band above so the FAQ arrives as a
-              continuation of the conversation rather than as admin. */}
-          <p className="cap-body">Ezek jönnek a legtöbbször - a csoportban is, e-mailben is.</p>
-          <div className="faq">
-            {FAQ.map(([q, a]) => (
-              <details key={q} className="faq-item">
-                <summary>{q}</summary>
-                <p>{a}</p>
-              </details>
-            ))}
-          </div>
-        </Rise>
-      </div>
-
       {/* ═══ 12 · ALEXA - the peak ══════════════════════════════════ */}
       <section className="alexa-hero" id="alexa" aria-labelledby="alexa-headline">
         <div className="ax-photo">
@@ -1002,11 +988,36 @@ export default function LandingPage({ catalog = EMPTY_CATALOG }: { catalog?: Lan
         </div>
       </section>
 
-      {/* ═══ 13 · ELŐFIZETÉS + FOOTER ═══════════════════════════════ */}
+      {/* ═══ 12b · GARANCIA ═════════════════════════════════════════
+          Between Alexa and the price on purpose: the guarantee is what makes
+          the number safe to look at, so it has to land BEFORE the number, not
+          as reassurance after it. Renders only when NEXT_PUBLIC_GUARANTEE_LIVE
+          is set - it is a contractual promise and waits on the ÁSZF clause. */}
+      <GuaranteeBlock />
+
+      {/* ═══ 13 · ELŐFIZETÉS ═══════════════════════════════ */}
       <div className="band-sage pricing-band" id="elofizetes">
         <div className="wrap">
           <PricingBand surface="landing" />
         </div>
+      </div>
+
+      {/* ═══ 11 · GYIK ══════════════════════════════════════════════ */}
+      <div className="band-cream sec-sm" id="gyik">
+        <Rise className="wrap seq">
+          <h3 className="cap-title">Mielőtt belevágsz.</h3>
+          {/* Catches "csoport" from the band above so the FAQ arrives as a
+              continuation of the conversation rather than as admin. */}
+          <p className="cap-body">Ezek jönnek a legtöbbször - a csoportban is, e-mailben is.</p>
+          <div className="faq">
+            {FAQ.map(([q, a]) => (
+              <details key={q} className="faq-item">
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </details>
+            ))}
+          </div>
+        </Rise>
       </div>
 
       {/* The footer is no longer nested inside #elofizetes - #gyik now sits
