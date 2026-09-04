@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { WithdrawalButton } from "@/components/WithdrawalButton";
 import { Protected, Loader } from "@/components/Protected";
 import { PRICES } from "@/lib/pricing/config";
 import { formatHuf } from "@/lib/pricing/display";
@@ -255,6 +256,19 @@ function Membership() {
             cta="Lemondás"
             onClick={() => setView("cancel")}
           />
+          {/* The statutory 14-day right, kept visually separate from the three
+              commercial options above: it is not one more way to cancel, it is
+              a different right with a different outcome (immediate end + a
+              pro-rata refund). Listed last and stated plainly - never hidden
+              behind the cancel flow, which is what the rule exists to prevent. */}
+          <div className={styles.withdraw} id="elallas">
+            <p className={styles.sub}>
+              A vásárlástól számított 14 napon belül elállási jog illet meg. Ilyenkor a
+              hozzáférés azonnal megszűnik, és a fel nem használt időszak díját
+              visszautaljuk.
+            </p>
+            <WithdrawalButton className={styles.withdrawBtn} />
+          </div>
         </div>
       )}
     </Shell>

@@ -431,6 +431,8 @@
 /* founder credential chips - left-aligned variant of .starter-facts */
 .lxl .founder-facts { justify-content: flex-start; margin-top: 20px; }
 
+.lxl .lx-withdraw-err { margin-top: 8px; font-size: 13px; color: var(--ink); }
+
 /* ---- offer v3: /arak page chrome ---- */
 /* /arak gets a page header rather than the landing's band header - it is a
    destination, not a section, so it opens with its own name. */

@@ -19,6 +19,11 @@ export function LandingFooter() {
       <div className="legal">
         <a href="/arak">Árak</a> | <a href="/aszf">Felhasználási feltételek</a> |{" "}
         <a href="/adatvedelem">Adatvédelem</a> | <a href="/impresszum">Impresszum</a> |{" "}
+        {/* The statutory withdrawal right has to be REACHABLE, not just
+            described in the ÁSZF. A logged-out visitor has no subscription to
+            withdraw from, so the link goes to the control in the app rather
+            than to an API this page could not authenticate against. */}
+        <a href="/app/membership#elallas">Elállás</a> |{" "}
         <CookieSettingsButton className="lx-cookie-btn" />
       </div>
     </div>

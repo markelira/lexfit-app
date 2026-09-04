@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { adminJson } from "@/lib/admin-fetch";
+import { GuaranteePanel, type GuaranteeVerdictDto } from "./GuaranteePanel";
 import { STEP_OPTIONS, LIFESTAGE, type ChoiceOption } from "@/lib/onboarding-data";
 import { SUB_BADGE, SUB_LABEL } from "@/app/admin/members/page";
 
@@ -13,6 +14,7 @@ interface Detail {
   onboarding: Record<string, unknown> | null;
   progress: Record<string, unknown> | null;
   subscription: Record<string, unknown> | null;
+  guarantee?: GuaranteeVerdictDto;
   stripeLive?: boolean;
 }
 
@@ -112,6 +114,10 @@ export default function MemberDetailPage() {
               <dt>Miért</dt><dd>{str(onb.why ?? onb.motiv)}</dd>
             </dl>
           </div>
+
+          {d.guarantee && (
+            <GuaranteePanel uid={uid} verdict={d.guarantee} subStatus={subStatus} />
+          )}
 
           <div className="adm-card">
             <div className="adm-secttl">Haladás</div>

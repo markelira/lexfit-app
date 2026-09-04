@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { verifyRequest, isAdmin } from "@/lib/auth-server";
 import { adminDb } from "@/lib/firebase-admin";
 import { serialize } from "@/lib/admin-serialize";
+import { guaranteeEligibility, type CompletedWorkout } from "@/lib/pricing/refund";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,8 +23,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ uid: str
 
   if (!uSnap.exists) return NextResponse.json({ error: "not found" }, { status: 404 });
 
+  // The guarantee verdict is computed HERE, from the same pure helper the refund
+  // route uses, so /admin can never show a verdict the route would disagree with.
+  const guarantee = guaranteeEligibility({
+    completed: (progSnap.data()?.completed ?? []) as CompletedWorkout[],
+    startedAt: (subSnap.data()?.startedAt as number | undefined) ?? null,
+  });
+
   return NextResponse.json({
     uid,
+    guarantee,
     profile: serialize(uSnap.data()),
     onboarding: onbSnap.exists ? serialize(onbSnap.data()) : null,
     progress: progSnap.exists ? serialize(progSnap.data()) : null,

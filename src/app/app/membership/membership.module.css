@@ -154,3 +154,26 @@
 }
 
 .error { margin-top: 0.8rem; color: var(--accent-2); font-size: 0.85rem; }
+
+/* The statutory 14-day withdrawal, kept visually apart from the three
+   commercial options above it. It is not a fourth way to cancel - it is a
+   different right with a different outcome, and the rule exists precisely to
+   stop it being buried inside a cancel flow. */
+.withdraw {
+  margin-top: 1.6rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.withdrawBtn {
+  margin-top: 0.7rem;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.6rem 1.1rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.withdrawBtn:hover:not(:disabled) { border-color: var(--ink-3); color: var(--ink); }
+.withdrawBtn:disabled { opacity: 0.55; cursor: default; }
