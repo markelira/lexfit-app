@@ -135,7 +135,7 @@ A kedvezményes ajánlatok érvényességi ideje (pl. a 72 órás határidő) va
 
 10.2. **A teljesítés megkezdése a türelmi idő alatt.** A Szolgáltatás nem tárgyi adathordozón nyújtott digitális szolgáltatás. A megrendelés leadásakor a Fogyasztó — külön jelölőnégyzettel — **kifejezetten kéri, hogy a Szolgáltató a teljesítést már az elállási határidő lejárta előtt kezdje meg** (azonnali hozzáférés), és tudomásul veszi, hogy ez esetben a 14 napon belüli felmondáskor a már igénybe vett szolgáltatás **arányos ellenértékét köteles megfizetni** (45/2014. Korm. rendelet 13. §, 26. §). E nyilatkozat nélkül a hozzáférés csak az elállási határidő lejárta után nyílna meg.
 
-10.3. **A gyakorlatban ez a következőt jelenti:** ha a Fogyasztó a vásárlástól számított 14 napon belül él felmondási jogával, a Szolgáltató minden ténylegesen megfizetett díjból **időarányosan visszatéríti a fel nem használt időszakra eső részt** (a már eltelt napokra eső arányos díj levonásával), a hozzáférés pedig a felmondással egyidejűleg megszűnik. A visszatérítés az eredeti fizetési móddal azonos módon (bankkártyára) történik, a felmondás közlésétől számított 14 napon belül. A Szolgáltató ezt a visszatérítést nem „pénzvisszafizetési garanciaként" hirdeti: ez a Fogyasztót jogszabály alapján megillető jog.
+10.3. **A gyakorlatban ez a következőt jelenti:** ha a Fogyasztó a vásárlástól számított 14 napon belül él felmondási jogával, a Szolgáltató minden ténylegesen megfizetett díjból **időarányosan visszatéríti a fel nem használt időszakra eső részt** (a már eltelt napokra eső arányos díj levonásával), a hozzáférés pedig a felmondással egyidejűleg megszűnik. A visszatérítés az eredeti fizetési móddal azonos módon (bankkártyára) történik, a felmondás közlésétől számított 14 napon belül. A Szolgáltató ezt a visszatérítést nem „pénzvisszafizetési garanciaként" hirdeti: ez a Fogyasztót jogszabály alapján megillető jog. (A Szolgáltató ezen felül önkéntes kereskedelmi garanciát is vállal — lásd a **10/A. pontot**. A kettő egymástól független: a jelen pont szerinti elszámolás időarányos, a 10/A. pont szerinti visszatérítés a megfizetett teljes díjra vonatkozik.)
 
 10.4. **A jog gyakorlásának módja.** A Fogyasztó felmondási jogát gyakorolhatja:
 a) a fiókján belül elérhető elállási/felmondási funkcióval (a Szolgáltató a beérkezést és a visszatérített összeget visszaigazolja); vagy
@@ -143,6 +143,28 @@ b) az 1. sz. melléklet szerinti nyilatkozat-minta vagy erre vonatkozó egyérte
 A határidő megtartottnak minősül, ha a Fogyasztó nyilatkozatát a határidő lejárta előtt elküldi.
 
 10.5. Az elállási jog a Fogyasztót a bevezető áras időszakban és a standard áras időszakban megfizetett díjak tekintetében egyaránt megilleti; az arányos elszámolás fizetési bizonylatonként (számlánként) történik.
+
+## 10/A. „10 edzés garancia" — a Szolgáltató önkéntes kereskedelmi garanciája
+
+> **[JOGI ELLENŐRZÉST IGÉNYEL]** — ez a szakasz a Szolgáltató önkéntes vállalása, nem
+> jogszabályon alapuló kötelezettség. A szöveget a közzététel előtt jogi szakértővel jóvá kell
+> hagyatni. A garancia hirdetése és e szakasz hatályba lépése **egyszerre** kell történjen: a
+> marketingfelületeken a garancia csak akkor jelenhet meg, ha ez a szakasz már közzétett és
+> hatályos (a kódban ezt a `NEXT_PUBLIC_GUARANTEE_LIVE` kapcsoló vezérli).
+
+10/A.1. **A vállalás.** A Szolgáltató a jogszabályon alapuló elállási jogon (10. pont) **felül**, önkéntesen vállalja, hogy a jelen pontban meghatározott feltételek teljesülése esetén a Fogyasztó részére **visszatéríti a Szolgáltatás igénybevételéért az adott előfizetői jogviszony keretében addig ténylegesen megfizetett teljes tagsági díjat**. Ez a vállalás a Ptk. szerinti **kereskedelmi garancia**: a Szolgáltató önkéntes többletvállalása, amelyre jogszabály nem kötelezi.
+
+10/A.2. **A feltétel.** A garancia akkor vehető igénybe, ha a Fogyasztó az előfizetése kezdőnapjától számított **35 napon (öt héten) belül legalább 10 különböző vezetett edzést teljesít** a Szolgáltatásban. Teljesítettnek minősül az az edzés, amelyet a rendszer befejezettként rögzít; **a gyakorlatok könnyített változatának végrehajtása is teljes értékű teljesítésnek számít**. Ugyanazon edzés ismételt megtekintése egy teljesítésnek számít.
+
+10/A.3. **Az igény bejelentése.** A Fogyasztó az igényét a **hi@lexfit.hu** címre küldött e-mailben jelentheti be, legkésőbb a 10/A.2. pont szerinti 35 napos időszak lejártát követő **14 napon belül**. Az igény bejelentéséhez indokolás nem szükséges, és a Szolgáltató a Fogyasztót a döntése megváltoztatására nem szólítja fel.
+
+10/A.4. **A visszatérítés módja és határideje.** A Szolgáltató az igény beérkezésétől számított **14 napon belül** visszatéríti az addig megfizetett tagsági díjakat, az eredeti fizetési móddal azonos módon (bankkártyára). A visszatérítéssel egyidejűleg a Fogyasztó **hozzáférése megszűnik** és az előfizetés lezárásra kerül; a haladási adatai megmaradnak. A visszatérítésről a Szolgáltató jóváíró számlát állít ki.
+
+10/A.5. **Egyszeri igénybevétel.** A garancia felhasználónként **egy alkalommal** vehető igénybe.
+
+10/A.6. **Viszony az elállási joghoz.** A jelen pont szerinti garancia **nem érinti és nem korlátozza** a Fogyasztót a 10. pont alapján megillető, jogszabályon alapuló 14 napos elállási/felmondási jogot. A két jogosultság egymástól függetlenül áll fenn, és a Fogyasztó azt gyakorolja, amelyik számára kedvezőbb. Ha a Fogyasztó a 14 napos határidőn belül a 10. pont szerinti elállással él, arra a 10.3. pont szerinti **időarányos** elszámolás vonatkozik.
+
+10/A.7. **A vállalás módosítása.** A Szolgáltató a garanciát a jövőre nézve módosíthatja vagy visszavonhatja. A módosítás **nem érinti** azokat a Fogyasztókat, akiknek az előfizetése a módosítás közzététele előtt kezdődött.
 
 ## 11. Felelősség — egészségügyi figyelmeztetés
 

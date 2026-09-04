@@ -9,7 +9,7 @@ const ONB_STEPS = {
     id: "goal", key: "goal", multi: false,
     options: [
       { v: "ero",     ic: "💪", b: "Erősebb, energikusabb test", s: "Hogy bírjam a napot, és jó legyen a tükörben." },
-      { v: "forma",   ic: "🔥", b: "Lefogyni, formálódni", s: "Égessünk, formáljunk — fokozatosan, fenntarthatóan." },
+      { v: "forma",   ic: "📈", b: "Jobb formába kerülni", s: "Több energia, jobb állóképesség - fokozatosan." },
       { v: "vissza",  ic: "🌱", b: "Visszatérni a mozgáshoz", s: "Régen volt — most újrakezdem, nulláról, szépen." },
       { v: "tartas",  ic: "🧘", b: "Jobb tartás, kevesebb fájdalom", s: "Sok ülés, fáradt hát — mozduljunk ki belőle." },
       { v: "szokas",  ic: "📅", b: "Napi mozgás-szokás", s: "Nem a csoda kell, hanem hogy végre rendszer legyen." },

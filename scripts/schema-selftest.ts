@@ -26,6 +26,7 @@ import {
   PAY_STEP,
   PRICING_BAND,
 } from "../src/components/landing/offer-copy";
+import { MOCK } from "../src/app/onboarding/_mock";
 
 function faqShape() {
   assert.equal(FAQ_ALL.length, FAQ_BASE.length + FAQ_NEW.length, "FAQ_ALL is base + new");
@@ -93,30 +94,73 @@ function allStrings(): string[] {
   return out;
 }
 
+/** The funnel copy this project touched (offer v3 §4.6 + the goal rewrite). */
+function funnelStrings(): string[] {
+  const out: string[] = [];
+  const walk = (v: unknown) => {
+    if (typeof v === "string") out.push(v);
+    else if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v).forEach(walk);
+  };
+  walk([MOCK.goal, MOCK.days, MOCK.focus, MOCK.env, MOCK.obstacle, MOCK.reveal]);
+  return out;
+}
+
 function brandVoice() {
   // Hard rule 1: no exclamation marks, anywhere.
-  const shouty = allStrings().filter((s) => s.includes("!"));
+  const shouty = [...allStrings(), ...funnelStrings()].filter((s) => s.includes("!"));
   assert.deepEqual(shouty, [], `exclamation marks found: ${JSON.stringify(shouty)}`);
 
   // Hard rule 2: no weight-loss vocabulary or body-transformation promises.
-  // Deliberately scoped to the copy THIS project owns - the funnel's `goal`
-  // step still carries "Lefogyni, formálódni" and is a separate, owner-supplied
-  // rewrite (dev plan Q8). Widening this check is what closes that out.
-  const banned = ["fogyás", "fogyni", "zsírégetés", "zsírégető", "kockás has", "before/after"];
-  for (const s of allStrings()) {
-    for (const b of banned) {
-      assert.ok(
-        !s.toLowerCase().includes(b),
-        `weight-loss vocabulary "${b}" in: ${s.slice(0, 60)}`,
-      );
+  // Now covers the FUNNEL's copy too, not just the landing's - the `goal` step
+  // used to offer "Lefogyni, formálódni" and the reveal echoed "Formálódsz",
+  // which is exactly what this rule forbids. Widening the check is what keeps
+  // it from coming back.
+  //
+  // NOT covered: src/app/terv/quiz-copy.ts. The lead-magnet quiz still has
+  // "Fogyás, zsírégetés", and its `fat_loss` value drives a real calorie
+  // calculation rather than being only a label - so it is a separate change
+  // with its own spec, deliberately out of this project's scope.
+  // Only the UNAMBIGUOUS terms are checked, on purpose. Bare "fogyni" cannot be
+  // machine-checked in Hungarian: the prefix separates, so "a lendület el
+  // szokott fogyni" (the momentum RUNS OUT - core LEXFIT copy, and Alexa's own
+  // voice) is indistinguishable by pattern from the weight-loss sense. Marketing
+  // copy that means weight loss reaches for "fogyás", "lefogyni", "fogyókúra"
+  // or "zsírégetés" in practice, and those are all caught. A rule that fires on
+  // good copy gets deleted by the next person in a hurry; a narrower rule that
+  // never cries wolf survives.
+  const banned: [RegExp, string][] = [
+    [/(?<!el)fogyás/i, "fogyás"],
+    [/fogyókúr/i, "fogyókúra"],   // stem: also catches "fogyókúrás"
+    [/lefogy/i, "lefogy"],
+    [/zsíréget/i, "zsírégetés"],
+    [/kockás has/i, "kockás has"],
+    [/before\s*\/?\s*after/i, "before/after"],
+    [/előtte\s*[-–/]\s*utána/i, "előtte-utána"],
+  ];
+  for (const s of [...allStrings(), ...funnelStrings()]) {
+    for (const [re, name] of banned) {
+      assert.ok(!re.test(s), `weight-loss vocabulary "${name}" in: ${s.slice(0, 70)}`);
     }
+  }
+  // ...and prove the lookbehind actually works, so nobody "simplifies" it back
+  // into a substring match later.
+  assert.ok(
+    !banned.some(([re]) => re.test("A lendület el szokott fogyni")),
+    "the run-out sense must pass - this exact line is in the reveal",
+  );
+  for (const bad of ["Szeretnék lefogyni", "gyors fogyás", "zsírégető edzés", "fogyókúrás terv"]) {
+    assert.ok(banned.some(([re]) => re.test(bad)), `still caught: ${bad}`);
   }
 
   // Hard rule 6: no forint amount may be a literal in the copy module - every
   // figure is interpolated from PRICES at render.
   const withHuf = allStrings().filter((s) => /\d[\d  ]*Ft/.test(s));
   assert.deepEqual(withHuf, [], `hardcoded amount in copy: ${JSON.stringify(withHuf)}`);
-  console.log(`✓ brand voice + no hardcoded amounts (${allStrings().length} strings)`);
+  console.log(
+    `✓ brand voice + no hardcoded amounts ` +
+      `(${allStrings().length} landing + ${funnelStrings().length} funnel strings)`,
+  );
 }
 
 function milestones() {

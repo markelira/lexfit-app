@@ -39,7 +39,9 @@ export const MOCK = {
     sub: "Egyet válassz - ez adja az edzéseid fókuszát. Később módosítható.",
     options: [
       { v: "ero", icon: lxPaths.dumbbell, label: "Erősebb, energikusabb test", sub: "Hogy bírjam a napot, és jó legyen a tükörben." },
-      { v: "forma", icon: lxPaths.flame, label: "Lefogyni, formálódni", sub: "Égessünk, formáljunk - fokozatosan, fenntarthatóan." },
+      // COPY-REVIEW (offer v3 hard rule 2: no weight-loss vocabulary). The
+      // `forma` key is unchanged - members already have it stored.
+      { v: "forma", icon: lxPaths.gauge, label: "Jobb formába kerülni", sub: "Több energia, jobb állóképesség - fokozatosan." },
       { v: "vissza", icon: lxPaths.rotateCcw, label: "Visszatérni a mozgáshoz", sub: "Régen volt - most újrakezdem, nulláról, szépen." },
       { v: "tartas", icon: lxPaths.userRound, label: "Jobb tartás, kevesebb fájdalom", sub: "Sok ülés, fáradt hát - mozduljunk ki belőle." },
       { v: "szokas", icon: lxPaths.calendarCheck, label: "Napi mozgás-szokás", sub: "Nem a csoda kell, hanem hogy végre rendszer legyen." },
@@ -172,7 +174,7 @@ export const MOCK = {
     // the pay step. No beats, no fixed-length claim.
     outcomes: {
       ero: { headline: "Erősebb, energikusabb tested lesz." },
-      forma: { headline: "Formálódsz - fokozatosan, fenntarthatóan." },
+      forma: { headline: "Jobb formába kerülsz - fokozatosan, fenntarthatóan." }, // COPY-REVIEW
       vissza: { headline: "Visszatérsz a mozgáshoz - nulláról, szépen." },
       tartas: { headline: "Jobb tartás, kevesebb fájdalom." },
       szokas: { headline: "Végre meglesz a napi mozgás-szokásod." },
