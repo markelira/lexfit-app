@@ -10,6 +10,7 @@ import { hasAccessFromData, type SubscriptionDoc } from "../src/lib/pricing/type
 import { budapestDay, budapestHour, checkinDocId, offerDocId } from "../src/lib/pricing/keys";
 import { formatHuf, perWeekHuf, perMonthHuf, annualSavingsPct } from "../src/lib/pricing/display";
 import { nextChargeDay, formatHuDate } from "../src/lib/pricing/renewal";
+import { planFromParam, planFromSearch } from "../src/lib/pricing/preselect";
 import { computeRefundMinor, unusedFraction, type PaidPeriod } from "../src/lib/pricing/refund";
 import {
   earningWindowDays,
@@ -218,12 +219,39 @@ function renewalDates() {
   console.log("✓ next-charge dates (DST, Budapest day, month-end) + hu format");
 }
 
+function planPreselect() {
+  // The three plans a pricing card can offer.
+  for (const role of ["week_intro", "month_std", "annual_std"]) {
+    assert.equal(planFromParam(role), role, `${role} round-trips`);
+  }
+  // Everything else keeps the funnel's own default. This is the only thing
+  // between a URL and a Stripe price id, so the list is an allow-list: one-off
+  // roles are real roles but are not offered on any pricing surface, and
+  // internal/earned roles must never be selectable from a link.
+  for (const bad of [
+    "week_oneoff", "month_oneoff", "annual_earned", "month_founder",
+    "annual_winback", "free", "", " ", "WEEK_INTRO", "../admin", null, undefined,
+  ]) {
+    assert.equal(planFromParam(bad as string | null), null, `rejects ${JSON.stringify(bad)}`);
+  }
+  // Read out of a real query string, with the ad parameters alongside it.
+  assert.equal(
+    planFromSearch("?utm_source=facebook&plan=annual_std&fbclid=X"),
+    "annual_std",
+    "reads ?plan= from a live ad URL",
+  );
+  assert.equal(planFromSearch("?utm_source=facebook"), null, "absent param → default");
+  assert.equal(planFromSearch(""), null, "empty search → default");
+  console.log("✓ ?plan= preselect allow-list");
+}
+
 accessMatrix();
 budapestDays();
 docIds();
 displayNumbers();
 perMonthDerivation();
 renewalDates();
+planPreselect();
 withdrawalProRata();
 earningWindow();
 makeupCutoff();

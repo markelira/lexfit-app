@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { hasOnboarded } from "@/lib/user";
 import { paidDestination } from "@/lib/billing";
 import { readDraft, writeDraft, clearDraft, type DraftAnswers } from "@/lib/onboarding-draft";
+import { planFromSearch } from "@/lib/pricing/preselect";
 import { captureAttribution } from "@/lib/attribution";
 import { trackCheckoutStart, trackOnboardingStart } from "@/lib/track";
 import { FIRST_WORKOUT } from "@/lib/foundation-preview";
@@ -110,7 +111,16 @@ function funnelFromDraft(a: DraftAnswers): FunnelAnswers {
 }
 function initialAnswers(): FunnelAnswers {
   const d = readDraft();
-  return d?.answers ? funnelFromDraft(d.answers) : INITIAL;
+  const base = d?.answers ? funnelFromDraft(d.answers) : INITIAL;
+  // ?plan= from a pricing card wins over the funnel's own default, so someone
+  // who deliberately chose Éves on / is not met by Heti at the pay step. It
+  // does NOT win over a later in-funnel choice: this runs once, at mount, and
+  // `answers.plan` is user state from then on. Reading the URL here rather
+  // than in an effect also means the pay step never renders the wrong plan
+  // first and corrects itself.
+  const preselect =
+    typeof window === "undefined" ? null : planFromSearch(window.location.search);
+  return preselect ? { ...base, plan: preselect } : base;
 }
 
 function stepFromUrl(): StepId {
