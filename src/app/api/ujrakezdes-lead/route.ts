@@ -1,14 +1,16 @@
 import "server-only";
 import { NextResponse } from "next/server";
+import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase-admin";
 import { allowRequest, HOUR_MS } from "@/lib/rate-limit";
 import { sendUjrakezdesD0 } from "@/lib/mailer";
 import { sendLead } from "@/lib/meta-capi";
 import { parseUtm } from "@/lib/quiz/lead";
 import {
-  buildLead, leadId, LM_VARIANT, parseAnswers, retakePatch, validateIdentity,
-  type LmLeadDoc,
+  buildLead, leadId, LM_BODY_FIELDS, LM_VARIANT, parseAnswers, retakePatch,
+  sameAnswers, validateIdentity, type LmLeadDoc,
 } from "@/lib/ujrakezdes/lead";
+import { parseBody, type BodyInput } from "@/lib/ujrakezdes/energy";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,6 +30,18 @@ export const dynamic = "force-dynamic";
  * be set in Vercel BEFORE the ads go live (docs/lead-magnet-v2-plan.md §7.1).
  */
 const enabled = () => process.env.UJRAKEZDES_ENABLED === "true";
+
+/**
+ * The energy module's own switch, independent of the funnel's.
+ *
+ * ⚠️ MUST STAY OFF until the Art. 9 privacy amendment
+ * (docs/legal/adatkezelesi-tajekoztato-kviz-modositas-TERVEZET.md) is published
+ * with a real effective date. Body metrics are special-category data; accepting
+ * them under an unpublished notice would make the very first submission
+ * unlawful. This guard is server-side on purpose - the client flag only decides
+ * whether to RENDER the module, and a client flag is not a legal control.
+ */
+const energyEnabled = () => process.env.ENERGY_MODULE_ENABLED === "true";
 
 function clientIp(req: Request): string | null {
   const fwd = req.headers.get("x-forwarded-for");
@@ -74,10 +88,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, limited: true });
   }
 
+  // 4b. The optional energy module. Absent for most submissions, and dropped
+  // entirely unless BOTH the server flag is on and an explicit health consent
+  // came with it - there is no lawful basis to store the metrics otherwise, so
+  // there is no branch that keeps them "just in case".
+  const consentHealth = body.consent_health === true;
+  let bodyBlock: BodyInput | null = null;
+  if (energyEnabled() && consentHealth && body.body != null) {
+    const parsed = parseBody(body.body);
+    if (Array.isArray(parsed)) {
+      return NextResponse.json({ error: "invalid", fields: parsed }, { status: 422 });
+    }
+    bodyBlock = parsed;
+  }
+
   const now = Date.now();
   const fresh = buildLead({
     email,
     consentMarketing,
+    body: bodyBlock,
+    consentHealth,
     answers,
     utm: parseUtm(body.utm),
     ip,
@@ -93,6 +123,10 @@ export async function POST(req: Request) {
   // and splitting them would give them two unsubscribe links for one consent.
   const ref = adminDb.doc(`quizLeads/${id}`);
   let retake = false;
+  // Whether this submission is new information for the person, as opposed to
+  // the same answers arriving again with the energy module attached. It decides
+  // whether D0 goes out - see below.
+  let resend = true;
   try {
     await adminDb.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
@@ -101,7 +135,14 @@ export async function POST(req: Request) {
       // lead" - a fresh submission after an erasure is a fresh consent.
       if (prev && prev.variant === LM_VARIANT) {
         retake = true;
-        tx.set(ref, retakePatch(prev, fresh), { merge: true });
+        resend = !sameAnswers(prev.answers, fresh.answers);
+        const patch: Record<string, unknown> = { ...retakePatch(prev, fresh) };
+        // Re-answering WITHOUT the module is a withdrawal of the health
+        // consent, so the metrics are deleted rather than left behind. A merge
+        // write leaves absent keys untouched, which here would mean quietly
+        // retaining special-category data nobody consented to any more.
+        if (!fresh.body) for (const f of LM_BODY_FIELDS) patch[f] = FieldValue.delete();
+        tx.set(ref, patch, { merge: true });
       } else {
         tx.set(ref, fresh, { merge: true });
       }
@@ -115,8 +156,11 @@ export async function POST(req: Request) {
   // out regardless of the marketing checkbox. `deliver()` never throws, but the
   // await is still guarded: the lead is already saved, and a mail problem must
   // not turn a successful submission into an error for the person waiting.
+  // Only when there is actually a new plan to deliver. Completing the energy
+  // module re-posts the same answers, and mailing somebody their identical plan
+  // a second time because they used a calculator is spam.
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
-  try {
+  if (resend) try {
     await sendUjrakezdesD0(fresh.email, {
       planHref: `${appUrl}/ujrakezdes`,
       consented: consentMarketing,

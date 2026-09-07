@@ -636,3 +636,115 @@
   .lxu .u-ctawrap { display: flex; justify-content: center; }
   .lxu .u-proof { gap: var(--sp-4); }
 }
+
+/* ═══ Energy module ═════════════════════════════════════════════════════════ */
+/* Quiet by construction. It sits below the plan and above the offer, and must
+   not compete with either - so it is a bordered panel rather than a filled one,
+   and its CTA is outlined rather than solid. */
+
+.lxu .u-energy-teaser,
+.lxu .u-energy {
+  margin: var(--sp-8) 0 0;
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.lxu .u-energy-teaser h3,
+.lxu .u-energy h3 {
+  font-size: 18px; font-weight: 600; letter-spacing: -0.015em;
+  margin: 0 0 var(--sp-3);
+}
+.lxu .u-energy-teaser p { font-size: 15px; line-height: 1.55; color: var(--ink-2); margin: 0 0 var(--sp-5); }
+.lxu .u-en-micro { font-size: 13px; line-height: 1.5; color: var(--ink-3); margin: var(--sp-2) 0 0; }
+
+.lxu .u-cta-quiet {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  box-shadow: none;
+}
+.lxu .u-cta-quiet:active { box-shadow: none; background: oklch(0.235 0.014 168 / 0.05); }
+
+.lxu .u-en-fs { border: 0; padding: 0; margin: 0 0 var(--sp-5); }
+.lxu .u-en-fs .u-label { padding: 0; }
+
+/* Segmented control - one row, equal columns, the selected cell filled. */
+.lxu .u-seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6px;
+  margin-top: var(--sp-2);
+}
+.lxu .u-seg-b {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px 6px;
+  font-family: var(--font);
+  font-size: 14.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-settle), color 160ms var(--ease-settle),
+              border-color 160ms var(--ease-settle), transform 110ms var(--ease-settle);
+}
+.lxu .u-seg-b:active { transform: scale(0.97); }
+.lxu .u-seg-b:focus-visible { outline: 2px solid var(--u-sage); outline-offset: 2px; }
+.lxu .u-seg-b.on { background: var(--u-navy); border-color: var(--u-navy); color: var(--u-cream); }
+
+.lxu .u-en-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); margin: 0 0 var(--sp-5); }
+.lxu .u-en-num { display: block; }
+.lxu .u-en-num .u-input { padding: 14px 12px; text-align: center; }
+/* The spinners add nothing on a numeric keypad and crowd a 3-up row. */
+.lxu .u-en-num input::-webkit-outer-spin-button,
+.lxu .u-en-num input::-webkit-inner-spin-button { appearance: none; margin: 0; }
+.lxu .u-en-num input[type="number"] { -moz-appearance: textfield; }
+
+/* The headline figure. One number, unmistakably the answer. */
+.lxu .u-en-hero { text-align: center; padding: var(--sp-4) 0 var(--sp-5); }
+.lxu .u-en-hero strong {
+  display: block;
+  font-size: clamp(40px, 12vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+.lxu .u-en-hero span {
+  display: block; margin-top: var(--sp-2);
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+
+.lxu .u-en-grid {
+  list-style: none; margin: 0 0 var(--sp-5); padding: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3);
+}
+.lxu .u-en-grid li {
+  text-align: center; padding: var(--sp-4) var(--sp-2);
+  border-radius: 14px; background: var(--u-cream);
+}
+.lxu .u-en-grid b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
+.lxu .u-en-grid span {
+  display: block; margin-top: 4px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+
+.lxu .u-en-note {
+  font-size: 14px; line-height: 1.55; color: var(--ink-2);
+  background: var(--accent-soft); border-radius: 12px;
+  padding: var(--sp-4); margin: 0 0 var(--sp-5);
+}
+/* The honesty line is a feature, not fine print to bury - so it is readable
+   body text, not a 10px grey footnote. */
+.lxu .u-en-disclaimer {
+  font-size: 13.5px; line-height: 1.6; color: var(--ink-2);
+  margin: 0 0 var(--sp-5);
+}
+
+@media (max-width: 380px) {
+  .lxu .u-en-grid { grid-template-columns: repeat(2, 1fr); }
+  .lxu .u-seg { font-size: 13px; }
+}

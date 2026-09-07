@@ -220,3 +220,94 @@ export const NAV = {
   back: "Vissza",
   progress: (a: number, b: number) => `${a}/${b}`,
 } as const;
+
+// ─── Energy module (opt-in, after the reveal) ────────────────────────────────
+//
+// ⚠️ SCOPED WAIVER OF OFFER V3 HARD RULE 3.2. Everything above this line obeys
+// the no-weight-loss-vocabulary rule. This block does not, and cannot: a
+// calorie target is a weight-management number, and naming the goal „fogyás" is
+// the honest word for what the arithmetic does. Owner decision 2026-09-07,
+// taken with the rule stated - see docs/lead-magnet-v2-plan.md.
+//
+// The waiver is kept as NARROW as the maths requires. Still excluded, because
+// nothing here needs them:
+//   - no „zsírégetés", „kockás has", „bikini test", before/after
+//   - no BMI category labels („Túlsúlyos", „Elhízott")
+//   - no goal-weight projection and no „X kg Y hét alatt" timeline
+//   - no second-person health assumption; the goal is something they pick,
+//     never something we infer about their body
+// The selftest asserts each of those, so the waiver cannot quietly widen.
+
+export const ENERGY = {
+  /** The invitation on the reveal. Opt-in: nothing is asked before this. */
+  teaserHeading: "Kiszámoljuk a napi kalóriacélod?",
+  teaserBody:
+    "Ha szeretnéd, a testadataidból kiszámoljuk a napi kalória- és fehérjecélod, és a napi lépéscélod. Nem kötelező — a heti terved enélkül is a tiéd.",
+  teaserCta: "Kiszámolom",
+
+  formHeading: "Néhány adat, és kész",
+  formMicro: "Csak a számoláshoz kell. Bármikor kérheted a törlésüket.",
+
+  sexLabel: "Nem",
+  sexOptions: [
+    { value: "female", label: "Nő" },
+    { value: "male", label: "Férfi" },
+  ] as Choice<"female" | "male">[],
+  sexMicro: "A képlet férfi és női szervezetre eltérő alapanyagcserével számol.",
+
+  ageLabel: "Kor",
+  heightLabel: "Magasság (cm)",
+  weightLabel: "Testsúly (kg)",
+
+  goalLabel: "Mi a célod?",
+  goalOptions: [
+    { value: "fogyas", label: "Fogyás" },
+    { value: "tonus", label: "Tónusosodás" },
+    { value: "tomeg", label: "Izomépítés" },
+  ] as Choice<"fogyas" | "tonus" | "tomeg">[],
+
+  tempoLabel: "Milyen tempóban?",
+  tempoOptions: [
+    { value: "laza", label: "Laza" },
+    { value: "kozepes", label: "Közepes" },
+    { value: "intenziv", label: "Intenzív" },
+  ] as Choice<"laza" | "kozepes" | "intenziv">[],
+  tempoMicro: "A közepes a legtöbb embernek jó kiindulás. Bármikor átállíthatod.",
+
+  consent:
+    "Hozzájárulok, hogy a LEXFIT a megadott testadataimat (nem, kor, magasság, testsúly) a kalóriacélom kiszámításához kezelje. Ezeket az adatokat bármikor töröltethetem.",
+
+  submit: "Mutasd az eredményem",
+  submitBusy: "Számoljuk…",
+  error: "Ellenőrizd az adatokat — a mezőknek valós értéket kell tartalmazniuk.",
+
+  // ── Results ──
+  resultHeading: "A napi célod",
+  kcalLabel: "napi kalória",
+  proteinLabel: "fehérje",
+  carbsLabel: "szénhidrát",
+  fatLabel: "zsír",
+  stepsLabel: "napi lépés",
+  waterLabel: "víz naponta",
+
+  /** Shown when the deficit would have gone under the safety floor. */
+  flooredNote:
+    "A célod ennél alacsonyabb értéket adna, de nem megyünk lejjebb — ennyi kalória alatt már szakember felügyelete kell hozzá.",
+
+  /** The one honesty line. Not a disclaimer to hide: it is the register. */
+  disclaimer:
+    "Ezek becsült értékek, tájékoztató jelleggel — nem minősülnek orvosi vagy dietetikai tanácsnak. Ha bármilyen krónikus betegséged van, vagy kezelés alatt állsz, beszéld meg az orvosoddal.",
+
+  recalcCta: "Újraszámolom",
+} as const;
+
+/** Feature flag. The module renders only when this is on, and it stays OFF
+ *  until the Art. 9 privacy amendment
+ *  (docs/legal/adatkezelesi-tajekoztato-kviz-modositas-TERVEZET.md) is
+ *  published with a real effective date. Same discipline as /terv's
+ *  QUIZ_ENABLED - collecting body metrics under an unpublished notice would
+ *  make the very first submission unlawful. */
+export const ENERGY_LIVE = process.env.NEXT_PUBLIC_ENERGY_MODULE === "1";
+
+/** The consent wording version recorded with every body-block submission. */
+export const CONSENT_HEALTH_VERSION = "consent_lm_health_v1";

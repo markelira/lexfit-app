@@ -17,13 +17,21 @@
 import assert from "node:assert/strict";
 import { buildWeekPlan, daysCount, trainingDays, SESSION_LABEL } from "../src/lib/ujrakezdes/plan";
 import {
-  buildLead, leadId, LM_HEALTH_FIELDS, LM_VARIANT, parseAnswers, retakePatch, validateIdentity,
+  buildLead, leadId, LM_BODY_FIELDS, LM_HEALTH_FIELDS, LM_VARIANT, parseAnswers,
+  retakePatch, validateIdentity,
 } from "../src/lib/ujrakezdes/lead";
 import {
   isLmStep, lmDueAt, lmNextStep, lmScheduleAfter, lmStopReason, LM_LAST_STEP,
 } from "../src/lib/ujrakezdes/sequence";
 import type { Answers, Days } from "../src/lib/ujrakezdes/types";
 import * as C from "../src/app/ujrakezdes/copy";
+import {
+  activityMultiplier, bmr, computeEnergy, macros, parseBody, targetCalories,
+  tdee, tempoCorrection, waterLitres, stepTarget, CALORIE_FLOOR,
+  type BodyInput,
+} from "../src/lib/ujrakezdes/energy";
+
+const ENERGY_CONSENT = C.ENERGY.consent;
 
 const base: Answers = {
   anchor: "restart", level: "none", days: "3", session: "20_30",
@@ -150,12 +158,14 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   const patch = retakePatch({ ...yes, unsubscribedAt: now }, again);
   assert.equal(patch.nextEmailAt, null, "újratöltés nem támasztja fel a visszavont hozzájárulást");
   assert.equal(patch.unsubscribedAt, now, "a leiratkozás megmarad");
-  assert.equal(patch.retakeCount, 1);
+  // Same answers → not a retake. The counter measures re-ANSWERING, not
+  // re-saving; see the energy-module block below for why that matters.
+  assert.equal(patch.retakeCount, 0, "azonos válaszok nem növelik a számlálót");
   assert.equal(retakePatch(yes, mk(true)).unsubscribedAt, null, "újra bejelölve visszatér a sorozat");
   ok("az újratöltés megőrzi az akvizíciós dátumot és a leiratkozást");
 
   assert.ok(yes.healthPurgeAt < yes.purgeAt, "a 9. cikkes mező hamarabb évül");
-  assert.deepEqual([...LM_HEALTH_FIELDS], ["answers.care"]);
+  assert.deepEqual([...LM_HEALTH_FIELDS], ["answers.care", "body", "energy"]);
   ok("a Q5 a 12 hónapos órán fut, a rekord többi része a 24 hónaposon");
 }
 
@@ -164,13 +174,18 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   console.log("\nCopy-szabályok");
 
   const strings: string[] = [];
+  // The energy module carries a SCOPED waiver of hard rule 3.2 (a calorie
+  // target is a weight-management number). It is excluded from the sweep below
+  // and asserted separately, so the waiver cannot quietly widen into the rest
+  // of the funnel.
+  const { ENERGY, ...CORE } = C as Record<string, unknown>;
   const walk = (v: unknown): void => {
     if (typeof v === "string") strings.push(v);
     else if (typeof v === "function") { try { strings.push(String((v as (...x: never[]) => string)(3 as never, "20–30 perc" as never))); } catch { /* not a copy fn */ } }
     else if (Array.isArray(v)) v.forEach(walk);
     else if (v && typeof v === "object") Object.values(v).forEach(walk);
   };
-  walk(C);
+  walk(CORE);
   assert.ok(strings.length > 40, "a copy modul bejárása értelmes mennyiséget talált");
 
   // Rule 1: no exclamation marks. Anywhere.
@@ -207,11 +222,162 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.equal(C.SEGMENT_PS.restart, undefined, "az »újrakezdenék« szegmensnek szándékosan nincs utóirata");
   ok("a Q1 szegmensek utóiratai megvannak");
 
+  // ── The energy module: the waiver, held to its stated limits ──
+  const en: string[] = [];
+  const walkEn = (v: unknown): void => {
+    if (typeof v === "string") en.push(v);
+    else if (Array.isArray(v)) v.forEach(walkEn);
+    else if (v && typeof v === "object") Object.values(v).forEach(walkEn);
+  };
+  walkEn(ENERGY);
+  assert.ok(en.length > 20, "a modul copy bejárása értelmes mennyiséget talált");
+
+  for (const s2 of en) assert.ok(!s2.includes("!"), `felkiáltójel a modulban: ${s2.slice(0, 60)}`);
+
+  // Waived: "kalória", "testsúly", "fogyás" - the arithmetic needs them.
+  // NOT waived, and asserted here so the exemption cannot creep:
+  const stillBanned = [
+    "zsírégetés", "kockás has", "bikini", "before", "after",
+    "túlsúlyos", "elhízott", "alulsúlyos", "bmi",   // no body-labelling
+    "garantál", "garantált",                        // no outcome guarantee
+    "hét alatt", "kg-ot fogysz",                    // no timeline projection
+  ];
+  for (const s2 of en) {
+    const low = s2.toLowerCase();
+    for (const b of stillBanned) {
+      assert.ok(!low.includes(b), `a felmentés nem terjed ki erre: "${b}" — ${s2.slice(0, 60)}`);
+    }
+  }
+  ok("az energia-modul felmentése szűk marad: nincs testcímkézés, ígéret és időzítés");
+
+  // The health consent must name the exact fields it covers - a consent that
+  // does not say what it collects is not informed.
+  for (const field of ["nem", "kor", "magasság", "testsúly"]) {
+    assert.ok(ENERGY_CONSENT.toLowerCase().includes(field), `a hozzájárulás nem nevezi meg: ${field}`);
+  }
+  assert.ok(ENERGY_CONSENT.toLowerCase().includes("töröltethetem"), "a törlés joga nincs megemlítve");
+  ok("a 9. cikkes hozzájárulás megnevezi a kezelt adatokat és a törlés jogát");
+
+  assert.ok(C.ENERGY.disclaimer.includes("nem minősülnek orvosi"), "hiányzik az orvosi tanács kizárása");
+  ok("az eredmény tájékoztató jellege ki van mondva");
+
   // The seven questions, in the specced order, with the interstitial after Q4.
   assert.equal(C.Q_CARE.options.length, 4);
   assert.equal(C.Q_ANCHOR.options.length, 5);
   assert.equal(C.INTERSTITIAL.lines.length, 2);
   ok("a kérdések és a köztes képernyő a specifikáció szerinti alakúak");
+}
+
+// ─── 5. The energy module's arithmetic ───────────────────────────────────────
+{
+  console.log("\nEnergia-modul");
+
+  // Mifflin-St Jeor, checked against the source implementation by hand.
+  // Female 70kg/170cm/40y: 10*70 + 6.25*170 - 5*40 - 161 = 700 + 1062.5 - 200 - 161
+  assert.equal(bmr("female", 70, 170, 40), 1401.5);
+  // Male, same body: the +5 constant instead of -161, a 166 kcal spread.
+  assert.equal(bmr("male", 70, 170, 40), 1567.5);
+  assert.equal(bmr("male", 70, 170, 40) - bmr("female", 70, 170, 40), 166);
+  ok("Mifflin-St Jeor a forrásimplementációval egyező értéket ad");
+
+  // Activity is DERIVED from the quiz, never asked twice.
+  assert.equal(activityMultiplier("none", "2"), 1.2, "a legalacsonyabb kombináció a padló");
+  assert.ok(activityMultiplier("regular", "4") <= 1.725, "a szorzó a táblázat tetejét nem lépi túl");
+  assert.ok(
+    activityMultiplier("none", "2") < activityMultiplier("none", "4"),
+    "több edzésnap magasabb szorzót ad",
+  );
+  assert.ok(
+    activityMultiplier("none", "3") < activityMultiplier("regular", "3"),
+    "aktívabb kiindulás magasabb szorzót ad",
+  );
+  // `flex` resolves to 3 in the plan, so it must resolve to 3 here too.
+  assert.equal(activityMultiplier("rare", "flex"), activityMultiplier("rare", "3"));
+  ok("az aktivitás a Q2/Q3 válaszokból származik, és a rugalmas hét itt is 3 nap");
+
+  // The tempo table, value for value against the source.
+  assert.equal(tempoCorrection("fogyas", "kozepes"), -400);
+  assert.equal(tempoCorrection("fogyas", "intenziv"), -600);
+  assert.equal(tempoCorrection("tonus", "laza"), 0);
+  assert.equal(tempoCorrection("tomeg", "intenziv"), 400);
+  ok("a tempó-korrekciós tábla megegyezik a forrással");
+
+  // THE SAFETY FLOOR - the one deliberate divergence from the source.
+  const tiny: BodyInput = {
+    sex: "female", age: 60, heightCm: 150, weightKg: 45,
+    goal: "fogyas", tempo: "intenziv",
+  };
+  const low = computeEnergy(tiny, "none", "2");
+  assert.ok(low.kcal >= CALORIE_FLOOR.female, "a női padló alá nem megy");
+  assert.equal(low.floored, true, "a padlózás jelezve van, nem elhallgatva");
+  const raw = Math.round(tdee(bmr("female", 45, 150, 60), 1.2) - 600);
+  assert.ok(raw < CALORIE_FLOOR.female, "a teszt tényleg a padló alatti esetet vizsgálja");
+  ok("a kalóriacél nem megy a biztonsági padló alá, és ezt meg is mondja");
+
+  const normal = computeEnergy(
+    { sex: "male", age: 35, heightCm: 182, weightKg: 88, goal: "tonus", tempo: "kozepes" },
+    "weekly", "3",
+  );
+  assert.equal(normal.floored, false, "átlagos testalkatnál nincs padlózás");
+  assert.ok(normal.kcal > 1800 && normal.kcal < 3500, "az érték hihető tartományban van");
+  ok("átlagos bemenetre hihető, nem padlózott célt ad");
+
+  // Macros must reconstruct the target, or the plate does not add up.
+  const m = macros(80, 2000, "fogyas");
+  assert.equal(m.proteinG, 160, "fehérje 2,0 g/kg fogyásnál");
+  const kcalFromMacros = m.proteinG * 4 + m.carbsG * 4 + m.fatG * 9;
+  assert.ok(Math.abs(kcalFromMacros - 2000) < 25, `a makrók visszaadják a célt (${kcalFromMacros})`);
+  assert.ok(macros(80, 2000, "tonus").proteinG > m.proteinG, "tónusosodásnál több fehérje");
+  ok("a makrók kiadják a kalóriacélt, és a fehérje a cél szerint változik");
+
+  assert.equal(stepTarget("fogyas"), 8000);
+  assert.equal(stepTarget("tomeg"), 6000, "izomépítésnél alacsonyabb lépéscél");
+  assert.ok(waterLitres(80, 1.55) > waterLitres(80, 1.2), "aktívabbnak több víz");
+  ok("a lépés- és vízcélok a forrás szerint alakulnak");
+
+  // Server-side validation is the real gate.
+  const good = { sex: "female", age: 33, heightCm: 168, weightKg: 64, goal: "tonus", tempo: "laza" };
+  assert.ok(!Array.isArray(parseBody(good)));
+  for (const [field, bad] of [
+    ["age", { ...good, age: 8 }], ["age", { ...good, age: 120 }],
+    ["heightCm", { ...good, heightCm: 60 }], ["weightKg", { ...good, weightKg: 500 }],
+    ["sex", { ...good, sex: "egyeb" }], ["goal", { ...good, goal: "nonsense" }],
+  ] as [string, unknown][]) {
+    const r = parseBody(bad);
+    assert.ok(Array.isArray(r) && r.includes(field), `${field}: a tartományon kívüli érték elutasítva`);
+  }
+  ok("a testadatok tartománya szerver oldalon is ellenőrzött");
+
+  // Consent is what makes storage lawful, so it gates storage - not the UI.
+  const base = {
+    email: "a@b.hu", answers: A(), utm: {}, ip: null, userAgent: null, now: 1_700_000_000_000,
+  };
+  const withBody = buildLead({ ...base, consentMarketing: false, body: good as BodyInput, consentHealth: true });
+  const noConsent = buildLead({ ...base, consentMarketing: false, body: good as BodyInput, consentHealth: false });
+  assert.ok(withBody.body && withBody.energy, "hozzájárulással tárolódik a testadat");
+  assert.equal(withBody.consents.health, true);
+  assert.equal(withBody.consents.healthTextVersion, "consent_lm_health_v1");
+  assert.equal(noConsent.body, undefined, "hozzájárulás nélkül nem tárolódik testadat");
+  assert.equal(noConsent.energy, undefined, "és a belőle számolt érték sem");
+  assert.equal(noConsent.consents.health, false,
+    "a hozzájárulás hiánya kiírva, nem csak kihagyva - különben a régi true megmarad");
+  assert.equal(noConsent.consents.healthAt, undefined, "meg nem adott hozzájáruláshoz nincs időbélyeg");
+  ok("testadat kizárólag kifejezett 9. cikkes hozzájárulással tárolódik");
+
+  // Withdrawing it must actually remove the data.
+  const dropped = retakePatch(withBody, noConsent);
+  assert.equal(dropped.body, undefined, "visszavonás után a patch nem írja vissza a testadatot");
+  assert.deepEqual([...LM_BODY_FIELDS], ["body", "energy"], "a törlendő mezők listája teljes");
+  assert.ok(LM_HEALTH_FIELDS.includes("body") && LM_HEALTH_FIELDS.includes("energy"),
+    "a testadat és a belőle számolt érték a 12 hónapos órán fut");
+  ok("a hozzájárulás visszavonása törli a testadatot, és a 12 hónapos óra is vonatkozik rá");
+
+  // Using the calculator is not "filling the quiz twice".
+  const sameAgain = buildLead({ ...base, consentMarketing: false, body: good as BodyInput, consentHealth: true });
+  assert.equal(retakePatch(withBody, sameAgain).retakeCount, 0, "azonos válaszok nem számítanak újratöltésnek");
+  const changed = buildLead({ ...base, consentMarketing: false, answers: A({ days: "4" }) });
+  assert.equal(retakePatch(withBody, changed).retakeCount, 1, "megváltozott válaszok igen");
+  ok("az újratöltés-számláló a válaszok változását méri, nem a mentéseket");
 }
 
 console.log(`\nAll /ujrakezdes self-tests passed (${n} blocks).`);

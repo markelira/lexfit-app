@@ -141,6 +141,28 @@ Meta CAPI `Lead` is reported server-side with the **shared `event_id`**, and onl
 
 ---
 
+## 7b. Energy module — the szavazzmagadra calculator (added 2026-09-07)
+
+Owner decision: port the calculator from `/Users/mark/szavazzmagadra` into `/ujrakezdes` as an **opt-in module after the plan reveal**, taken with both prerequisites stated — a published Art. 9 amendment, and a scoped waiver of offer v3 hard rule 3.2.
+
+**Placement is the design.** It sits below the reveal, collapsed, opt-in. The lead is captured and the plan delivered *before* anything is asked, so the funnel's headline promise („7 kérdés, és kész a heti edzésterved") stays true and no one is asked for their weight to receive what the ad offered.
+
+**Ported:** Mifflin-St Jeor BMR · TDEE · the goal×tempo correction table (value for value) · macros · step targets · water.
+**Deliberately not ported:** BMI and its category labels („Túlsúlyos", „Elhízott"), and `calculateGoalPlan` — the goal-weight/timeline projection that `docs/onboarding-personalization-plan.md` §6 lists under AVOID on FTC-substantiation grounds. Neither was part of the request.
+**Added, not in the source:** a per-sex calorie floor (1200 / 1500). The source lets an intensive deficit on a small sedentary body land under 1200 kcal; we clamp and say so.
+
+**Activity is not asked again** — it is derived from Q2 (level) and Q3 (days). That is the actual integration, and it is why the module needs four new fields instead of five.
+
+**Two flags, both off by default.** `NEXT_PUBLIC_ENERGY_MODULE=1` renders it; `ENERGY_MODULE_ENABLED=true` lets the server accept a body block. The server flag is the legal control — a client flag is not. Verified: with the server flag unset, a payload carrying body metrics *and* a health consent stores the lead, drops the metrics, and records `consents.health: false`.
+
+**The waiver is scoped and tested.** `copy.ts` splits into core (rule 3.2 enforced, as before) and `ENERGY` (waived). The selftest asserts the exemption cannot widen: still banned inside the module are `zsírégetés`, `bikini`, before/after, every BMI category label, outcome guarantees and `hét alatt` timelines.
+
+**Consent:** separate and explicit, never bundled with the marketing box, versioned `consent_lm_health_v1`. Withdrawal (re-answering without the module) deletes `body` and `energy` via `LM_BODY_FIELDS` and writes `health: false` — a merge write would otherwise leave a stale `true` standing over deleted data. Both fields ride the existing 12-month Art. 9 clock.
+
+**Still blocked on:** `docs/legal/adatkezelesi-tajekoztato-kviz-modositas-TERVEZET.md` being published with a real effective date. Until then both flags stay off.
+
+---
+
 ## 8. Open items for Alexa (not blocking the build)
 
 - A replacement for D10 in the no-urgency register — a quiet „a terved megvár" nudge rather than a close. Proposed draft ships as a `// COPY-REVIEW` stub, unscheduled, until approved.

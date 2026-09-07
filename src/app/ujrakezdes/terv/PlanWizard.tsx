@@ -10,6 +10,8 @@ import "../ujrakezdes.css";
 import "@/app/landing.css";
 import * as C from "../copy";
 import { PricingBand } from "@/components/landing/PricingBand";
+import EnergyModule from "./EnergyModule";
+import type { BodyInput } from "@/lib/ujrakezdes/energy";
 import { buildWeekPlan } from "@/lib/ujrakezdes/plan";
 import { validateEmail } from "@/lib/quiz/validate";
 import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes/types";
@@ -172,6 +174,36 @@ export default function PlanWizard() {
 
   const plan = useMemo(() => (isComplete(a) ? buildWeekPlan(a) : null), [a]);
 
+  /**
+   * The one place this funnel talks to the server. The gate calls it, and the
+   * energy module calls it again with a body block attached; routing both
+   * through the same function is what stops the two payloads drifting apart.
+   */
+  const post = useCallback((opts: { eventId?: string; body?: BodyInput }) =>
+    fetch("/api/ujrakezdes-lead", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email,
+        consent_marketing: consent,
+        answers: a,
+        hp_field: hp,
+        ...(opts.eventId ? { event_id: opts.eventId, marketing_context: marketingContext() } : {}),
+        ...(opts.body ? { body: opts.body, consent_health: true } : {}),
+        utm: readUtm(),
+      }),
+    }), [email, consent, a, hp]);
+
+  /**
+   * The energy module finished. The result is already on screen - this only
+   * attaches the block to the stored lead, so a failure is silent by design:
+   * re-showing an error over a result they can already read would be noise
+   * about something they did not ask us to save in the first place.
+   */
+  const attachBody = useCallback((bodyBlock: BodyInput) => {
+    void post({ body: bodyBlock }).catch(() => { /* result already rendered */ });
+  }, [post]);
+
   const submit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
@@ -182,19 +214,7 @@ export default function PlanWizard() {
     setErr(null);
     const eventId = newEventId();
     try {
-      const res = await fetch("/api/ujrakezdes-lead", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          email,
-          consent_marketing: consent,
-          answers: a,
-          hp_field: hp,
-          event_id: eventId,
-          marketing_context: marketingContext(),
-          utm: readUtm(),
-        }),
-      });
+      const res = await post({ eventId });
       if (!res.ok) throw new Error(String(res.status));
       trackUjrakezdesLead(eventId);
       go("reveal");
@@ -205,7 +225,7 @@ export default function PlanWizard() {
     } finally {
       setBusy(false);
     }
-  }, [busy, email, consent, a, hp, back, go]);
+  }, [busy, email, a, back, go, post]);
 
   return (
     <main className="lxu">
@@ -411,6 +431,14 @@ export default function PlanWizard() {
               </div>
               <p className="u-transcript">{C.REVEAL.alexaVideo.transcript}</p>
             </section>
+
+            {/* The calculator, opt-in and after the plan: the lead is already
+                captured and the promise already kept, so nobody is asked for
+                their weight in order to receive what the ad offered. Renders
+                only when NEXT_PUBLIC_ENERGY_MODULE=1. */}
+            {C.ENERGY_LIVE && isComplete(a) && (
+              <EnergyModule level={a.level} days={a.days} onComputed={attachBody} />
+            )}
 
             <div className="lxl u-offer" onClickCapture={trackUjrakezdesOfferClick}>
               <PricingBand surface="ujrakezdes" />
