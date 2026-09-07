@@ -4,6 +4,10 @@ import { useEffect } from "react";
 import Link from "next/link";
 import "./ujrakezdes.css";
 import { ALEXA, HERO, IGY_NEZ_KI, ISMEROS, MASKEPP } from "./copy";
+// The two forgiveness rules appear here AND on the landing/#ismeros section, so
+// per the repo's single-source rule they are defined once in offer-copy.ts and
+// imported - not restated in this file.
+import { ISMEROS as OFFER_ISMEROS } from "@/components/landing/offer-copy";
 import { trackUjrakezdesQuizStart, trackUjrakezdesView } from "@/lib/track";
 
 // The ad landing page (spec §1). One job: get the click into the wizard.
@@ -26,17 +30,22 @@ export default function Landing() {
 
   return (
     <main className="lxu">
+      {/* The hero is a full-bleed sage card inset 16px with a 28px radius - the
+          same signature as the landing page's. On cold traffic arriving from an
+          ad, the first screen has to be unmistakably LEXFIT before it is
+          anything else, and a flat cream page is not. */}
+      <header className="u-herocard">
+        <p className="u-eyebrow">LEXFIT</p>
+        <h1>{HERO.headline}</h1>
+        <p className="u-sub">{HERO.sub}</p>
+        <p className="u-audience">{HERO.audience}</p>
+        {cta}
+        <ul className="u-chips">
+          {HERO.chips.map((c) => <li key={c} className="u-chip">{c}</li>)}
+        </ul>
+      </header>
+
       <div className="u-wrap">
-        <header className="u-hero">
-          <p className="u-eyebrow">LEXFIT</p>
-          <h1>{HERO.headline}</h1>
-          <p className="u-sub">{HERO.sub}</p>
-          <p className="u-audience">{HERO.audience}</p>
-          {cta}
-          <ul className="u-chips">
-            {HERO.chips.map((c) => <li key={c} className="u-chip">{c}</li>)}
-          </ul>
-        </header>
 
         <section className="u-sec" aria-labelledby="u-ismeros">
           <h2 id="u-ismeros">{ISMEROS.heading}</h2>
@@ -46,6 +55,11 @@ export default function Landing() {
         <section className="u-sec" aria-labelledby="u-maskepp">
           <h2 id="u-maskepp">{MASKEPP.heading}</h2>
           <p>{MASKEPP.body}</p>
+          {/* The two forgiveness rules are the differentiator, so they get a
+              surface of their own instead of being buried in the paragraph. */}
+          <ul className="u-rules">
+            {OFFER_ISMEROS.rules.map((r) => <li key={r}>{r}</li>)}
+          </ul>
         </section>
 
         <section className="u-sec" aria-labelledby="u-igy">

@@ -49,6 +49,10 @@ const Q_NUMBER: Partial<Record<Screen, number>> = Object.fromEntries(
   STEP_IDS.map((id, i) => [id, i + 1]),
 );
 
+/** How long the commit state is held before the next question arrives. Long
+ *  enough to read as acknowledgement, short enough that nobody waits on it. */
+const COMMIT_MS = 230;
+
 type Draft = Partial<Answers>;
 
 const isComplete = (d: Draft): d is Answers =>
@@ -56,6 +60,13 @@ const isComplete = (d: Draft): d is Answers =>
 
 export default function PlanWizard() {
   const [screen, setScreen] = useState<Screen>("anchor");
+  // Which way the stage is travelling. Enter and exit share an axis: forward
+  // brings the next screen in from the right, Vissza mirrors it exactly, so a
+  // screen always leaves the way it arrived (spatial consistency).
+  const [dir, setDir] = useState<1 | -1>(1);
+  // The option being committed to, during the brief beat between the tap and
+  // the advance. Null the rest of the time.
+  const [picked, setPicked] = useState<string | null>(null);
   const [a, setA] = useState<Draft>({ care: [] });
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
@@ -63,6 +74,11 @@ export default function PlanWizard() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
+  const commitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Any pending commit must die with the component, or it fires setState on an
+  // unmounted tree when somebody leaves mid-answer.
+  useEffect(() => () => { if (commitTimer.current) clearTimeout(commitTimer.current); }, []);
 
   // Restore once on mount. Failure is non-fatal: Safari private mode throws on
   // storage access, and a quiz that refuses to start is worse than a lost draft.
@@ -88,8 +104,14 @@ export default function PlanWizard() {
 
   const idx = ORDER.indexOf(screen);
   const qNum = Q_NUMBER[screen] ?? 0;
+  // The bar never reads as empty: arriving at question one is already progress,
+  // and the two non-question screens hold the last real position rather than
+  // dropping to zero.
+  const shownStep = qNum || (screen === "interstitial" ? 4 : STEP_IDS.length);
 
-  const go = useCallback((next: Screen) => {
+  const go = useCallback((next: Screen, direction: 1 | -1 = 1) => {
+    setDir(direction);
+    setPicked(null);
     setScreen(next);
     // Move focus to the new question, or a screen change is silent to a screen
     // reader and lands nowhere for a keyboard user.
@@ -98,23 +120,31 @@ export default function PlanWizard() {
 
   const advance = useCallback(() => {
     const next = ORDER[ORDER.indexOf(screen) + 1];
-    if (next) go(next);
+    if (next) go(next, 1);
   }, [screen, go]);
 
   const back = useCallback(() => {
     const prev = ORDER[ORDER.indexOf(screen) - 1];
     // Stepping back INTO the interstitial would replay a beat they already sat
     // through, so it is skipped in reverse.
-    if (prev === "interstitial") go(ORDER[ORDER.indexOf(screen) - 2]!);
-    else if (prev) go(prev);
+    if (prev === "interstitial") go(ORDER[ORDER.indexOf(screen) - 2]!, -1);
+    else if (prev) go(prev, -1);
   }, [screen, go]);
 
-  /** Answer a single-select question and move on. */
+  /**
+   * Answer a single-select question, then move on.
+   *
+   * The advance is held for one short beat so the choice is visibly
+   * acknowledged first. Swapping the screen on the raw tap is faster but reads
+   * as "did that register?" - the commit is what makes it feel answered.
+   */
   const pick = useCallback(<K extends keyof Answers>(key: K, value: Answers[K]) => {
+    if (picked) return;                      // ignore a double-tap mid-commit
     setA((prev) => ({ ...prev, [key]: value }));
+    setPicked(String(value));
     if (Q_NUMBER[screen]) trackUjrakezdesStep(String(screen), Q_NUMBER[screen]!);
-    advance();
-  }, [screen, advance]);
+    commitTimer.current = setTimeout(advance, COMMIT_MS);
+  }, [picked, screen, advance]);
 
   /** Q5 only. "Semmi különös" is exclusive both ways: picking it clears the
    *  cautions, and picking a caution clears it. */
@@ -179,6 +209,25 @@ export default function PlanWizard() {
 
   return (
     <main className="lxu">
+      {/* The interstitial lives OUTSIDE the stage on purpose. It is a full-bleed
+          takeover, and `position: fixed` resolves against the nearest
+          transformed ancestor - so rendering it inside the stage would clip it
+          to that box for the length of the stage's entry animation. */}
+      {screen === "interstitial" && (
+        <div
+          className="u-inter"
+          role="status"
+          style={{ ["--inter-ms" as string]: `${C.INTERSTITIAL.holdMs}ms` }}
+        >
+          <div className="u-inter-lines">
+            {C.INTERSTITIAL.lines.map((l) => <p key={l}>{l}</p>)}
+          </div>
+          {/* Makes the pause legible as "this is going somewhere" rather than as
+              the page having stalled. */}
+          <span className="u-inter-bar" aria-hidden="true"><i /></span>
+        </div>
+      )}
+
       {screen !== "reveal" && (
         <div className="u-top">
           <div className="u-topline">
@@ -187,47 +236,45 @@ export default function PlanWizard() {
                 {C.NAV.back}
               </button>
             )}
-            {qNum > 0 && (
-              <>
-                <div className="u-dots" aria-hidden="true">
-                  {STEP_IDS.map((id, i) => (
-                    <span
-                      key={id}
-                      className={`u-dot${i + 1 < qNum ? " on" : ""}${i + 1 === qNum ? " now" : ""}`}
-                    />
-                  ))}
-                </div>
-                <span className="u-count">{C.NAV.progress(qNum, STEP_IDS.length)}</span>
-              </>
-            )}
+            <div
+              className="u-progress"
+              role="progressbar"
+              aria-valuemin={1}
+              aria-valuemax={STEP_IDS.length}
+              aria-valuenow={shownStep}
+              aria-label="Haladás a kérdéseken"
+            >
+              <i style={{ width: `${(shownStep / STEP_IDS.length) * 100}%` }} />
+            </div>
+            <span className="u-count">{C.NAV.progress(shownStep, STEP_IDS.length)}</span>
           </div>
         </div>
       )}
 
-      <div className="u-wrap u-stage" ref={stageRef} tabIndex={-1}>
-        {screen === "anchor" && <Single q={C.Q_ANCHOR} onPick={(v) => pick("anchor", v)} />}
-        {screen === "level" && <Single q={C.Q_LEVEL} onPick={(v) => pick("level", v)} />}
-        {screen === "days" && <Single q={C.Q_DAYS} onPick={(v) => pick("days", v)} />}
-        {screen === "session" && <Single q={C.Q_SESSION} onPick={(v) => pick("session", v)} />}
-
-        {screen === "interstitial" && (
-          <div className="u-inter" role="status">
-            {C.INTERSTITIAL.lines.map((l) => <p key={l}>{l}</p>)}
-          </div>
-        )}
+      <div
+        key={screen}
+        className={`u-wrap u-stage ${dir === 1 ? "u-anim-fwd" : "u-anim-back"}`}
+        ref={stageRef}
+        tabIndex={-1}
+      >
+        {screen === "anchor" && <Single q={C.Q_ANCHOR} onPick={(v) => pick("anchor", v)} picked={picked} />}
+        {screen === "level" && <Single q={C.Q_LEVEL} onPick={(v) => pick("level", v)} picked={picked} />}
+        {screen === "days" && <Single q={C.Q_DAYS} onPick={(v) => pick("days", v)} picked={picked} />}
+        {screen === "session" && <Single q={C.Q_SESSION} onPick={(v) => pick("session", v)} picked={picked} />}
 
         {screen === "care" && (
           <>
             <h1 className="u-q">{C.Q_CARE.hd}</h1>
             <p className="u-micro">{C.Q_CARE.micro}</p>
             <div className="u-opts">
-              {C.Q_CARE.options.map((o) => {
+              {C.Q_CARE.options.map((o, i) => {
                 const on = (a.care ?? []).includes(o.value);
                 return (
                   <button
                     key={o.value}
                     type="button"
                     className={`u-opt${on ? " sel" : ""}`}
+                    style={{ ["--i" as string]: i }}
                     aria-pressed={on}
                     onClick={() => toggleCare(o.value)}
                   >
@@ -255,8 +302,8 @@ export default function PlanWizard() {
           </>
         )}
 
-        {screen === "place" && <Single q={C.Q_PLACE} onPick={(v) => pick("place", v)} />}
-        {screen === "daypart" && <Single q={C.Q_DAYPART} onPick={(v) => pick("daypart", v)} />}
+        {screen === "place" && <Single q={C.Q_PLACE} onPick={(v) => pick("place", v)} picked={picked} />}
+        {screen === "daypart" && <Single q={C.Q_DAYPART} onPick={(v) => pick("daypart", v)} picked={picked} />}
 
         {screen === "gate" && (
           <form onSubmit={submit} noValidate>
@@ -326,11 +373,12 @@ export default function PlanWizard() {
             </p>
 
             <div className="u-grid" role="list" aria-label="A heti terved">
-              {plan.days.map((d) => (
+              {plan.days.map((d, i) => (
                 <div
                   key={d.weekday}
                   role="listitem"
                   className={`u-day ${d.training ? "train" : "rest"}`}
+                  style={{ ["--i" as string]: i }}
                 >
                   <div className="u-dayname">{d.short}</div>
                   <div className="u-daymin">
@@ -378,18 +426,26 @@ export default function PlanWizard() {
 
 /** A single-select question. Tap advances - six of the seven work this way. */
 function Single<T extends string>({
-  q, onPick,
+  q, onPick, picked,
 }: {
   q: { hd: string; micro?: string; options: C.Choice<T>[] };
   onPick: (v: T) => void;
+  /** The value being committed to, or null. Dims the options not chosen. */
+  picked: string | null;
 }) {
   return (
     <>
       <h1 className="u-q">{q.hd}</h1>
       {q.micro && <p className="u-micro">{q.micro}</p>}
-      <div className="u-opts">
-        {q.options.map((o) => (
-          <button key={o.value} type="button" className="u-opt" onClick={() => onPick(o.value)}>
+      <div className={`u-opts${picked ? " committing" : ""}`}>
+        {q.options.map((o, i) => (
+          <button
+            key={o.value}
+            type="button"
+            className={`u-opt${picked === o.value ? " picked" : ""}`}
+            style={{ ["--i" as string]: i }}
+            onClick={() => onPick(o.value)}
+          >
             {o.label}
           </button>
         ))}
