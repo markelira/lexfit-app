@@ -15,6 +15,7 @@
 // and listed in docs/lead-magnet-v2-plan.md §3.
 
 import type { Anchor, Care, Daypart, Days, Level, Place, Session } from "@/lib/ujrakezdes/types";
+import { lxPaths } from "@/lib/icons";
 
 // ─── §1 Landing ──────────────────────────────────────────────────────────────
 
@@ -55,45 +56,52 @@ export const ALEXA = {
 export interface Choice<T extends string> {
   value: T;
   label: string;
+  /** The second line on the option row. The /register wizard gives every option
+   *  one, and without it the rows read as a bare list rather than as choices
+   *  with consequences. // COPY-REVIEW - not supplied by the v2 spec. */
+  sub?: string;
+  /** lxPaths value for the 34px tile. The tile always renders, so an option
+   *  without one shows an empty square. */
+  icon?: string;
 }
 
 export const Q_ANCHOR = {
   hd: "Mi hozott ide?",
   options: [
-    { value: "restart", label: "Újra rendszeresen mozognék" },
-    { value: "careful", label: "A hátam, ízületeim miatt óvatosan mozognék" },
-    { value: "no_energy", label: "A nap végén nincs energiám elkezdeni" },
-    { value: "stronger", label: "Erősödnék, formálódnék" },
-    { value: "browsing", label: "Csak körülnézek" },
+    { value: "restart", label: "Újra rendszeresen mozognék", sub: "Volt már, hogy ment — most maradjon is meg.", icon: lxPaths.rotateCcw },
+    { value: "careful", label: "Óvatosan mozognék", sub: "A hátam, az ízületeim miatt figyelnem kell.", icon: lxPaths.shield },
+    { value: "no_energy", label: "A nap végén nincs energiám", sub: "Elkezdeni a nehéz, nem maga a mozgás.", icon: lxPaths.moon },
+    { value: "stronger", label: "Erősödnék, formálódnék", sub: "Van alapom, csak kell hozzá egy rend.", icon: lxPaths.dumbbell },
+    { value: "browsing", label: "Csak körülnézek", sub: "Még nem döntöttem el semmit.", icon: lxPaths.eye },
   ] as Choice<Anchor>[],
 };
 
 export const Q_LEVEL = {
   hd: "Mennyire mozogsz mostanában?",
   options: [
-    { value: "none", label: "Szinte semennyit" },
-    { value: "rare", label: "Néha, rendszertelenül" },
-    { value: "weekly", label: "Hetente egyszer-kétszer" },
-    { value: "regular", label: "Rendszeresen, csak keretet keresek" },
+    { value: "none", label: "Szinte semennyit", sub: "Nulláról indulunk — ez teljesen rendben van.", icon: lxPaths.house },
+    { value: "rare", label: "Néha, rendszertelenül", sub: "Van mozgás, csak nincs mögötte rendszer.", icon: lxPaths.clock },
+    { value: "weekly", label: "Hetente egyszer-kétszer", sub: "Megvan az alap, erre lehet építeni.", icon: lxPaths.calendarCheck },
+    { value: "regular", label: "Rendszeresen", sub: "Csak egy keret hiányzik, ami összefogja.", icon: lxPaths.gauge },
   ] as Choice<Level>[],
 };
 
 export const Q_DAYS = {
   hd: "Hány nap férne bele egy hetedbe?",
   options: [
-    { value: "2", label: "2 nap" },
-    { value: "3", label: "3 nap" },
-    { value: "4", label: "4 nap" },
-    { value: "flex", label: "Ahogy jön — legyen rugalmas" },
+    { value: "2", label: "2 nap", sub: "Kevés, de tartható — ez többet ér, mint a semmi." },
+    { value: "3", label: "3 nap", sub: "A legtöbb embernek ez a jó egyensúly." },
+    { value: "4", label: "4 nap", sub: "Sűrűbb ritmus, még mindig három pihenőnappal." },
+    { value: "flex", label: "Ahogy jön", sub: "Legyen rugalmas — hárommal számolunk.", icon: lxPaths.sliders },
   ] as Choice<Days>[],
 };
 
 export const Q_SESSION = {
   hd: "Mennyi idő jut egy alkalomra?",
   options: [
-    { value: "10_15", label: "10–15 perc" },
-    { value: "20_30", label: "20–30 perc" },
-    { value: "30_plus", label: "Fél óránál több is" },
+    { value: "10_15", label: "10–15 perc", sub: "Rövid, de teljes értékű edzés." },
+    { value: "20_30", label: "20–30 perc", sub: "A LEXFIT edzések alaphossza." },
+    { value: "30_plus", label: "Fél óránál több is", sub: "Van időd — kihasználjuk." },
   ] as Choice<Session>[],
 };
 
@@ -112,10 +120,10 @@ export const Q_CARE = {
   hd: "Mire figyeljünk a testednél?",
   micro: "többet is jelölhetsz",
   options: [
-    { value: "knee", label: "Térd — ugrálás nélkül szeretném" },
-    { value: "back", label: "Derék, hát — kímélettel" },
-    { value: "quiet", label: "Csendben kell edzenem (alvó gyerek, szomszédok)" },
-    { value: "none", label: "Semmi különös" },
+    { value: "knee", label: "Térd", sub: "Ugrálás nélkül, becsapódásmentes párokkal.", icon: lxPaths.shield },
+    { value: "back", label: "Derék, hát", sub: "Kíméletes felépítés, biztonságos gyakorlatokkal.", icon: lxPaths.userRound },
+    { value: "quiet", label: "Csendben kell edzenem", sub: "Alvó gyerek, szomszédok — van csendes változat.", icon: lxPaths.volumeX },
+    { value: "none", label: "Semmi különös", sub: "Jöhet bármi, bírom.", icon: lxPaths.check },
   ] as Choice<Care>[],
   cta: "Tovább",
 };
@@ -123,19 +131,19 @@ export const Q_CARE = {
 export const Q_PLACE = {
   hd: "Hol fogsz mozogni?",
   options: [
-    { value: "living_room", label: "Nappaliban, matracon" },
-    { value: "small", label: "Kisebb helyen — 2×2 méter is elég?" },
-    { value: "varied", label: "Változó helyeken" },
+    { value: "living_room", label: "Nappaliban, matracon", sub: "A leggyakoribb — pont erre épül minden edzés.", icon: lxPaths.house },
+    { value: "small", label: "Kisebb helyen", sub: "Két négyzetméter is elég hozzá.", icon: lxPaths.layers },
+    { value: "varied", label: "Változó helyeken", sub: "Nincs fix hely — ahol épp vagy.", icon: lxPaths.layoutGrid },
   ] as Choice<Place>[],
 };
 
 export const Q_DAYPART = {
   hd: "Napszak, ami reális nálad?",
   options: [
-    { value: "morning", label: "Reggel, munka előtt" },
-    { value: "midday", label: "Napközben" },
-    { value: "evening", label: "Este, a nap végén" },
-    { value: "varies", label: "Mindig máskor" },
+    { value: "morning", label: "Reggel, munka előtt", sub: "Amíg még nem jött közbe semmi.", icon: lxPaths.gauge },
+    { value: "midday", label: "Napközben", sub: "Ebédszünet, vagy két dolog között.", icon: lxPaths.clock },
+    { value: "evening", label: "Este, a nap végén", sub: "Levezetésnek, a nap után.", icon: lxPaths.moon },
+    { value: "varies", label: "Mindig máskor", sub: "Nem tervezhető — a terv ehhez igazodik.", icon: lxPaths.sliders },
   ] as Choice<Daypart>[],
 };
 
@@ -244,6 +252,7 @@ export const SEGMENT_PS: Partial<Record<Anchor, string>> = {
 };
 
 export const NAV = {
+  pickHint: "Válassz egyet",
   back: "Vissza",
   progress: (a: number, b: number) => `${a}/${b}`,
 } as const;

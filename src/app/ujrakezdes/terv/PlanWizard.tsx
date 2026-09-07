@@ -2,6 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+// The quiz adopts the /register wizard's layout wholesale - the split-screen
+// shell, the per-step photography, the question chrome and the option rows are
+// the SAME components, not a lookalike. A marketing funnel that looks like a
+// different product than the one it sells is a funnel that leaks trust at
+// exactly the moment it is asking for an email.
+import "@/app/login/auth.css";
+import "@/app/onboarding/onbv2.css";
 import "../ujrakezdes.css";
 // The offer block reuses the shipped <PricingBand>, whose styles live in
 // landing.css scoped under `.lxl` - so the stylesheet comes along and the band
@@ -13,6 +20,9 @@ import { PricingBand } from "@/components/landing/PricingBand";
 import EnergyModule from "./EnergyModule";
 import ProgramPreview from "./ProgramPreview";
 import PlanTray from "./PlanTray";
+import { BrandPanel } from "@/components/onboarding/BrandPanel";
+import { StepFrame } from "@/components/onboarding/StepFrame";
+import { OptionList } from "@/components/onboarding/OptionList";
 import type { LandingCatalog } from "@/lib/landing-catalog";
 import type { BodyInput } from "@/lib/ujrakezdes/energy";
 import { buildWeekPlan } from "@/lib/ujrakezdes/plan";
@@ -58,6 +68,28 @@ const Q_NUMBER: Partial<Record<Screen, number>> = Object.fromEntries(
  *  enough to read as acknowledgement, short enough that nobody waits on it. */
 const COMMIT_MS = 230;
 
+/**
+ * Our screen → the /register step whose photograph and caption fit it.
+ *
+ * BrandPanel keys its imagery off the join wizard's own step ids, so mapping
+ * onto those ids is what gets the right picture rather than a default. The
+ * pairing is by MEANING, not by position: `session` takes the player photo
+ * because it asks how long a session is, and `care` takes the focus photo
+ * because it asks what to work around.
+ */
+const BRAND_STEP: Record<Screen, string> = {
+  anchor: "goal",          // the community photo - why they came
+  level: "level",
+  days: "days",
+  session: "time",         // the player
+  interstitial: "why",     // Alexa's quote, under the two rules
+  care: "focus",
+  place: "env",
+  daypart: "obstacle",
+  gate: "reveal",          // the promise photo, as the plan is handed over
+  reveal: "plan",
+};
+
 type Draft = Partial<Answers>;
 
 const isComplete = (d: Draft): d is Answers =>
@@ -65,10 +97,6 @@ const isComplete = (d: Draft): d is Answers =>
 
 export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   const [screen, setScreen] = useState<Screen>("anchor");
-  // Which way the stage is travelling. Enter and exit share an axis: forward
-  // brings the next screen in from the right, Vissza mirrors it exactly, so a
-  // screen always leaves the way it arrived (spatial consistency).
-  const [dir, setDir] = useState<1 | -1>(1);
   // The option being committed to, during the brief beat between the tap and
   // the advance. Null the rest of the time.
   const [picked, setPicked] = useState<string | null>(null);
@@ -82,6 +110,11 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
+  /** The question heading. Focus lands here on every step, which is what makes
+   *  the change audible to a screen reader and reachable from the keyboard.
+   *  Kept separate from `stageRef` (the reveal's container) rather than casting
+   *  one into the other - they are different elements with different jobs. */
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const commitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Any pending commit must die with the component, or it fires setState on an
@@ -112,31 +145,26 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
 
   const idx = ORDER.indexOf(screen);
   const qNum = Q_NUMBER[screen] ?? 0;
-  // The bar never reads as empty: arriving at question one is already progress,
-  // and the two non-question screens hold the last real position rather than
-  // dropping to zero.
-  const shownStep = qNum || (screen === "interstitial" ? 4 : STEP_IDS.length);
 
-  const go = useCallback((next: Screen, direction: 1 | -1 = 1) => {
-    setDir(direction);
+  const go = useCallback((next: Screen) => {
     setPicked(null);
     setScreen(next);
     // Move focus to the new question, or a screen change is silent to a screen
     // reader and lands nowhere for a keyboard user.
-    requestAnimationFrame(() => stageRef.current?.focus());
+    requestAnimationFrame(() => (headingRef.current ?? stageRef.current)?.focus());
   }, []);
 
   const advance = useCallback(() => {
     const next = ORDER[ORDER.indexOf(screen) + 1];
-    if (next) go(next, 1);
+    if (next) go(next);
   }, [screen, go]);
 
   const back = useCallback(() => {
     const prev = ORDER[ORDER.indexOf(screen) - 1];
     // Stepping back INTO the interstitial would replay a beat they already sat
     // through, so it is skipped in reverse.
-    if (prev === "interstitial") go(ORDER[ORDER.indexOf(screen) - 2]!, -1);
-    else if (prev) go(prev, -1);
+    if (prev === "interstitial") go(ORDER[ORDER.indexOf(screen) - 2]!);
+    else if (prev) go(prev);
   }, [screen, go]);
 
   /**
@@ -154,20 +182,6 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     if (Q_NUMBER[screen]) trackUjrakezdesStep(String(screen), Q_NUMBER[screen]!);
     commitTimer.current = setTimeout(advance, COMMIT_MS);
   }, [picked, screen, advance]);
-
-  /** Q5 only. "Semmi különös" is exclusive both ways: picking it clears the
-   *  cautions, and picking a caution clears it. */
-  const toggleCare = useCallback((value: Care) => {
-    setA((prev) => {
-      const cur = prev.care ?? [];
-      if (value === "none") return { ...prev, care: cur.includes("none") ? [] : ["none"] };
-      const without = cur.filter((c) => c !== "none");
-      return {
-        ...prev,
-        care: without.includes(value) ? without.filter((c) => c !== value) : [...without, value],
-      };
-    });
-  }, []);
 
   // The interstitial holds for its own beat and then moves on by itself.
   useEffect(() => {
@@ -211,6 +225,16 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     void post({ body: bodyBlock }).catch(() => { /* result already rendered */ });
   }, [post]);
 
+  /** Q5's "Tovább". Hoisted rather than written inline in the cta prop: a
+   *  handler created during render and closing over refs is what the compiler
+   *  lint flags, and hoisting it is the fix rather than the silencer. */
+  const finishCare = useCallback(() => {
+    setA((p) => ((p.care ?? []).length ? p : { ...p, care: ["none"] }));
+    setLanded("care");
+    trackUjrakezdesStep("care", 5);
+    advance();
+  }, [advance]);
+
   const submit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
@@ -234,276 +258,233 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     }
   }, [busy, email, a, back, go, post]);
 
-  return (
-    <main className="lxu">
-      {/* The interstitial lives OUTSIDE the stage on purpose. It is a full-bleed
-          takeover, and `position: fixed` resolves against the nearest
-          transformed ancestor - so rendering it inside the stage would clip it
-          to that box for the length of the stage's entry animation. */}
-      {screen === "interstitial" && (
-        <div
-          className="u-inter"
-          role="status"
-          style={{ ["--inter-ms" as string]: `${C.INTERSTITIAL.holdMs}ms` }}
-        >
-          <div className="u-inter-lines">
-            {C.INTERSTITIAL.lines.map((l) => <p key={l}>{l}</p>)}
-          </div>
-          {/* Makes the pause legible as "this is going somewhere" rather than as
-              the page having stalled. */}
-          <span className="u-inter-bar" aria-hidden="true"><i /></span>
-        </div>
-      )}
 
-      {screen !== "reveal" && (
-        <div className="u-top">
-          <div className="u-topline">
-            {idx > 0 && (
-              <button type="button" className="u-back" onClick={back}>
-                {C.NAV.back}
-              </button>
-            )}
-            <div
-              className="u-progress"
-              role="progressbar"
-              aria-valuemin={1}
-              aria-valuemax={STEP_IDS.length}
-              aria-valuenow={shownStep}
-              aria-label="Haladás a kérdéseken"
-            >
-              <i style={{ width: `${(shownStep / STEP_IDS.length) * 100}%` }} />
-            </div>
-            <span className="u-count">{C.NAV.progress(shownStep, STEP_IDS.length)}</span>
-          </div>
+  // ââ The reveal is NOT a wizard step ââââââââââââââââââââââââââââââââââââââââ
+  // It carries the week, the whole Foundation programme, the calculator and the
+  // offer. The split-screen exists to keep a single question company; giving
+  // long-form content half a viewport would be using the layout against itself.
+  if (screen === "reveal" && plan) {
+    return (
+      <main className="lxu">
+        <div className="u-wrap u-stage" ref={stageRef} tabIndex={-1}>
+          <h1 className="u-q">{C.REVEAL.hd}</h1>
+          <p className="u-micro">{C.REVEAL.sub(plan.trainingCount, plan.sessionLabel)}</p>
 
-          {/* The plan assembling itself. Only while questions are running - once
-              the gate is reached it has done its job, and on the reveal the real
-              week takes over. */}
-          {qNum > 0 && <PlanTray a={a} latest={landed} />}
-        </div>
-      )}
-
-      <div
-        key={screen}
-        className={`u-wrap u-stage ${dir === 1 ? "u-anim-fwd" : "u-anim-back"}`}
-        ref={stageRef}
-        tabIndex={-1}
-      >
-        {screen === "anchor" && <Single q={C.Q_ANCHOR} onPick={(v) => pick("anchor", v)} picked={picked} />}
-        {screen === "level" && <Single q={C.Q_LEVEL} onPick={(v) => pick("level", v)} picked={picked} />}
-        {screen === "days" && <Single q={C.Q_DAYS} onPick={(v) => pick("days", v)} picked={picked} />}
-        {screen === "session" && <Single q={C.Q_SESSION} onPick={(v) => pick("session", v)} picked={picked} />}
-
-        {screen === "care" && (
-          <>
-            <h1 className="u-q">{C.Q_CARE.hd}</h1>
-            <p className="u-micro">{C.Q_CARE.micro}</p>
-            <div className="u-opts">
-              {C.Q_CARE.options.map((o, i) => {
-                const on = (a.care ?? []).includes(o.value);
-                return (
-                  <button
-                    key={o.value}
-                    type="button"
-                    className={`u-opt${on ? " sel" : ""}`}
-                    style={{ ["--i" as string]: i }}
-                    aria-pressed={on}
-                    onClick={() => toggleCare(o.value)}
-                  >
-                    <span className="u-tick" aria-hidden="true">✓</span>
-                    {o.label}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="u-ctawrap">
-              <button
-                type="button"
-                className="u-cta"
-                onClick={() => {
-                  // An empty selection IS an answer - "Semmi különös" by another
-                  // name - so the button is never disabled here.
-                  if (!(a.care ?? []).length) setA((p) => ({ ...p, care: ["none"] }));
-                  setLanded("care");
-                  trackUjrakezdesStep("care", 5);
-                  advance();
-                }}
+          <div className="u-grid" role="list" aria-label="A heti terved">
+            {plan.days.map((d, i) => (
+              <div
+                key={d.weekday}
+                role="listitem"
+                className={`u-day ${d.training ? "train" : "rest"}`}
+                style={{ ["--i" as string]: i }}
               >
-                {C.Q_CARE.cta}
-              </button>
-            </div>
-          </>
-        )}
-
-        {screen === "place" && <Single q={C.Q_PLACE} onPick={(v) => pick("place", v)} picked={picked} />}
-        {screen === "daypart" && <Single q={C.Q_DAYPART} onPick={(v) => pick("daypart", v)} picked={picked} />}
-
-        {screen === "gate" && (
-          <form onSubmit={submit} noValidate>
-            <h1 className="u-q">{C.GATE.hd}</h1>
-            <p className="u-micro">{C.GATE.sub}</p>
-
-            <div className="u-field">
-              <label className="u-label" htmlFor="u-email">{C.GATE.emailLabel}</label>
-              <input
-                id="u-email"
-                className="u-input"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
-                placeholder={C.GATE.emailPlaceholder}
-                value={email}
-                aria-invalid={err ? true : undefined}
-                aria-describedby={err ? "u-email-err" : undefined}
-                onChange={(e) => { setEmail(e.target.value); if (err) setErr(null); }}
-              />
-              {err && <p className="u-err" id="u-email-err" role="alert">{err}</p>}
-            </div>
-
-            <label className="u-consent">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
-              />
-              <span>{C.GATE.consent}</span>
-            </label>
-
-            {/* Off-screen, never display:none - a bot reads the DOM, not pixels. */}
-            <div className="u-hp" aria-hidden="true">
-              <label htmlFor="u-company">Cég</label>
-              <input
-                id="u-company"
-                name="company"
-                tabIndex={-1}
-                autoComplete="off"
-                value={hp}
-                onChange={(e) => setHp(e.target.value)}
-              />
-            </div>
-
-            <div className="u-ctawrap">
-              <button type="submit" className="u-cta" disabled={busy}>
-                {busy ? C.GATE.ctaBusy : C.GATE.cta}
-              </button>
-            </div>
-
-            <p className="u-fine">
-              {C.GATE.fine}{" "}
-              <Link href="/adatvedelem">{C.GATE.privacy}</Link>
-            </p>
-          </form>
-        )}
-
-        {screen === "reveal" && plan && (
-          <>
-            <h1 className="u-q">{C.REVEAL.hd}</h1>
-            <p className="u-micro">
-              {C.REVEAL.sub(plan.trainingCount, plan.sessionLabel)}
-            </p>
-
-            <div className="u-grid" role="list" aria-label="A heti terved">
-              {plan.days.map((d, i) => (
-                <div
-                  key={d.weekday}
-                  role="listitem"
-                  className={`u-day ${d.training ? "train" : "rest"}`}
-                  style={{ ["--i" as string]: i }}
-                >
-                  <div className="u-dayname">{d.short}</div>
-                  <div className="u-daymin">
-                    {d.training ? `${d.minutes}′` : "—"}
-                  </div>
-                  <span className="u-sr-only">
-                    {d.full}: {d.training ? `${d.minutes} perc` : C.REVEAL.restLabel}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {plan.care.length > 0 && (
-              <ul className="u-carelist">
-                {plan.care.map((c) => <li key={c}>{C.CARE_NOTE[c]}</li>)}
-              </ul>
-            )}
-
-            <div className="u-panel">
-              <h3>{C.REVEAL.firstWorkout.lead}</h3>
-              <p>{C.REVEAL.firstWorkout.body(plan.firstWorkoutMinutes)}</p>
-            </div>
-
-            <section aria-labelledby="u-alexavid">
-              <h2 className="u-q" id="u-alexavid" style={{ fontSize: 20 }}>
-                {C.REVEAL.alexaVideo.heading}
-              </h2>
-              <div className="u-video">
-                <span className="u-dayname">videó</span>
+                <div className="u-dayname">{d.short}</div>
+                <div className="u-daymin">{d.training ? `${d.minutes}′` : "—"}</div>
+                <span className="u-sr-only">
+                  {d.full}: {d.training ? `${d.minutes} perc` : C.REVEAL.restLabel}
+                </span>
               </div>
-              <p className="u-transcript">{C.REVEAL.alexaVideo.transcript}</p>
-            </section>
+            ))}
+          </div>
 
-            {/* What they are joining, before what it costs. The order matters:
-                the offer band reads as expensive next to a plan and reasonable
-                next to thirty workouts they have just been able to open. */}
-            <ProgramPreview catalog={catalog} onCta={() => { window.location.href = "/register"; }} />
+          {plan.care.length > 0 && (
+            <ul className="u-carelist">
+              {plan.care.map((c) => <li key={c}>{C.CARE_NOTE[c]}</li>)}
+            </ul>
+          )}
 
-            {/* The calculator, opt-in and after the plan: the lead is already
-                captured and the promise already kept, so nobody is asked for
-                their weight in order to receive what the ad offered. Renders
-                only when NEXT_PUBLIC_ENERGY_MODULE=1. */}
-            {C.ENERGY_LIVE && isComplete(a) && (
-              <EnergyModule
-                level={a.level}
-                days={a.days}
-                trainingCount={plan.trainingCount}
-                onComputed={attachBody}
-              />
-            )}
+          <div className="u-panel">
+            <h3>{C.REVEAL.firstWorkout.lead}</h3>
+            <p>{C.REVEAL.firstWorkout.body(plan.firstWorkoutMinutes)}</p>
+          </div>
 
-            <div className="lxl u-offer" onClickCapture={trackUjrakezdesOfferClick}>
-              <PricingBand surface="ujrakezdes" />
-            </div>
+          <section aria-labelledby="u-alexavid">
+            <h2 className="u-vidh" id="u-alexavid">{C.REVEAL.alexaVideo.heading}</h2>
+            <div className="u-video"><span className="u-dayname">videó</span></div>
+            <p className="u-transcript">{C.REVEAL.alexaVideo.transcript}</p>
+          </section>
 
-            <p className="u-fine">{C.REVEAL.footer}</p>
-          </>
-        )}
-      </div>
-    </main>
-  );
-}
+          {/* What they are joining, before what it costs. */}
+          <ProgramPreview catalog={catalog} onCta={() => { window.location.href = "/register"; }} />
 
-/** A single-select question. Tap advances - six of the seven work this way. */
-function Single<T extends string>({
-  q, onPick, picked,
-}: {
-  q: { hd: string; micro?: string; options: C.Choice<T>[] };
-  onPick: (v: T) => void;
-  /** The value being committed to, or null. Dims the options not chosen. */
-  picked: string | null;
-}) {
+          {C.ENERGY_LIVE && isComplete(a) && (
+            <EnergyModule
+              level={a.level}
+              days={a.days}
+              trainingCount={plan.trainingCount}
+              onComputed={attachBody}
+            />
+          )}
+
+          <div className="lxl u-offer" onClickCapture={trackUjrakezdesOfferClick}>
+            <PricingBand surface="ujrakezdes" />
+          </div>
+
+          <p className="u-fine">{C.REVEAL.footer}</p>
+        </div>
+      </main>
+    );
+  }
+
+  // ââ The interstitial keeps the shell, and takes it over ââââââââââââââââââââ
+  // Same photograph, same column; only the sheet is replaced by the two rules.
+  // Dropping the shell for two seconds would read as a page break rather than a
+  // beat inside the flow.
   return (
-    <>
-      <h1 className="u-q">{q.hd}</h1>
-      {q.micro && <p className="u-micro">{q.micro}</p>}
-      <div className={`u-opts${picked ? " committing" : ""}`}>
-        {q.options.map((o, i) => (
-          <button
-            key={o.value}
-            type="button"
-            className={`u-opt${picked === o.value ? " picked" : ""}`}
-            style={{ ["--i" as string]: i }}
-            onClick={() => onPick(o.value)}
-          >
-            {o.label}
-          </button>
-        ))}
+    <div className="lx authx fnl-wiz u-onb" data-step={BRAND_STEP[screen]}>
+      <div className="authx-shell">
+        <BrandPanel step={BRAND_STEP[screen]} />
+
+        <main className="fnl-col">
+          <div className="fnl-sr" role="status" aria-live="polite">
+            {qNum > 0 ? `${qNum}. kérdés a hétből` : ""}
+          </div>
+
+          {screen === "interstitial" && (
+            <div className="fnl-main fnl u-inter-step">
+              <div className="fnl-sheet">
+                <div className="fnl-scroll center">
+                  {C.INTERSTITIAL.lines.map((l) => (
+                    <p key={l} className="u-inter-line">{l}</p>
+                  ))}
+                </div>
+                <div className="fnl-foot">
+                  <span className="u-inter-bar" aria-hidden="true"><i /></span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {screen === "gate" && (
+            <StepFrame
+              onBack={back}
+              progressCurrent={7}
+              counter={C.NAV.progress(7, STEP_IDS.length)}
+              heading={C.GATE.hd}
+              sub={C.GATE.sub}
+              headingRef={headingRef}
+              cta={
+                <>
+                  <button className="fnl-cta" onClick={submit as unknown as () => void} disabled={busy}>
+                    {busy ? C.GATE.ctaBusy : C.GATE.cta}
+                  </button>
+                  <p className="fnl-alt">
+                    {C.GATE.fine} <Link href="/adatvedelem" className="link">{C.GATE.privacy}</Link>
+                  </p>
+                </>
+              }
+            >
+              <form onSubmit={submit} noValidate>
+                <label className="u-label" htmlFor="u-email">{C.GATE.emailLabel}</label>
+                <input
+                  id="u-email"
+                  className="u-input"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  placeholder={C.GATE.emailPlaceholder}
+                  value={email}
+                  aria-invalid={err ? true : undefined}
+                  aria-describedby={err ? "u-email-err" : undefined}
+                  onChange={(e) => { setEmail(e.target.value); if (err) setErr(null); }}
+                />
+                {err && <p className="u-err" id="u-email-err" role="alert">{err}</p>}
+
+                <label className="u-consent">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                  />
+                  <span>{C.GATE.consent}</span>
+                </label>
+
+                {/* Off-screen, never display:none - a bot reads the DOM. */}
+                <div className="u-hp" aria-hidden="true">
+                  <label htmlFor="u-company">Cég</label>
+                  <input
+                    id="u-company" name="company" tabIndex={-1} autoComplete="off"
+                    value={hp} onChange={(e) => setHp(e.target.value)}
+                  />
+                </div>
+              </form>
+            </StepFrame>
+          )}
+
+          {qNum > 0 && (
+            <StepFrame
+              onBack={idx > 0 ? back : undefined}
+              progressCurrent={qNum}
+              counter={C.NAV.progress(qNum, STEP_IDS.length)}
+              heading={QUESTION[screen as StepId].hd}
+              sub={QUESTION[screen as StepId].micro}
+              headingRef={headingRef}
+              cta={
+                screen === "care" ? (
+                  <button className="fnl-cta" onClick={finishCare}>{C.Q_CARE.cta}</button>
+                ) : (
+                  <span className="u-cta-hint">{C.NAV.pickHint}</span>
+                )
+              }
+            >
+              {screen === "care" ? (
+                <OptionList
+                  multi
+                  ariaLabel={C.Q_CARE.hd}
+                  exclusive="none"
+                  value={a.care ?? []}
+                  onChange={(v) => setA((p) => ({ ...p, care: v as Care[] }))}
+                  items={C.Q_CARE.options.map((o) => ({
+                    v: o.value, label: o.label, sub: o.sub, icon: o.icon,
+                  }))}
+                />
+              ) : (
+                <OptionList
+                  ariaLabel={QUESTION[screen as StepId].hd}
+                  value={(a as Record<string, string | undefined>)[screen] ?? null}
+                  onChange={(v) => { if (v != null) pick(screen as keyof Answers, v as never); }}
+                  items={QUESTION[screen as StepId].options.map((o) => ({
+                    v: o.value,
+                    label: o.label,
+                    sub: o.sub,
+                    icon: o.icon,
+                    // "2 nap" and "20-30 perc" ARE numbers; an icon standing in
+                    // for one is a worse tile than the number itself.
+                    ...(o.icon ? {} : { leading: <span className="u-numtile">{NUM_TILE[o.value] ?? ""}</span> }),
+                  }))}
+                />
+              )}
+
+              {/* The plan assembling itself, inside the sheet where the answers
+                  are given rather than floating above the chrome. */}
+              <PlanTray a={a} latest={landed} />
+            </StepFrame>
+          )}
+        </main>
       </div>
-    </>
+    </div>
   );
 }
+
+/** The numeric tiles for the two questions whose answers are quantities. */
+const NUM_TILE: Record<string, string> = {
+  "2": "2", "3": "3", "4": "4",
+  "10_15": "15", "20_30": "30", "30_plus": "30+",
+};
+
+/** The seven questions, keyed by step, so the render can stay one branch. */
+const QUESTION: Record<StepId, { hd: string; micro?: string; options: C.Choice<string>[] }> = {
+  anchor: C.Q_ANCHOR as never,
+  level: C.Q_LEVEL as never,
+  days: C.Q_DAYS as never,
+  session: C.Q_SESSION as never,
+  care: C.Q_CARE as never,
+  place: C.Q_PLACE as never,
+  daypart: C.Q_DAYPART as never,
+};
 
 /** UTMs off the current URL. The campaign puts them on the ad link, and they
  *  ride along to Stripe metadata if this person later buys. */

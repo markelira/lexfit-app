@@ -883,3 +883,146 @@
 /* No account exists on this surface, so the save control has nothing to save
    to. Hidden rather than wired to a no-op, which would be a dead affordance. */
 .lxu .u-prog-grid .wc-save { display: none; }
+
+/* ===== Inside the /register shell ==========================================
+   The quiz now renders in the join wizard's split-screen (.authx/.fnl-*), so
+   the chrome, the option rows and the photography all come from there. Only the
+   pieces that are ours - the tray, the interstitial, the gate fields - need
+   styling, and they are written to sit INSIDE that language rather than beside
+   it. */
+
+/* The tray, inside the question sheet. Quieter here than it was standing alone:
+   the photograph is now carrying the visual weight, so the chips only have to
+   be legible, not loud. */
+.u-onb .u-tray { margin: var(--sp-5) 0 0; display: grid; gap: var(--sp-2); }
+.u-onb .u-tray-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.u-onb .u-tchip {
+  padding: 4px 10px; border-radius: 999px;
+  background: oklch(0.235 0.014 168 / 0.07);
+  color: var(--ink-2); font-size: 12px; font-weight: 500; line-height: 1.35;
+}
+.u-onb .u-tchip.land {
+  animation: u-chip-land 420ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  background: var(--accent); color: var(--ink);
+}
+.u-onb .u-tray-week {
+  list-style: none; margin: 2px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 250px;
+}
+.u-onb .u-tray-week li {
+  height: 20px; border-radius: 6px;
+  background: oklch(0.235 0.014 168 / 0.07); color: var(--ink-3);
+  font-family: var(--mono); font-size: 9px; display: grid; place-items: center;
+}
+.u-onb .u-tray-week li.on { background: var(--ink); color: var(--surface); }
+
+/* A single-select step has no button to press, so the foot says what to do
+   instead of standing empty - an empty action bar reads as a broken screen. */
+.u-onb .u-cta-hint {
+  display: block; text-align: center;
+  font-size: 13.5px; color: var(--ink-3); padding: 4px 0;
+}
+
+/* The interstitial, as a step rather than a takeover. */
+.u-onb .u-inter-line {
+  font-size: clamp(21px, 5.4vw, 27px);
+  line-height: 1.3; letter-spacing: -0.015em; font-weight: 500;
+  margin: 0 0 var(--sp-5); text-wrap: balance;
+  animation: u-rise 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.u-onb .u-inter-line:nth-child(2) { animation-delay: 560ms; }
+.u-onb .u-inter-bar {
+  display: block; width: 92px; height: 3px; margin: 0 auto;
+  border-radius: 999px; background: oklch(0.235 0.014 168 / 0.14); overflow: hidden;
+}
+.u-onb .u-inter-bar i {
+  display: block; height: 100%; width: 100%; background: var(--accent);
+  transform-origin: left center;
+  animation: u-sweep 2000ms linear both;
+}
+
+/* The gate's own fields, matched to the wizard's field metrics. */
+.u-onb .u-label {
+  display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); margin: 0 0 6px;
+}
+.u-onb .u-input {
+  width: 100%; box-sizing: border-box;
+  border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface);
+  font-family: var(--font); font-size: 16.5px; padding: 15px 16px; color: var(--ink);
+}
+.u-onb .u-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px oklch(0.660 0.042 168 / 0.18); }
+.u-onb .u-consent {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13.5px; line-height: 1.5; color: var(--ink-2);
+  cursor: pointer; padding: var(--sp-4) 0 0;
+}
+.u-onb .u-consent input { margin: 1px 0 0; width: 19px; height: 19px; flex: 0 0 auto; accent-color: var(--ink); }
+.u-onb .u-err { font-size: 13px; color: var(--danger); margin: 8px 0 0; }
+.u-onb .u-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .u-onb .u-tchip.land,
+  .u-onb .u-inter-line { animation: u-fade-in 180ms linear both; }
+  .u-onb .u-inter-bar i { animation: none; }
+}
+
+/* The screen-reader sentence in the tray. `.u-sr-only` is defined under `.lxu`,
+   and inside the wizard shell the root is `.u-onb` - so without this the tray
+   printed its own alt text on the page. */
+.u-onb .u-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* Quantity answers get the number as their tile rather than a stand-in icon. */
+.u-onb .u-numtile {
+  display: grid; place-items: center;
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--accent-soft); color: var(--accent-ink);
+  font-family: var(--mono); font-size: 13px; font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Under 768px the wizard's sheet becomes dark glass over the step photo, so the
+   tray has to invert with it - the light chips measured as barely legible there.
+   Matching the breakpoint onbv2.css uses rather than inventing a second one. */
+@media (max-width: 767.98px) {
+  /* The mobile sheet is deliberately tight, and the tray must not win space
+     from the question it is meant to accompany. So: ONE line that scrolls
+     sideways, and no week strip - the week gets its full moment on the reveal,
+     where there is room for it. Two wrapped rows plus a 7-cell grid pushed the
+     strip under the action bar and clipped it. */
+  .u-onb .u-tray { margin-top: var(--sp-4); }
+  .u-onb .u-tray-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    /* The row runs to the sheet's edge rather than stopping at the padding, so
+       a scrolled chip is visibly cut off - the affordance that says "more". */
+    margin: 0 -20px; padding-left: 20px; padding-right: 20px;
+  }
+  .u-onb .u-tray-chips::-webkit-scrollbar { display: none; }
+  .u-onb .u-tchip { flex: 0 0 auto; }
+  .u-onb .u-tray-week { display: none; }
+  .u-onb .u-tchip {
+    background: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .u-onb .u-tchip.land { background: var(--accent); color: #101613; }
+  .u-onb .u-tray-week li {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .u-onb .u-tray-week li.on { background: rgba(255, 255, 255, 0.92); color: #101613; }
+  .u-onb .u-cta-hint { color: rgba(255, 255, 255, 0.66); }
+  .u-onb .u-inter-line { color: #f0f4f3; }
+  .u-onb .u-label { color: rgba(255, 255, 255, 0.78); }
+  .u-onb .u-consent { color: rgba(255, 255, 255, 0.78); }
+  .u-onb .u-input {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #f0f4f3;
+  }
+  .u-onb .u-input::placeholder { color: rgba(255, 255, 255, 0.45); }
+}
