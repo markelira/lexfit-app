@@ -3,7 +3,7 @@
 import { useState } from "react";
 import * as C from "../copy";
 import { BODY_LIMITS, computeEnergy, parseBody, type BodyInput, type EnergyResult } from "@/lib/ujrakezdes/energy";
-import type { Days, Level } from "@/lib/ujrakezdes/types";
+import type { Days, Focus, Level } from "@/lib/ujrakezdes/types";
 
 // The energy module: the szavazzmagadra calculator, offered AFTER the plan.
 //
@@ -31,10 +31,12 @@ const EMPTY: Draft = { sex: "", age: "", heightCm: "", weightKg: "", goal: "", t
 const hu = (n: number) => n.toLocaleString("hu-HU");
 
 export default function EnergyModule({
-  level, days, trainingCount, onComputed,
+  level, days, focus, trainingCount, onComputed,
 }: {
   level: Level;
   days: Days;
+  /** Q4 - decides which programme the result recommends second. */
+  focus: Focus;
   /** From the plan, so the module never contradicts the week already shown. */
   trainingCount: number;
   /** Hands the parent the block to submit with the lead, plus the consent. */
@@ -60,7 +62,7 @@ export default function EnergyModule({
     // Computed on the client for an instant result; the server recomputes from
     // the same inputs when it stores the lead, and its numbers are the ones
     // that count.
-    setResult(computeEnergy(parsed, level, days));
+    setResult(computeEnergy(parsed, level, days, focus));
     onComputed(parsed);
   }
 

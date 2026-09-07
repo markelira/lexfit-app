@@ -6,9 +6,9 @@ import {
 import { buildWeekPlan, type WeekPlan } from "./plan";
 import { computeEnergy, type BodyInput, type EnergyResult } from "./energy";
 import {
-  ANCHORS, CARES, DAYPARTS, DAYS, LEVELS, PLACES, SESSIONS,
+  ANCHORS, CARES, DAYPARTS, DAYS, FOCUSES, LEVELS, PLACES,
   type Answers, type Anchor, type Care, type Daypart, type Days,
-  type Level, type Place, type Session,
+  type Focus, type Level, type Place,
 } from "./types";
 
 // Lead magnet v2 - the server side of a submission.
@@ -42,7 +42,7 @@ const IN = <T extends string>(vals: readonly T[]) => (v: unknown): v is T =>
 const isAnchor = IN<Anchor>(ANCHORS);
 const isLevel = IN<Level>(LEVELS);
 const isDays = IN<Days>(DAYS);
-const isSession = IN<Session>(SESSIONS);
+const isFocus = IN<Focus>(FOCUSES);
 const isPlace = IN<Place>(PLACES);
 const isDaypart = IN<Daypart>(DAYPARTS);
 const isCare = IN<Care>(CARES);
@@ -66,7 +66,7 @@ export function parseAnswers(raw: unknown): Answers | ValidationError[] {
   need(isAnchor(a.anchor), "anchor");
   need(isLevel(a.level), "level");
   need(isDays(a.days), "days");
-  need(isSession(a.session), "session");
+  need(isFocus(a.focus), "focus");
   need(isPlace(a.place), "place");
   need(isDaypart(a.daypart), "daypart");
 
@@ -82,7 +82,7 @@ export function parseAnswers(raw: unknown): Answers | ValidationError[] {
     anchor: a.anchor as Anchor,
     level: a.level as Level,
     days: a.days as Days,
-    session: a.session as Session,
+    focus: a.focus as Focus,
     care: normalisedCare,
     place: a.place as Place,
     daypart: a.daypart as Daypart,
@@ -202,7 +202,7 @@ export function buildLead(i: BuildInput): LmLeadDoc {
     },
     answers: i.answers,
     ...(withBody
-      ? { body: i.body!, energy: computeEnergy(i.body!, i.answers.level, i.answers.days) }
+      ? { body: i.body!, energy: computeEnergy(i.body!, i.answers.level, i.answers.days, i.answers.focus) }
       : {}),
     computed: {
       trainingCount: plan.trainingCount,
@@ -231,7 +231,7 @@ export function sameAnswers(a: Answers | undefined, b: Answers): boolean {
   const care = (x: Answers) => [...x.care].sort().join(",");
   return (
     a.anchor === b.anchor && a.level === b.level && a.days === b.days &&
-    a.session === b.session && a.place === b.place && a.daypart === b.daypart &&
+    a.focus === b.focus && a.place === b.place && a.daypart === b.daypart &&
     care(a) === care(b)
   );
 }

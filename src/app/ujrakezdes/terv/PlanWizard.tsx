@@ -53,7 +53,7 @@ type Screen = StepId | "interstitial" | "gate" | "reveal";
  *  the two forgiveness rules are stated BEFORE we ask about knees and backs, so
  *  the caution question lands as care rather than as a risk assessment. */
 const ORDER: Screen[] = [
-  "anchor", "level", "days", "session",
+  "anchor", "level", "days", "focus",
   "interstitial",
   "care", "place", "daypart",
   "gate", "reveal",
@@ -81,11 +81,11 @@ const BRAND_STEP: Record<Screen, string> = {
   anchor: "goal",          // the community photo - why they came
   level: "level",
   days: "days",
-  session: "time",         // the player
+  focus: "focus",
   interstitial: "why",     // Alexa's quote, under the two rules
-  care: "focus",
+  care: "obstacle",       // what to work around
   place: "env",
-  daypart: "obstacle",
+  daypart: "time",         // the player
   gate: "reveal",          // the promise photo, as the plan is handed over
   reveal: "plan",
 };
@@ -93,7 +93,7 @@ const BRAND_STEP: Record<Screen, string> = {
 type Draft = Partial<Answers>;
 
 const isComplete = (d: Draft): d is Answers =>
-  !!(d.anchor && d.level && d.days && d.session && d.place && d.daypart && d.care);
+  !!(d.anchor && d.level && d.days && d.focus && d.place && d.daypart && d.care);
 
 export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   const [screen, setScreen] = useState<Screen>("anchor");
@@ -193,7 +193,20 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   useEffect(() => { if (screen === "gate") trackUjrakezdesGateView(); }, [screen]);
   useEffect(() => { if (screen === "reveal") trackUjrakezdesRevealView(); }, [screen]);
 
-  const plan = useMemo(() => (isComplete(a) ? buildWeekPlan(a) : null), [a]);
+  /**
+   * The programme's real session length, taken from the live catalogue: the
+   * median of its published workouts. The quiz no longer ASKS how long a
+   * session is, so the only honest number is the one the videos actually are.
+   */
+  const sessionMin = useMemo(() => {
+    const mins = (catalog.entry?.sessions ?? []).map((s) => s.mins).filter((m) => m > 0).sort((x, y) => x - y);
+    return mins.length ? mins[Math.floor(mins.length / 2)]! : undefined;
+  }, [catalog]);
+
+  const plan = useMemo(
+    () => (isComplete(a) ? buildWeekPlan(a, sessionMin) : null),
+    [a, sessionMin],
+  );
 
   /**
    * The one place this funnel talks to the server. The gate calls it, and the
@@ -311,6 +324,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
             <EnergyModule
               level={a.level}
               days={a.days}
+              focus={a.focus}
               trainingCount={plan.trainingCount}
               onComputed={attachBody}
             />
@@ -472,7 +486,6 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
 /** The numeric tiles for the two questions whose answers are quantities. */
 const NUM_TILE: Record<string, string> = {
   "2": "2", "3": "3", "4": "4",
-  "10_15": "15", "20_30": "30", "30_plus": "30+",
 };
 
 /** The seven questions, keyed by step, so the render can stay one branch. */
@@ -480,7 +493,7 @@ const QUESTION: Record<StepId, { hd: string; micro?: string; options: C.Choice<s
   anchor: C.Q_ANCHOR as never,
   level: C.Q_LEVEL as never,
   days: C.Q_DAYS as never,
-  session: C.Q_SESSION as never,
+  focus: C.Q_FOCUS as never,
   care: C.Q_CARE as never,
   place: C.Q_PLACE as never,
   daypart: C.Q_DAYPART as never,

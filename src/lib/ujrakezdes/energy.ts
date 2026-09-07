@@ -1,4 +1,4 @@
-import type { Days, Level } from "./types";
+import type { Days, Focus, Level } from "./types";
 
 // The energy module - BMR → TDEE → daily target, macros, step goal, water.
 //
@@ -155,7 +155,9 @@ export interface EnergyResult {
   waterLitres: number;
 }
 
-export function computeEnergy(body: BodyInput, level: Level, days: Days): EnergyResult {
+export function computeEnergy(
+  body: BodyInput, level: Level, days: Days, focus?: Focus,
+): EnergyResult {
   const activity = activityMultiplier(level, days);
   const b = bmr(body.sex, body.weightKg, body.heightCm, body.age);
   const t = tdee(b, activity);
@@ -169,7 +171,7 @@ export function computeEnergy(body: BodyInput, level: Level, days: Days): Energy
     macros: macros(body.weightKg, kcal, body.goal),
     stepTarget: stepTarget(body.goal),
     waterLitres: waterLitres(body.weightKg, activity),
-    programs: recommendPrograms(body.goal, level),
+    programs: recommendPrograms(body.goal, level, focus),
   };
 }
 
@@ -254,22 +256,41 @@ export interface WorkoutPick {
   why: string;
 }
 
+/** Q4 -> the programme that actually trains that area. This is why the question
+ *  exists: every value here is a real, published programme. */
+const BY_FOCUS: Record<Focus, WorkoutPick> = {
+  fenek: { program: PROGRAM.LAB, why: "Célzottan fenék és comb, öt napon át." },
+  core: { program: PROGRAM.HAS, why: "Has és mély törzs — a tartás alapja." },
+  felso: { program: PROGRAM.START, why: "Felsőtest-napokkal, a teljes programon belül." },
+  tartas: { program: PROGRAM.TARTAS, why: "Négy hét a hátra és a tartásra." },
+  teljes: { program: PROGRAM.START, why: "Mindenből egyensúlyban, sorrendben." },
+};
+
 /**
- * Two programmes for the goal, in the order they should be started.
+ * Two programmes, in the order they should be started.
  *
  * `level` decides the entry point rather than the goal does: somebody starting
  * from nothing gets the 7-day beginner programme first whatever they picked,
  * because the fastest way to lose a beginner is to open with the hardest thing
  * on the shelf.
+ *
+ * The second pick follows the FOCUS answer when there is one - the quiz asks
+ * where they want to get stronger, and answering that with a programme chosen
+ * from their calorie goal instead would make the question decorative.
  */
-export function recommendPrograms(goal: EnergyGoal, level: Level): WorkoutPick[] {
+export function recommendPrograms(
+  goal: EnergyGoal, level: Level, focus?: Focus,
+): WorkoutPick[] {
   const opener: WorkoutPick =
     level === "none"
       ? { program: PROGRAM.KEZDO, why: "Hét rövid nap, hogy meglegyen a lendület." }
       : { program: PROGRAM.START, why: "A gerincprogram — 30 vezetett edzés, a te tempódban." };
 
+  const byFocus = focus ? BY_FOCUS[focus] : null;
   const second: WorkoutPick =
-    goal === "fogyas"
+    byFocus && byFocus.program !== PROGRAM.START
+      ? byFocus
+      : goal === "fogyas"
       ? { program: PROGRAM.LAB, why: "Nagy izomcsoportok, több energia egy edzés alatt." }
       : goal === "tonus"
         ? { program: PROGRAM.HAS, why: "Törzserő — ez tartja meg a formát a többi edzésben." }

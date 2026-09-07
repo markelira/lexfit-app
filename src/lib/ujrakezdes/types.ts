@@ -19,8 +19,21 @@ export type Level = "none" | "rare" | "weekly" | "regular";
 /** Q3 - days per week. `flex` is a real answer, not a refusal to answer. */
 export type Days = "2" | "3" | "4" | "flex";
 
-/** Q4 - minutes per session. */
-export type Session = "10_15" | "20_30" | "30_plus";
+/**
+ * Q4 - where they want to get stronger.
+ *
+ * REPLACED the old "how long is a session" question, which asked about a
+ * control this product does not have: the Start programme's sessions are ~30
+ * minutes, fixed (18 of the seeded workouts are 30, three are 32). Offering
+ * 10-15 implied we would hand somebody a twelve-minute Foundation workout, and
+ * the reveal duly printed "12'" next to a thirty-minute video.
+ * docs/onboarding-personalization-plan.md lists session length under
+ * "Deliberately NOT adding" for exactly this reason.
+ *
+ * These values map onto the real library themes and the real programmes, so the
+ * answer can actually change what somebody is shown.
+ */
+export type Focus = "fenek" | "core" | "felso" | "tartas" | "teljes";
 
 /** Q5 - multi-select. `none` is exclusive: picking it clears the others. */
 export type Care = "knee" | "back" | "quiet" | "none";
@@ -35,7 +48,7 @@ export interface Answers {
   anchor: Anchor;
   level: Level;
   days: Days;
-  session: Session;
+  focus: Focus;
   care: Care[];
   place: Place;
   daypart: Daypart;
@@ -44,13 +57,13 @@ export interface Answers {
 export const ANCHORS: readonly Anchor[] = ["restart", "careful", "no_energy", "stronger", "browsing"];
 export const LEVELS: readonly Level[] = ["none", "rare", "weekly", "regular"];
 export const DAYS: readonly Days[] = ["2", "3", "4", "flex"];
-export const SESSIONS: readonly Session[] = ["10_15", "20_30", "30_plus"];
+export const FOCUSES: readonly Focus[] = ["fenek", "core", "felso", "tartas", "teljes"];
 export const CARES: readonly Care[] = ["knee", "back", "quiet", "none"];
 export const PLACES: readonly Place[] = ["living_room", "small", "varied"];
 export const DAYPARTS: readonly Daypart[] = ["morning", "midday", "evening", "varies"];
 
 /** The seven step ids, in order. Drives the progress dots and the URL. */
 export const STEP_IDS = [
-  "anchor", "level", "days", "session", "care", "place", "daypart",
+  "anchor", "level", "days", "focus", "care", "place", "daypart",
 ] as const;
 export type StepId = (typeof STEP_IDS)[number];

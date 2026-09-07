@@ -34,16 +34,17 @@ export const dynamic = "force-dynamic";
 const enabled = () => process.env.UJRAKEZDES_ENABLED === "true";
 
 /**
- * The energy module's own switch, independent of the funnel's.
+ * The energy module's server-side switch, independent of the funnel's.
  *
- * ⚠️ MUST STAY OFF until the Art. 9 privacy amendment
- * (docs/legal/adatkezelesi-tajekoztato-kviz-modositas-TERVEZET.md) is published
- * with a real effective date. Body metrics are special-category data; accepting
- * them under an unpublished notice would make the very first submission
- * unlawful. This guard is server-side on purpose - the client flag only decides
- * whether to RENDER the module, and a client flag is not a legal control.
+ * ON by default (owner decision 2026-09-07). It remains the place to turn the
+ * module off - ENERGY_MODULE_ENABLED=false stops the server ACCEPTING body
+ * metrics, which is the control that actually matters; the client flag only
+ * decides whether to render the form, and a client flag is not a legal control.
+ *
+ * ⚠️ The Art. 9 amendment still has to be published with a real effective date
+ * before this sees real traffic. That is a signature, not a deploy.
  */
-const energyEnabled = () => process.env.ENERGY_MODULE_ENABLED === "true";
+const energyEnabled = () => process.env.ENERGY_MODULE_ENABLED !== "false";
 
 function clientIp(req: Request): string | null {
   const fwd = req.headers.get("x-forwarded-for");

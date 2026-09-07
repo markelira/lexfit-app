@@ -1,4 +1,4 @@
-import type { Answers, Care, Days, Session } from "./types";
+import type { Answers, Care, Days } from "./types";
 
 // Turning seven answers into the week the reveal draws.
 //
@@ -45,19 +45,18 @@ export function trainingDays(d: Days): Weekday[] {
   }
 }
 
-/** The label the reveal header and the D0 mail both use for session length. */
-export const SESSION_LABEL: Record<Session, string> = {
-  "10_15": "10–15 perc",
-  "20_30": "20–30 perc",
-  "30_plus": "fél óránál több",
-};
+/**
+ * How long a session actually is.
+ *
+ * NOT asked, and deliberately so - the Start programme's workouts are ~30
+ * minutes and that is not a dial we can turn. This is the programme's real
+ * length, and the wizard overrides it with the live catalogue's own figure
+ * where one is available, so the grid can never print a duration no video has.
+ */
+export const DEFAULT_SESSION_MIN = 30;
 
-/** Minutes shown on a training cell - the low end, so the plan under-promises. */
-export const SESSION_MINUTES: Record<Session, number> = {
-  "10_15": 12,
-  "20_30": 22,
-  "30_plus": 32,
-};
+/** The label the reveal header and the D0 mail both use. */
+export const sessionLabel = (mins: number): string => `${mins} perc`;
 
 export interface PlanDay {
   weekday: Weekday;
@@ -78,9 +77,9 @@ export interface WeekPlan {
   firstWorkoutMinutes: number;
 }
 
-export function buildWeekPlan(a: Answers): WeekPlan {
+export function buildWeekPlan(a: Answers, sessionMin = DEFAULT_SESSION_MIN): WeekPlan {
   const set = new Set(trainingDays(a.days));
-  const minutes = SESSION_MINUTES[a.session];
+  const minutes = sessionMin;
   return {
     days: ([1, 2, 3, 4, 5, 6, 7] as Weekday[]).map((w) => ({
       weekday: w,
@@ -90,7 +89,7 @@ export function buildWeekPlan(a: Answers): WeekPlan {
       minutes: set.has(w) ? minutes : null,
     })),
     trainingCount: daysCount(a.days),
-    sessionLabel: SESSION_LABEL[a.session],
+    sessionLabel: sessionLabel(minutes),
     flexible: a.days === "flex",
     care: a.care.filter((c): c is Exclude<Care, "none"> => c !== "none"),
     firstWorkoutMinutes: minutes,

@@ -35,7 +35,7 @@ export default function PlanTray({
   if (a.anchor) chips.push({ key: "anchor", step: "anchor", label: C.TRAY.anchor[a.anchor] });
   if (a.level) chips.push({ key: "level", step: "level", label: C.TRAY.level[a.level] });
   if (a.days) chips.push({ key: "days", step: "days", label: C.TRAY.days[a.days] });
-  if (a.session) chips.push({ key: "session", step: "session", label: C.TRAY.session[a.session] });
+  if (a.focus) chips.push({ key: "focus", step: "focus", label: C.TRAY.focus[a.focus] });
   for (const c of a.care ?? []) {
     chips.push({ key: `care-${c}`, step: "care", label: C.TRAY.care[c] });
   }

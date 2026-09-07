@@ -14,7 +14,7 @@
 // could NOT be pasted is marked // COPY-REVIEW with the rule that forced it,
 // and listed in docs/lead-magnet-v2-plan.md §3.
 
-import type { Anchor, Care, Daypart, Days, Level, Place, Session } from "@/lib/ujrakezdes/types";
+import type { Anchor, Care, Daypart, Days, Focus, Level, Place } from "@/lib/ujrakezdes/types";
 import { lxPaths } from "@/lib/icons";
 
 // ─── §1 Landing ──────────────────────────────────────────────────────────────
@@ -96,13 +96,16 @@ export const Q_DAYS = {
   ] as Choice<Days>[],
 };
 
-export const Q_SESSION = {
-  hd: "Mennyi idő jut egy alkalomra?",
+export const Q_FOCUS = {
+  hd: "Hol szeretnél erősödni?",
+  micro: "Erre teszünk külön hangsúlyt — később bármikor módosítható.",
   options: [
-    { value: "10_15", label: "10–15 perc", sub: "Rövid, de teljes értékű edzés." },
-    { value: "20_30", label: "20–30 perc", sub: "A LEXFIT edzések alaphossza." },
-    { value: "30_plus", label: "Fél óránál több is", sub: "Van időd — kihasználjuk." },
-  ] as Choice<Session>[],
+    { value: "fenek", label: "Fenék, comb", sub: "Stabil, erős alsótest.", icon: lxPaths.flame },
+    { value: "core", label: "Has, törzs", sub: "Erős törzs, biztos tartás.", icon: lxPaths.gauge },
+    { value: "felso", label: "Kar, váll", sub: "Feszes, erős felsőtest.", icon: lxPaths.dumbbell },
+    { value: "tartas", label: "Hát, tartás", sub: "Egyenes gerinc, nyitott mellkas.", icon: lxPaths.userRound },
+    { value: "teljes", label: "Teljes test", sub: "Mindenből egyensúlyban.", icon: lxPaths.layoutGrid },
+  ] as Choice<Focus>[],
 };
 
 /** Between Q4 and Q5, auto-advancing. The two rules, stated before they are
@@ -166,7 +169,10 @@ export const TRAY = {
     none: "nulláról", rare: "néha mozogsz", weekly: "heti 1-2", regular: "van bázisod",
   } as Record<Level, string>,
   days: { "2": "2 nap", "3": "3 nap", "4": "4 nap", flex: "rugalmas" } as Record<Days, string>,
-  session: { "10_15": "10-15 perc", "20_30": "20-30 perc", "30_plus": "30+ perc" } as Record<Session, string>,
+  focus: {
+    fenek: "fenék, comb", core: "has, törzs", felso: "kar, váll",
+    tartas: "hát, tartás", teljes: "teljes test",
+  } as Record<Focus, string>,
   care: {
     knee: "térdkímélő", back: "derékkímélő", quiet: "csendes", none: "nincs korlát",
   } as Record<Care, string>,
@@ -356,13 +362,20 @@ export const PROGRAM_PREVIEW = {
   modalCta: "Ezzel kezdenék",
 } as const;
 
-/** Feature flag. The module renders only when this is on, and it stays OFF
- *  until the Art. 9 privacy amendment
- *  (docs/legal/adatkezelesi-tajekoztato-kviz-modositas-TERVEZET.md) is
- *  published with a real effective date. Same discipline as /terv's
- *  QUIZ_ENABLED - collecting body metrics under an unpublished notice would
- *  make the very first submission unlawful. */
-export const ENERGY_LIVE = process.env.NEXT_PUBLIC_ENERGY_MODULE === "1";
+/**
+ * The energy module is ON by default - owner decision 2026-09-07, taken after
+ * the Art. 9 position was put in writing three times.
+ *
+ * The switch survives as an OFF switch: set NEXT_PUBLIC_ENERGY_MODULE=0 to pull
+ * the module without a deploy if counsel asks for it. What it no longer does is
+ * hide the feature from the person who asked for it.
+ *
+ * ⚠️ STILL OUTSTANDING, and not something code can close: the amendment at
+ * docs/legal/adatkezelesi-tajekoztato-kviz-modositas-TERVEZET.md must be
+ * approved and published with a real effective date before this collects body
+ * metrics from real traffic.
+ */
+export const ENERGY_LIVE = process.env.NEXT_PUBLIC_ENERGY_MODULE !== "0";
 
 /** The consent wording version recorded with every body-block submission. */
 export const CONSENT_HEALTH_VERSION = "consent_lm_health_v1";

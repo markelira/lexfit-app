@@ -1026,3 +1026,8 @@
   }
   .u-onb .u-input::placeholder { color: rgba(255, 255, 255, 0.45); }
 }
+
+/* The reveal container takes focus programmatically so the screen change is
+   announced. Keyboard users still get a ring (:focus-visible); a mouse user
+   should not see one drawn around the whole page. */
+.lxu .u-stage:focus:not(:focus-visible) { outline: none; }

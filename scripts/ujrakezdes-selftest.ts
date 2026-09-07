@@ -15,7 +15,7 @@
  * Run:  node --import tsx scripts/ujrakezdes-selftest.ts
  */
 import assert from "node:assert/strict";
-import { buildWeekPlan, daysCount, trainingDays, SESSION_LABEL } from "../src/lib/ujrakezdes/plan";
+import { buildWeekPlan, daysCount, trainingDays, DEFAULT_SESSION_MIN } from "../src/lib/ujrakezdes/plan";
 import {
   buildLead, leadId, LM_BODY_FIELDS, LM_HEALTH_FIELDS, LM_VARIANT, parseAnswers,
   retakePatch, validateIdentity,
@@ -23,7 +23,7 @@ import {
 import {
   isLmStep, lmDueAt, lmNextStep, lmScheduleAfter, lmStopReason, LM_LAST_STEP,
 } from "../src/lib/ujrakezdes/sequence";
-import type { Answers, Days } from "../src/lib/ujrakezdes/types";
+import type { Answers, Days, Focus } from "../src/lib/ujrakezdes/types";
 import * as C from "../src/app/ujrakezdes/copy";
 import {
   activityMultiplier, bmr, computeEnergy, macros, parseBody, targetCalories,
@@ -38,7 +38,7 @@ import { CAT_HEX, CAT_WORD, catHex, catWordOf } from "../emails/components/Worko
 const ENERGY_CONSENT = C.ENERGY.consent;
 
 const base: Answers = {
-  anchor: "restart", level: "none", days: "3", session: "20_30",
+  anchor: "restart", level: "none", days: "3", focus: "teljes",
   care: ["none"], place: "living_room", daypart: "evening",
 };
 const A = (o: Partial<Answers> = {}): Answers => ({ ...base, ...o });
@@ -66,14 +66,18 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   }
   ok("minden tervben marad pihenőnap, és hétfőn kezdődik");
 
-  // Training cells carry the LOW end of the range: the plan under-promises.
-  const p = buildWeekPlan(A({ session: "20_30" }));
-  assert.equal(p.sessionLabel, SESSION_LABEL["20_30"]);
-  assert.ok(p.firstWorkoutMinutes <= 30 && p.firstWorkoutMinutes >= 20);
+  // The session length is NOT asked - the Start programme's workouts are ~30
+  // minutes and that is not a dial we can turn. The grid must print the
+  // programme's real length, never a number invented from an answer.
+  const p = buildWeekPlan(A());
+  assert.equal(p.firstWorkoutMinutes, DEFAULT_SESSION_MIN, "az alapértelmezett a program valós hossza");
+  assert.equal(p.sessionLabel, `${DEFAULT_SESSION_MIN} perc`);
+  const fromCatalog = buildWeekPlan(A(), 26);
+  assert.equal(fromCatalog.firstWorkoutMinutes, 26, "a katalógus valós hossza felülírja");
   for (const day of p.days) {
     assert.equal(day.training, day.minutes !== null, "pihenőnapon nincs perc");
   }
-  ok("a hossz a sáv alját mutatja, pihenőnapon nincs szám");
+  ok("a hossz a programból jön, nem egy meg nem válaszolható kérdésből");
 
   // Q5 drives the reveal's care notes, and "none" must never produce one.
   assert.deepEqual(buildWeekPlan(A({ care: ["none"] })).care, []);
@@ -88,7 +92,7 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.deepEqual(parseAnswers(base), base);
   ok("érvényes válaszblokk átmegy");
 
-  for (const field of ["anchor", "level", "days", "session", "place", "daypart"]) {
+  for (const field of ["anchor", "level", "days", "focus", "place", "daypart"]) {
     const bad = { ...base, [field]: "nonsense" };
     const res = parseAnswers(bad);
     assert.ok(Array.isArray(res), `${field}: a hibás érték elutasítva`);
@@ -405,11 +409,24 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   }
   ok("mozgásbázissal a Start a belépő, mellé a célhoz illő második program");
 
-  // The goal actually changes the second pick - otherwise the branch is theatre.
+  // The goal changes the second pick when there is no focus answer.
   const second = (g: "fogyas" | "tonus" | "tomeg") => recommendPrograms(g, "weekly")[1]!.program;
   assert.equal(new Set([second("fogyas"), second("tonus"), second("tomeg")]).size, 3,
     "mindhárom cél más második programot ad");
   ok("a cél ténylegesen más programot ad, nem csak más szöveget");
+
+  // ...but Q4 wins when it names a programme of its own. The quiz asks where
+  // they want to get stronger; answering that from a calorie goal instead would
+  // make the question decorative.
+  const byFocus = (f: Focus) => recommendPrograms("fogyas", "weekly", f)[1]!.program;
+  assert.equal(byFocus("fenek"), PROGRAM.LAB, "fenék/comb → Láb & Fenék");
+  assert.equal(byFocus("core"), PROGRAM.HAS, "has/törzs → Has & Mély Törzs");
+  assert.equal(byFocus("tartas"), PROGRAM.TARTAS, "hát/tartás → Tartásjavító");
+  for (const f of ["fenek", "core", "tartas"] as Focus[]) {
+    const picks = recommendPrograms("fogyas", "weekly", f);
+    assert.equal(new Set(picks.map((x) => x.program)).size, picks.length, `${f}: nincs ismétlés`);
+  }
+  ok("a fókusz-válasz dönti el a második programot, nem a kalóriacél");
 
   // The session count is the PLAN's, never the calculator's - the module must
   // not restate it, or the two can disagree on screen.
