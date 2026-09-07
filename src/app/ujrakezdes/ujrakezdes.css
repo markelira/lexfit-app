@@ -1264,3 +1264,73 @@
   .lxu .u-split .rule { width: 56px; height: 1px; align-self: center; }
   .lxu .u-calc-foot { grid-template-columns: 1fr; }
 }
+
+/* The skip under the calculator's first step. Quiet, but a real target - the
+   Art. 9 consent is only valid if declining is as available as agreeing. */
+.u-onb .fnl-skip {
+  display: block; width: 100%; margin-top: 10px;
+  background: none; border: 0; cursor: pointer;
+  font-family: var(--font); font-size: 14px; color: var(--ink-3);
+  padding: 10px; border-radius: 12px;
+}
+.u-onb .fnl-skip:hover { color: var(--ink); }
+.u-onb .fnl-skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 767.98px) {
+  .u-onb .fnl-skip { color: rgba(255, 255, 255, 0.7); }
+  .u-onb .fnl-skip:hover { color: #fff; }
+}
+
+/* The calculator's fields inside the wizard sheet. */
+.u-onb .u-flabel {
+  display: block; font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px;
+}
+.u-onb .u-fhint { font-size: 12.5px; line-height: 1.5; color: var(--ink-3); margin: var(--sp-2) 0 0; }
+.u-onb .u-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+.u-onb .u-seg-b {
+  appearance: none; border: 1.5px solid var(--line); background: var(--surface);
+  border-radius: 12px; padding: 13px 8px;
+  font-family: var(--font); font-size: 14.5px; color: var(--ink-2); cursor: pointer;
+}
+.u-onb .u-seg-b.on { border-color: var(--ink); background: var(--ink); color: var(--surface); }
+.u-onb .u-calc-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: var(--sp-4); }
+.u-onb .u-calc-num .u-input { padding: 13px 10px; text-align: center; }
+.u-onb .u-calc-num input::-webkit-outer-spin-button,
+.u-onb .u-calc-num input::-webkit-inner-spin-button { appearance: none; margin: 0; }
+.u-onb .u-calc-num input[type="number"] { -moz-appearance: textfield; }
+
+.u-onb .u-tempos { display: grid; gap: 10px; }
+.u-onb .u-tempo {
+  appearance: none; display: grid; gap: 4px; text-align: left;
+  border: 2px solid var(--line); background: var(--surface); border-radius: 14px;
+  padding: 13px 15px; font-family: var(--font); color: var(--ink); cursor: pointer;
+}
+.u-onb .u-tempo.on { border-color: var(--accent); background: var(--accent-soft); }
+.u-onb .u-tempo .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.u-onb .u-tempo b { font-size: 15px; font-weight: 700; }
+.u-onb .u-tempo em {
+  font-style: normal; font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--ink); color: var(--surface); padding: 3px 8px; border-radius: 999px;
+}
+.u-onb .u-tempo .korr { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--accent-ink); font-weight: 600; }
+.u-onb .u-tempo .desc { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.u-onb .u-tempo .rate { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+@media (max-width: 767.98px) {
+  .u-onb .u-flabel, .u-onb .u-fhint { color: rgba(255, 255, 255, 0.66); }
+  .u-onb .u-seg-b {
+    background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .u-onb .u-seg-b.on { background: #fff; border-color: #fff; color: #101613; }
+  .u-onb .u-tempo {
+    background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.92);
+  }
+  .u-onb .u-tempo.on { border-color: var(--accent); background: rgba(255, 255, 255, 0.12); }
+  .u-onb .u-tempo .desc { color: rgba(255, 255, 255, 0.72); }
+  .u-onb .u-tempo .rate { color: rgba(255, 255, 255, 0.55); }
+  .u-onb .u-tempo em { background: #fff; color: #101613; }
+  .u-onb .u-tempo .korr { color: var(--accent); }
+}

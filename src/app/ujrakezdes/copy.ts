@@ -360,6 +360,7 @@ export const ENERGY = {
   } as Record<string, Record<string, string>>,
   tempoRecommended: "Ajánlott",
 
+  resultHeading: "A napi célod",
   resultEyebrow: "A napi kalóriacélod",
   macroHeading: "Makrótápanyagok",
   perDay: "naponta",
@@ -370,12 +371,12 @@ export const ENERGY = {
 
   back: "Vissza",
   next: "Tovább",
+  skip: "Kihagyom",
   submit: "Mutasd az eredményem",
   submitBusy: "Számoljuk…",
   error: "Ellenőrizd az adatokat — a mezőknek valós értéket kell tartalmazniuk.",
 
   // ── Results ──
-  resultHeading: "A napi célod",
   kcalLabel: "napi kalória",
   proteinLabel: "fehérje",
   carbsLabel: "szénhidrát",

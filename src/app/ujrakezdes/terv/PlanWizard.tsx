@@ -17,14 +17,17 @@ import "../ujrakezdes.css";
 import "@/app/landing.css";
 import * as C from "../copy";
 import { PricingBand } from "@/components/landing/PricingBand";
-import EnergyModule from "./EnergyModule";
+import EnergyResult from "./EnergyResult";
 import ProgramPreview from "./ProgramPreview";
 import PlanTray from "./PlanTray";
 import { BrandPanel } from "@/components/onboarding/BrandPanel";
 import { StepFrame } from "@/components/onboarding/StepFrame";
 import { OptionList } from "@/components/onboarding/OptionList";
 import type { LandingCatalog } from "@/lib/landing-catalog";
-import type { BodyInput } from "@/lib/ujrakezdes/energy";
+import {
+  BODY_LIMITS, computeEnergy, parseBody, tempoDelta, tempoRate,
+  type BodyInput, type EnergyGoal, type EnergyResult as Energy, type Tempo,
+} from "@/lib/ujrakezdes/energy";
 import { buildWeekPlan } from "@/lib/ujrakezdes/plan";
 import { validateEmail } from "@/lib/quiz/validate";
 import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes/types";
@@ -47,17 +50,32 @@ import {
 
 const STORE_KEY = "lexfit_ujrakezdes_v1";
 
-type Screen = StepId | "interstitial" | "gate" | "reveal";
+type Screen =
+  | StepId
+  | "interstitial"
+  /** The calculator's own questions, asked HERE rather than on the reveal. */
+  | "body" | "goal" | "tempo"
+  | "gate" | "reveal";
 
 /** Screen order. The interstitial sits between Q4 and Q5 exactly as specced:
  *  the two forgiveness rules are stated BEFORE we ask about knees and backs, so
  *  the caution question lands as care rather than as a risk assessment. */
-const ORDER: Screen[] = [
+const CORE: Screen[] = [
   "anchor", "level", "days", "focus",
   "interstitial",
   "care", "place", "daypart",
-  "gate", "reveal",
 ];
+
+/**
+ * The calculator's three questions, asked in the flow rather than after it.
+ *
+ * SKIPPABLE, and that is not a UX nicety. These are Art. 9 body metrics, and
+ * consent to special-category data is only valid if it is freely given -
+ * making the plan conditional on handing them over would make the consent
+ * worthless and the processing unlawful with it. So the first of the three
+ * carries a "Kihagyom" that jumps straight to the gate.
+ */
+const CALC: Screen[] = ["body", "goal", "tempo"];
 
 /** 1-7 for the progress dots; 0 for the screens that are not questions. */
 const Q_NUMBER: Partial<Record<Screen, number>> = Object.fromEntries(
@@ -86,11 +104,33 @@ const BRAND_STEP: Record<Screen, string> = {
   care: "obstacle",       // what to work around
   place: "env",
   daypart: "time",         // the player
+  body: "reassure",        // the calculator's own three, still in the flow
+  goal: "reassure",
+  tempo: "reassure",
   gate: "reveal",          // the promise photo, as the plan is handed over
   reveal: "plan",
 };
 
 type Draft = Partial<Answers>;
+
+type BodyDraft = {
+  sex: BodyInput["sex"] | "";
+  age: string;
+  heightCm: string;
+  weightKg: string;
+  goal: EnergyGoal | "";
+  tempo: Tempo;
+};
+
+const EMPTY_BODY: BodyDraft = {
+  sex: "", age: "", heightCm: "", weightKg: "", goal: "", tempo: "kozepes",
+};
+
+/** The three calculator steps carry their own counter: the seven questions are
+ *  genuinely finished by then, and inflating the denominator to ten from the
+ *  first screen would overstate the length of a funnel most people will not
+ *  extend. */
+const CALC_NO: Partial<Record<Screen, number>> = { body: 1, goal: 2, tempo: 3 };
 
 const isComplete = (d: Draft): d is Answers =>
   !!(d.anchor && d.level && d.days && d.focus && d.place && d.daypart && d.care);
@@ -104,6 +144,11 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
    *  going back does not replay a landing for an answer already sitting there. */
   const [landed, setLanded] = useState<string | null>(null);
   const [a, setA] = useState<Draft>({ care: [] });
+  /** The calculator's answers. Separate from `a` because they are Art. 9 data
+   *  with their own consent and their own retention clock. */
+  const [body, setBody] = useState<BodyDraft>(EMPTY_BODY);
+  const [bodyConsent, setBodyConsent] = useState(false);
+  const [skipCalc, setSkipCalc] = useState(false);
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [hp, setHp] = useState("");
@@ -142,6 +187,14 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
       sessionStorage.setItem(STORE_KEY, JSON.stringify({ a, screen }));
     } catch { /* ignore */ }
   }, [a, screen]);
+
+  // The order depends on whether they are still in the calculator branch: once
+  // somebody skips it, the three steps leave the flow entirely rather than
+  // lingering as screens they have to dismiss again on the way back.
+  const ORDER: Screen[] = useMemo(
+    () => [...CORE, ...(skipCalc ? [] : CALC), "gate" as Screen, "reveal" as Screen],
+    [skipCalc],
+  );
 
   const idx = ORDER.indexOf(screen);
   const qNum = Q_NUMBER[screen] ?? 0;
@@ -208,12 +261,29 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     [a, sessionMin],
   );
 
+  /** The parsed body block, or null when they skipped or have not finished. */
+  const bodyInput = useMemo<BodyInput | null>(() => {
+    if (skipCalc || !bodyConsent) return null;
+    const parsed = parseBody({
+      sex: body.sex, age: Number(body.age), heightCm: Number(body.heightCm),
+      weightKg: Number(body.weightKg), goal: body.goal, tempo: body.tempo,
+    });
+    return Array.isArray(parsed) ? null : parsed;
+  }, [skipCalc, bodyConsent, body]);
+
+  /** Everything needed is answered by the gate, so the result is simply ready
+   *  when the reveal arrives - no second form and no second submit. */
+  const energy = useMemo<Energy | null>(
+    () => (bodyInput && isComplete(a) ? computeEnergy(bodyInput, a.level, a.days, a.focus, sessionMin) : null),
+    [bodyInput, a, sessionMin],
+  );
+
   /**
    * The one place this funnel talks to the server. The gate calls it, and the
    * energy module calls it again with a body block attached; routing both
    * through the same function is what stops the two payloads drifting apart.
    */
-  const post = useCallback((opts: { eventId?: string; body?: BodyInput }) =>
+  const post = useCallback((opts: { eventId?: string }) =>
     fetch("/api/ujrakezdes-lead", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -223,24 +293,19 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
         answers: a,
         hp_field: hp,
         ...(opts.eventId ? { event_id: opts.eventId, marketing_context: marketingContext() } : {}),
-        ...(opts.body ? { body: opts.body, consent_health: true } : {}),
+        ...(bodyInput ? { body: bodyInput, consent_health: true } : {}),
         utm: readUtm(),
       }),
-    }), [email, consent, a, hp]);
-
-  /**
-   * The energy module finished. The result is already on screen - this only
-   * attaches the block to the stored lead, so a failure is silent by design:
-   * re-showing an error over a result they can already read would be noise
-   * about something they did not ask us to save in the first place.
-   */
-  const attachBody = useCallback((bodyBlock: BodyInput) => {
-    void post({ body: bodyBlock }).catch(() => { /* result already rendered */ });
-  }, [post]);
+    }), [email, consent, a, hp, bodyInput]);
 
   /** Q5's "Tovább". Hoisted rather than written inline in the cta prop: a
    *  handler created during render and closing over refs is what the compiler
    *  lint flags, and hoisting it is the fix rather than the silencer. */
+  /** Every body field present. The consent is checked separately, because a
+   *  filled form without it must still be able to move on - it just moves on
+   *  without storing anything. */
+  const bodyReady = !!(body.sex && body.age && body.heightCm && body.weightKg);
+
   const finishCare = useCallback(() => {
     setA((p) => ((p.care ?? []).length ? p : { ...p, care: ["none"] }));
     setLanded("care");
@@ -320,14 +385,12 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
           {/* What they are joining, before what it costs. */}
           <ProgramPreview catalog={catalog} onCta={() => { window.location.href = "/register"; }} />
 
-          {C.ENERGY_LIVE && isComplete(a) && (
-            <EnergyModule
-              level={a.level}
-              days={a.days}
-              focus={a.focus}
+          {C.ENERGY_LIVE && energy && (
+            <EnergyResult
+              result={energy}
               trainingCount={plan.trainingCount}
-              sessionMin={plan.firstWorkoutMinutes}
-              onComputed={attachBody}
+              goal={body.goal}
+              tempo={body.tempo}
             />
           )}
 
@@ -426,6 +489,128 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
                   />
                 </div>
               </form>
+            </StepFrame>
+          )}
+
+          {/* ── The calculator's three questions, in the flow ─────────────
+              They sit after the seven and before the gate, carry their own
+              counter (the seven are genuinely done), and the first one can be
+              skipped outright - Art. 9 consent has to be freely given, so the
+              plan can never be made conditional on handing over body metrics. */}
+          {CALC_NO[screen] && (
+            <StepFrame
+              onBack={back}
+              progressCurrent={STEP_IDS.length}
+              counter={`Kalkulátor · ${CALC_NO[screen]} / 3`}
+              heading={
+                screen === "body" ? C.ENERGY.card1
+                  : screen === "goal" ? C.ENERGY.goalLabel
+                  : C.ENERGY.tempoHeading
+              }
+              sub={
+                screen === "body" ? C.ENERGY.formMicro
+                  : screen === "tempo" && body.goal ? C.ENERGY.tempoLead[body.goal]
+                  : undefined
+              }
+              headingRef={headingRef}
+              cta={
+                screen === "body" ? (
+                  <>
+                    <button
+                      className="fnl-cta"
+                      disabled={!bodyReady}
+                      onClick={advance}
+                    >{C.ENERGY.next}</button>
+                    <button
+                      className="fnl-skip"
+                      onClick={() => { setSkipCalc(true); go("gate"); }}
+                    >{C.ENERGY.skip}</button>
+                  </>
+                ) : screen === "goal" ? (
+                  <span className="u-cta-hint">{C.NAV.pickHint}</span>
+                ) : (
+                  <button className="fnl-cta" onClick={advance}>{C.ENERGY.next}</button>
+                )
+              }
+            >
+              {screen === "body" && (
+                <>
+                  <span className="u-flabel">{C.ENERGY.sexLabel}</span>
+                  <div className="u-seg">
+                    {C.ENERGY.sexOptions.map((o) => (
+                      <button
+                        key={o.value} type="button"
+                        className={`u-seg-b${body.sex === o.value ? " on" : ""}`}
+                        aria-pressed={body.sex === o.value}
+                        onClick={() => setBody((p) => ({ ...p, sex: o.value }))}
+                      >{o.label}</button>
+                    ))}
+                  </div>
+                  <p className="u-fhint">{C.ENERGY.sexMicro}</p>
+
+                  <div className="u-calc-nums">
+                    {([
+                      ["age", C.ENERGY.ageLabel, BODY_LIMITS.age],
+                      ["heightCm", C.ENERGY.heightLabel, BODY_LIMITS.heightCm],
+                      ["weightKg", C.ENERGY.weightLabel, BODY_LIMITS.weightKg],
+                    ] as const).map(([k, label, [lo, hi]]) => (
+                      <label key={k} className="u-calc-num">
+                        <span className="u-flabel">{label}</span>
+                        <input
+                          className="u-input" type="number" inputMode="numeric"
+                          min={lo} max={hi} value={body[k]}
+                          onChange={(e) => setBody((p) => ({ ...p, [k]: e.target.value }))}
+                        />
+                      </label>
+                    ))}
+                  </div>
+
+                  {/* The Art. 9 consent lives on the screen that asks for the
+                      data, not bundled into the marketing box at the gate. */}
+                  <label className="u-consent">
+                    <input
+                      type="checkbox" checked={bodyConsent}
+                      onChange={(e) => setBodyConsent(e.target.checked)}
+                    />
+                    <span>{C.ENERGY.consent}</span>
+                  </label>
+                </>
+              )}
+
+              {screen === "goal" && (
+                <OptionList
+                  ariaLabel={C.ENERGY.goalLabel}
+                  value={body.goal || null}
+                  onChange={(v) => {
+                    if (v == null) return;
+                    setBody((p) => ({ ...p, goal: v as EnergyGoal }));
+                    setLanded("goal");
+                    commitTimer.current = setTimeout(advance, COMMIT_MS);
+                  }}
+                  items={C.ENERGY.goalOptions.map((o) => ({ v: o.value, label: o.label }))}
+                />
+              )}
+
+              {screen === "tempo" && body.goal && (
+                <div className="u-tempos">
+                  {(["laza", "kozepes", "intenziv"] as Tempo[]).map((t) => (
+                    <button
+                      key={t} type="button"
+                      className={`u-tempo${body.tempo === t ? " on" : ""}`}
+                      aria-pressed={body.tempo === t}
+                      onClick={() => setBody((p) => ({ ...p, tempo: t }))}
+                    >
+                      <span className="row">
+                        <b>{C.ENERGY.tempoName[t]}</b>
+                        {t === "kozepes" && <em>{C.ENERGY.tempoRecommended}</em>}
+                        <span className="korr">{tempoDelta(body.goal as EnergyGoal, t)}</span>
+                      </span>
+                      <span className="desc">{C.ENERGY.tempoDesc[body.goal][t]}</span>
+                      <span className="rate">{tempoRate(body.goal as EnergyGoal, t)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </StepFrame>
           )}
 
