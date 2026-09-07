@@ -27,7 +27,7 @@ import { trackGuaranciaView, trackPricingPlanSelect } from "@/lib/track";
  *  Must be /register - /onboarding is a redirect that drops the query string. */
 const planHref = (role: string) => `/register?plan=${role}`;
 
-export type PricingSurface = "landing" | "arak";
+export type PricingSurface = "landing" | "arak" | "ujrakezdes";
 
 export function PricingBand({ surface = "landing" }: { surface?: PricingSurface }) {
   const week = PRICING_BAND.cards.week;

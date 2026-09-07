@@ -1,0 +1,482 @@
+/* LEXFIT lead magnet v2 (/ujrakezdes). Everything is scoped under `.lxu` so the
+   generic class names here never leak into the app screens, which share the
+   global stylesheet layer - same convention as the landing's `.lxl` and the
+   older quiz's `.lxq`.
+
+   Mobile-first by construction: this page is served almost entirely to phones
+   arriving from a Meta ad, so the phone layout is the base and the desktop
+   rules are the exception.
+
+   Motion follows the Apple fluid-interface rules the rest of the app uses:
+   feedback lands on pointer-DOWN not on release, transitions are short and
+   critically damped (no overshoot on anything that did not carry momentum),
+   and every one of them is dropped under prefers-reduced-motion. */
+
+.lxu {
+  --u-max: 560px;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  display: flex;
+  flex-direction: column;
+}
+
+.lxu .u-wrap {
+  width: 100%;
+  max-width: var(--u-max);
+  margin: 0 auto;
+  padding: 0 var(--sp-4);
+}
+
+/* ── Landing ─────────────────────────────────────────────────────────────── */
+
+.lxu .u-hero {
+  padding: var(--sp-10) 0 var(--sp-8);
+  text-align: center;
+}
+.lxu .u-eyebrow {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;      /* positive tracking: small text needs it */
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 var(--sp-4);
+}
+.lxu h1 {
+  font-size: clamp(30px, 8vw, 44px);
+  line-height: 1.08;           /* tight leading for large text */
+  letter-spacing: -0.02em;     /* negative tracking as type grows */
+  font-weight: 600;
+  margin: 0 0 var(--sp-4);
+  text-wrap: balance;
+}
+.lxu .u-sub {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0 0 var(--sp-3);
+  text-wrap: pretty;
+}
+.lxu .u-audience {
+  font-size: 15px;
+  color: var(--ink-3);
+  margin: 0 0 var(--sp-6);
+}
+
+.lxu .u-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.lxu .u-chip {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.lxu .u-sec {
+  padding: var(--sp-8) 0;
+  border-top: 1px solid var(--line);
+}
+.lxu .u-sec h2 {
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+  margin: 0 0 var(--sp-3);
+}
+.lxu .u-sec p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin: 0 0 var(--sp-3);
+  text-wrap: pretty;
+}
+
+.lxu .u-steps {
+  margin: 0;
+  padding: 0 0 0 var(--sp-5);
+  display: grid;
+  gap: var(--sp-3);
+}
+.lxu .u-steps li {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* Member photo placeholders. The aspect ratio is reserved so swapping the real
+   finish cards in later cannot introduce layout shift. */
+.lxu .u-proof {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin: var(--sp-5) 0 0;
+}
+.lxu .u-proof figure {
+  margin: 0;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+}
+.lxu .u-proof img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lxu .u-proof figcaption {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  text-align: center;
+  padding: var(--sp-2);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.lxu .u-cta {
+  appearance: none;
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--surface);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 16px 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  /* Short, critically damped. Nothing here carried momentum, so nothing bounces. */
+  transition: transform 100ms ease-out, opacity 100ms ease-out;
+}
+/* Feedback on the PRESS, not on release - the moment lag appears, directness
+   falls off a cliff. */
+.lxu .u-cta:active { transform: scale(0.98); }
+.lxu .u-cta:disabled { opacity: 0.5; cursor: default; transform: none; }
+.lxu .u-cta:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+
+.lxu .u-ctawrap { padding: var(--sp-6) 0 0; }
+
+/* ── Wizard chrome ───────────────────────────────────────────────────────── */
+
+.lxu .u-top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: var(--sp-3) var(--sp-4) var(--sp-3);
+  /* A translucent layer with content scrolling under it, not an opaque strip. */
+  background: color-mix(in oklch, var(--bg) 86%, transparent);
+  backdrop-filter: blur(12px) saturate(160%);
+}
+.lxu .u-topline {
+  max-width: var(--u-max);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 32px;
+}
+.lxu .u-back {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--ink-3);
+  padding: 6px 8px;
+  margin-left: -8px;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+}
+.lxu .u-back:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+.lxu .u-dots { display: flex; gap: 6px; margin-left: auto; }
+.lxu .u-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  transition: background-color 180ms ease-out, transform 180ms ease-out;
+}
+.lxu .u-dot.on { background: var(--ink); }
+.lxu .u-dot.now { background: var(--accent-2); transform: scale(1.35); }
+.lxu .u-count {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-left: var(--sp-3);
+}
+
+.lxu .u-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--sp-6) 0 var(--sp-10);
+}
+.lxu .u-q {
+  font-size: clamp(22px, 6vw, 28px);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  margin: 0 0 var(--sp-2);
+  text-wrap: balance;
+}
+.lxu .u-micro {
+  font-size: 14px;
+  color: var(--ink-3);
+  margin: 0 0 var(--sp-5);
+}
+.lxu .u-q + .u-opts { margin-top: var(--sp-5); }
+
+/* ── Options ─────────────────────────────────────────────────────────────── */
+
+.lxu .u-opts { display: grid; gap: var(--sp-2); }
+.lxu .u-opt {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 100ms ease-out, border-color 140ms ease-out,
+              background-color 140ms ease-out;
+}
+.lxu .u-opt:active { transform: scale(0.985); }
+.lxu .u-opt:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.lxu .u-opt[aria-pressed="true"],
+.lxu .u-opt.sel {
+  border-color: var(--ink);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+.lxu .u-tick {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: transparent;
+}
+.lxu .u-opt.sel .u-tick {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--surface);
+}
+
+/* ── Interstitial ────────────────────────────────────────────────────────── */
+
+.lxu .u-inter {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: var(--sp-10) var(--sp-4);
+}
+.lxu .u-inter p {
+  font-size: clamp(19px, 5.5vw, 24px);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 var(--sp-3);
+  /* Enter and exit on the same path; a fade only, so there is nothing to grab. */
+  animation: u-rise 460ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.lxu .u-inter p:nth-child(2) { animation-delay: 420ms; }
+@keyframes u-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Gate ────────────────────────────────────────────────────────────────── */
+
+.lxu .u-field { margin: var(--sp-5) 0 var(--sp-4); }
+.lxu .u-label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  margin: 0 0 var(--sp-2);
+}
+.lxu .u-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-family: var(--font);
+  /* 16px minimum: anything smaller makes iOS Safari zoom on focus, which on a
+     Facebook in-app browser looks like the page breaking. */
+  font-size: 16px;
+  padding: 14px 16px;
+  color: var(--ink);
+  transition: border-color 140ms ease-out;
+}
+.lxu .u-input:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.lxu .u-input[aria-invalid="true"] { border-color: var(--danger, #b13a38); }
+.lxu .u-err { font-size: 13.5px; color: #b13a38; margin: var(--sp-2) 0 0; }
+
+.lxu .u-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  cursor: pointer;
+  padding: var(--sp-2) 0 var(--sp-4);
+}
+.lxu .u-consent input { margin: 2px 0 0; width: 18px; height: 18px; flex: 0 0 auto; }
+
+.lxu .u-fine {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  margin: var(--sp-4) 0 0;
+}
+.lxu .u-fine a { color: var(--accent-ink); }
+
+/* Off-screen, never display:none - a bot reads the DOM, not the pixels. */
+.lxu .u-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ── Reveal ──────────────────────────────────────────────────────────────── */
+
+.lxu .u-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin: var(--sp-5) 0;
+}
+.lxu .u-day {
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: var(--sp-3) 2px;
+  text-align: center;
+}
+.lxu .u-day.train { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.lxu .u-dayname {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.lxu .u-daymin { font-size: 13px; font-weight: 600; margin-top: 4px; }
+.lxu .u-day.rest .u-daymin { color: var(--ink-3); font-weight: 500; }
+
+.lxu .u-panel {
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  padding: var(--sp-5);
+  margin: var(--sp-5) 0;
+}
+.lxu .u-panel h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 var(--sp-2);
+  color: var(--accent-ink);
+}
+.lxu .u-panel p { font-size: 15px; line-height: 1.55; margin: 0; color: var(--ink-2); }
+
+.lxu .u-carelist { margin: var(--sp-4) 0 0; padding: 0; list-style: none; display: grid; gap: var(--sp-2); }
+.lxu .u-carelist li { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+
+.lxu .u-video {
+  aspect-ratio: 9 / 16;
+  max-height: 60vh;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  margin: var(--sp-4) 0;
+}
+.lxu .u-transcript { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+/* Not "no feedback" - a gentler, non-vestibular equivalent. The press states
+   stay as colour/opacity; only the movement goes. */
+@media (prefers-reduced-motion: reduce) {
+  .lxu *,
+  .lxu *::before,
+  .lxu *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+  .lxu .u-cta:active,
+  .lxu .u-opt:active { transform: none; opacity: 0.85; }
+  .lxu .u-inter p { animation: none; opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lxu .u-top { background: var(--bg); backdrop-filter: none; }
+}
+
+/* ── Desktop ─────────────────────────────────────────────────────────────── */
+@media (min-width: 720px) {
+  .lxu .u-hero { padding: var(--sp-10) 0; }
+  .lxu .u-cta { width: auto; min-width: 280px; margin: 0 auto; }
+  .lxu .u-ctawrap { display: flex; justify-content: center; }
+  .lxu .u-opts { gap: var(--sp-3); }
+}
+
+/* Screen-reader-only. The day cells show "H / 22′"; a screen reader gets the
+   full "hétfő: 22 perc" or "hétfő: pihenőnap" instead of a bare letter. */
+.lxu .u-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The offer block. <PricingBand> brings its own `.lxl`-scoped styling from
+   landing.css; this only undoes the landing's full-bleed section padding,
+   which assumes a 120px band on a wide page rather than a card inside a
+   560px reveal. */
+.lxu .u-offer {
+  margin: var(--sp-8) calc(var(--sp-4) * -1) var(--sp-4);
+}
+.lxu .u-offer .pricing-band { padding: var(--sp-6) 0; background: transparent; }
+/* The landing band assumes a wide column where the intro sits on one line. At
+   the reveal's 560px the intro wraps and the absolutely-positioned card badges
+   ride up into it, so the grid gets the clearance back. */
+.lxu .u-offer .pb-intro { margin-bottom: var(--sp-6); }
+.lxu .u-offer .pb-grid { margin-top: var(--sp-5); }

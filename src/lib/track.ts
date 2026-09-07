@@ -121,7 +121,7 @@ export function trackQuizCtaClick(programCode?: string): void {
 /** The guarantee block came into view. Fires once per session per surface: it
  *  measures whether the objection was SEEN, and a scroll that re-crosses the
  *  section is not new information. */
-export function trackGuaranciaView(surface: "landing" | "arak" | "pay"): void {
+export function trackGuaranciaView(surface: "landing" | "arak" | "pay" | "ujrakezdes"): void {
   const key = `lx_garancia_view_${surface}`;
   try {
     if (sessionStorage.getItem(key) === "1") return;
@@ -136,7 +136,7 @@ export function trackGuaranciaView(surface: "landing" | "arak" | "pay"): void {
 /** A plan card was chosen on a pricing surface. Carries the price for the same
  *  reason trackCheckoutStart does - value-based bidding cannot work without
  *  one - resolved from PRICES so it can never drift from what we charge. */
-export function trackPricingPlanSelect(plan: string, surface: "landing" | "arak"): void {
+export function trackPricingPlanSelect(plan: string, surface: "landing" | "arak" | "ujrakezdes"): void {
   const spec = plan in PRICES ? PRICES[plan as PriceRole] : undefined;
   push("lx_pricing_plan_select", {
     plan,
@@ -160,6 +160,49 @@ export function trackArakView(): void {
 /** The forgiveness whisper after the `days` step was shown. */
 export function trackOnbWhisperView(): void {
   push("lx_onb_whisper_view");
+}
+
+// ─── Lead magnet v2 (/ujrakezdes) ────────────────────────────────────────────
+//
+// Same rules as everything above: `lx_` prefixed, vendor-neutral, and NO ANSWER
+// ever travels with an event. The step events carry the step id, never what was
+// picked - "which question they dropped at" is a funnel fact; "they have a bad
+// back" is not something to put in a dataLayer.
+
+/** The /ujrakezdes landing was viewed. */
+export function trackUjrakezdesView(): void {
+  push("lx_ujrakezdes_view");
+}
+
+/** The landing CTA was taken into the wizard. */
+export function trackUjrakezdesQuizStart(): void {
+  push("lx_ujrakezdes_quiz_start");
+}
+
+/** A question was answered. `q` is the 1-7 position, for a clean drop-off chart. */
+export function trackUjrakezdesStep(stepId: string, q: number): void {
+  push("lx_ujrakezdes_step", { step_id: stepId, q });
+}
+
+/** The email gate was shown - the denominator for gate conversion. */
+export function trackUjrakezdesGateView(): void {
+  push("lx_ujrakezdes_gate_view");
+}
+
+/** A lead was stored. The `event_id` is SHARED with the server-side CAPI call
+ *  so Meta collapses the pair instead of counting the lead twice. */
+export function trackUjrakezdesLead(eventId: string): void {
+  push("lx_ujrakezdes_lead", { event_id: eventId });
+}
+
+/** The plan reveal was shown. */
+export function trackUjrakezdesRevealView(): void {
+  push("lx_ujrakezdes_reveal_view");
+}
+
+/** The offer CTA on the reveal was clicked. */
+export function trackUjrakezdesOfferClick(): void {
+  push("lx_ujrakezdes_offer_click");
 }
 
 /** What the SERVER needs to report a purchase to Meta's Conversions API.

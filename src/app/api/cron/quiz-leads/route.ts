@@ -11,8 +11,12 @@ import {
 import {
   sendQuizHowItWorks, sendQuizLastCall, sendQuizObjections,
   sendQuizObstacle, sendQuizOffer, sendQuizWinback,
+  sendUjrakezdesD3, sendUjrakezdesD6,
   type QuizObstacleKind,
 } from "@/lib/mailer";
+import { LM_HEALTH_FIELDS, LM_VARIANT, type LmLeadDoc } from "@/lib/ujrakezdes/lead";
+import { isLmStep, lmScheduleAfter, lmStopReason } from "@/lib/ujrakezdes/sequence";
+import { APP_URL } from "../../../../../emails/tokens";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,6 +36,42 @@ export const maxDuration = 60;
  */
 
 const BATCH = 200;
+
+/**
+ * One step of the lead magnet v2 sequence (D3, D6). Returns true when a mail
+ * actually went out.
+ *
+ * Mirrors the original path's idempotency contract exactly: the schedule is
+ * advanced in the SAME write that records the send, and a transport rejection
+ * leaves `nextEmailAt` untouched so tomorrow's run retries rather than
+ * silently skipping somebody's mail.
+ */
+async function advanceLmLead(
+  doc: FirebaseFirestore.QueryDocumentSnapshot,
+  lead: LmLeadDoc,
+  now: number,
+): Promise<boolean> {
+  const step = lead.nextEmailStep ?? 0;
+  const stop = lmStopReason(lead, step);
+  if (stop || !isLmStep(step)) {
+    await doc.ref.set({ nextEmailAt: null, nextEmailStep: null }, { merge: true });
+    return false;
+  }
+
+  const planHref = `${APP_URL}/ujrakezdes`;
+  const sent = step === 3
+    ? (await sendUjrakezdesD3(lead.email, doc.id, { planHref, segment: lead.computed.segment })).sent
+    : (await sendUjrakezdesD6(lead.email, doc.id)).sent;
+
+  if (!sent) return false;
+
+  await doc.ref.set(
+    { ...lmScheduleAfter(lead, step), lastEmailAt: now, lastEmailStep: step },
+    { merge: true },
+  );
+  return true;
+}
+
 
 async function section(name: string, fn: () => Promise<void>): Promise<void> {
   try {
@@ -75,7 +115,18 @@ export async function GET(req: Request) {
     const catalog = await loadQuizCatalog();
 
     for (const doc of snap.docs) {
-      const lead = doc.data() as LeadDoc;
+      const raw = doc.data() as LeadDoc | LmLeadDoc;
+
+      // Two funnels share this collection (see src/lib/ujrakezdes/lead.ts).
+      // The branch is additive: a document with no `variant` is an original
+      // quiz lead and takes the path below completely unchanged.
+      if ((raw as LmLeadDoc).variant === LM_VARIANT) {
+        const handled = await advanceLmLead(doc, raw as LmLeadDoc, now);
+        if (handled) stats.sent++; else stats.stopped++;
+        continue;
+      }
+
+      const lead = raw as LeadDoc;
       const step = (lead.nextEmailStep ?? 0) as SequenceStep;
 
       // Withdrawn consent, an unsubscribe, or a conversion since scheduling.
@@ -132,7 +183,12 @@ export async function GET(req: Request) {
       .get();
     for (const doc of snap.docs) {
       const patch: Record<string, unknown> = { healthPurgeAt: null, healthPurgedAt: now };
-      for (const f of HEALTH_FIELDS) patch[f] = FieldValue.delete();
+      // Each variant has its own Art. 9 field list: the original quiz's body
+      // metrics and calorie figures, or v2's single `care` answer.
+      const fields = (doc.data() as LmLeadDoc).variant === LM_VARIANT
+        ? LM_HEALTH_FIELDS
+        : HEALTH_FIELDS;
+      for (const f of fields) patch[f] = FieldValue.delete();
       await doc.ref.update(patch);
       stats.healthPurged++;
     }

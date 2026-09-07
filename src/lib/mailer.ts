@@ -60,10 +60,15 @@ import WeeklyRecap, { subjectFor as recapSubject } from "../../emails/weekly-rec
 import Welcome, { subject as welcomeSubject } from "../../emails/welcome";
 import WithdrawalConfirm, { subject as withdrawalSubject } from "../../emails/withdrawal-confirm";
 import GuaranteeRefundConfirm, { subject as guaranteeRefundSubject } from "../../emails/guarantee-refund-confirm";
+import UjrakezdesD0, { subject as ujraD0Subject } from "../../emails/ujrakezdes-d0";
+import UjrakezdesD3, { subject as ujraD3Subject } from "../../emails/ujrakezdes-d3";
+import UjrakezdesD6, { subject as ujraD6Subject } from "../../emails/ujrakezdes-d6";
 import WorkoutReminder, { subject as workoutSubject } from "../../emails/workout-reminder";
 import type { DayState } from "../../emails/components/Bits";
+import type { Anchor as UjraAnchor } from "@/lib/ujrakezdes/types";
 
 export type { DayState };
+export type { UjraAnchor };
 
 async function deliver(opts: {
   to: string;
@@ -428,3 +433,33 @@ export const sendDay2Nudge = (to: string, uid: string, motiv?: string) =>
     unsub: { uid, kind: "workout" },
     make: () => Day2Nudge({ motiv }),
   });
+
+// ─── Lead magnet v2 (/ujrakezdes) ────────────────────────────────────────────
+//
+// Same split as the older quiz's sequence: D0 is transactional - it IS the plan
+// they asked for - so it ships regardless of the marketing box. D3 and D6 are
+// marketing: consent-gated, and each carries a working one-click opt-out keyed
+// on the LEAD id, because these people have no account to unsubscribe in
+// (Grtv. §6 - no soft opt-in in Hungary).
+
+export const sendUjrakezdesD0 = (
+  to: string, p: { planHref: string; consented: boolean },
+) => deliver({ to, subject: ujraD0Subject, category: "habit", make: () => UjrakezdesD0(p) });
+
+export const sendUjrakezdesD3 = (
+  to: string, leadId: string, p: { planHref: string; segment: UjraAnchor },
+) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: ujraD3Subject, category: "marketing", unsub: u.unsub,
+    make: () => UjrakezdesD3({ ...p, unsubHref: u.href }),
+  });
+};
+
+export const sendUjrakezdesD6 = (to: string, leadId: string) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: ujraD6Subject, category: "marketing", unsub: u.unsub,
+    make: () => UjrakezdesD6({ unsubHref: u.href }),
+  });
+};
