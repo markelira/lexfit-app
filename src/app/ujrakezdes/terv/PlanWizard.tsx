@@ -437,7 +437,12 @@ export default function PlanWizard() {
                 their weight in order to receive what the ad offered. Renders
                 only when NEXT_PUBLIC_ENERGY_MODULE=1. */}
             {C.ENERGY_LIVE && isComplete(a) && (
-              <EnergyModule level={a.level} days={a.days} onComputed={attachBody} />
+              <EnergyModule
+                level={a.level}
+                days={a.days}
+                trainingCount={plan.trainingCount}
+                onComputed={attachBody}
+              />
             )}
 
             <div className="lxl u-offer" onClickCapture={trackUjrakezdesOfferClick}>

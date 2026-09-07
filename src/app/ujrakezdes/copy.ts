@@ -290,6 +290,12 @@ export const ENERGY = {
   stepsLabel: "napi lépés",
   waterLabel: "víz naponta",
 
+  /** The workout half. The session count is NOT repeated here - the plan above
+   *  already answered it, and two numbers for one question is worse than one. */
+  workoutHeading: "Mivel kezdd",
+  workoutLead: (days: number) =>
+    `A heti ${days} edzésnapodra ezt ajánljuk — a tagságban mind a kettő benne van.`,
+
   /** Shown when the deficit would have gone under the safety floor. */
   flooredNote:
     "A célod ennél alacsonyabb értéket adna, de nem megyünk lejjebb — ennyi kalória alatt már szakember felügyelete kell hozzá.",

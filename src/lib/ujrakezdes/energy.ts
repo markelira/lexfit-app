@@ -143,6 +143,8 @@ export function waterLitres(weightKg: number, activity: number): number {
 // ── Orchestrator ────────────────────────────────────────────────────────────
 
 export interface EnergyResult {
+  /** Two LEXFIT programmes for the goal - the workout half of the original. */
+  programs: WorkoutPick[];
   bmr: number;
   tdee: number;
   activity: number;
@@ -167,6 +169,7 @@ export function computeEnergy(body: BodyInput, level: Level, days: Days): Energy
     macros: macros(body.weightKg, kcal, body.goal),
     stepTarget: stepTarget(body.goal),
     waterLitres: waterLitres(body.weightKg, activity),
+    programs: recommendPrograms(body.goal, level),
   };
 }
 
@@ -209,4 +212,73 @@ export function parseBody(raw: unknown): BodyInput | string[] {
     goal: b.goal as EnergyGoal,
     tempo: b.tempo as Tempo,
   };
+}
+
+// ── The workout half ────────────────────────────────────────────────────────
+//
+// The source pairs its calorie target with `getExerciseRecommendation`, which
+// returns a weekly session count, a step goal and four lines of training
+// advice. Two of those three could not be ported as they stand:
+//
+//  1. THE SESSION COUNT IS NOT REPEATED. The source would tell a sedentary
+//     person to train 4-5 times a week; the plan they were just shown says 2, 3
+//     or 4, because that is what they chose. Two numbers for the same question
+//     is worse than one, so the count always comes from the plan and this
+//     module never restates it.
+//
+//  2. THE TRAINING ADVICE IS RE-POINTED AT LEXFIT. The source recommends
+//     resistance bands, dumbbells and HIIT circuits. LEXFIT's whole promise is
+//     "elég egy matrac" - repeating that advice would sell equipment the
+//     product does not use and the ad did not mention. So the recommendation
+//     names real programmes from the catalogue instead, which is also the
+//     honest bridge from a free calculator to the thing being sold.
+//
+// The step goal ports unchanged; it is the one output that was already ours.
+
+/** Canonical programme names. Kept in sync with PRICING_BAND.included by the
+ *  selftest, so a rename on the offer surfaces cannot leave this stale. */
+export const PROGRAM = {
+  START: "LEXFIT Start",
+  KEZDO: "7 napos kezdő",
+  REGGELI: "Reggeli rutinok",
+  ESTI: "Esti rutinok",
+  TARTAS: "Tartásjavító",
+  HAS: "Has & Mély Törzs",
+  LAB: "Láb & Fenék",
+} as const;
+
+export type ProgramName = (typeof PROGRAM)[keyof typeof PROGRAM];
+
+export interface WorkoutPick {
+  program: ProgramName;
+  why: string;
+}
+
+/**
+ * Two programmes for the goal, in the order they should be started.
+ *
+ * `level` decides the entry point rather than the goal does: somebody starting
+ * from nothing gets the 7-day beginner programme first whatever they picked,
+ * because the fastest way to lose a beginner is to open with the hardest thing
+ * on the shelf.
+ */
+export function recommendPrograms(goal: EnergyGoal, level: Level): WorkoutPick[] {
+  const opener: WorkoutPick =
+    level === "none"
+      ? { program: PROGRAM.KEZDO, why: "Hét rövid nap, hogy meglegyen a lendület." }
+      : { program: PROGRAM.START, why: "A gerincprogram — 30 vezetett edzés, a te tempódban." };
+
+  const second: WorkoutPick =
+    goal === "fogyas"
+      ? { program: PROGRAM.LAB, why: "Nagy izomcsoportok, több energia egy edzés alatt." }
+      : goal === "tonus"
+        ? { program: PROGRAM.HAS, why: "Törzserő — ez tartja meg a formát a többi edzésben." }
+        : { program: PROGRAM.TARTAS, why: "Stabil váll és csípő, hogy bírja a terhelést." };
+
+  // Never recommend the same thing twice: a beginner's opener is the 7-day
+  // programme, so LEXFIT Start becomes their second step rather than a repeat.
+  if (opener.program === PROGRAM.KEZDO && second.program === PROGRAM.START) return [opener];
+  return level === "none"
+    ? [opener, { program: PROGRAM.START, why: "Utána ez viszi tovább, 30 edzésen át." }]
+    : [opener, second];
 }

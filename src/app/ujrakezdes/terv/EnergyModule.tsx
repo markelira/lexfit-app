@@ -31,10 +31,12 @@ const EMPTY: Draft = { sex: "", age: "", heightCm: "", weightKg: "", goal: "", t
 const hu = (n: number) => n.toLocaleString("hu-HU");
 
 export default function EnergyModule({
-  level, days, onComputed,
+  level, days, trainingCount, onComputed,
 }: {
   level: Level;
   days: Days;
+  /** From the plan, so the module never contradicts the week already shown. */
+  trainingCount: number;
   /** Hands the parent the block to submit with the lead, plus the consent. */
   onComputed: (body: BodyInput) => void;
 }) {
@@ -93,6 +95,22 @@ export default function EnergyModule({
           <li><b>{hu(result.stepTarget)}</b><span>{C.ENERGY.stepsLabel}</span></li>
           <li><b>{result.waterLitres.toString().replace(".", ",")} l</b><span>{C.ENERGY.waterLabel}</span></li>
         </ul>
+
+        {/* The workout half: which LEXFIT programmes to start with. Named from
+            the real catalogue rather than the source's band-and-dumbbell
+            advice, which would sell equipment this product does not use. */}
+        <div className="u-en-workout">
+          <h4>{C.ENERGY.workoutHeading}</h4>
+          <p className="u-en-micro">{C.ENERGY.workoutLead(trainingCount)}</p>
+          <ol>
+            {result.programs.map((p) => (
+              <li key={p.program}>
+                <b>{p.program}</b>
+                <span>{p.why}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
 
         <p className="u-en-disclaimer">{C.ENERGY.disclaimer}</p>
         <button type="button" className="u-cta u-cta-quiet" onClick={() => setResult(null)}>

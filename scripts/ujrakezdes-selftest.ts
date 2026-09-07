@@ -28,8 +28,10 @@ import * as C from "../src/app/ujrakezdes/copy";
 import {
   activityMultiplier, bmr, computeEnergy, macros, parseBody, targetCalories,
   tdee, tempoCorrection, waterLitres, stepTarget, CALORIE_FLOOR,
+  recommendPrograms, PROGRAM,
   type BodyInput,
 } from "../src/lib/ujrakezdes/energy";
+import { PRICING_BAND } from "../src/components/landing/offer-copy";
 
 const ENERGY_CONSENT = C.ENERGY.consent;
 
@@ -371,6 +373,51 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.ok(LM_HEALTH_FIELDS.includes("body") && LM_HEALTH_FIELDS.includes("energy"),
     "a testadat és a belőle számolt érték a 12 hónapos órán fut");
   ok("a hozzájárulás visszavonása törli a testadatot, és a 12 hónapos óra is vonatkozik rá");
+
+  // ── The workout half ──
+  // Every programme named must actually exist on the offer surfaces. A rename
+  // there would otherwise leave the calculator recommending something the
+  // pricing band no longer lists.
+  const included = PRICING_BAND.included.join(" | ");
+  for (const name of Object.values(PROGRAM)) {
+    assert.ok(included.includes(name), `a katalógus nem tartalmazza: ${name}`);
+  }
+  ok("a modul csak létező, az ajánlatban is szereplő programokat nevez meg");
+
+  // A true beginner is opened with the 7-day programme whatever their goal is.
+  for (const g of ["fogyas", "tonus", "tomeg"] as const) {
+    const picks = recommendPrograms(g, "none");
+    assert.equal(picks[0]!.program, PROGRAM.KEZDO, `${g}: kezdőnek a 7 napos az első`);
+    assert.ok(picks.length >= 1 && picks.length <= 2);
+    // Never the same programme twice.
+    assert.equal(new Set(picks.map((p) => p.program)).size, picks.length, `${g}: nincs ismétlés`);
+  }
+  ok("nulláról indulónál a 7 napos kezdő az első, céltól függetlenül");
+
+  for (const lvl of ["rare", "weekly", "regular"] as const) {
+    const picks = recommendPrograms("fogyas", lvl);
+    assert.equal(picks[0]!.program, PROGRAM.START, `${lvl}: a Start a belépő`);
+    assert.equal(picks.length, 2);
+    assert.equal(new Set(picks.map((p) => p.program)).size, 2, `${lvl}: nincs ismétlés`);
+    for (const p of picks) assert.ok(p.why.length > 10 && !p.why.includes("!"), "indoklás megvan, felkiáltójel nélkül");
+  }
+  ok("mozgásbázissal a Start a belépő, mellé a célhoz illő második program");
+
+  // The goal actually changes the second pick - otherwise the branch is theatre.
+  const second = (g: "fogyas" | "tonus" | "tomeg") => recommendPrograms(g, "weekly")[1]!.program;
+  assert.equal(new Set([second("fogyas"), second("tonus"), second("tomeg")]).size, 3,
+    "mindhárom cél más második programot ad");
+  ok("a cél ténylegesen más programot ad, nem csak más szöveget");
+
+  // The session count is the PLAN's, never the calculator's - the module must
+  // not restate it, or the two can disagree on screen.
+  const en = computeEnergy(
+    { sex: "female", age: 30, heightCm: 165, weightKg: 60, goal: "fogyas", tempo: "laza" },
+    "weekly", "2",
+  );
+  assert.ok(!("exerciseCount" in en), "a modul nem közöl saját edzésszámot");
+  assert.ok(en.programs.length > 0, "viszont ad programajánlást");
+  ok("az edzésszám a tervből jön, a modul nem mond rá másik számot");
 
   // Using the calculator is not "filling the quiz twice".
   const sameAgain = buildLead({ ...base, consentMarketing: false, body: good as BodyInput, consentHealth: true });

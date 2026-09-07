@@ -44,7 +44,14 @@
   font-family: var(--font);
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;   /* the stage translates on the X axis */
+  /* `clip`, NOT `hidden`. Setting one axis to `hidden` forces the other to
+     compute as `auto`, which turns this element into its own scroll container:
+     the page then scrolls INSIDE .lxu while the window stays put. That breaks
+     scrollIntoView, anchor jumps and scroll restoration, stops mobile browsers
+     collapsing their URL bar, and a nested scroller inside a Facebook in-app
+     browser is a well-known source of stuck scrolling. `clip` contains the
+     stage's X-axis travel without creating a scrollport. */
+  overflow-x: clip;
 }
 
 .lxu .u-wrap {
@@ -747,4 +754,33 @@
 @media (max-width: 380px) {
   .lxu .u-en-grid { grid-template-columns: repeat(2, 1fr); }
   .lxu .u-seg { font-size: 13px; }
+}
+
+/* The workout half of the calculator. Numbered, because it is an order to
+   start in, not a menu. */
+.lxu .u-en-workout { margin: 0 0 var(--sp-5); }
+.lxu .u-en-workout h4 {
+  font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 var(--sp-2);
+}
+.lxu .u-en-workout ol {
+  list-style: none; counter-reset: w; margin: var(--sp-4) 0 0; padding: 0;
+  display: grid; gap: var(--sp-3);
+}
+.lxu .u-en-workout li {
+  counter-increment: w;
+  display: grid; grid-template-columns: 26px 1fr; gap: var(--sp-3);
+  align-items: baseline;
+}
+.lxu .u-en-workout li::before {
+  content: counter(w);
+  grid-row: span 2;
+  align-self: start;
+  display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--u-sage); color: var(--u-navy);
+  font-family: var(--mono); font-size: 12px;
+}
+.lxu .u-en-workout li b { font-size: 15.5px; font-weight: 600; }
+.lxu .u-en-workout li span {
+  grid-column: 2; font-size: 14px; line-height: 1.5; color: var(--ink-2);
 }

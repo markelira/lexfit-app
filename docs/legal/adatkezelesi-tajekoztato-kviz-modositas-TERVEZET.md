@@ -274,6 +274,55 @@ még nem szerződött látogatókat is elér, és testadatot kér?
 
 ---
 
+## 10/B. KIEGÉSZÍTÉS — az `/ujrakezdes` energia-modul (2026-09-07)
+
+> **Fejlesztői kiegészítés, jóváhagyásra.** A jelen tervezet eredetileg a `/terv`
+> kvízre készült. Azóta a `/ujrakezdes` tölcsérben elkészült egy **opcionális
+> energia-modul**, amely szintén testadatot kér be. Az alábbi eltérések a
+> 3.1. n) sorhoz képest a modul javára szólnak, ezért külön rögzítjük.
+
+**Mi tér el a `/terv` kvíztől — mindegyik szűkítés:**
+
+| | `/terv` kvíz (3.1. n) sor) | `/ujrakezdes` energia-modul |
+|---|---|---|
+| Testadat | testmagasság, testsúly, **cél-testsúly** | testmagasság, testsúly — **cél-testsúly nincs** |
+| Élethelyzet | `life_stage` (szülés utáni állapot, változókor) | **nincs bekérve** |
+| Egyéb | biológiai nem, korsáv | biológiai nem, **pontos életkor** (a képlethez) |
+| Kötelező-e | a kvíz kitöltésének része | **teljesen opcionális** — a felhasználó a heti tervét már megkapta, mielőtt bármit kérdeznénk |
+| Mikor | a kvíz közben, az eredmény előtt | **az eredmény után**, külön megnyitható blokkban |
+| Képzett adat | kalóriabecslés, programajánlás, lépéscél | kalóriacél, makrótápanyag-célok, lépéscél, vízbevitel, programajánlás |
+| Testkategória | — | **nincs** (BMI-besorolást nem képzünk) |
+| Célsúly-előrejelzés | — | **nincs** (időtávra vonatkozó ígéretet nem teszünk) |
+
+**Hozzájárulás.** A modul **külön, előre be nem jelölt** jelölőnégyzettel gyűjt
+hozzájárulást, amely a marketing-hozzájárulástól elkülönül és azzal nem vonható
+össze. A szöveg tételesen megnevezi a kezelt adatokat és a törlés jogát:
+
+> „Hozzájárulok, hogy a LEXFIT a megadott testadataimat (nem, kor, magasság,
+> testsúly) a kalóriacélom kiszámításához kezelje. Ezeket az adatokat bármikor
+> töröltethetem."
+
+**Megőrzés.** A testadatok és a belőlük számított értékek (`body`, `energy`) a
+kitöltéstől számított **12 hónap** után automatikusan törlésre kerülnek, a lead
+egyéb adatai 24 hónapig maradnak — azonos a 3.1. n) sor szabályával.
+
+**Visszavonás.** Ha a felhasználó úgy tölti ki újra a kérdőívet, hogy a modult
+kihagyja, az a hozzájárulás visszavonásának minősül: a testadatok és a belőlük
+számított értékek **törlődnek**, a hozzájárulás-napló pedig `health: false`
+értéket rögzít.
+
+**Technikai zár.** A modul két, alapértelmezetten kikapcsolt kapcsoló mögött
+fut; a szerveroldali (`ENERGY_MODULE_ENABLED`) a jogi kontroll. Ellenőrizve:
+kikapcsolt állapotban a testadatot tartalmazó kérés esetén is **kizárólag** a
+testadat nélküli lead tárolódik.
+
+> **⚖️ Kérdés az ügyvédhez (a 11. pont listájához):** a fenti szűkítések
+> (cél-testsúly és élethelyzet nélkül, opcionálisan, az eredmény után, BMI-besorolás
+> és célsúly-előrejelzés nélkül) befolyásolják-e a 9. cikk alkalmazandóságáról szóló
+> 1. pontbeli döntést erre a modulra nézve?
+
+---
+
 ## 11. Összefoglaló ellenőrzőlista az ügyvédnek
 
 | # | Kérdés | Hol |
@@ -284,6 +333,7 @@ még nem szerződött látogatókat is elér, és testadatot kér?
 | 4 | A Firebase-sor kiegészítendő-e a lead-adatokkal? | 6. pont |
 | 5 | A kvíz localStorage-tárolása „feltétlenül szükséges"-nek minősül-e? | 8. pont |
 | 6 | A hozzájáruló szöveg elég „kifejezett"-e a 9. cikkhez? | 10/A |
+| 6b | Az `/ujrakezdes` energia-modul szűkített adatköre változtat-e a 9. cikk megítélésén? | 10/B |
 | 7 | Kell-e korhatár-jelzés a kvíz felületén? | 10/C |
 | 8 | A dátum-alapú verziószámozás elfogadható-e? | 9. pont |
 
