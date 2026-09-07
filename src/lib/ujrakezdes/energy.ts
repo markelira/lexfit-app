@@ -94,6 +94,32 @@ export const tempoCorrection = (goal: EnergyGoal, tempo: Tempo): number =>
   TEMPO_CORRECTION[goal][tempo];
 
 /**
+ * The weekly rate each tempo implies, from the source's own table.
+ *
+ * Shown while CHOOSING a tempo, because it is the thing that distinguishes
+ * them - a deficit without its rate is not a choice, it is a number. This is
+ * arithmetic implied by the deficit (~7700 kcal/kg), not a dated promise: no
+ * goal weight is asked for and no finish date is produced, which is the line
+ * docs/onboarding-personalization-plan.md §6 actually draws.
+ */
+export const WEEKLY_KG: Record<EnergyGoal, Record<Tempo, number>> = {
+  fogyas: { laza: 0.23, kozepes: 0.37, intenziv: 0.55 },
+  tonus:  { laza: 0.10, kozepes: 0.15, intenziv: 0.25 },
+  tomeg:  { laza: 0.14, kozepes: 0.23, intenziv: 0.37 },
+};
+
+/** "-400 kcal/nap" · "Fenntartó kalória" · "+250 kcal/nap". */
+export function tempoDelta(goal: EnergyGoal, tempo: Tempo): string {
+  const d = tempoCorrection(goal, tempo);
+  if (d === 0) return "Fenntartó kalória";
+  return `${d > 0 ? "+" : "−"}${Math.abs(d)} kcal/nap`;
+}
+
+/** "kb. 0,37 kg/hét" - Hungarian decimal comma. */
+export const tempoRate = (goal: EnergyGoal, tempo: Tempo): string =>
+  `kb. ${WEEKLY_KG[goal][tempo].toFixed(2).replace(".", ",")} kg/hét`;
+
+/**
  * The daily target.
  *
  * FLOORED, which the original does not do. An unclamped intensive deficit on a
@@ -153,10 +179,13 @@ export interface EnergyResult {
   macros: Macros;
   stepTarget: number;
   waterLitres: number;
+  /** The programme's real session length, so the result cannot name a duration
+   *  the videos do not have. */
+  sessionMin?: number;
 }
 
 export function computeEnergy(
-  body: BodyInput, level: Level, days: Days, focus?: Focus,
+  body: BodyInput, level: Level, days: Days, focus?: Focus, sessionMin?: number,
 ): EnergyResult {
   const activity = activityMultiplier(level, days);
   const b = bmr(body.sex, body.weightKg, body.heightCm, body.age);
@@ -172,6 +201,7 @@ export function computeEnergy(
     stepTarget: stepTarget(body.goal),
     waterLitres: waterLitres(body.weightKg, activity),
     programs: recommendPrograms(body.goal, level, focus),
+    ...(sessionMin ? { sessionMin } : {}),
   };
 }
 

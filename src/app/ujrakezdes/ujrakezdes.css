@@ -1031,3 +1031,236 @@
    announced. Keyboard users still get a ring (:focus-visible); a mouse user
    should not see one drawn around the whole page. */
 .lxu .u-stage:focus:not(:focus-visible) { outline: none; }
+
+/* ═══ The calculator ════════════════════════════════════════════════════════
+   Ported from szavazzmagadra's own calculator: a three-step flow with numbered
+   section cards and a result built around one very large number. Its shape is
+   the point - a form plus a table would compute the same values and feel like
+   a spreadsheet. Palette is LEXFIT's sage/navy rather than the source's pink. */
+
+.lxu .u-energy-teaser,
+.lxu .u-calc {
+  margin: var(--sp-8) 0 0;
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+.lxu .u-energy-teaser h3,
+.lxu .u-calc-h {
+  font-size: 19px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 var(--sp-3);
+}
+.lxu .u-energy-teaser p { font-size: 15px; line-height: 1.55; color: var(--ink-2); margin: 0 0 var(--sp-5); }
+
+.lxu .u-cta-quiet {
+  background: transparent; color: var(--ink);
+  border: 1.5px solid var(--ink); box-shadow: none;
+}
+.lxu .u-cta-quiet:active { box-shadow: none; background: oklch(0.235 0.014 168 / 0.05); }
+
+/* ── Step indicator ──────────────────────────────────────────────────────── */
+.lxu .u-calc-steps {
+  list-style: none; margin: 0 0 var(--sp-6); padding: 0;
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--sp-2);
+  text-align: center;
+}
+.lxu .u-calc-steps li {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.lxu .u-calc-steps .dot {
+  display: block; width: 8px; height: 8px; margin: 0 auto var(--sp-2);
+  border-radius: 50%; background: var(--line);
+  transition: background-color 260ms var(--ease-settle), transform 260ms var(--ease-settle);
+}
+.lxu .u-calc-steps li.done .dot { background: var(--u-sage); }
+.lxu .u-calc-steps li.on { color: var(--ink); }
+.lxu .u-calc-steps li.on .dot { background: var(--u-navy); transform: scale(1.3); }
+
+.lxu .u-calc-body { display: grid; gap: var(--sp-5); }
+
+/* ── Numbered section cards ──────────────────────────────────────────────── */
+.lxu .u-calc-card {
+  border: 1px solid var(--line); border-radius: 18px;
+  background: var(--u-cream); padding: var(--sp-5);
+}
+.lxu .u-calc-card h4 {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15.5px; font-weight: 700; margin: 0 0 var(--sp-4); letter-spacing: -0.01em;
+}
+.lxu .u-calc-card h4 .n {
+  display: grid; place-items: center; flex: 0 0 auto;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--u-sage); color: var(--u-navy);
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+}
+
+.lxu .u-flabel {
+  display: block; font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);
+  margin: 0 0 6px;
+}
+.lxu .u-fhint { font-size: 12.5px; line-height: 1.5; color: var(--ink-3); margin: var(--sp-2) 0 0; }
+
+.lxu .u-seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px;
+}
+.lxu .u-seg-b {
+  appearance: none; border: 1.5px solid var(--line); background: var(--surface);
+  border-radius: 12px; padding: 13px 8px;
+  font-family: var(--font); font-size: 14.5px; color: var(--ink-2); cursor: pointer;
+  transition: border-color 160ms var(--ease-settle), background-color 160ms var(--ease-settle),
+              color 160ms var(--ease-settle), transform 110ms var(--ease-settle);
+}
+.lxu .u-seg-b:active { transform: scale(0.97); }
+.lxu .u-seg-b.on { border-color: var(--u-navy); background: var(--u-navy); color: var(--u-cream); }
+
+.lxu .u-calc-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); margin-top: var(--sp-4); }
+.lxu .u-calc-num .u-input { padding: 13px 10px; text-align: center; }
+.lxu .u-calc-num input::-webkit-outer-spin-button,
+.lxu .u-calc-num input::-webkit-inner-spin-button { appearance: none; margin: 0; }
+.lxu .u-calc-num input[type="number"] { -moz-appearance: textfield; }
+.lxu .u-calc .u-input {
+  width: 100%; box-sizing: border-box;
+  border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface);
+  font-family: var(--font); font-size: 16.5px; color: var(--ink);
+}
+.lxu .u-calc .u-input:focus { outline: none; border-color: var(--u-sage); box-shadow: 0 0 0 4px oklch(0.660 0.042 168 / 0.18); }
+
+.lxu .u-goals { display: grid; gap: 8px; }
+.lxu .u-goal {
+  appearance: none; text-align: left;
+  border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px;
+  padding: 14px 16px; font-family: var(--font); font-size: 15.5px; color: var(--ink);
+  cursor: pointer; transition: border-color 160ms var(--ease-settle), background-color 160ms var(--ease-settle);
+}
+.lxu .u-goal.on { border-color: var(--u-navy); background: var(--u-navy); color: var(--u-cream); }
+
+/* ── Tempo ───────────────────────────────────────────────────────────────── */
+.lxu .u-calc-head { text-align: center; }
+.lxu .u-calc-tag {
+  display: inline-block; padding: 5px 14px; border-radius: 999px;
+  background: var(--u-sage); color: var(--u-navy);
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.lxu .u-calc-head h4 {
+  font-size: clamp(21px, 5.5vw, 27px); font-weight: 600; letter-spacing: -0.02em;
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+.lxu .u-calc-head p { font-size: 14px; line-height: 1.55; color: var(--ink-3); margin: 0; }
+
+.lxu .u-tempos { display: grid; gap: 10px; }
+.lxu .u-tempo {
+  appearance: none; display: grid; gap: 4px; text-align: left;
+  border: 2px solid var(--line); background: var(--surface); border-radius: 14px;
+  padding: 14px 16px; font-family: var(--font); color: var(--ink); cursor: pointer;
+  transition: border-color 160ms var(--ease-settle), background-color 160ms var(--ease-settle);
+}
+.lxu .u-tempo.on { border-color: var(--u-sage); background: var(--accent-soft); }
+.lxu .u-tempo .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lxu .u-tempo b { font-size: 15px; font-weight: 700; }
+.lxu .u-tempo em {
+  font-style: normal; font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--u-navy); color: var(--u-cream);
+  padding: 3px 8px; border-radius: 999px;
+}
+.lxu .u-tempo .korr {
+  margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--accent-ink); font-weight: 600;
+}
+.lxu .u-tempo .desc { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.lxu .u-tempo .rate { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+.lxu .u-calc-foot { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3); }
+
+/* ── The result ──────────────────────────────────────────────────────────── */
+.lxu .u-res-hero {
+  position: relative; overflow: hidden;
+  border-radius: 22px; padding: var(--sp-8) var(--sp-6);
+  background: linear-gradient(150deg, oklch(0.72 0.05 168) 0%, oklch(0.50 0.046 168) 100%);
+  color: #fff;
+}
+.lxu .u-res-hero .ring {
+  position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.10); pointer-events: none;
+}
+.lxu .u-res-hero .ring.a { width: 190px; height: 190px; top: -54px; right: -48px; }
+.lxu .u-res-hero .ring.b { width: 150px; height: 150px; bottom: -62px; left: -34px; background: rgba(255,255,255,0.06); }
+.lxu .u-res-hero > p { position: relative; margin: 0; }
+.lxu .u-res-hero .eyebrow {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.13em;
+  text-transform: uppercase; opacity: 0.9;
+}
+.lxu .u-res-hero .big {
+  font-size: clamp(52px, 15vw, 76px); font-weight: 700; line-height: 1;
+  letter-spacing: -0.04em; margin-top: var(--sp-3);
+  font-variant-numeric: tabular-nums;
+}
+.lxu .u-res-hero .big span { font-size: 20px; font-weight: 600; letter-spacing: 0; margin-left: 8px; opacity: 0.85; }
+.lxu .u-res-hero .desc { font-size: 13.5px; line-height: 1.55; margin-top: var(--sp-4); max-width: 34ch; opacity: 0.92; }
+
+.lxu .u-macros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.lxu .u-macro {
+  border: 1.5px solid var(--line); border-radius: 16px; background: var(--surface);
+  padding: var(--sp-4) var(--sp-2); text-align: center;
+}
+.lxu .u-macro .dot { display: block; width: 8px; height: 8px; border-radius: 50%; margin: 0 auto 10px; }
+.lxu .u-macro .dot.p { background: var(--cat-also); }
+.lxu .u-macro .dot.c { background: var(--cat-cardio); }
+.lxu .u-macro .dot.f { background: var(--cat-tartas); }
+.lxu .u-macro .lbl {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px;
+}
+.lxu .u-macro .val { font-size: 26px; font-weight: 700; line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
+.lxu .u-macro .val span { font-size: 13px; font-weight: 600; margin-left: 2px; color: var(--ink-3); }
+
+.lxu .u-split {
+  display: flex; align-items: center; gap: var(--sp-5);
+  border: 1.5px solid var(--line); border-radius: 18px; background: var(--surface);
+  padding: var(--sp-5);
+}
+.lxu .u-split > div { flex: 1; text-align: center; }
+.lxu .u-split .big { font-size: 34px; font-weight: 700; line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
+.lxu .u-split .lbl { font-size: 12px; color: var(--ink-3); margin: 6px 0 0; }
+.lxu .u-split .rule { width: 1px; align-self: stretch; background: var(--line); }
+
+.lxu .u-water {
+  border-radius: 18px; padding: var(--sp-5) var(--sp-6);
+  background: linear-gradient(140deg, oklch(0.95 0.02 225) 0%, oklch(0.90 0.035 225) 100%);
+}
+.lxu .u-water .eyebrow {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.11em;
+  text-transform: uppercase; color: oklch(0.45 0.06 245); margin: 0 0 6px;
+}
+.lxu .u-water .val {
+  font-size: 30px; font-weight: 700; line-height: 1; margin: 0; color: oklch(0.36 0.07 245);
+}
+.lxu .u-water .val span { font-size: 15px; font-weight: 600; margin-left: 6px; }
+
+.lxu .u-en-note {
+  font-size: 14px; line-height: 1.55; color: var(--ink-2);
+  background: var(--accent-soft); border-radius: 14px; padding: var(--sp-4); margin: 0;
+}
+.lxu .u-en-disclaimer { font-size: 13px; line-height: 1.6; color: var(--ink-2); margin: 0; }
+
+.lxu .u-en-workout h4 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+.lxu .u-en-workout ol {
+  list-style: none; counter-reset: w; margin: var(--sp-4) 0 0; padding: 0; display: grid; gap: var(--sp-3);
+}
+.lxu .u-en-workout li {
+  counter-increment: w; display: grid; grid-template-columns: 26px 1fr; gap: var(--sp-3); align-items: baseline;
+}
+.lxu .u-en-workout li::before {
+  content: counter(w); grid-row: span 2; align-self: start;
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--u-sage); color: var(--u-navy); font-family: var(--mono); font-size: 12px;
+}
+.lxu .u-en-workout li b { font-size: 15px; font-weight: 600; }
+.lxu .u-en-workout li span { grid-column: 2; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+
+@media (max-width: 400px) {
+  .lxu .u-macros { grid-template-columns: 1fr; }
+  .lxu .u-split { flex-direction: column; gap: var(--sp-4); }
+  .lxu .u-split .rule { width: 56px; height: 1px; align-self: center; }
+  .lxu .u-calc-foot { grid-template-columns: 1fr; }
+}

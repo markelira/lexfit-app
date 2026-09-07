@@ -2,36 +2,44 @@
 
 import { useState } from "react";
 import * as C from "../copy";
-import { BODY_LIMITS, computeEnergy, parseBody, type BodyInput, type EnergyResult } from "@/lib/ujrakezdes/energy";
+import {
+  BODY_LIMITS, computeEnergy, parseBody, tempoDelta, tempoRate,
+  type BodyInput, type EnergyGoal, type EnergyResult, type Tempo,
+} from "@/lib/ujrakezdes/energy";
 import type { Days, Focus, Level } from "@/lib/ujrakezdes/types";
 
-// The energy module: the szavazzmagadra calculator, offered AFTER the plan.
+// The calculator, ported from szavazzmagadra's own (app/src/components/
+// calculator/*). Its shape is the point, not just its arithmetic: it is a
+// THREE-STEP flow with numbered section cards and a result built around one
+// very large number - not a form and a table.
 //
-// Placement is the whole design. It sits below the reveal, opt-in, collapsed by
-// default - so the lead is already captured, the plan is already delivered, and
-// nobody is asked for their weight in order to receive what they were promised.
-// Putting body metrics before the gate would have made the funnel's headline
-// claim ("7 kérdés, és kész a heti edzésterved") false.
+// Steps here are Adatok · Tempó · Eredmény. The source has a fourth, an email
+// gate before the result; ours is already behind the quiz's own gate, so
+// repeating it would be asking the same person for the same address twice.
 //
-// It renders only when NEXT_PUBLIC_ENERGY_MODULE=1, and the server refuses the
-// body block unless ENERGY_MODULE_ENABLED=true. Both stay off until the Art. 9
-// privacy amendment is published.
+// Two pieces of the source's result are deliberately absent, as decided when
+// the maths was ported: the BMI badge (body-category labelling) and the
+// goal-weight projection. Everything else - the gradient hero, the three macro
+// cards, the split exercise/steps card, the water panel - is here, in LEXFIT's
+// palette rather than the pink one.
+
+type Step = 1 | 2 | 3;
 
 type Draft = {
   sex: BodyInput["sex"] | "";
   age: string;
   heightCm: string;
   weightKg: string;
-  goal: BodyInput["goal"] | "";
-  tempo: BodyInput["tempo"];
+  goal: EnergyGoal | "";
+  tempo: Tempo;
 };
 
 const EMPTY: Draft = { sex: "", age: "", heightCm: "", weightKg: "", goal: "", tempo: "kozepes" };
-
+const TEMPOS: Tempo[] = ["laza", "kozepes", "intenziv"];
 const hu = (n: number) => n.toLocaleString("hu-HU");
 
 export default function EnergyModule({
-  level, days, focus, trainingCount, onComputed,
+  level, days, focus, trainingCount, sessionMin, onComputed,
 }: {
   level: Level;
   days: Days;
@@ -39,33 +47,37 @@ export default function EnergyModule({
   focus: Focus;
   /** From the plan, so the module never contradicts the week already shown. */
   trainingCount: number;
-  /** Hands the parent the block to submit with the lead, plus the consent. */
+  /** The programme's real session length, from the live catalogue. */
+  sessionMin: number;
   onComputed: (body: BodyInput) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<Step>(1);
   const [d, setD] = useState<Draft>(EMPTY);
   const [consent, setConsent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [result, setResult] = useState<EnergyResult | null>(null);
 
-  const set = <K extends keyof Draft>(k: K, v: Draft[K]) =>
-    setD((p) => ({ ...p, [k]: v }));
+  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((p) => ({ ...p, [k]: v }));
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
+  const step1Ready = d.sex && d.goal && d.age && d.heightCm && d.weightKg;
+
+  function compute() {
     const parsed = parseBody({
       sex: d.sex, age: Number(d.age), heightCm: Number(d.heightCm),
       weightKg: Number(d.weightKg), goal: d.goal, tempo: d.tempo,
     });
-    if (Array.isArray(parsed)) { setErr(C.ENERGY.error); return; }
+    if (Array.isArray(parsed)) { setErr(C.ENERGY.error); setStep(1); return; }
     setErr(null);
     // Computed on the client for an instant result; the server recomputes from
     // the same inputs when it stores the lead, and its numbers are the ones
     // that count.
-    setResult(computeEnergy(parsed, level, days, focus));
+    setResult(computeEnergy(parsed, level, days, focus, sessionMin));
+    setStep(3);
     onComputed(parsed);
   }
 
+  // ── The invitation ─────────────────────────────────────────────────────────
   if (!open) {
     return (
       <section className="u-energy-teaser" aria-labelledby="u-en-teaser">
@@ -78,136 +90,197 @@ export default function EnergyModule({
     );
   }
 
-  if (result) {
-    const m = result.macros;
-    return (
-      <section className="u-energy" aria-labelledby="u-en-res">
-        <h3 id="u-en-res">{C.ENERGY.resultHeading}</h3>
-
-        <div className="u-en-hero">
-          <strong>{hu(result.kcal)}</strong>
-          <span>{C.ENERGY.kcalLabel}</span>
-        </div>
-        {result.floored && <p className="u-en-note">{C.ENERGY.flooredNote}</p>}
-
-        <ul className="u-en-grid">
-          <li><b>{hu(m.proteinG)} g</b><span>{C.ENERGY.proteinLabel}</span></li>
-          <li><b>{hu(m.carbsG)} g</b><span>{C.ENERGY.carbsLabel}</span></li>
-          <li><b>{hu(m.fatG)} g</b><span>{C.ENERGY.fatLabel}</span></li>
-          <li><b>{hu(result.stepTarget)}</b><span>{C.ENERGY.stepsLabel}</span></li>
-          <li><b>{result.waterLitres.toString().replace(".", ",")} l</b><span>{C.ENERGY.waterLabel}</span></li>
-        </ul>
-
-        {/* The workout half: which LEXFIT programmes to start with. Named from
-            the real catalogue rather than the source's band-and-dumbbell
-            advice, which would sell equipment this product does not use. */}
-        <div className="u-en-workout">
-          <h4>{C.ENERGY.workoutHeading}</h4>
-          <p className="u-en-micro">{C.ENERGY.workoutLead(trainingCount)}</p>
-          <ol>
-            {result.programs.map((p) => (
-              <li key={p.program}>
-                <b>{p.program}</b>
-                <span>{p.why}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        <p className="u-en-disclaimer">{C.ENERGY.disclaimer}</p>
-        <button type="button" className="u-cta u-cta-quiet" onClick={() => setResult(null)}>
-          {C.ENERGY.recalcCta}
-        </button>
-      </section>
-    );
-  }
-
-  const ready = d.sex && d.goal && d.age && d.heightCm && d.weightKg && consent;
-
   return (
-    <section className="u-energy" aria-labelledby="u-en-form">
-      <h3 id="u-en-form">{C.ENERGY.formHeading}</h3>
-      <p className="u-en-micro">{C.ENERGY.formMicro}</p>
+    <section className="u-calc" aria-labelledby="u-calc-h">
+      <h3 className="u-calc-h" id="u-calc-h">{C.ENERGY.teaserHeading}</h3>
 
-      <form onSubmit={submit} noValidate>
-        <fieldset className="u-en-fs">
-          <legend className="u-label">{C.ENERGY.sexLabel}</legend>
-          <div className="u-seg">
-            {C.ENERGY.sexOptions.map((o) => (
-              <button
-                key={o.value} type="button"
-                className={`u-seg-b${d.sex === o.value ? " on" : ""}`}
-                aria-pressed={d.sex === o.value}
-                onClick={() => set("sex", o.value)}
-              >{o.label}</button>
-            ))}
+      {/* Where you are in the calculator, as in the source: dots over labels. */}
+      <ol className="u-calc-steps" aria-label="A kalkulátor lépései">
+        {C.ENERGY.steps.map((label, i) => (
+          <li key={label} className={i + 1 === step ? "on" : i + 1 < step ? "done" : ""}>
+            <span className="dot" aria-hidden="true" />
+            {label}
+          </li>
+        ))}
+      </ol>
+
+      {/* ── 1 · Adatok ───────────────────────────────────────────────────── */}
+      {step === 1 && (
+        <div className="u-calc-body">
+          <div className="u-calc-card">
+            <h4><span className="n">1</span>{C.ENERGY.card1}</h4>
+
+            <span className="u-flabel">{C.ENERGY.sexLabel}</span>
+            <div className="u-seg">
+              {C.ENERGY.sexOptions.map((o) => (
+                <button
+                  key={o.value} type="button"
+                  className={`u-seg-b${d.sex === o.value ? " on" : ""}`}
+                  aria-pressed={d.sex === o.value}
+                  onClick={() => set("sex", o.value)}
+                >{o.label}</button>
+              ))}
+            </div>
+            <p className="u-fhint">{C.ENERGY.sexMicro}</p>
+
+            <div className="u-calc-nums">
+              {([
+                ["age", C.ENERGY.ageLabel, BODY_LIMITS.age],
+                ["heightCm", C.ENERGY.heightLabel, BODY_LIMITS.heightCm],
+                ["weightKg", C.ENERGY.weightLabel, BODY_LIMITS.weightKg],
+              ] as const).map(([k, label, [lo, hi]]) => (
+                <label key={k} className="u-calc-num">
+                  <span className="u-flabel">{label}</span>
+                  <input
+                    className="u-input" type="number" inputMode="numeric"
+                    min={lo} max={hi} value={d[k]}
+                    onChange={(e) => { set(k, e.target.value); if (err) setErr(null); }}
+                  />
+                </label>
+              ))}
+            </div>
           </div>
-          <p className="u-en-micro">{C.ENERGY.sexMicro}</p>
-        </fieldset>
 
-        <div className="u-en-nums">
-          {([
-            ["age", C.ENERGY.ageLabel, BODY_LIMITS.age],
-            ["heightCm", C.ENERGY.heightLabel, BODY_LIMITS.heightCm],
-            ["weightKg", C.ENERGY.weightLabel, BODY_LIMITS.weightKg],
-          ] as const).map(([k, label, [lo, hi]]) => (
-            <label key={k} className="u-en-num">
-              <span className="u-label">{label}</span>
-              <input
-                className="u-input"
-                type="number"
-                inputMode="numeric"
-                min={lo}
-                max={hi}
-                value={d[k]}
-                onChange={(e) => { set(k, e.target.value); if (err) setErr(null); }}
-              />
-            </label>
-          ))}
+          <div className="u-calc-card">
+            <h4><span className="n">2</span>{C.ENERGY.card2}</h4>
+            <div className="u-goals">
+              {C.ENERGY.goalOptions.map((o) => (
+                <button
+                  key={o.value} type="button"
+                  className={`u-goal${d.goal === o.value ? " on" : ""}`}
+                  aria-pressed={d.goal === o.value}
+                  onClick={() => set("goal", o.value)}
+                >{o.label}</button>
+              ))}
+            </div>
+          </div>
+
+          {err && <p className="u-err" role="alert">{err}</p>}
+
+          <button
+            type="button" className="u-cta"
+            disabled={!step1Ready}
+            onClick={() => setStep(2)}
+          >{C.ENERGY.next}</button>
         </div>
+      )}
 
-        <fieldset className="u-en-fs">
-          <legend className="u-label">{C.ENERGY.goalLabel}</legend>
-          <div className="u-seg">
-            {C.ENERGY.goalOptions.map((o) => (
-              <button
-                key={o.value} type="button"
-                className={`u-seg-b${d.goal === o.value ? " on" : ""}`}
-                aria-pressed={d.goal === o.value}
-                onClick={() => set("goal", o.value)}
-              >{o.label}</button>
+      {/* ── 2 · Tempó ────────────────────────────────────────────────────── */}
+      {step === 2 && d.goal && (
+        <div className="u-calc-body">
+          <div className="u-calc-head">
+            <span className="u-calc-tag">{C.ENERGY.tempoTag[d.goal]}</span>
+            <h4>{C.ENERGY.tempoHeading}</h4>
+            <p>{C.ENERGY.tempoLead[d.goal]}</p>
+          </div>
+
+          <div className="u-calc-card">
+            <h4><span className="n">3</span>{C.ENERGY.card3}</h4>
+            <div className="u-tempos">
+              {TEMPOS.map((t) => (
+                <button
+                  key={t} type="button"
+                  className={`u-tempo${d.tempo === t ? " on" : ""}`}
+                  aria-pressed={d.tempo === t}
+                  onClick={() => set("tempo", t)}
+                >
+                  <span className="row">
+                    <b>{C.ENERGY.tempoName[t]}</b>
+                    {t === "kozepes" && <em>{C.ENERGY.tempoRecommended}</em>}
+                    <span className="korr">{tempoDelta(d.goal as EnergyGoal, t)}</span>
+                  </span>
+                  <span className="desc">{C.ENERGY.tempoDesc[d.goal][t]}</span>
+                  <span className="rate">{tempoRate(d.goal as EnergyGoal, t)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* The Art. 9 consent sits on the step that triggers the calculation
+              and the store - not buried on the first screen, where it would be
+              agreed to long before anything is computed. */}
+          <label className="u-consent">
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+            <span>{C.ENERGY.consent}</span>
+          </label>
+
+          <div className="u-calc-foot">
+            <button type="button" className="u-cta u-cta-quiet" onClick={() => setStep(1)}>
+              {C.ENERGY.back}
+            </button>
+            <button type="button" className="u-cta" disabled={!consent} onClick={compute}>
+              {C.ENERGY.submit}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── 3 · Eredmény ─────────────────────────────────────────────────── */}
+      {step === 3 && result && (
+        <div className="u-calc-body">
+          {/* One very large number, as in the source. The result has to read as
+              an answer, not as a row in a table. */}
+          <div className="u-res-hero">
+            <span className="ring a" aria-hidden="true" />
+            <span className="ring b" aria-hidden="true" />
+            <p className="eyebrow">{C.ENERGY.resultEyebrow}</p>
+            <p className="big">{hu(result.kcal)}<span>kcal</span></p>
+            <p className="desc">{C.ENERGY.tempoDesc[d.goal as string][d.tempo]}</p>
+          </div>
+
+          {result.floored && <p className="u-en-note">{C.ENERGY.flooredNote}</p>}
+
+          <div className="u-macros">
+            {[
+              { k: "p", label: C.ENERGY.proteinLabel, v: result.macros.proteinG },
+              { k: "c", label: C.ENERGY.carbsLabel, v: result.macros.carbsG },
+              { k: "f", label: C.ENERGY.fatLabel, v: result.macros.fatG },
+            ].map((m) => (
+              <div className="u-macro" key={m.k}>
+                <span className={`dot ${m.k}`} aria-hidden="true" />
+                <p className="lbl">{m.label}</p>
+                <p className="val">{hu(m.v)}<span>g</span></p>
+              </div>
             ))}
           </div>
-        </fieldset>
 
-        <fieldset className="u-en-fs">
-          <legend className="u-label">{C.ENERGY.tempoLabel}</legend>
-          <div className="u-seg">
-            {C.ENERGY.tempoOptions.map((o) => (
-              <button
-                key={o.value} type="button"
-                className={`u-seg-b${d.tempo === o.value ? " on" : ""}`}
-                aria-pressed={d.tempo === o.value}
-                onClick={() => set("tempo", o.value)}
-              >{o.label}</button>
-            ))}
+          <div className="u-split">
+            <div>
+              <p className="big">{trainingCount}</p>
+              <p className="lbl">{C.ENERGY.weekSplitLabel(result.sessionMin ?? 30)}</p>
+            </div>
+            <span className="rule" aria-hidden="true" />
+            <div>
+              <p className="big">{hu(result.stepTarget)}</p>
+              <p className="lbl">{C.ENERGY.stepsSplitLabel}</p>
+            </div>
           </div>
-          <p className="u-en-micro">{C.ENERGY.tempoMicro}</p>
-        </fieldset>
 
-        {/* The Art. 9 consent. Separate from the marketing box by law, and
-            separate on screen so it cannot be mistaken for it. */}
-        <label className="u-consent">
-          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-          <span>{C.ENERGY.consent}</span>
-        </label>
+          <div className="u-en-workout">
+            <h4>{C.ENERGY.workoutHeading}</h4>
+            <p className="u-fhint">{C.ENERGY.workoutLead(trainingCount)}</p>
+            <ol>
+              {result.programs.map((p) => (
+                <li key={p.program}><b>{p.program}</b><span>{p.why}</span></li>
+              ))}
+            </ol>
+          </div>
 
-        {err && <p className="u-err" role="alert">{err}</p>}
+          <div className="u-water">
+            <p className="eyebrow">{C.ENERGY.waterEyebrow}</p>
+            <p className="val">
+              {result.waterLitres.toString().replace(".", ",")}
+              <span>{C.ENERGY.waterUnit}</span>
+            </p>
+          </div>
 
-        <button type="submit" className="u-cta" disabled={!ready}>
-          {C.ENERGY.submit}
-        </button>
-      </form>
+          <p className="u-en-disclaimer">{C.ENERGY.disclaimer}</p>
+          <button
+            type="button" className="u-cta u-cta-quiet"
+            onClick={() => { setResult(null); setStep(1); }}
+          >{C.ENERGY.recalcCta}</button>
+        </div>
+      )}
     </section>
   );
 }

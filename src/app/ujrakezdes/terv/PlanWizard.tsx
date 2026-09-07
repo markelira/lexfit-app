@@ -326,6 +326,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
               days={a.days}
               focus={a.focus}
               trainingCount={plan.trainingCount}
+              sessionMin={plan.firstWorkoutMinutes}
               onComputed={attachBody}
             />
           )}

@@ -319,6 +319,57 @@ export const ENERGY = {
   consent:
     "Hozzájárulok, hogy a LEXFIT a megadott testadataimat (nem, kor, magasság, testsúly) a kalóriacélom kiszámításához kezelje. Ezeket az adatokat bármikor töröltethetem.",
 
+
+  // -- The three steps, as in the source calculator: Adatok, Tempo, Eredmeny.
+  // (Its fourth step is an email gate; ours is already the quiz's own gate, so
+  // asking again here would be asking twice for the same address.)
+  steps: ["Adatok", "Tempó", "Eredmény"] as const,
+
+  card1: "Alapadatok",
+  card2: "Célod",
+  card3: "Tempó",
+
+  tempoHeading: "Válassz tempót",
+  tempoTag: {
+    fogyas: "Fogyás",
+    tonus: "Tónusosodás",
+    tomeg: "Izomépítés",
+  } as Record<"fogyas" | "tonus" | "tomeg", string>,
+  tempoLead: {
+    fogyas: "Mindhárom biztonságos — a különbség a sebesség és a fenntarthatóság egyensúlya.",
+    tonus: "Itt az erősítés és a fehérje a fontos; a kalória csak finomhangolás.",
+    tomeg: "A többlet mérete dönti el, mennyi izom és mennyi zsír épül mellé.",
+  } as Record<"fogyas" | "tonus" | "tomeg", string>,
+  tempoName: { laza: "Laza", kozepes: "Közepes", intenziv: "Intenzív" } as Record<string, string>,
+  tempoDesc: {
+    fogyas: {
+      laza: "Minimális izomvesztés, hosszú távon könnyen tartható.",
+      kozepes: "A szakmailag ajánlott alap. Jó egyensúly tempó és tarthatóság között.",
+      intenziv: "Biztonságos tartományon belül, de nagyobb fegyelmet kér.",
+    },
+    tonus: {
+      laza: "Fenntartó kalória — a legtisztább átalakulás, türelmesen.",
+      kozepes: "Enyhe deficit. A legtöbb embernek ez a jó kiindulás.",
+      intenziv: "Erősebb zsírvesztési fókusz, az izom megőrzése mellett.",
+    },
+    tomeg: {
+      laza: "Lassú, minőségi izomépítés, minimális zsírral.",
+      kozepes: "Az ajánlott alap — észrevehető fejlődés, kordában tartva.",
+      intenziv: "Gyorsabb építés, valamivel több zsírral együtt.",
+    },
+  } as Record<string, Record<string, string>>,
+  tempoRecommended: "Ajánlott",
+
+  resultEyebrow: "A napi kalóriacélod",
+  macroHeading: "Makrótápanyagok",
+  perDay: "naponta",
+  weekSplitLabel: (n: number) => `× ${n} perces edzés / hét`,
+  stepsSplitLabel: "lépés / nap ajánlott",
+  waterEyebrow: "Napi vízfogyasztás",
+  waterUnit: "liter",
+
+  back: "Vissza",
+  next: "Tovább",
   submit: "Mutasd az eredményem",
   submitBusy: "Számoljuk…",
   error: "Ellenőrizd az adatokat — a mezőknek valós értéket kell tartalmazniuk.",
