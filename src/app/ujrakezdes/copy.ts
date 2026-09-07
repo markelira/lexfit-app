@@ -139,6 +139,33 @@ export const Q_DAYPART = {
   ] as Choice<Daypart>[],
 };
 
+// ---- The tray: answers echoed back as you go ------------------------------
+//
+// Each answer drops a chip here, so the quiz reads as BUILDING something rather
+// than filling a form. The labels are short restatements of what they picked -
+// never a score, never a grade. This audience has failed at fitness before;
+// inventing a number they can do badly at is the one thing this funnel must not
+// do. (docs/onboarding-personalization-plan.md 5 recommends exactly this:
+// "answers echoed back as labelled chips".)
+
+export const TRAY = {
+  heading: "A terved",
+  anchor: {
+    restart: "újrakezdés", careful: "kíméletes", no_energy: "esti energia",
+    stronger: "erősödés", browsing: "körülnézek",
+  } as Record<Anchor, string>,
+  level: {
+    none: "nulláról", rare: "néha mozogsz", weekly: "heti 1-2", regular: "van bázisod",
+  } as Record<Level, string>,
+  days: { "2": "2 nap", "3": "3 nap", "4": "4 nap", flex: "rugalmas" } as Record<Days, string>,
+  session: { "10_15": "10-15 perc", "20_30": "20-30 perc", "30_plus": "30+ perc" } as Record<Session, string>,
+  care: {
+    knee: "térdkímélő", back: "derékkímélő", quiet: "csendes", none: "nincs korlát",
+  } as Record<Care, string>,
+  place: { living_room: "nappali", small: "kis hely", varied: "változó hely" } as Record<Place, string>,
+  daypart: { morning: "reggel", midday: "napközben", evening: "este", varies: "váltakozó" } as Record<Daypart, string>,
+} as const;
+
 // ─── §3 Gate ─────────────────────────────────────────────────────────────────
 
 export const GATE = {
@@ -305,6 +332,19 @@ export const ENERGY = {
     "Ezek becsült értékek, tájékoztató jelleggel — nem minősülnek orvosi vagy dietetikai tanácsnak. Ha bármilyen krónikus betegséged van, vagy kezelés alatt állsz, beszéld meg az orvosoddal.",
 
   recalcCta: "Újraszámolom",
+} as const;
+
+// ─── The Foundation programme on the reveal ─────────────────────────────────
+
+export const PROGRAM_PREVIEW = {
+  heading: "Ez vár rád",
+  /** The count comes from the live catalogue, never from a literal - the
+   *  programme is authored in /admin and a hardcoded number would go stale the
+   *  first time somebody adds a session. */
+  lead: (n: number) =>
+    `A LEXFIT Start mind a ${n} edzése, sorrendben. Nyisd meg bármelyiket — megnézheted, mi van benne, mielőtt bármit fizetnél.`,
+  foot: "Az edzések a tagsággal indíthatók. A heti terved enélkül is a tiéd marad.",
+  modalCta: "Ezzel kezdenék",
 } as const;
 
 /** Feature flag. The module renders only when this is on, and it stays OFF

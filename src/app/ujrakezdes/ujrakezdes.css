@@ -784,3 +784,102 @@
 .lxu .u-en-workout li span {
   grid-column: 2; font-size: 14px; line-height: 1.5; color: var(--ink-2);
 }
+
+/* ═══ The tray ══════════════════════════════════════════════════════════════ */
+/* The plan assembling itself while the questions run. This is the funnel's one
+   theatrical moment, and everything around it stays quiet so it can land. */
+
+.lxu .u-tray {
+  max-width: var(--u-max);
+  margin: var(--sp-3) auto 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.lxu .u-tray-chips {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.lxu .u-tchip {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: oklch(0.235 0.014 168 / 0.06);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+/* Only the newest chip animates. Replaying the whole row on every answer makes
+   the tray flicker instead of accumulate, which is the opposite of the point. */
+.lxu .u-tchip.land {
+  animation: u-chip-land 420ms var(--ease-pop) both;
+  background: var(--u-sage);
+  color: var(--u-navy);
+}
+@keyframes u-chip-land {
+  0%   { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.9); }
+  60%  { opacity: 1; transform: translate3d(0, 0, 0) scale(1.04); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* The week, in miniature. Appears only once `days` is answered - before that it
+   would be decoration pretending to be information. */
+.lxu .u-tray-week {
+  list-style: none; margin: 2px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  max-width: 260px;
+}
+.lxu .u-tray-week li {
+  height: 22px;
+  border-radius: 6px;
+  background: oklch(0.235 0.014 168 / 0.06);
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  display: grid; place-items: center;
+  transition: background-color 320ms var(--ease-settle), color 320ms var(--ease-settle);
+}
+.lxu .u-tray-week li.on { background: var(--u-navy); color: var(--u-cream); }
+
+/* ═══ The programme on the reveal ═══════════════════════════════════════════ */
+
+.lxu .u-prog { margin: var(--sp-10) 0 0; }
+.lxu .u-prog-h {
+  font-size: clamp(24px, 6.5vw, 30px);
+  line-height: 1.15; letter-spacing: -0.02em; font-weight: 600;
+  margin: 0 0 var(--sp-3);
+}
+.lxu .u-prog-lead {
+  font-size: 15.5px; line-height: 1.6; color: var(--ink-2);
+  margin: 0 0 var(--sp-6); text-wrap: pretty;
+}
+
+.lxu .u-prog-phase { margin: 0 0 var(--sp-8); }
+.lxu .u-prog-phead { margin: 0 0 var(--sp-4); }
+.lxu .u-prog-phead h3 {
+  font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px;
+}
+.lxu .u-prog-phead p { font-size: 14px; line-height: 1.5; color: var(--ink-3); margin: 0; }
+
+/* One column on a phone, because these are the app's real cards and they are
+   built for a full-width row. Two from tablet up, where the reveal has room. */
+.lxu .u-prog-grid { display: grid; gap: var(--sp-4); }
+@media (min-width: 640px) {
+  .lxu .u-prog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.lxu .u-prog-foot {
+  font-size: 13.5px; line-height: 1.6; color: var(--ink-3);
+  margin: 0; padding-top: var(--sp-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxu .u-tchip.land { animation: u-fade-in 180ms linear both; }
+}
+
+/* The card grid carries `.lx` so the app's card styles apply; that class also
+   paints the app background, which would tile a second surface over the cream. */
+.lxu .u-prog-grid.lx { background: transparent; }
+/* No account exists on this surface, so the save control has nothing to save
+   to. Hidden rather than wired to a no-op, which would be a dead affordance. */
+.lxu .u-prog-grid .wc-save { display: none; }

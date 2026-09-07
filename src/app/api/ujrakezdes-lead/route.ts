@@ -11,6 +11,8 @@ import {
   sameAnswers, validateIdentity, type LmLeadDoc,
 } from "@/lib/ujrakezdes/lead";
 import { parseBody, type BodyInput } from "@/lib/ujrakezdes/energy";
+import { loadLandingCatalog } from "@/lib/landing-catalog.server";
+import type { EmailWorkout } from "../../../../emails/components/WorkoutCards";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -161,9 +163,33 @@ export async function POST(req: Request) {
   // a second time because they used a calculator is spam.
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
   if (resend) try {
+    // The first sessions, in the same card language as the reveal. Read here
+    // rather than taken from the request: the client could say anything, and a
+    // mail is the one surface a person keeps.
+    let workouts: EmailWorkout[] = [];
+    let workoutTotal = 0;
+    try {
+      const cat = await loadLandingCatalog();
+      const byCode = new Map(cat.workouts.map((w) => [w.code, w]));
+      const sessions = cat.entry?.sessions ?? [];
+      workoutTotal = sessions.filter((s) => byCode.has(s.code)).length;
+      workouts = sessions
+        .map((s, i) => ({ s, w: byCode.get(s.code), step: i + 1 }))
+        .filter((x): x is { s: typeof sessions[number]; w: NonNullable<typeof x.w>; step: number } => !!x.w)
+        .slice(0, 3)
+        .map(({ w, step }) => ({
+          code: w.code, title: w.title, theme: w.theme, mins: w.mins, step,
+        }));
+    } catch {
+      // A catalogue failure must not cost somebody their plan email; the mail
+      // simply ships without the card block.
+    }
+
     await sendUjrakezdesD0(fresh.email, {
       planHref: `${appUrl}/ujrakezdes`,
       consented: consentMarketing,
+      workouts,
+      workoutTotal,
     });
   } catch (e) {
     console.error("[ujrakezdes-lead] D0 send failed", e);

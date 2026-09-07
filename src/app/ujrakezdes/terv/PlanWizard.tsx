@@ -11,6 +11,9 @@ import "@/app/landing.css";
 import * as C from "../copy";
 import { PricingBand } from "@/components/landing/PricingBand";
 import EnergyModule from "./EnergyModule";
+import ProgramPreview from "./ProgramPreview";
+import PlanTray from "./PlanTray";
+import type { LandingCatalog } from "@/lib/landing-catalog";
 import type { BodyInput } from "@/lib/ujrakezdes/energy";
 import { buildWeekPlan } from "@/lib/ujrakezdes/plan";
 import { validateEmail } from "@/lib/quiz/validate";
@@ -60,7 +63,7 @@ type Draft = Partial<Answers>;
 const isComplete = (d: Draft): d is Answers =>
   !!(d.anchor && d.level && d.days && d.session && d.place && d.daypart && d.care);
 
-export default function PlanWizard() {
+export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   const [screen, setScreen] = useState<Screen>("anchor");
   // Which way the stage is travelling. Enter and exit share an axis: forward
   // brings the next screen in from the right, Vissza mirrors it exactly, so a
@@ -69,6 +72,9 @@ export default function PlanWizard() {
   // The option being committed to, during the brief beat between the tap and
   // the advance. Null the rest of the time.
   const [picked, setPicked] = useState<string | null>(null);
+  /** The step whose chip should animate into the tray. Cleared on navigation so
+   *  going back does not replay a landing for an answer already sitting there. */
+  const [landed, setLanded] = useState<string | null>(null);
   const [a, setA] = useState<Draft>({ care: [] });
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
@@ -144,6 +150,7 @@ export default function PlanWizard() {
     if (picked) return;                      // ignore a double-tap mid-commit
     setA((prev) => ({ ...prev, [key]: value }));
     setPicked(String(value));
+    setLanded(String(key));
     if (Q_NUMBER[screen]) trackUjrakezdesStep(String(screen), Q_NUMBER[screen]!);
     commitTimer.current = setTimeout(advance, COMMIT_MS);
   }, [picked, screen, advance]);
@@ -268,6 +275,11 @@ export default function PlanWizard() {
             </div>
             <span className="u-count">{C.NAV.progress(shownStep, STEP_IDS.length)}</span>
           </div>
+
+          {/* The plan assembling itself. Only while questions are running - once
+              the gate is reached it has done its job, and on the reveal the real
+              week takes over. */}
+          {qNum > 0 && <PlanTray a={a} latest={landed} />}
         </div>
       )}
 
@@ -312,6 +324,7 @@ export default function PlanWizard() {
                   // An empty selection IS an answer - "Semmi különös" by another
                   // name - so the button is never disabled here.
                   if (!(a.care ?? []).length) setA((p) => ({ ...p, care: ["none"] }));
+                  setLanded("care");
                   trackUjrakezdesStep("care", 5);
                   advance();
                 }}
@@ -431,6 +444,11 @@ export default function PlanWizard() {
               </div>
               <p className="u-transcript">{C.REVEAL.alexaVideo.transcript}</p>
             </section>
+
+            {/* What they are joining, before what it costs. The order matters:
+                the offer band reads as expensive next to a plan and reasonable
+                next to thirty workouts they have just been able to open. */}
+            <ProgramPreview catalog={catalog} onCta={() => { window.location.href = "/register"; }} />
 
             {/* The calculator, opt-in and after the plan: the lead is already
                 captured and the promise already kept, so nobody is asked for

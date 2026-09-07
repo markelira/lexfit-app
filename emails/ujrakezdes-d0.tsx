@@ -12,13 +12,22 @@ import * as React from "react";
 import { Link, Text } from "react-email";
 import { EmailLayout } from "./components/EmailLayout";
 import { Cta, Panel, PanelText, Sign } from "./components/Bits";
+import { WorkoutCardList, type EmailWorkout } from "./components/WorkoutCards";
 import { APP_URL, color, styles } from "./tokens";
 
 export const subject = "A heti terved";
 
 export default function UjrakezdesD0({
-  planHref, consented,
-}: { planHref: string; consented: boolean }) {
+  planHref, consented, workouts = [], workoutTotal = 0,
+}: {
+  planHref: string;
+  consented: boolean;
+  /** The first few sessions of the programme, in the same card language as the
+   *  app and the reveal. Empty when the catalogue could not be read - the mail
+   *  then simply omits the block rather than showing an empty frame. */
+  workouts?: EmailWorkout[];
+  workoutTotal?: number;
+}) {
   return (
     <EmailLayout preview="Bent van minden, az első edzéssel együtt.">
       <Text style={styles.eyebrow}>Szeptemberi újrakezdés</Text>
@@ -34,6 +43,21 @@ export default function UjrakezdesD0({
         (20–30 perc, eszköz nélkül — elég egy matrac és 2×2 méter), és a
         folytatás.
       </Text>
+
+      {workouts.length > 0 && (
+        <>
+          <Text style={styles.body}>
+            <strong>Ez vár rád a tagságban.</strong> A LEXFIT Start első edzései —
+            ugyanezek a kártyák, mint az appban:
+          </Text>
+          <WorkoutCardList
+            workouts={workouts}
+            total={workoutTotal}
+            href={planHref}
+            moreLabel={(rest) => `…és további ${rest} edzés, sorrendben. A teljes program a tervedben.`}
+          />
+        </>
+      )}
 
       <Panel>
         <PanelText>

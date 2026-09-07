@@ -32,6 +32,8 @@ import {
   type BodyInput,
 } from "../src/lib/ujrakezdes/energy";
 import { PRICING_BAND } from "../src/components/landing/offer-copy";
+import { CAT } from "../src/lib/categories";
+import { CAT_HEX, CAT_WORD, catHex, catWordOf } from "../emails/components/WorkoutCards";
 
 const ENERGY_CONSENT = C.ENERGY.consent;
 
@@ -425,6 +427,27 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   const changed = buildLead({ ...base, consentMarketing: false, answers: A({ days: "4" }) });
   assert.equal(retakePatch(withBody, changed).retakeCount, 1, "megváltozott válaszok igen");
   ok("az újratöltés-számláló a válaszok változását méri, nem a mentéseket");
+}
+
+// ─── 6. The email card system ────────────────────────────────────────────────
+{
+  console.log("\nE-mail kártyák");
+
+  // Email cannot resolve CSS custom properties or oklch(), so the category
+  // colours are frozen as hex. That freeze is the risk: a new theme added to the
+  // app would silently fall back here. Pin the two together.
+  for (const theme of Object.keys(CAT)) {
+    assert.ok(CAT_HEX[theme], `hiányzó e-mail szín: ${theme}`);
+    assert.ok(CAT_WORD[theme], `hiányzó e-mail borítószó: ${theme}`);
+    assert.match(CAT_HEX[theme]!, /^#[0-9a-f]{6}$/, `${theme}: nem hex szín`);
+    assert.equal(CAT_WORD[theme], CAT[theme]!.word, `${theme}: a borítószó eltér az appétól`);
+  }
+  ok("minden app-kategóriának van e-mail-biztos színe és a borítószó egyezik");
+
+  // An unknown theme must still render a card, not a hole.
+  assert.equal(catHex("ilyen nincs"), CAT_HEX["Teljes test"]);
+  assert.equal(catWordOf("ilyen nincs"), CAT_WORD["Teljes test"]);
+  ok("ismeretlen kategória is renderel, a teljes test visszaesésre");
 }
 
 console.log(`\nAll /ujrakezdes self-tests passed (${n} blocks).`);

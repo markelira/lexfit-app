@@ -66,9 +66,10 @@ import UjrakezdesD6, { subject as ujraD6Subject } from "../../emails/ujrakezdes-
 import WorkoutReminder, { subject as workoutSubject } from "../../emails/workout-reminder";
 import type { DayState } from "../../emails/components/Bits";
 import type { Anchor as UjraAnchor } from "@/lib/ujrakezdes/types";
+import type { EmailWorkout as UjraEmailWorkout } from "../../emails/components/WorkoutCards";
 
 export type { DayState };
-export type { UjraAnchor };
+export type { UjraAnchor, UjraEmailWorkout };
 
 async function deliver(opts: {
   to: string;
@@ -443,7 +444,8 @@ export const sendDay2Nudge = (to: string, uid: string, motiv?: string) =>
 // (Grtv. §6 - no soft opt-in in Hungary).
 
 export const sendUjrakezdesD0 = (
-  to: string, p: { planHref: string; consented: boolean },
+  to: string,
+  p: { planHref: string; consented: boolean; workouts?: UjraEmailWorkout[]; workoutTotal?: number },
 ) => deliver({ to, subject: ujraD0Subject, category: "habit", make: () => UjrakezdesD0(p) });
 
 export const sendUjrakezdesD3 = (
