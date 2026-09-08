@@ -30,6 +30,7 @@ import {
   BODY_LIMITS, computeEnergy, parseBody, tempoDelta, tempoRate,
   type BodyInput, type EnergyGoal, type EnergyResult as Energy, type Tempo,
 } from "@/lib/ujrakezdes/energy";
+import { writeQuizHandoff } from "@/lib/ujrakezdes/handoff";
 import { buildWeekPlan } from "@/lib/ujrakezdes/plan";
 import { validateEmail } from "@/lib/quiz/validate";
 import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes/types";
@@ -472,6 +473,15 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     const weeklyMonthly = formatHuf(Math.round((PRICES.week_std.amountHuf * 4.33) / 100) * 100);
     const firstDayName = plan.days.find((d) => d.training)?.full ?? "hétfő";
 
+    /** Every CTA runs through here before the browser follows the link: the
+     *  quiz's answers become the join wizard's draft (so /register skips its
+     *  questions without losing a single preference), then the click is
+     *  counted. localStorage is synchronous - the write always lands. */
+    const goCheckout = (sticky: boolean) => () => {
+      if (isComplete(a)) writeQuizHandoff(a);
+      (sticky ? trackUjrakezdesStickyClick : trackUjrakezdesOfferClick)();
+    };
+
     return (
       <main className="lxu u2" ref={stageRef} tabIndex={-1}>
         {/* ── B0 · the quiz's bar, parked at 88% ──────────────────────────── */}
@@ -538,7 +548,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
 
             {/* ── B2 · the offer at the fold (mobile; desktop = the rail) ──── */}
             <section className="u2-offer u2-mobile u2-m1" style={{ ["--i" as string]: 15 }} ref={b2Ref}>
-              <RevealOffer intro={intro} weekStd={weekStd} />
+              <RevealOffer intro={intro} weekStd={weekStd} onGo={goCheckout(false)} />
             </section>
 
             {/* ── B3 · the mechanism ──────────────────────────────────────── */}
@@ -602,7 +612,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
                   <li key={it.b}><span className="k">{it.k}</span><b>{it.b}</b></li>
                 ))}
               </ul>
-              <RevealOffer intro={intro} weekStd={weekStd} />
+              <RevealOffer intro={intro} weekStd={weekStd} onGo={goCheckout(false)} />
               <RevealRhythm month={month} annual={annual} perMonth={perMonth} weeklyMonthly={weeklyMonthly} />
             </div>
           </aside>
@@ -671,7 +681,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
               className="u2-cta"
               href={CTA_HREF}
               ref={closeCtaRef}
-              onClick={trackUjrakezdesOfferClick}
+              onClick={goCheckout(false)}
             >
               {C.REVEAL.offer.cta(intro)}
             </a>
@@ -689,7 +699,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
             <b>{C.REVEAL.sticky.line(intro)}</b>
             <span>{C.REVEAL.sticky.sub(weekStd)}</span>
           </div>
-          <a className="u2-cta u2-cta-sm" href={CTA_HREF} onClick={trackUjrakezdesStickyClick}>
+          <a className="u2-cta u2-cta-sm" href={CTA_HREF} onClick={goCheckout(true)}>
             {C.REVEAL.sticky.go}
           </a>
         </div>
@@ -1045,14 +1055,17 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   );
 }
 
-/** The reveal's CTA target. One destination for every button on the page -
- *  the pay step reads the ?plan= preselect (handoff Q1). */
-const CTA_HREF = "/register?plan=week_intro";
+/** The reveal's CTA target. One destination for every button on the page.
+ *  `q=plan` opens the join wizard DIRECTLY on the plan picker - the reveal's
+ *  quiz already asked the questions, and writeQuizHandoff() carries the
+ *  answers across as the wizard's own draft (owner decision 2026-09-08).
+ *  `plan=week_intro` preselects the intro week there. */
+const CTA_HREF = "/register?q=plan&plan=week_intro";
 
 /** B2 / rail: the offer. Module scope - a component created during render gets
  *  a new identity every pass. */
-function RevealOffer({ intro, weekStd, sticky = false }: {
-  intro: string; weekStd: string; sticky?: boolean;
+function RevealOffer({ intro, weekStd, onGo }: {
+  intro: string; weekStd: string; onGo: () => void;
 }) {
   return (
     <>
@@ -1061,11 +1074,7 @@ function RevealOffer({ intro, weekStd, sticky = false }: {
           ? <><b>{C.REVEAL.offer.proofGuar}</b>{C.REVEAL.offer.proofRest}</>
           : C.REVEAL.offer.proofNoGuar}
       </p>
-      <a
-        className="u2-cta"
-        href={CTA_HREF}
-        onClick={sticky ? trackUjrakezdesStickyClick : trackUjrakezdesOfferClick}
-      >
+      <a className="u2-cta" href={CTA_HREF} onClick={onGo}>
         {C.REVEAL.offer.cta(intro)}
       </a>
       <p className="u2-renew">{C.REVEAL.offer.renew(weekStd)}</p>

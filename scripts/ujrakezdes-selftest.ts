@@ -23,6 +23,7 @@ import {
 import {
   isLmStep, lmDueAt, lmNextStep, lmScheduleAfter, lmStopReason, LM_LAST_STEP,
 } from "../src/lib/ujrakezdes/sequence";
+import { onboardingDraftFromQuiz } from "../src/lib/ujrakezdes/handoff";
 import type { Answers, Days, Focus } from "../src/lib/ujrakezdes/types";
 import * as C from "../src/app/ujrakezdes/copy";
 import {
@@ -345,6 +346,35 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   // with the guarantee itself.
   assert.equal(C.REVEAL.faq.length, 5);
   assert.equal(C.REVEAL.faq.filter((f) => f.guar).length, 1, "pontosan egy GYIK-tétel függ a garanciától");
+
+  // The reveal → /register handoff: skipping the wizard's questions may not
+  // lose a single preference, so every translation rule is pinned. Anything
+  // without an honest counterpart maps to null, never to a guess.
+  {
+    const full: Answers = {
+      anchor: "careful", level: "weekly", days: "3", focus: "felso",
+      care: ["knee", "quiet"], place: "small", daypart: "evening",
+    };
+    const d = onboardingDraftFromQuiz(full);
+    assert.equal(d.goal, "tartas");
+    assert.equal(d.obstacle, "serules", "az óvatos válasz a sérülés-akadályra fordul");
+    assert.equal(d.level, 2);
+    assert.deepEqual(d.focus, ["kar"], "a felsőtest a wizard `kar` kulcsára fordul");
+    assert.equal(d.days, 3);
+    assert.deepEqual(d.weekdays, [...trainingDays("3")], "a kvíz hete és az app hete ugyanaz a hét");
+    assert.equal(d.flexible, false);
+    assert.equal(d.time, "este");
+    assert.deepEqual(d.env, ["terd", "csendes"]);
+
+    const flex = onboardingDraftFromQuiz({ ...full, anchor: "browsing", days: "flex", care: ["none"], daypart: "varies" });
+    assert.equal(flex.goal, null, "a körülnéző nem kap kitalált célt");
+    assert.equal(flex.obstacle, null);
+    assert.equal(flex.flexible, true);
+    assert.deepEqual(flex.weekdays, [], "rugalmas hétnél nincs kitalált napkiosztás");
+    assert.equal(flex.time, null, "a „mindig máskor\u201d nem kap kitalált napszakot");
+    assert.deepEqual(flex.env, ["none"]);
+  }
+  ok("a kvíz→wizard átadás minden szabálya áll");
 
   // No guest-workout promise anywhere: guest playback does not exist
   // (pay-to-join hard gate, locked P0), and the handoff's own rule for that
