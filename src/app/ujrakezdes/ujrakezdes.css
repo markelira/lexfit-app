@@ -61,168 +61,266 @@
   padding: 0 var(--sp-5);
 }
 
-/* ═══ Landing ═══════════════════════════════════════════════════════════════ */
+/* ═══ The hero ══════════════════════════════════════════════════════════════
+   ONE composition, nothing below it. Two columns: the argument on the left, the
+   product on the right. Everything is left-aligned - centred type reads as a
+   poster, and this is a page with one job and a lot to say.
 
-/* The brand's signature: a full-bleed colour card inset 16px with a 28px
-   radius, exactly like the landing hero. On cold ad traffic the first screen
-   has to be unmistakably LEXFIT before it is anything else. */
-.lxu .u-herocard {
-  position: relative;
-  overflow: hidden;
-  margin: 16px;
-  border-radius: 28px;
-  background: var(--u-sage);
-  color: var(--u-navy);
-  padding: var(--sp-10) var(--sp-5) var(--sp-8);
-  text-align: center;
-  min-height: calc(100svh - 32px);
-  display: flex;
-  flex-direction: column;
+   Three tiers of hierarchy, and nothing crosses between them: the ask
+   (headline, sub, CTA), the artifact (the week), and the argument (pain, steps,
+   signature). The week grid is the one element allowed to be bold; if anything
+   else here starts competing with it, that is the bug. */
+
+.lxu.u-hero {
+  min-height: 100svh;
+  padding: clamp(20px, 4vw, 44px);
+  background: var(--u-cream);
+  /* `.lxu` is already a COLUMN flex container, so `align-items: center` here
+     would centre horizontally and leave the composition pinned to the top -
+     which is exactly how it rendered. `justify-content` is the cross-axis for
+     a column. */
   justify-content: center;
 }
-/* A soft light source top-left, so the card reads as a material with a bright
-   edge rather than a flat fill. */
-.lxu .u-herocard::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    120% 90% at 15% 0%,
-    oklch(1 0 0 / 0.30) 0%,
-    oklch(1 0 0 / 0) 60%
-  );
-  pointer-events: none;
-}
-.lxu .u-herocard > * { position: relative; z-index: 1; }
 
-/* Hierarchy on the sage card comes from SIZE, WEIGHT and TRACKING - never from
-   opacity. Navy at 72% over sage measures 3.5:1 and at 66% only 3.1:1, both
-   under the 4.5:1 AA floor for normal text; at full strength it is 5.5:1. */
+.lxu .u-hero-grid {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  gap: clamp(28px, 5vw, 64px);
+}
+/* ── Mobile order ────────────────────────────────────────────────────────
+   Stacked, the two columns would put the CTA and the week card below a long
+   recognition paragraph - so the graphic lands well past the fold and the ask
+   lands after the complaint. `display: contents` dissolves the two wrappers so
+   every piece becomes a grid item and can be ordered directly: the ask and the
+   artifact first, the argument under them. */
+@media (max-width: 899.98px) {
+  .lxu.u-hero .u-hero-copy,
+  .lxu.u-hero .u-hero-art { display: contents; }
+  .lxu .u-hero-grid { gap: 0; }        /* spacing comes from each element */
+
+  .lxu.u-hero .u-eyebrow { order: 1; }
+  .lxu.u-hero h1 { order: 2; }
+  .lxu.u-hero .u-sub { order: 3; }
+  .lxu.u-hero .u-audience { order: 4; margin-bottom: var(--sp-8); }
+  .lxu .u-hero-cta { order: 5; margin-bottom: var(--sp-8); }
+  .lxu .u-weekcard { order: 6; margin-bottom: var(--sp-8); }
+  .lxu .u-pain { order: 7; margin: 0 0 var(--sp-8); }
+  .lxu .u-flow { order: 8; margin-bottom: var(--sp-8); }
+  .lxu .u-sig { order: 9; }
+}
+
+@media (min-width: 900px) {
+  .lxu .u-hero-grid {
+    /* The type column is the smaller half on purpose - a 45/55 split reads as
+       one composition, where 50/50 reads as two boxes side by side. */
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
+/* ── The argument ───────────────────────────────────────────────────────── */
+
+.lxu .u-hero-copy { max-width: 34rem; }
+
 .lxu .u-eyebrow {
   font-family: var(--mono);
   font-size: 11px;
-  letter-spacing: 0.14em;   /* positive tracking: small type needs it */
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  font-weight: 500;
+  color: var(--ink-3);
   margin: 0 0 var(--sp-5);
 }
 
-.lxu h1 {
-  font-size: clamp(34px, 9.5vw, 52px);
-  line-height: 1.02;        /* tight leading for large text */
-  letter-spacing: -0.03em;  /* negative tracking as type grows */
+.lxu.u-hero h1 {
+  font-size: clamp(38px, 6.4vw, 68px);
+  line-height: 0.98;          /* tight leading, because the type is large */
+  letter-spacing: -0.035em;   /* and negative tracking, because it is larger still */
   font-weight: 600;
-  margin: 0 0 var(--sp-4);
+  margin: 0 0 var(--sp-5);
   text-wrap: balance;
 }
-.lxu .u-sub {
-  font-size: 17px;
+.lxu.u-hero .u-sub {
+  font-size: clamp(16.5px, 1.4vw, 19px);
   line-height: 1.5;
-  margin: 0 auto var(--sp-3);
-  max-width: 30ch;
+  color: var(--ink-2);
+  margin: 0 0 var(--sp-3);
+  max-width: 42ch;            /* under 80 characters, well under */
   text-wrap: pretty;
 }
-.lxu .u-audience {
-  font-size: 14px;
+.lxu.u-hero .u-sub { margin-bottom: var(--sp-4); }
+.lxu.u-hero .u-audience {
+  font-size: 14.5px;
   font-weight: 500;
-  margin: 0 0 var(--sp-8);
+  color: var(--ink-3);
+  margin: 0;
 }
 
+/* The recognition beat. A rule and an indent rather than a card: it is an
+   aside, and a card would give it the same weight as the week. */
+.lxu .u-pain {
+  margin: var(--sp-8) 0 var(--sp-8);
+  padding-left: var(--sp-5);
+  border-left: 2px solid var(--u-sage);
+}
+.lxu .u-pain h2 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--sp-2);
+}
+.lxu .u-pain p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+/* The answer to the paragraph above it, so it carries the weight the paragraph
+   does not. */
+.lxu .u-pain-answer {
+  margin-top: var(--sp-3) !important;
+  color: var(--ink) !important;
+  font-weight: 500;
+}
+
+.lxu .u-hero-cta { display: grid; gap: var(--sp-4); justify-items: start; }
 .lxu .u-chips {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: var(--sp-2);
-  margin: var(--sp-6) 0 0;
+  margin: 0;
   padding: 0;
-  list-style: none;
+  list-style: none;          /* they were rendering as bullets */
 }
 .lxu .u-chip {
   padding: 7px 14px;
   border-radius: 999px;
-  font-size: 13px;
-  font-weight: 500;
-  background: oklch(1 0 0 / 0.28);
-  color: var(--u-navy);
-  backdrop-filter: blur(6px);
-}
-.lxu .u-sec .u-chip { background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); }
-
-/* Below-the-fold sections, for scrollers only. */
-.lxu .u-sec { padding: var(--sp-10) 0; border-top: 1px solid var(--line); }
-.lxu .u-sec:first-of-type { border-top: 0; }
-.lxu .u-sec h2 {
-  font-size: clamp(24px, 6.5vw, 30px);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  font-weight: 600;
-  margin: 0 0 var(--sp-4);
-  text-wrap: balance;
-}
-.lxu .u-sec p {
-  font-size: 16.5px;
-  line-height: 1.62;
-  color: var(--ink-2);
-  margin: 0 0 var(--sp-3);
-  text-wrap: pretty;
-}
-
-/* The two rules get their own surface: they are the differentiator, not a
-   paragraph. */
-.lxu .u-rules { margin: var(--sp-5) 0 0; padding: 0; list-style: none; display: grid; gap: var(--sp-3); }
-.lxu .u-rules li {
-  position: relative;
-  padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-8);
-  border-radius: var(--r-md);
+  border: 1px solid var(--line);
   background: var(--surface);
-  box-shadow: var(--shadow-card);
-  font-size: 15.5px;
-  line-height: 1.5;
-  color: var(--ink);
-}
-.lxu .u-rules li::before {
-  content: "";
-  position: absolute;
-  left: var(--sp-4);
-  top: 22px;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--u-sage);
-}
-
-.lxu .u-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--sp-4); counter-reset: s; }
-.lxu .u-steps li {
-  counter-increment: s;
-  display: grid;
-  grid-template-columns: 32px 1fr;
-  gap: var(--sp-4);
-  align-items: start;
-  font-size: 16px;
-  line-height: 1.55;
+  font-size: 13.5px;
+  font-weight: 500;
   color: var(--ink-2);
 }
-.lxu .u-steps li::before {
-  content: counter(s);
+
+/* ── The product ────────────────────────────────────────────────────────── */
+
+.lxu .u-hero-art { display: grid; gap: var(--sp-6); align-content: center; }
+
+.lxu .u-weekcard {
+  margin: 0;
+  padding: clamp(20px, 2.4vw, 30px);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: 0 2px 4px oklch(0.3 0.014 168 / 0.05),
+              0 24px 60px -24px oklch(0.42 0.03 168 / 0.28);
+}
+.lxu .u-weekcard figcaption { margin: 0 0 var(--sp-5); }
+.lxu .u-weekcard .u-eyebrow { margin: 0; }
+
+.lxu .u-weekgrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(5px, 0.6vw, 9px);
+}
+.lxu .u-weekgrid li {
+  border-radius: 12px;
+  background: var(--u-cream);
+  padding: clamp(12px, 1.4vw, 18px) 2px;
+  text-align: center;
+  /* The one orchestrated moment on the page: the week assembles itself once,
+     on load, left to right. Nothing else here animates. */
+  animation: u-drop 520ms var(--ease-settle) both;
+  animation-delay: calc(180ms + var(--i, 0) * 70ms);
+}
+.lxu .u-weekgrid li.on { background: var(--u-navy); color: var(--u-cream); }
+.lxu .u-weekgrid .d {
+  display: block;
+  font-family: var(--mono);
+  font-size: clamp(10px, 0.85vw, 12px);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.lxu .u-weekgrid .m {
+  display: block;
+  font-size: clamp(9.5px, 0.8vw, 11.5px);
+  margin-top: 5px;
+  opacity: 0.62;
+}
+.lxu .u-weeknote {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  margin: var(--sp-5) 0 0;
+}
+
+/* Three steps, genuinely a sequence, so genuinely numbered. */
+.lxu .u-flow {
+  list-style: none;
+  counter-reset: f;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+@media (min-width: 520px) {
+  .lxu .u-flow { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4); }
+}
+.lxu .u-flow li {
+  counter-increment: f;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+.lxu .u-flow li::before {
+  content: counter(f);
   display: grid;
   place-items: center;
-  width: 32px; height: 32px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: var(--u-navy);
-  color: var(--u-cream);
+  background: var(--u-sage);
+  color: var(--u-navy);
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 11px;
+  font-weight: 600;
 }
 
-/* Member photo placeholders. Aspect ratio reserved so swapping the real finish
-   cards in later cannot introduce layout shift. */
-.lxu .u-proof { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin: var(--sp-6) 0 0; }
-.lxu .u-proof figure {
-  margin: 0; aspect-ratio: 4 / 5; border-radius: var(--r-md); overflow: hidden;
-  background: var(--surface-2); border: 1px solid var(--line);
-  display: grid; place-items: center;
+.lxu .u-sig {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: var(--sp-4);
+  align-items: start;
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
 }
-.lxu .u-proof img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.lxu .u-proof figcaption { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.lxu .u-sig-av { border-radius: 50%; object-fit: cover; }
+.lxu .u-sig figcaption { margin: 0; }
+.lxu .u-sig-quote {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0 0 6px;
+  max-width: 44ch;
+  text-wrap: pretty;
+}
+.lxu .u-sig-name { font-size: 13px; color: var(--ink-3); margin: 0; }
+.lxu .u-sig-name b { color: var(--ink-2); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lxu .u-weekgrid li { animation: u-fade-in 180ms linear both; animation-delay: 0ms; }
+}
 
 /* ═══ Buttons ═══════════════════════════════════════════════════════════════ */
 
@@ -641,6 +739,8 @@
   .lxu .u-herocard { padding: var(--sp-10) var(--sp-8); }
   .lxu .u-cta { width: auto; min-width: 300px; margin: 0 auto; }
   .lxu .u-ctawrap { display: flex; justify-content: center; }
+  /* ...but not in the hero, which is left-aligned throughout. */
+  .lxu .u-hero-cta .u-cta { margin: 0; min-width: 260px; }
   .lxu .u-proof { gap: var(--sp-4); }
 }
 

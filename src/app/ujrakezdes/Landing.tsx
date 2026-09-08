@@ -1,87 +1,110 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import "./ujrakezdes.css";
-import { ALEXA, HERO, IGY_NEZ_KI, ISMEROS, MASKEPP } from "./copy";
-// The two forgiveness rules appear here AND on the landing/#ismeros section, so
-// per the repo's single-source rule they are defined once in offer-copy.ts and
-// imported - not restated in this file.
-import { ISMEROS as OFFER_ISMEROS } from "@/components/landing/offer-copy";
+import { ALEXA, HERO, HERO_WEEK, IGY_NEZ_KI, ISMEROS } from "./copy";
 import { trackUjrakezdesQuizStart, trackUjrakezdesView } from "@/lib/track";
 
-// The ad landing page (spec §1). One job: get the click into the wizard.
+// The ad landing page: ONE composition, nothing below it.
 //
-// Everything below the fold is for scrollers only - the spec is explicit that
-// the hero has to stand alone, because most of the paid traffic decides in the
-// first screen and never scrolls. So the CTA appears twice and says the same
-// thing both times, and nothing between them introduces a second ask.
+// It has a single job - get the click into the quiz - and it has to carry the
+// whole argument in one screen on desktop, so hierarchy does the work that
+// sections used to. Three tiers, and nothing competes across them:
+//
+//   1. the ask        headline, sub, CTA          - largest, left, first
+//   2. the artifact   the week grid               - the one bold element
+//   3. the argument   the pain, the steps, Alexa  - compact, subordinate
+//
+// The left column is the argument, the right is the product. On a phone the two
+// stack and the composition runs a little past the fold, deliberately: fitting
+// all of this inside 660px would mean shrinking everything into exactly the
+// cramped grid this layout exists to avoid.
 
 export default function Landing() {
   useEffect(() => { trackUjrakezdesView(); }, []);
 
-  const cta = (
-    <div className="u-ctawrap">
-      <Link href="/ujrakezdes/terv" className="u-cta" onClick={trackUjrakezdesQuizStart}>
-        {HERO.cta}
-      </Link>
-    </div>
-  );
-
   return (
-    <main className="lxu">
-      {/* The hero is a full-bleed sage card inset 16px with a 28px radius - the
-          same signature as the landing page's. On cold traffic arriving from an
-          ad, the first screen has to be unmistakably LEXFIT before it is
-          anything else, and a flat cream page is not. */}
-      <header className="u-herocard">
-        <p className="u-eyebrow">LEXFIT</p>
-        <h1>{HERO.headline}</h1>
-        <p className="u-sub">{HERO.sub}</p>
-        <p className="u-audience">{HERO.audience}</p>
-        {cta}
-        <ul className="u-chips">
-          {HERO.chips.map((c) => <li key={c} className="u-chip">{c}</li>)}
-        </ul>
-      </header>
+    <main className="lxu u-hero">
+      <div className="u-hero-grid">
+        {/* ── The argument ─────────────────────────────────────────────── */}
+        <div className="u-hero-copy">
+          <p className="u-eyebrow">LEXFIT</p>
 
-      <div className="u-wrap">
+          <h1>{HERO.headline}</h1>
+          <p className="u-sub">{HERO.sub}</p>
+          <p className="u-audience">{HERO.audience}</p>
 
-        <section className="u-sec" aria-labelledby="u-ismeros">
-          <h2 id="u-ismeros">{ISMEROS.heading}</h2>
-          <p>{ISMEROS.body}</p>
-        </section>
+          {/* The recognition beat. Left as an aside rather than a section: it
+              has to be readable without competing with the headline above it
+              or the CTA below. */}
+          <aside className="u-pain">
+            <h2>{ISMEROS.heading}</h2>
+            <p>{ISMEROS.body}</p>
+            <p className="u-pain-answer">{ISMEROS.answer}</p>
+          </aside>
 
-        <section className="u-sec" aria-labelledby="u-maskepp">
-          <h2 id="u-maskepp">{MASKEPP.heading}</h2>
-          <p>{MASKEPP.body}</p>
-          {/* The two forgiveness rules are the differentiator, so they get a
-              surface of their own instead of being buried in the paragraph. */}
-          <ul className="u-rules">
-            {OFFER_ISMEROS.rules.map((r) => <li key={r}>{r}</li>)}
-          </ul>
-        </section>
+          <div className="u-hero-cta">
+            <Link
+              href="/ujrakezdes/terv"
+              className="u-cta"
+              onClick={trackUjrakezdesQuizStart}
+            >
+              {HERO.cta}
+            </Link>
+            <ul className="u-chips">
+              {HERO.chips.map((c) => <li key={c} className="u-chip">{c}</li>)}
+            </ul>
+          </div>
+        </div>
 
-        <section className="u-sec" aria-labelledby="u-igy">
-          <h2 id="u-igy">{IGY_NEZ_KI.heading}</h2>
-          <ol className="u-steps">
-            {IGY_NEZ_KI.steps.map((s) => <li key={s}>{s}</li>)}
+        {/* ── The product ──────────────────────────────────────────────── */}
+        <div className="u-hero-art">
+          {/* The one bold element. It is the thing the quiz actually hands
+              over, so it earns the space that a stock photograph would not. */}
+          <figure className="u-weekcard">
+            <figcaption>
+              <span className="u-eyebrow">{HERO_WEEK.eyebrow}</span>
+            </figcaption>
+            <ul className="u-weekgrid">
+              {HERO_WEEK.days.map((d, i) => (
+                <li
+                  key={d.d}
+                  className={d.on ? "on" : ""}
+                  style={{ ["--i" as string]: i }}
+                >
+                  <span className="d">{d.d}</span>
+                  <span className="m">{d.on ? HERO_WEEK.train : HERO_WEEK.rest}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="u-weeknote">{HERO_WEEK.note}</p>
+          </figure>
+
+          {/* Genuinely a sequence, so genuinely numbered. */}
+          <ol className="u-flow">
+            {IGY_NEZ_KI.stepsShort.map((s) => <li key={s}>{s}</li>)}
           </ol>
 
-          {/* Two member finish cards, one male. Real ones from the existing set
-              are an open item (docs/lead-magnet-v2-plan.md §8); the aspect ratio
-              is reserved here so swapping them in causes no layout shift. */}
-          <div className="u-proof">
-            <figure><figcaption>tagi kép</figcaption></figure>
-            <figure><figcaption>tagi kép</figcaption></figure>
-          </div>
-        </section>
-
-        <section className="u-sec" aria-labelledby="u-alexa">
-          <h2 id="u-alexa">{ALEXA.heading}</h2>
-          <p>{ALEXA.body}</p>
-          {cta}
-        </section>
+          {/* Alexa as a signature, not a section - a face and the one line that
+              carries the register. */}
+          <figure className="u-sig">
+            <Image
+              src="/alexa-av.jpg"
+              alt=""
+              width={52}
+              height={52}
+              className="u-sig-av"
+            />
+            <figcaption>
+              <p className="u-sig-quote">{ALEXA.signature}</p>
+              <p className="u-sig-name">
+                <b>{ALEXA.name}</b> · {ALEXA.role}
+              </p>
+            </figcaption>
+          </figure>
+        </div>
       </div>
     </main>
   );

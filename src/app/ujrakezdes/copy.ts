@@ -30,6 +30,11 @@ export const HERO = {
 export const ISMEROS = {
   heading: "Ismerős?",
   body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra — aztán a jövő hétből hónap lett. Nem az akaraterővel van baj. Azzal, hogy minden kihagyás után nulláról kell kezdeni.",
+  /** The answer to the paragraph above. The rules block was cut from the page,
+   *  and a problem statement with no resolution is a liability on a landing
+   *  page - so the resolving clause survives as one line, lifted verbatim from
+   *  MASKEPP's approved body rather than newly written. */
+  answer: "A LEXFIT-ben a pihenőnap nem töri meg a sorozatot, és a kihagyott hét nem nulláz.",
 } as const;
 
 export const MASKEPP = {
@@ -39,6 +44,9 @@ export const MASKEPP = {
 
 export const IGY_NEZ_KI = {
   heading: "Így néz ki",
+  /** The compact form for the hero - the full sentences below are too long for
+   *  a three-up row beside a graphic. // COPY-REVIEW */
+  stepsShort: ["Válaszolsz 7 kérdésre", "Megkapod a heti terved", "Elindítod az elsőt"],
   steps: [
     "Válaszolsz 7 kérdésre — nagyjából egy perc.",
     "Megkapod a heti tervedet, pihenőnapokkal.",
@@ -49,6 +57,15 @@ export const IGY_NEZ_KI = {
 export const ALEXA = {
   heading: "Ki az az Alexa?",
   body: "Tíz évig versenyszerűen tornáztam, aztán évekig semmit. Nulláról, egy matracon kezdtem újra — ebből lett a LEXFIT. Nem vagyok orvos és nem ígérek csodát. Egy rendszert ígérek, ami kibírja az életet.",
+  /** The signature block in the hero. The last two sentences of the approved
+   *  paragraph, verbatim - the whole thing would crowd the composition, and
+   *  these two are the ones that carry the register. */
+  signature: "Nem vagyok orvos és nem ígérek csodát. Egy rendszert ígérek, ami kibírja az életet.",
+  name: "Alexa",
+  /** Not "a LEXFIT alapítója": offer v3 §7 bans `alapító` because of the
+   *  founder PRICE, and the guard cannot tell the two senses apart. Saying what
+   *  she does for the reader is more useful than a job title anyway. */
+  role: "ő vezet végig minden edzést",
 } as const;
 
 // ─── §2 Quiz ─────────────────────────────────────────────────────────────────
@@ -183,6 +200,21 @@ export const TRAY = {
   daypart: { morning: "reggel", midday: "napközben", evening: "este", varies: "váltakozó" } as Record<Daypart, string>,
 } as const;
 
+
+/** The example week drawn in the hero. Labelled as an EXAMPLE on purpose: it is
+ *  rendered before anybody has answered anything, and a week grid that looks
+ *  like a personal plan would be promising one that does not exist yet. */
+export const HERO_WEEK = {
+  eyebrow: "Példa egy hétre",
+  note: "Heti 3 nap, pihenőnapokkal. A tiéd a válaszaidból készül.",
+  days: [
+    { d: "H", on: true }, { d: "K", on: false }, { d: "Sze", on: true },
+    { d: "Cs", on: false }, { d: "P", on: true }, { d: "Szo", on: false },
+    { d: "V", on: false },
+  ],
+  train: "edzés",
+  rest: "pihenő",
+} as const;
 
 // ─── Sections ────────────────────────────────────────────────────────────────
 //
