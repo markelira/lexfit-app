@@ -69,11 +69,19 @@ export default function Landing({ variant = "base" }: { variant?: C.LpVariant })
     if (!h || !c || typeof IntersectionObserver === "undefined") return;
     let past = false, closeVis = false;
     const upd = () => setStickyOn(past && !closeVis);
-    const io1 = new IntersectionObserver(([e]) => {
+    // Read the LAST entry of each batch: a flick can cross "enters viewport"
+    // and "leaves above" between two frames, and the observer then delivers
+    // both crossings in ONE callback - entries[0] is the stale one.
+    const io1 = new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
       past = !!e && !e.isIntersecting && e.boundingClientRect.top < 0;
       upd();
     });
-    const io2 = new IntersectionObserver(([e]) => { closeVis = !!e && e.isIntersecting; upd(); });
+    const io2 = new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
+      closeVis = !!e && e.isIntersecting;
+      upd();
+    });
     io1.observe(h);
     io2.observe(c);
     return () => { io1.disconnect(); io2.disconnect(); };

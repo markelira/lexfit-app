@@ -207,11 +207,14 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
       if (!raw) return;
       const d = JSON.parse(raw) as { a?: Draft; screen?: Screen };
       if (d.a) setA({ care: [], ...d.a });
-      // Never resume INTO the reveal: it depends on a submit that did not
-      // survive the refresh, and re-showing it would imply a lead we never saved.
-      if (d.screen && d.screen !== "reveal" && d.screen !== "interstitial") {
-        setScreen(d.screen);
-      }
+      // Never resume INTO the reveal: it depends on a submit whose result did
+      // not survive the refresh, and re-showing it would imply a lead we never
+      // confirmed. But dropping them to Q1 with every answer pre-filled made
+      // them re-tap seven answered questions - so a lost reveal resumes at the
+      // GATE instead: one submit away from the plan, and the lead upsert
+      // dedupes on the email hash, so resubmitting is harmless.
+      if (d.screen === "reveal") setScreen("gate");
+      else if (d.screen && d.screen !== "interstitial") setScreen(d.screen);
     } catch { /* ignore */ }
   }, []);
 
@@ -297,11 +300,19 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     if (!b2 || !cl || typeof IntersectionObserver === "undefined") return;
     let past = false, closeVis = false;
     const upd = () => setStickyOn(past && !closeVis);
-    const io1 = new IntersectionObserver(([e]) => {
+    // Read the LAST entry of each batch: a flick can cross "enters viewport"
+    // and "leaves above" between two frames, and the observer then delivers
+    // both crossings in ONE callback - entries[0] is the stale one.
+    const io1 = new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
       past = !!e && !e.isIntersecting && e.boundingClientRect.top < 0;
       upd();
     });
-    const io2 = new IntersectionObserver(([e]) => { closeVis = !!e && e.isIntersecting; upd(); });
+    const io2 = new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
+      closeVis = !!e && e.isIntersecting;
+      upd();
+    });
     io1.observe(b2);
     io2.observe(cl);
     return () => { io1.disconnect(); io2.disconnect(); };
