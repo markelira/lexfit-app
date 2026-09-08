@@ -482,7 +482,12 @@
 }
 .lxl .pb-mark { color: var(--ink); justify-content: center; font-size: 26px; line-height: 33px; margin-top: 22px; }
 .lxl .pb-intro { max-width: 560px; margin: 14px auto 0; font-size: 16px; line-height: 26px; color: oklch(.235 .014 168/.84); text-wrap: pretty; }
-.lxl .pb-grid { margin-top: 38px; align-items: stretch; }
+/* .price-grid.pb-grid, not .pb-grid: the base `.lxl .price-grid` below sets
+   `margin: 0 auto` at the same (0,2,0) specificity and, being later in the
+   file, silently zeroed this margin - so the card badges (top: -12px) collided
+   with the intro's last line on every surface the band renders on. Found
+   2026-09-08 while reviewing the reveal. */
+.lxl .price-grid.pb-grid { margin: 38px auto 0; align-items: stretch; }
 
 /* The card is one big tap target (the whole thing is the <Link>), so the CTA
    inside it is a styled span, not a nested anchor. */

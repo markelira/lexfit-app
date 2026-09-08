@@ -1942,46 +1942,8 @@
 
 /* ═══ The programme on the reveal ═══════════════════════════════════════════ */
 
-.lxu .u-prog { margin: var(--sp-10) 0 0; }
-.lxu .u-prog-h {
-  font-size: clamp(24px, 6.5vw, 30px);
-  line-height: 1.15; letter-spacing: -0.02em; font-weight: 600;
-  margin: 0 0 var(--sp-3);
-}
-.lxu .u-prog-lead {
-  font-size: 15.5px; line-height: 1.6; color: var(--ink-2);
-  margin: 0 0 var(--sp-6); text-wrap: pretty;
-}
-
-.lxu .u-prog-phase { margin: 0 0 var(--sp-8); }
-.lxu .u-prog-phead { margin: 0 0 var(--sp-4); }
-.lxu .u-prog-phead h3 {
-  font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px;
-}
-.lxu .u-prog-phead p { font-size: 14px; line-height: 1.5; color: var(--ink-3); margin: 0; }
-
-/* One column on a phone, because these are the app's real cards and they are
-   built for a full-width row. Two from tablet up, where the reveal has room. */
-.lxu .u-prog-grid { display: grid; gap: var(--sp-4); }
-@media (min-width: 640px) {
-  .lxu .u-prog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-.lxu .u-prog-foot {
-  font-size: 13.5px; line-height: 1.6; color: var(--ink-3);
-  margin: 0; padding-top: var(--sp-2);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lxu .u-tchip.land { animation: u-fade-in 180ms linear both; }
-}
-
-/* The card grid carries `.lx` so the app's card styles apply; that class also
-   paints the app background, which would tile a second surface over the cream. */
-.lxu .u-prog-grid.lx { background: transparent; }
-/* No account exists on this surface, so the save control has nothing to save
-   to. Hidden rather than wired to a no-op, which would be a dead affordance. */
-.lxu .u-prog-grid .wc-save { display: none; }
+/* (duplicate preview block removed 2026-09-08 - it was pasted twice during the
+   reveal band rebuild) */
 
 /* ===== Inside the /register shell ==========================================
    The quiz now renders in the join wizard's split-screen (.authx/.fnl-*), so
@@ -2960,10 +2922,24 @@
 
 @media (min-width: 760px) {
   /* Days two and three sit side by side; the first keeps the full width because
-     it carries the exercise list. A 2-day plan has only ONE follow-up card -
-     alone in a two-column grid it rendered as a half-width orphan, so a lone
-     second card spans too. */
+     it carries the exercise list. A lone follow-up card (2-day plan) stays at
+     HALF width on purpose: spanning it was tried and produced a giant
+     unframed cover competing with the first day - a half card beside honest
+     whitespace matches how the 3-day pair reads. */
   .lxu .u-wdays { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lxu .u-wday.first { grid-column: 1 / -1; }
-  .lxu .u-wday:nth-child(2):last-child { grid-column: 1 / -1; }
+}
+
+/* ── The preview band's composition (S6) ───────────────────────────────────
+   On its own band below the price the section inherited two wrongs: a CENTRED
+   lead under a left-aligned heading (cap-body centres itself), and the page's
+   724px column discipline lost - 550px covers in a 1120px wrap. Cap the
+   section at the page's own column width so the whole page keeps one measure,
+   and left-align the lead like every other section's. */
+.lxu.u-rev .u-prog { max-width: 724px; margin-top: 0; }
+.lxu.u-rev .u-prog .cap-body {
+  text-align: left;
+  margin-inline: 0;
+  margin-bottom: var(--sp-6);
+  max-width: none;
 }
