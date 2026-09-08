@@ -23,6 +23,7 @@ export function StepFrame({
   onBack,
   progressCurrent,
   progressTotal,
+  progressLabels,
   counter,
   heading,
   sub,
@@ -36,6 +37,9 @@ export function StepFrame({
   /** Segment count. Omit for the wizard's default of seven questions; the lead
    *  magnet passes its section count so the bar reads as sections, not steps. */
   progressTotal?: number;
+  /** A row rendered directly under the bar, aligned to it. The lead magnet uses
+   *  it to name every section at once instead of only the current one. */
+  progressLabels?: React.ReactNode;
   counter?: string; // "3 / 5" · "Kész"
   heading: string;
   sub?: string;
@@ -63,6 +67,8 @@ export function StepFrame({
         )}
         {counter && <span className="fnl-counter mono">{counter}</span>}
       </div>
+
+      {progressLabels}
 
       {/* .fnl-sheet groups body+action into ONE object so the mobile layer can
           make it the dark glass sheet that floats over the step photo

@@ -923,23 +923,6 @@
   font-size: 13.5px; color: var(--ink-3); padding: 4px 0;
 }
 
-/* The interstitial, as a step rather than a takeover. */
-.u-onb .u-inter-line {
-  font-size: clamp(21px, 5.4vw, 27px);
-  line-height: 1.3; letter-spacing: -0.015em; font-weight: 500;
-  margin: 0 0 var(--sp-5); text-wrap: balance;
-  animation: u-rise 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-}
-.u-onb .u-inter-line:nth-child(2) { animation-delay: 560ms; }
-.u-onb .u-inter-bar {
-  display: block; width: 92px; height: 3px; margin: 0 auto;
-  border-radius: 999px; background: oklch(0.235 0.014 168 / 0.14); overflow: hidden;
-}
-.u-onb .u-inter-bar i {
-  display: block; height: 100%; width: 100%; background: var(--accent);
-  transform-origin: left center;
-  animation: u-sweep 2000ms linear both;
-}
 
 /* The gate's own fields, matched to the wizard's field metrics. */
 .u-onb .u-label {
@@ -1338,4 +1321,135 @@
   .u-onb .u-tempo .rate { color: rgba(255, 255, 255, 0.55); }
   .u-onb .u-tempo em { background: #fff; color: #101613; }
   .u-onb .u-tempo .korr { color: var(--accent); }
+}
+
+/* ═══ Section labels ════════════════════════════════════════════════════════
+   Every section named, always, aligned under its own bar segment. The current
+   one is lifted by weight and opacity rather than by being the only one there:
+   knowing what is still coming is most of what a progress indicator is for. */
+
+/* The row inherits .fnl-top's padding and gap; only its vertical box is
+   collapsed, so the labels sit hard under the segments instead of a chrome
+   height below them. */
+.u-onb .u-secs-row {
+  height: auto;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: -4px;
+  align-items: start;
+}
+
+.u-onb .u-secs {
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--sp-1);
+}
+.u-onb .u-secs li {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+  opacity: 0.42;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 320ms var(--ease-settle), color 320ms var(--ease-settle);
+}
+.u-onb .u-secs li.done { opacity: 0.7; }
+.u-onb .u-secs li.on { opacity: 1; color: var(--ink); font-weight: 600; }
+
+/* ═══ The interstitial ══════════════════════════════════════════════════════
+   Their week, assembling. Not a loading screen: `days` is answered by this
+   point, so the beat can show something true instead of holding two sentences
+   over a photograph for two seconds. */
+
+/* This step has no action button, so the sheet does not need the band reserved
+   for one - and it was clipping the second rule during a beat nobody scrolls
+   through. Same lever onbv2 uses for the quote step. */
+.u-onb .u-inter-step .fnl-sheet { --fnl-band: var(--fnl-chrome); }
+.u-onb .u-inter-step .fnl-foot { padding-top: var(--sp-3); }
+
+.u-onb .u-inter-eyebrow {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--sp-4);
+  animation: u-fade-in 320ms var(--ease-settle) both;
+}
+
+.u-onb .u-inter-week {
+  list-style: none; margin: 0 0 var(--sp-6); padding: 0;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+}
+.u-onb .u-inter-week li {
+  border-radius: 10px;
+  min-width: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  padding: 10px 2px;
+  text-align: center;
+  /* One cell at a time, left to right - the week builds rather than appears. */
+  animation: u-drop 420ms var(--ease-settle) both;
+  animation-delay: calc(260ms + var(--i, 0) * 70ms);
+}
+.u-onb .u-inter-week li.on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.u-onb .u-inter-week .d {
+  display: block; font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.72;
+}
+.u-onb .u-inter-week .m { display: block; font-size: 9.5px; margin-top: 3px; opacity: 0.62; }
+
+.u-onb .u-inter-line {
+  font-size: clamp(17px, 4.6vw, 21px);
+  line-height: 1.35; letter-spacing: -0.012em; font-weight: 500;
+  margin: 0 0 var(--sp-3); text-wrap: balance;
+  animation: u-rise 560ms var(--ease-settle) both;
+  animation-delay: calc(900ms + var(--i, 0) * 260ms);
+}
+.u-onb .u-inter-bar {
+  display: block; width: 92px; height: 3px; margin: 0 auto;
+  border-radius: 999px; background: oklch(0.235 0.014 168 / 0.14); overflow: hidden;
+}
+.u-onb .u-inter-bar i {
+  display: block; height: 100%; width: 100%; background: var(--accent);
+  transform-origin: left center; animation: u-sweep 2000ms linear both;
+}
+
+@media (max-width: 767.98px) {
+  .u-onb .u-secs li { color: rgba(255, 255, 255, 0.72); }
+  .u-onb .u-secs li.on { color: #fff; }
+  /* This step has no action button, so the sheet does not need the band reserved
+   for one - and it was clipping the second rule during a beat nobody scrolls
+   through. Same lever onbv2 uses for the quote step. */
+.u-onb .u-inter-step .fnl-sheet { --fnl-band: var(--fnl-chrome); }
+.u-onb .u-inter-step .fnl-foot { padding-top: var(--sp-3); }
+
+.u-onb .u-inter-eyebrow { color: rgba(255, 255, 255, 0.6); }
+  .u-onb .u-inter-week li {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .u-onb .u-inter-week li.on { background: #fff; border-color: #fff; color: #101613; }
+  .u-onb .u-inter-line { color: #f0f4f3; }
+  .u-onb .u-inter-bar { background: rgba(255, 255, 255, 0.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u-onb .u-inter-week li,
+  .u-onb .u-inter-line,
+  /* This step has no action button, so the sheet does not need the band reserved
+   for one - and it was clipping the second rule during a beat nobody scrolls
+   through. Same lever onbv2 uses for the quote step. */
+.u-onb .u-inter-step .fnl-sheet { --fnl-band: var(--fnl-chrome); }
+.u-onb .u-inter-step .fnl-foot { padding-top: var(--sp-3); }
+
+.u-onb .u-inter-eyebrow {
+    animation: u-fade-in 180ms linear both !important; animation-delay: 0ms !important;
+  }
+  .u-onb .u-inter-bar i { animation: none; }
 }

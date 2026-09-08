@@ -282,6 +282,13 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     [a, sessionMin],
   );
 
+  /** The week as far as it is known at the interstitial - `days` is answered by
+   *  then, which is the whole reason the beat can show something true. */
+  const interWeek = useMemo(
+    () => (a.days ? buildWeekPlan({ ...(a as Answers), days: a.days }, sessionMin).days : []),
+    [a, sessionMin],
+  );
+
   /** The parsed body block, or null when they skipped or have not finished. */
   const bodyInput = useMemo<BodyInput | null>(() => {
     if (skipCalc || !bodyConsent) return null;
@@ -322,6 +329,32 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   /** Q5's "Tovább". Hoisted rather than written inline in the cta prop: a
    *  handler created during render and closing over refs is what the compiler
    *  lint flags, and hoisting it is the fix rather than the silencer. */
+  /**
+   * Every section named, all the time, with the current one lifted out by
+   * weight and opacity. Showing only the current label told somebody where they
+   * were but never where they were going - the shape of the thing they had
+   * agreed to was invisible until they reached the end of it.
+   */
+  const sectionLabels = (
+    // Reuses `.fnl-top`'s own row so the horizontal padding, the gap and the
+    // spacer width all track the back button at every breakpoint - the offsets
+    // differ between desktop and the two mobile height ladders, and hardcoding
+    // any of them would misalign the labels on some phone.
+    <div className="fnl-top u-secs-row">
+      <span className="fnl-back-spacer" aria-hidden="true" />
+      <ol className="u-secs" aria-hidden="true">
+        {C.SECTIONS.map((sec, i) => (
+          <li
+            key={sec.key}
+            className={i === SECTION_OF[screen] ? "on" : i < SECTION_OF[screen] ? "done" : ""}
+          >
+            {sec.label}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+
   /** Every body field present. The consent is checked separately, because a
    *  filled form without it must still be able to move on - it just moves on
    *  without storing anything. */
@@ -442,9 +475,29 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
           {screen === "interstitial" && (
             <div className="fnl-main fnl u-inter-step">
               <div className="fnl-sheet">
-                <div className="fnl-scroll center">
-                  {C.INTERSTITIAL.lines.map((l) => (
-                    <p key={l} className="u-inter-line">{l}</p>
+                <div className="fnl-scroll">
+                  {/* Not a loading screen. They have just answered how many days
+                      and when, so at this exact point their week is knowable -
+                      and showing it is worth more than two lines of text over a
+                      photograph. The rules below then land as captions on
+                      something concrete rather than as claims in the air. */}
+                  <p className="u-inter-eyebrow">{C.INTERSTITIAL.eyebrow}</p>
+
+                  <ul className="u-inter-week" aria-label="A heti terved">
+                    {interWeek.map((d, i) => (
+                      <li
+                        key={d.weekday}
+                        className={d.training ? "on" : ""}
+                        style={{ ["--i" as string]: i }}
+                      >
+                        <span className="d">{d.short}</span>
+                        <span className="m">{d.training ? "edzés" : "pihenő"}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {C.INTERSTITIAL.lines.map((l, i) => (
+                    <p key={l} className="u-inter-line" style={{ ["--i" as string]: i }}>{l}</p>
                   ))}
                 </div>
                 <div className="fnl-foot">
@@ -459,7 +512,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
               onBack={back}
               progressCurrent={C.SECTIONS.length}
               progressTotal={C.SECTIONS.length}
-              counter={C.SECTIONS[C.SECTIONS.length - 1]!.label}
+              progressLabels={sectionLabels}
               heading={C.GATE.hd}
               sub={C.GATE.sub}
               headingRef={headingRef}
@@ -524,7 +577,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
               onBack={back}
               progressCurrent={SECTION_OF[screen] + 1}
               progressTotal={C.SECTIONS.length}
-              counter={C.SECTIONS[SECTION_OF[screen]]!.label}
+              progressLabels={sectionLabels}
               heading={
                 screen === "body" ? C.ENERGY.formHeading
                   : screen === "goal" ? C.ENERGY.goalLabel
@@ -607,8 +660,9 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
                   ariaLabel={C.ENERGY.goalLabel}
                   value={body.goal || null}
                   onChange={(v) => {
-                    if (v == null) return;
-                    setBody((p) => ({ ...p, goal: v as EnergyGoal }));
+                    const val = v ?? body.goal;
+                    if (!val) return;
+                    setBody((p) => ({ ...p, goal: val as EnergyGoal }));
                     setLanded("goal");
                     commitTimer.current = setTimeout(advance, COMMIT_MS);
                   }}
@@ -644,7 +698,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
               onBack={idx > 0 ? back : undefined}
               progressCurrent={SECTION_OF[screen] + 1}
               progressTotal={C.SECTIONS.length}
-              counter={C.SECTIONS[SECTION_OF[screen]]!.label}
+              progressLabels={sectionLabels}
               heading={QUESTION[screen as StepId].hd}
               sub={QUESTION[screen as StepId].micro}
               headingRef={headingRef}
@@ -671,7 +725,14 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
                 <OptionList
                   ariaLabel={QUESTION[screen as StepId].hd}
                   value={(a as Record<string, string | undefined>)[screen] ?? null}
-                  onChange={(v) => { if (v != null) pick(screen as keyof Answers, v as never); }}
+                  onChange={(v) => {
+                    // OptionList treats a tap on the selected row as a deselect.
+                    // These steps have no Tovább, so after coming back with an
+                    // answer already chosen that would leave no way forward
+                    // except changing it. Re-confirming advances instead.
+                    const val = v ?? (a as Record<string, string | undefined>)[screen];
+                    if (val) pick(screen as keyof Answers, val as never);
+                  }}
                   items={QUESTION[screen as StepId].options.map((o) => ({
                     v: o.value,
                     label: o.label,

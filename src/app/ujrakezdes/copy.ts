@@ -111,6 +111,9 @@ export const Q_FOCUS = {
 /** Between Q4 and Q5, auto-advancing. The two rules, stated before they are
  *  asked about their knees - so the caution question lands as care, not risk. */
 export const INTERSTITIAL = {
+  /** // COPY-REVIEW - not in the v2 spec. The beat now shows their actual week,
+   *  so it needs one line naming what they are looking at. */
+  eyebrow: "Ennyi már megvan",
   lines: [
     "A terved pihenőnapokkal készül.",
     "A kihagyott hét nálunk nem nulláz.",
