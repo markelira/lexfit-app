@@ -205,6 +205,12 @@ export function trackUjrakezdesOfferClick(): void {
   push("lx_ujrakezdes_offer_click");
 }
 
+/** The reveal's sticky price bar, measured separately from the in-flow CTAs so
+ *  the bar's own contribution is visible (design handoff §8). */
+export function trackUjrakezdesStickyClick(): void {
+  push("lx_ujrakezdes_sticky_click");
+}
+
 /** What the SERVER needs to report a purchase to Meta's Conversions API.
  *
  *  Why it is collected here, in the browser, and carried through Stripe:

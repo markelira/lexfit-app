@@ -215,7 +215,10 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   // Rule 2: no weight-loss vocabulary or body-transformation promises.
   const banned = ["fogyás", "fogyni", "zsírégetés", "kockás has", "testsúly", "kalória", "kilo", "before/after"];
   for (const s of strings) {
-    const low = s.toLowerCase();
+    // „nem kockás has" is the brand's own ANTI-promise (Has & Mély Törzs copy,
+    // same wording as the seed) - the ban is on promising the body, not on
+    // refusing to. Only the negated form passes.
+    const low = s.toLowerCase().replace(/nem kockás has/g, "");
     for (const b of banned) assert.ok(!low.includes(b), `tiltott szó "${b}": ${s.slice(0, 60)}`);
   }
   ok("nincs fogyás-szókincs és testsúly-ígéret");
@@ -290,25 +293,11 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
     assert.ok(sec.label.split(" ").length <= 2, `túl hosszú szekciócímke: ${sec.label}`);
   }
 
-  // The reveal's commitment beat and D0 must give the same advice, or the page
-  // and the email are coaching two different things.
-  assert.ok(
-    /átlagos/i.test(C.REVEAL.firstWorkout.hint),
-    "a reveal nem ismétli meg a D0 tanácsát az átlagos napról",
-  );
-  // It is a commitment device, not a booking - and it must say so, because we
-  // cannot schedule anything and must not imply that we can.
-  assert.ok(
-    /nem küldünk/i.test(C.REVEAL.firstWorkout.note),
-    "a napválasztó emlékeztetőt sugall, amit nem küldünk",
-  );
-
   // Declining the calculator has to be a real, visible answer.
   assert.ok(C.CALC_INVITE.no.length > 0, "a kalkulátort nem lehet nemmel elutasítani");
-  // The reveal's first training day lists its real exercises. `items` is a
-  // UNION - a bare string on older records, { name, start } on stamped ones -
-  // and the list must read both. The dev seed only stamps F023 (position 23),
-  // so this path cannot be seen in a local browser; it is guarded here instead.
+
+  // Exercise `items` are a UNION - a bare string on older records,
+  // { name, start } on stamped ones - and every reader must accept both.
   const block = {
     name: "1. blokk — EMOM 10",
     items: ["Térdelés-felállás", { name: "Hegymászó (csendes)", start: 7 }],
@@ -318,29 +307,58 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
     "Térdelés-felállás · Hegymászó (csendes)",
     "a gyakorlatlista nem olvassa mindkét item-alakot",
   );
-  assert.ok(C.WEEK_WORKOUTS.firstTag.length > 0, "az első nap nincs megjelölve");
-  assert.ok(
-    /első/.test(C.WEEK_WORKOUTS.lead(3)),
-    "a heti lista nem mondja meg, hogy az első hétről van szó",
-  );
-  // S1 (the artifact): the provenance line is the IKEA effect's trace back to
-  // their own work, and the chips must come from the SAME mapping the quiz's
-  // tray used - a second mapping is how two surfaces describe one person
-  // differently.
-  assert.ok(/válasz/.test(C.REVEAL.art.meta("szeptember 8.")), "az artifact nem nevezi meg a válaszokat");
-  assert.ok(C.REVEAL.art.title.length > 0 && !C.REVEAL.art.title.includes("!"));
 
-  // The rail is an order summary: at most six includes lines, no forint in any
-  // of them (amounts are interpolated from PRICES in the markup), and every
-  // line a strict subset of what the shared PRICING_BAND.included claims -
-  // checked by keyword so the condensed list cannot quietly promise more.
-  assert.ok(C.REVEAL.rail.includes.length <= 6, "a rail-lista több, mint egy rendelés-összesítő");
-  for (const line of C.REVEAL.rail.includes) {
-    assert.ok(!/\d[\d\s ]*Ft/.test(line), `forint a rail-listában: ${line}`);
+  // ── The design-handoff reveal (2026-09-08) ─────────────────────────────
+
+  // B0: the bar parks at 88 - if it ever reads 100 before payment, the page
+  // claims a finished journey it has not finished.
+  assert.ok(C.REVEAL.progress.pct < 100, "a folyamatjelző fizetés előtt nem lehet 100%");
+
+  // The offer's promise about the renewal date is only true because the pay
+  // step actually shows it (EmbeddedPay → nextChargeLabel). The sentence and
+  // that feature must move together.
+  assert.ok(/megújítás dátumát/.test(C.REVEAL.offer.renew("X")), "a megújítás-mondat elvesztette a dátum-ígéretet");
+
+  // One CTA, one price: every CTA is the same sentence built on the
+  // interpolated intro amount - no second verb, no second offer.
+  assert.equal(C.REVEAL.offer.cta("X"), "Kezdem — az első hét X");
+  assert.ok(C.REVEAL.sticky.go.length > 0);
+
+  // B6: the entry list must carry every named programme the shared band
+  // claims - keyword-checked so the reveal can never promise more or less
+  // than the product.
+  const entryBlob = C.REVEAL.entry.items.map((i) => i.b).join(" ").toLowerCase();
+  for (const kw of ["edzés program", "kezdő", "reggeli", "esti", "törzs", "láb", "tartás", "kihívás", "mérföldkövek"]) {
+    assert.ok(entryBlob.includes(kw), `hiányzó tétel a belépő-listából: ${kw}`);
   }
   const bandBlob = PRICING_BAND.included.join(" ").toLowerCase();
   for (const kw of ["start", "kihívás", "mérföldkövek", "szünet"]) {
-    assert.ok(bandBlob.includes(kw), `a rail olyat ígér, amit a band nem: ${kw}`);
+    assert.ok(bandBlob.includes(kw), `a reveal olyat ígér, amit a band nem: ${kw}`);
+  }
+
+  // The monthly/annual cards are information, not buttons (handoff Q2) - so
+  // their copy may not contain an imperative CTA verb.
+  assert.ok(!/kérek|váltok|kezdem/i.test(C.REVEAL.entry.monthTag + C.REVEAL.entry.annualTag("X", 44)),
+    "a ritmus-kártyák gombként beszélnek");
+
+  // B10: five questions, exactly one gated on the guarantee so it can go dark
+  // with the guarantee itself.
+  assert.equal(C.REVEAL.faq.length, 5);
+  assert.equal(C.REVEAL.faq.filter((f) => f.guar).length, 1, "pontosan egy GYIK-tétel függ a garanciától");
+
+  // No guest-workout promise anywhere: guest playback does not exist
+  // (pay-to-join hard gate, locked P0), and the handoff's own rule for that
+  // case is that every „vendég" string is omitted.
+  {
+    const rs: string[] = [];
+    const walkR = (v: unknown): void => {
+      if (typeof v === "string") rs.push(v);
+      else if (typeof v === "function") { try { rs.push(String((v as (...x: never[]) => string)("X" as never, "Y" as never))); } catch { /* not copy */ } }
+      else if (Array.isArray(v)) v.forEach(walkR);
+      else if (v && typeof v === "object") Object.values(v).forEach(walkR);
+    };
+    walkR(C.REVEAL);
+    for (const st of rs) assert.ok(!/vendég/i.test(st), `vendég-ígéret a revealen: ${st.slice(0, 50)}`);
   }
 
   // S4: a named person stands behind the guarantee - and it must never become

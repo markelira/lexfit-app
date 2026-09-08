@@ -128,7 +128,7 @@ export default function Landing() {
                 the funnel produces. A portrait is not evidence of a plan. */}
             <div className="hero-device u-weekdevice">
               <PlanMail
-                headline={C.REVEAL.hd}
+                headline={C.REVEAL.b1.hd}
                 sampleTag={HERO_WEEK.sampleTag}
                 cta="Megnyitom a tervem"
                 stats={[...HERO_WEEK.stats]}

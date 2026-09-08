@@ -16,13 +16,10 @@ import "../ujrakezdes.css";
 // of it leaks into `.lxu`.
 import "@/app/landing.css";
 import * as C from "../copy";
-import { PricingBand } from "@/components/landing/PricingBand";
-import { GARANCIA, GUARANTEE_LIVE, PRICING_BAND } from "@/components/landing/offer-copy";
+import Image from "next/image";
+import { GARANCIA, GUARANTEE_LIVE } from "@/components/landing/offer-copy";
 import { PRICES } from "@/lib/pricing/config";
-import { formatHuf } from "@/lib/pricing/display";
-import EnergyResult from "./EnergyResult";
-import ProgramPreview from "./ProgramPreview";
-import WeekWorkouts from "./WeekWorkouts";
+import { annualSavingsPct, formatHuf, perMonthHuf } from "@/lib/pricing/display";
 import PlanTray, { trayChips } from "./PlanTray";
 import MailPreview from "./MailPreview";
 import { BrandPanel } from "@/components/onboarding/BrandPanel";
@@ -39,6 +36,7 @@ import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes
 import {
   marketingContext, newEventId, trackUjrakezdesGateView, trackUjrakezdesLead,
   trackUjrakezdesOfferClick, trackUjrakezdesRevealView, trackUjrakezdesStep,
+  trackUjrakezdesStickyClick,
 } from "@/lib/track";
 
 // The lead magnet v2 wizard: Q1-Q7 → interstitial → gate → reveal.
@@ -177,9 +175,12 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   const [body, setBody] = useState<BodyDraft>(EMPTY_BODY);
   const [bodyConsent, setBodyConsent] = useState(false);
   const [skipCalc, setSkipCalc] = useState(false);
-  /** The day they commit to starting on. Local only, by design: this is a
-   *  commitment device, not a booking, and we have nothing to book against. */
-  const [startDay, setStartDay] = useState<number | null>(null);
+  /** S · the sticky price bar (M4). Shown once B2's CTA scrolls out, hidden
+   *  again while the closing CTA is on screen. Mobile only - desktop's rail is
+   *  the constant price. */
+  const [stickyOn, setStickyOn] = useState(false);
+  const b2Ref = useRef<HTMLElement>(null);
+  const closeCtaRef = useRef<HTMLAnchorElement>(null);
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [hp, setHp] = useState("");
@@ -286,6 +287,25 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   useEffect(() => { if (screen === "gate") trackUjrakezdesGateView(); }, [screen]);
   useEffect(() => { if (screen === "reveal") trackUjrakezdesRevealView(); }, [screen]);
 
+  // M4. Two observers rather than scroll math: the bar appears when the fold
+  // offer leaves upward, and yields while the closing CTA is visible so the
+  // page never shows the same ask twice at once.
+  useEffect(() => {
+    if (screen !== "reveal") return;
+    const b2 = b2Ref.current, cl = closeCtaRef.current;
+    if (!b2 || !cl || typeof IntersectionObserver === "undefined") return;
+    let past = false, closeVis = false;
+    const upd = () => setStickyOn(past && !closeVis);
+    const io1 = new IntersectionObserver(([e]) => {
+      past = !!e && !e.isIntersecting && e.boundingClientRect.top < 0;
+      upd();
+    });
+    const io2 = new IntersectionObserver(([e]) => { closeVis = !!e && e.isIntersecting; upd(); });
+    io1.observe(b2);
+    io2.observe(cl);
+    return () => { io1.disconnect(); io2.disconnect(); };
+  }, [screen]);
+
   /**
    * The programme's real session length, taken from the live catalogue: the
    * median of its published workouts. The quiz no longer ASKS how long a
@@ -306,13 +326,6 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   const interWeek = useMemo(
     () => (a.days ? buildWeekPlan({ ...(a as Answers), days: a.days }, sessionMin).days : []),
     [a, sessionMin],
-  );
-
-  /** The artifact's date line. Client-side by design: the reveal is a client
-   *  component, and the date it should show is the person's own today. */
-  const madeOn = useMemo(
-    () => new Intl.DateTimeFormat("hu-HU", { month: "long", day: "numeric" }).format(new Date()),
-    [],
   );
 
   /** Their answers, in the same labels the quiz's tray used - one source
@@ -433,278 +446,252 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   // offer. The split-screen exists to keep a single question company; giving
   // long-form content half a viewport would be using the layout against itself.
   if (screen === "reveal" && plan) {
-    // The reveal now speaks the SAME design language as /ujrakezdes and the
-    // homepage: `.lxl` bands, the `.wrap` column, the eyebrow / .h-bold /
-    // .cap-body ramp, `.pill` controls and the sage pricing band.
+    // ═══ The reveal — design-handoff rebuild (2026-09-08) ═══════════════════
     //
-    // It used to be a 560px `.lxu` column with hairline dividers, which on a
-    // desktop left the whole plan hugging the left third of the screen and set
-    // every heading in a tier that exists nowhere else in the product. The
-    // person reading this has just come from the landing page; arriving at a
-    // differently-designed page is how a funnel tells somebody it handed them
-    // off to a different company.
+    // Block order per ~/Downloads/design_handoff_reveal README §5 (the order IS
+    // the design): B0 progress-at-88% → B1 plan card → B2 offer at the fold →
+    // B3 mechanism → B4 first workout → (B5 hidden: no consented member photos)
+    // → B6 entry → B7 guarantee band → B8 Alexa → B9 anti-avatar → B10 FAQ →
+    // B11 close → S sticky price bar.
     //
-    // BOTH scopes sit on the root on purpose: `.lxl` brings the band system,
-    // `.lxu` keeps the reveal's own atoms (week grid, numbers, workout rows)
-    // working unchanged.
+    // Desktop ≥1024px: B1/B3/B4 form the left column, the decision panel is a
+    // 320px sticky rail on the right (B2 and B6 fold into it), B7 onward runs
+    // full-width. Mobile is the master DOM order; the rail and the mobile-only
+    // blocks swap via CSS, never by re-ordering the document.
     //
-    // No scroll-reveal here, unlike the landing. This IS the thing they asked
-    // for - it has to be present the moment the page is.
+    // Guest playback does not exist (pay-to-join hard gate, locked P0), so the
+    // handoff's guest button and every „vendégként" string are omitted - the
+    // handoff itself prescribes exactly that for this case (Q3).
+    const intro = formatHuf(PRICES.week_intro.amountHuf);
+    const weekStd = formatHuf(PRICES.week_std.amountHuf);
+    const month = formatHuf(PRICES.month_std.amountHuf);
+    const annual = formatHuf(PRICES.annual_std.amountHuf);
+    const perMonth = formatHuf(perMonthHuf());
+    // The honesty comparison: weekly rhythm at monthly scale. Computed, never
+    // typed - 1 990 × 4.33 rounded to the nearest hundred (handoff §8).
+    const weeklyMonthly = formatHuf(Math.round((PRICES.week_std.amountHuf * 4.33) / 100) * 100);
+    const firstDayName = plan.days.find((d) => d.training)?.full ?? "hétfő";
+
     return (
-      <main className="lxu lxl u-rev" ref={stageRef} tabIndex={-1}>
-        {/* Everything up to the offer lives in ONE band, as a two-column grid:
-            the plan on the left, the decision on the right. The rail is sticky,
-            so from the first screen to the last the person can see both what
-            they got and what it would take to keep going - which is the whole
-            job of this page. Left-aligned throughout: a centred column reads as
-            a poster, and this is a page somebody has to make a decision on. */}
-        <div className="band-cream sec-first">
-          <div className="wrap u-rev-grid">
-            <div className="u-rev-main">
-              <div className="eyebrow">{C.REVEAL.eyebrow}</div>
-              <h1 className="h-bold" id="u-plan-h">{C.REVEAL.hd}</h1>
-              <p className="cap-body">{C.REVEAL.sub(plan.trainingCount, plan.sessionLabel)}</p>
-
-              {/* ═══ S1 · The artifact ══════════════════════════════════════
-                  The peak of the funnel, built to the master plan's brief
-                  (docs/reveal-redesign/05 §S1). A document, not a panel:
-                  issuer, date, provenance, and the answers it was made from -
-                  the same trayChips labels the quiz's own tray taught them, so
-                  the thread „your answers accumulate into this" runs unbroken
-                  from Q1 to here. Care notes are the document's footnotes
-                  rather than orphaned lines under it.
-
-                  The card ASSEMBLES: chips land, then the days draw in, then
-                  the numbers, then the footnotes - staged in CSS, done inside
-                  1.2s, and it ends visibly complete (the IKEA effect's
-                  boundary condition is a FINISHED build). We genuinely compute
-                  this plan, so the choreography shows real work, not
-                  theatre. */}
-              <div className="u-plancard u-art">
-                <header className="u-art-head">
-                  <div>
-                    <p className="u-art-title">{C.REVEAL.art.title}</p>
-                    <p className="u-art-meta">{C.REVEAL.art.meta(madeOn)}</p>
-                  </div>
-                </header>
-
-                <ul className="u-art-chips" aria-label={C.REVEAL.art.chipsAria}>
-                  {chips.map((c, i) => (
-                    <li key={c.key} style={{ ["--i" as string]: i }}>{c.label}</li>
-                  ))}
-                </ul>
-
-                <div className="u-grid" role="list" aria-label="A heti terved">
-                  {plan.days.map((d, i) => (
-                    <div
-                      key={d.weekday}
-                      role="listitem"
-                      className={`u-day ${d.training ? "train" : "rest"}`}
-                      style={{ ["--i" as string]: i }}
-                    >
-                      <div className="u-dayname">{d.short}</div>
-                      <div className="u-daymin">{d.training ? `${d.minutes}′` : "—"}</div>
-                      <span className="u-sr-only">
-                        {d.full}: {d.training ? `${d.minutes} perc` : C.REVEAL.restLabel}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* The plan's own numbers - always present, so the artifact
-                    has substance even in its weakest state (no calculator, no
-                    care flags). Same family as the gate mail's stats row: the
-                    same three facts, the same order. */}
-                <dl className="u-art-stats">
-                  {[
-                    { k: "nap / hét", v: String(plan.trainingCount) },
-                    { k: "perc / edzés", v: String(plan.firstWorkoutMinutes) },
-                    { k: "eszköz", v: "0" },
-                  ].map((f) => (
-                    <div key={f.k}>
-                      <dt>{f.v}</dt>
-                      <dd>{f.k}</dd>
-                    </div>
-                  ))}
-                </dl>
-
-                {/* The concrete first thing they would do. A plan with a
-                    named workout is an itinerary, not a calendar. */}
-                {firstW && (
-                  <div className="u-art-first">
-                    <span className="u-art-first-l">{C.REVEAL.art.firstLabel}</span>
-                    <div>
-                      <p className="u-art-first-t">{firstW.title}</p>
-                      <p className="u-art-first-m">{firstW.theme} · {firstW.mins} perc · eszköz nélkül</p>
-                    </div>
-                  </div>
-                )}
-
-                {C.ENERGY_LIVE && energy && (
-                  <EnergyResult result={energy} goal={body.goal} tempo={body.tempo} />
-                )}
-
-                {plan.care.length > 0 && (
-                  <ul className="u-carelist u-art-foot">
-                    {plan.care.map((c) => <li key={c}>{C.CARE_NOTE[c]}</li>)}
-                  </ul>
-                )}
-              </div>
-
-              {/* The commitment. An implementation intention (d = 0.65) is what
-                  this brand uses in place of the countdown it refuses to ship. */}
-              <section className="u-block" aria-labelledby="u-start-h">
-                <div className="eyebrow">{C.REVEAL.startEyebrow}</div>
-                <h2 className="h-bold" id="u-start-h">{C.REVEAL.firstWorkout.lead}</h2>
-                <p className="cap-body">{C.REVEAL.firstWorkout.body(plan.firstWorkoutMinutes)}</p>
-
-                <div className="u-days" role="group" aria-label={C.REVEAL.firstWorkout.lead}>
-                  {plan.days.filter((d) => d.training).map((d) => (
-                    <button
-                      key={d.weekday}
-                      type="button"
-                      className={`pill pill-outline u-dayb${startDay === d.weekday ? " on" : ""}`}
-                      aria-pressed={startDay === d.weekday}
-                      onClick={() => setStartDay(d.weekday)}
-                    >
-                      {/* Full names, not H/Sze/P - a commitment is made to a
-                          day, and „Csütörtök" is a day where „Cs" is a cell
-                          label (S2 brief, docs/reveal-redesign/05). */}
-                      {d.full.charAt(0).toUpperCase() + d.full.slice(1)}
-                    </button>
-                  ))}
-                </div>
-
-                <p className="u-starthint" aria-live="polite">
-                  {startDay
-                    ? C.REVEAL.firstWorkout.picked(
-                        plan.days.find((d) => d.weekday === startDay)?.full ?? "",
-                      )
-                    : C.REVEAL.firstWorkout.hint}
-                </p>
-                <p className="u-fine">{C.REVEAL.firstWorkout.note}</p>
-              </section>
-
-              <section className="u-block">
-                <WeekWorkouts
-                  catalog={catalog}
-                  plan={plan}
-                  startDay={startDay}
-                  onCta={() => { window.location.href = "/register"; }}
-                />
-              </section>
-
-            </div>
-
-            {/* The decision, travelling with the plan. */}
-            <aside className="u-rail" aria-labelledby="u-rail-h">
-              <div className="u-rail-in">
-                <div className="eyebrow">{C.REVEAL.rail.eyebrow}</div>
-                <h2 className="u-rail-h" id="u-rail-h">{C.REVEAL.rail.heading}</h2>
-                <p className="u-rail-lead">{C.REVEAL.rail.lead}</p>
-
-                {/* The price, visible where the decision is made. 21% of
-                    checkout abandonment ties to totals not being visible and
-                    64% hunt for a hidden number (docs/reveal-redesign/02 §2).
-                    Amounts interpolated from PRICES - never literals. */}
-                <p className="u-rail-price">
-                  <b>{formatHuf(PRICES.month_std.amountHuf)} {C.REVEAL.rail.priceMonthSuffix}</b>
-                  {" · "}{C.REVEAL.rail.priceIntroLead}{" "}
-                  {formatHuf(PRICES.week_intro.amountHuf)}
-                </p>
-
-                <p className="u-rail-sub">{PRICING_BAND.includedHeading}</p>
-                <ul className="u-rail-list">
-                  {C.REVEAL.rail.includes.map((it) => <li key={it}>{it}</li>)}
-                </ul>
-
-                {GUARANTEE_LIVE && (
-                  <p className="u-rail-guar">
-                    <b>{GARANCIA.shortLead}</b>{GARANCIA.shortBody}
-                  </p>
-                )}
-
-                <a className="pill pill-dark u-rail-cta" href="#arak">
-                  {C.REVEAL.rail.cta}
-                </a>
-                <p className="u-fine">{C.REVEAL.rail.trust}</p>
-                <p className="u-rail-out">{C.REVEAL.rail.out}</p>
-              </div>
-            </aside>
-          </div>
+      <main className="lxu u2" ref={stageRef} tabIndex={-1}>
+        {/* ── B0 · the quiz's bar, parked at 88% ──────────────────────────── */}
+        <div className="u2-top">
+          <span className="u2-top-mark">LEXFIT</span>
+          <span className="u2-top-lbl">
+            <b>{C.REVEAL.progress.done}</b> · {C.REVEAL.progress.left}
+          </span>
+          <span className="u2-top-bar" aria-hidden="true">
+            <i style={{ width: `${C.REVEAL.progress.pct}%` }} />
+          </span>
         </div>
 
-        {/* The guarantee, in the landing's navy mechanism band. */}
-        {GUARANTEE_LIVE && (
-          <div className="band-navy sec-sm heted-band" id="garancia">
-            {/* Order per the S4 brief (docs/reveal-redesign/05): the numeric
-                MECHANISM first - condition, window, refund - then the frame,
-                then the miss-path, then a person's name. Every strong live
-                guarantee found in the research leads with the mechanics; a
-                philosophy line in front of them reads as a slogan. */}
-            <div className="wrap u-rev-head">
-              <div className="eyebrow u-eyebrow-d">{C.GUARANTEE_BLOCK.eyebrow}</div>
-              {/* h-bold, not starter-title: a 54px band heading OUTRANKED the page's
-                  own 34px h1 - a mid-page section cannot be bigger than the title of
-                  the thing it belongs to. */}
-              <h2 className="h-bold u-title-d">{GARANCIA.heading}</h2>
+        <div className="u2-grid">
+          <div className="u2-main">
+            {/* ── B1 · the plan card ──────────────────────────────────────── */}
+            <section className="u2-plan" aria-labelledby="u2-h1">
+              <p className="u2-eyebrow u2-m1" style={{ ["--i" as string]: 0 }}>{C.REVEAL.b1.eyebrow}</p>
+              <h1 id="u2-h1" className="u2-m1" style={{ ["--i" as string]: 1 }}>{C.REVEAL.b1.hd}</h1>
+              <p className="u2-sub u2-m1" style={{ ["--i" as string]: 2 }}>
+                {C.REVEAL.b1.sub(plan.trainingCount, plan.sessionLabel)}
+              </p>
+              <p className="u2-identity u2-m1" style={{ ["--i" as string]: 3 }}>{C.REVEAL.b1.identity}</p>
 
-              <p className="cap-body u-body-d u-guar-mech">
+              <ul className="u2-chips u2-m1" style={{ ["--i" as string]: 4 }} aria-label={C.REVEAL.b1.chipsAria}>
+                {chips.slice(0, 6).map((c) => <li key={c.key}>{c.label}</li>)}
+              </ul>
+
+              <div className="u2-week" role="list" aria-label="A heti terved">
+                {plan.days.map((d, i) => (
+                  <div
+                    key={d.weekday}
+                    role="listitem"
+                    className={`u2-day u2-m1 ${d.training ? "on" : ""}`}
+                    style={{ ["--i" as string]: 5 + i }}
+                  >
+                    <span className="d">{d.short}</span>
+                    <span className="dot" aria-hidden="true" />
+                    <span className="u-sr-only">
+                      {d.full}: {d.training ? `${d.minutes} perc` : "pihenőnap"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <ol className="u2-miles u2-m1" style={{ ["--i" as string]: 12 }} aria-label="Mérföldkövek">
+                {C.REVEAL.b1.milestones.map((m, i) => (
+                  <li key={m} className={i === C.REVEAL.b1.guardIdx ? "guard" : i === 0 ? "now" : ""}>{m}</li>
+                ))}
+              </ol>
+
+              <dl className="u2-stats u2-m1" style={{ ["--i" as string]: 13 }}>
+                <div><dt><Count to={plan.trainingCount} /></dt><dd>{C.REVEAL.b1.stats.days}</dd></div>
+                <div><dt><Count to={plan.firstWorkoutMinutes} /></dt><dd>{C.REVEAL.b1.stats.mins}</dd></div>
+                <div><dt>0</dt><dd>{C.REVEAL.b1.stats.equip}</dd></div>
+              </dl>
+
+              {C.ENERGY_LIVE && energy && (
+                <p className="u2-calc u2-m1" style={{ ["--i" as string]: 14 }}>
+                  {C.REVEAL.b1.calc(energy.kcal.toLocaleString("hu-HU"), energy.stepTarget.toLocaleString("hu-HU"))}
+                </p>
+              )}
+            </section>
+
+            {/* ── B2 · the offer at the fold (mobile; desktop = the rail) ──── */}
+            <section className="u2-offer u2-mobile u2-m1" style={{ ["--i" as string]: 15 }} ref={b2Ref}>
+              <RevealOffer intro={intro} weekStd={weekStd} />
+            </section>
+
+            {/* ── B3 · the mechanism ──────────────────────────────────────── */}
+            <section className="u2-blk">
+              <p className="u2-eyebrow">{C.REVEAL.b3.eyebrow}</p>
+              <p className="u2-body">{C.REVEAL.b3.body}</p>
+              <ol className="u2-rules">
+                {C.REVEAL.b3.rules.map((r, i) => (
+                  <li key={r}><span className="n">{String(i + 1).padStart(2, "0")}</span>{r}</li>
+                ))}
+              </ol>
+            </section>
+
+            {/* ── B4 · the first workout ──────────────────────────────────── */}
+            <section className="u2-blk">
+              <p className="u2-eyebrow">{C.REVEAL.b4.eyebrow(firstDayName)}</p>
+              {firstW && (
+                <div className="u2-cover" aria-hidden="true">
+                  <span className="mono">LEXFIT · {firstW.code}</span>
+                  <b>{firstW.theme}</b>
+                  <i>{firstW.mins} PERC</i>
+                </div>
+              )}
+              <h2>{C.REVEAL.b4.hd}</h2>
+              <p className="u2-xs">{C.REVEAL.b4.sub(plan.firstWorkoutMinutes)}</p>
+            </section>
+
+            {/* B5 · „Akik már csinálják" does NOT render: no consented member
+                photos exist, and the handoff forbids the section without them
+                (invented or stock imagery is excluded outright). */}
+
+            {/* ── B6 · the entry (mobile; desktop = the rail) ─────────────── */}
+            <section className="u2-blk u2-entry u2-mobile" aria-labelledby="u2-entry-h">
+              <p className="u2-eyebrow">{C.REVEAL.entry.eyebrow}</p>
+              <h2 id="u2-entry-h">{C.REVEAL.entry.hd(intro)}</h2>
+              <p className="u2-body">{C.REVEAL.entry.lead(weekStd)}</p>
+
+              <p className="u2-label">{C.REVEAL.entry.listTitle}</p>
+              <ul className="u2-inc">
+                {C.REVEAL.entry.items.map((it) => (
+                  <li key={it.b}>
+                    <span className="k">{it.k}</span>
+                    <span><b>{it.b}</b> — {it.d}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <RevealRhythm month={month} annual={annual} perMonth={perMonth} weeklyMonthly={weeklyMonthly} />
+              <p className="u2-body u2-yt">{C.REVEAL.entry.youtube}</p>
+            </section>
+          </div>
+
+          {/* ── The decision rail (desktop only) ──────────────────────────── */}
+          <aside className="u2-rail" aria-label="A belépő">
+            <div className="u2-rail-in">
+              <p className="u2-eyebrow">{C.REVEAL.entry.eyebrow}</p>
+              <h2>{C.REVEAL.entry.hd(intro)}</h2>
+              <p className="u2-xs">{C.REVEAL.entry.lead(weekStd)}</p>
+              <ul className="u2-inc u2-inc-slim">
+                {C.REVEAL.entry.items.map((it) => (
+                  <li key={it.b}><span className="k">{it.k}</span><b>{it.b}</b></li>
+                ))}
+              </ul>
+              <RevealOffer intro={intro} weekStd={weekStd} />
+              <RevealRhythm month={month} annual={annual} perMonth={perMonth} weeklyMonthly={weeklyMonthly} />
+            </div>
+          </aside>
+        </div>
+
+        {/* ── B7 · the guarantee band — the page's one ground change ──────── */}
+        {GUARANTEE_LIVE && (
+          <section className="u2-band u2-dark" id="garancia">
+            <div className="u2-col">
+              <p className="u2-eyebrow">{C.REVEAL.guarEyebrow}</p>
+              <h2>{GARANCIA.heading}</h2>
+              <p className="u2-body">
                 {GARANCIA.bodyLead}<b>{GARANCIA.bodyStrong}</b>{GARANCIA.bodyTail}
               </p>
-
-              <p className="cap-body u-body-d u-guar-frame">{C.GUARANTEE_BLOCK.frame}</p>
-              <p className="cap-body u-body-d">{C.GUARANTEE_BLOCK.missPath}</p>
-
-              <p className="u-guar-sign">
-                {C.GUARANTEE_BLOCK.signedLead} <b>— {C.GUARANTEE_BLOCK.signedName}</b>
-              </p>
-
-              <p className="u-fine u-fine-d">{GARANCIA.statutory}</p>
+              <p className="u2-xs">{GARANCIA.statutory}</p>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* The decision itself - the homepage's own pricing band. */}
-        <div
-          className="band-sage pricing-band"
-          id="arak"
-          onClickCapture={trackUjrakezdesOfferClick}
-        >
-          <div className="wrap">
-            <PricingBand surface="ujrakezdes" />
+        {/* ── B8 · Alexa ──────────────────────────────────────────────────── */}
+        <section className="u2-band">
+          <div className="u2-col u2-alexa">
+            <Image src="/alexa-av.jpg" alt="Alexa" width={72} height={72} className="u2-face" />
+            <div>
+              <p className="u2-eyebrow">{C.REVEAL.alexaEyebrow}</p>
+              <h2>{C.ALEXA.name}</h2>
+              <p className="u2-body">{C.ALEXA.story} {C.ALEXA.promise}</p>
+              <p className="u2-signed">{C.REVEAL.alexaSigned}</p>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* S6 (moved 2026-09-08): below the price, not above it. „Mi jön a
-            hét után" is a retention question - it serves the person still
-            deciding AFTER seeing the band, and only delayed the person who had
-            already decided (docs/reveal-redesign/02 §8). A/B candidate for
-            removal once analytics exist. */}
-        <div className="band-cream sec-sm">
-          <div className="wrap">
-            <ProgramPreview
-              catalog={catalog}
-              skip={plan.trainingCount}
-              onCta={() => { window.location.href = "/register"; }}
-            />
+        {/* ── B9 · who it is not for ──────────────────────────────────────── */}
+        <section className="u2-band u2-tight">
+          <div className="u2-col u2-notfor">
+            <p className="u2-eyebrow">{C.REVEAL.notFor.eyebrow}</p>
+            <p className="u2-body">{C.REVEAL.notFor.body}</p>
           </div>
-        </div>
+        </section>
 
-        <div className="band-cream sec-sm">
-          <div className="wrap u-rev-head">
-            <p className="u-fine">{C.REVEAL.footer}</p>
+        {/* ── B10 · FAQ ───────────────────────────────────────────────────── */}
+        <section className="u2-band u2-tight">
+          <div className="u2-col">
+            <p className="u2-eyebrow">{C.REVEAL.faqTitle}</p>
+            <div className="u2-faq">
+              {C.REVEAL.faq
+                .filter((f) => !f.guar || GUARANTEE_LIVE)
+                .map((f) => (
+                  <details key={f.q}>
+                    <summary>{f.q}</summary>
+                    <p>{f.a}</p>
+                  </details>
+                ))}
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Mobile carries the same decision as a docked bar, because the rail
-            cannot be sticky in a single-column layout. */}
-        <div className="u-revbar">
-          <span className="u-revbar-price">
-            <b>{formatHuf(PRICES.month_std.amountHuf)} {C.REVEAL.rail.priceMonthSuffix}</b>
-            <i>{C.REVEAL.rail.priceIntroLead} {formatHuf(PRICES.week_intro.amountHuf)}</i>
-          </span>
-          <a className="pill pill-dark" href="#arak">{C.REVEAL.rail.cta}</a>
+        {/* ── B11 · the close ─────────────────────────────────────────────── */}
+        <section className="u2-band u2-close">
+          <div className="u2-col">
+            <blockquote>
+              <p>{C.REVEAL.close.quote}</p>
+              <footer>{C.REVEAL.close.by}</footer>
+            </blockquote>
+            <a
+              className="u2-cta"
+              href={CTA_HREF}
+              ref={closeCtaRef}
+              onClick={trackUjrakezdesOfferClick}
+            >
+              {C.REVEAL.offer.cta(intro)}
+            </a>
+            <p className="u2-xs">
+              {GUARANTEE_LIVE ? C.REVEAL.close.sub : C.REVEAL.close.subNoGuar}
+            </p>
+            <p className="u2-later">{C.REVEAL.close.later}</p>
+            <p className="u2-trust">{C.REVEAL.close.trust}</p>
+          </div>
+        </section>
+
+        {/* ── S · the sticky price bar (mobile only; M4) ──────────────────── */}
+        <div className={`u2-sticky${stickyOn ? " on" : ""}`} aria-hidden={!stickyOn}>
+          <div className="u2-sticky-p">
+            <b>{C.REVEAL.sticky.line(intro)}</b>
+            <span>{C.REVEAL.sticky.sub(weekStd)}</span>
+          </div>
+          <a className="u2-cta u2-cta-sm" href={CTA_HREF} onClick={trackUjrakezdesStickyClick}>
+            {C.REVEAL.sticky.go}
+          </a>
         </div>
       </main>
     );
@@ -1056,6 +1043,81 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
       </div>
     </div>
   );
+}
+
+/** The reveal's CTA target. One destination for every button on the page -
+ *  the pay step reads the ?plan= preselect (handoff Q1). */
+const CTA_HREF = "/register?plan=week_intro";
+
+/** B2 / rail: the offer. Module scope - a component created during render gets
+ *  a new identity every pass. */
+function RevealOffer({ intro, weekStd, sticky = false }: {
+  intro: string; weekStd: string; sticky?: boolean;
+}) {
+  return (
+    <>
+      <p className="u2-proof">
+        {GUARANTEE_LIVE
+          ? <><b>{C.REVEAL.offer.proofGuar}</b>{C.REVEAL.offer.proofRest}</>
+          : C.REVEAL.offer.proofNoGuar}
+      </p>
+      <a
+        className="u2-cta"
+        href={CTA_HREF}
+        onClick={sticky ? trackUjrakezdesStickyClick : trackUjrakezdesOfferClick}
+      >
+        {C.REVEAL.offer.cta(intro)}
+      </a>
+      <p className="u2-renew">{C.REVEAL.offer.renew(weekStd)}</p>
+    </>
+  );
+}
+
+/** B6 / rail: the two rhythm cards. Information, not buttons (handoff Q2). */
+function RevealRhythm({ month, annual, perMonth, weeklyMonthly }: {
+  month: string; annual: string; perMonth: string; weeklyMonthly: string;
+}) {
+  return (
+    <div className="u2-rhythm">
+      <p className="u2-label">{C.REVEAL.entry.rhythmTitle}</p>
+      <div className="u2-price2">
+        <div className="on"><b>{month}</b><span>{C.REVEAL.entry.monthTag}</span></div>
+        <div><b>{annual}</b><span>{C.REVEAL.entry.annualTag(perMonth, annualSavingsPct())}</span></div>
+      </div>
+      <p className="u2-xs">{C.REVEAL.entry.same}</p>
+      <p className="u2-honesty">
+        <b>{C.REVEAL.entry.honestyLead}</b>{C.REVEAL.entry.honesty(weeklyMonthly, month)}
+      </p>
+      <p className="u2-xs">{C.REVEAL.entry.later}</p>
+    </div>
+  );
+}
+
+/** M2 · a number that counts up to its value in ~700ms. Tabular numerals keep
+ *  the width steady; reduced-motion renders the final value immediately. */
+function Count({ to }: { to: number }) {
+  // The node is driven directly rather than through state: the effect then
+  // only touches an external system (the DOM), and the SERVER render already
+  // contains the final value - no-JS and reduced-motion both simply keep it.
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.textContent = String(to);
+      return;
+    }
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / 700);
+      el.textContent = String(Math.round(to * p));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to]);
+  return <span ref={ref}>{to}</span>;
 }
 
 /** The numeric tiles for the two questions whose answers are quantities. */

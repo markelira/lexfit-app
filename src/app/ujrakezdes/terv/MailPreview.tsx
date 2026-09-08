@@ -38,7 +38,7 @@ export default function MailPreview({
     >
       <div className="u-mailwrap">
         <PlanMail
-          headline={C.REVEAL.hd}
+          headline={C.REVEAL.b1.hd}
           cta="Megnyitom a tervem"
           days={(plan?.days ?? []).map((d) => ({
             key: String(d.weekday),
@@ -55,7 +55,7 @@ export default function MailPreview({
                   { k: "perc", v: String(plan.firstWorkoutMinutes) },
                   { k: "eszköz", v: "0" },
                 ],
-                sub: C.REVEAL.sub(plan.trainingCount, plan.sessionLabel),
+                sub: C.REVEAL.b1.sub(plan.trainingCount, plan.sessionLabel),
               }
             : {})}
           {...(chips.length ? { answersLead: C.HERO_WEEK.answersLead, answers: chips } : {})}
