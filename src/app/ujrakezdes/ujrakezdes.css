@@ -1319,6 +1319,11 @@
 
 @media (max-width: 767.98px) {
   .u-onb .u-flabel, .u-onb .u-fhint { color: rgba(255, 255, 255, 0.66); }
+  /* .fnl-helper is coloured for the LIGHT desktop panel (#5c6e66) and never
+     inverted for the dark sheet, where it measures ~3.0:1 - under the 4.5:1 AA
+     floor. Scoped to this funnel; /register renders the same class on the same
+     sheet and has the same problem, but that is its own call to make. */
+  .u-onb .fnl-helper { color: rgba(255, 255, 255, 0.72); }
   .u-onb .u-seg-b {
     background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.22);
     color: rgba(255, 255, 255, 0.86);

@@ -60,10 +60,21 @@ type Screen =
 /** Screen order. The interstitial sits between Q4 and Q5 exactly as specced:
  *  the two forgiveness rules are stated BEFORE we ask about knees and backs, so
  *  the caution question lands as care rather than as a risk assessment. */
+/**
+ * Grouped so each SECTION is contiguous - the progress bar names sections, and
+ * a section that jumps around the flow would be a label pointing at nothing.
+ *
+ * `daypart` moved up next to `days`: both answer "when", and the two now form
+ * the schedule section. That also puts the interstitial immediately after the
+ * schedule questions, which is where its two lines belong - they are about rest
+ * days and missed weeks. It still lands BEFORE the caution question, so that
+ * one still reads as care rather than as a risk assessment.
+ */
 const CORE: Screen[] = [
-  "anchor", "level", "days", "focus",
+  "anchor", "level",
+  "days", "daypart",
   "interstitial",
-  "care", "place", "daypart",
+  "focus", "care", "place",
 ];
 
 /**
@@ -131,6 +142,16 @@ const EMPTY_BODY: BodyDraft = {
  *  first screen would overstate the length of a funnel most people will not
  *  extend. */
 const CALC_NO: Partial<Record<Screen, number>> = { body: 1, goal: 2, tempo: 3 };
+
+/** Which section each screen belongs to. The interstitial inherits the section
+ *  it interrupts, so the bar does not blink between two states mid-beat. */
+const SECTION_OF: Record<Screen, number> = {
+  anchor: 0, level: 0,
+  days: 1, daypart: 1, interstitial: 1,
+  focus: 2, care: 2, place: 2,
+  body: 3, goal: 3, tempo: 3,
+  gate: 3, reveal: 3,
+};
 
 const isComplete = (d: Draft): d is Answers =>
   !!(d.anchor && d.level && d.days && d.focus && d.place && d.daypart && d.care);
@@ -415,7 +436,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
 
         <main className="fnl-col">
           <div className="fnl-sr" role="status" aria-live="polite">
-            {qNum > 0 ? `${qNum}. kérdés a hétből` : ""}
+            {C.SECTIONS[SECTION_OF[screen]]!.label}
           </div>
 
           {screen === "interstitial" && (
@@ -436,8 +457,9 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
           {screen === "gate" && (
             <StepFrame
               onBack={back}
-              progressCurrent={7}
-              counter={C.NAV.progress(7, STEP_IDS.length)}
+              progressCurrent={C.SECTIONS.length}
+              progressTotal={C.SECTIONS.length}
+              counter={C.SECTIONS[C.SECTIONS.length - 1]!.label}
               heading={C.GATE.hd}
               sub={C.GATE.sub}
               headingRef={headingRef}
@@ -500,18 +522,21 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
           {CALC_NO[screen] && (
             <StepFrame
               onBack={back}
-              progressCurrent={STEP_IDS.length}
-              counter={`Kalkulátor · ${CALC_NO[screen]} / 3`}
+              progressCurrent={SECTION_OF[screen] + 1}
+              progressTotal={C.SECTIONS.length}
+              counter={C.SECTIONS[SECTION_OF[screen]]!.label}
               heading={
-                screen === "body" ? C.ENERGY.card1
+                screen === "body" ? C.ENERGY.formHeading
                   : screen === "goal" ? C.ENERGY.goalLabel
                   : C.ENERGY.tempoHeading
               }
               sub={
-                screen === "body" ? C.ENERGY.formMicro
+                screen === "body" ? C.ENERGY.formSub
+                  : screen === "goal" ? C.ENERGY.goalSub
                   : screen === "tempo" && body.goal ? C.ENERGY.tempoLead[body.goal]
                   : undefined
               }
+              helper={screen === "body" ? C.ENERGY.formMicro : undefined}
               headingRef={headingRef}
               cta={
                 screen === "body" ? (
@@ -617,8 +642,9 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
           {qNum > 0 && (
             <StepFrame
               onBack={idx > 0 ? back : undefined}
-              progressCurrent={qNum}
-              counter={C.NAV.progress(qNum, STEP_IDS.length)}
+              progressCurrent={SECTION_OF[screen] + 1}
+              progressTotal={C.SECTIONS.length}
+              counter={C.SECTIONS[SECTION_OF[screen]]!.label}
               heading={QUESTION[screen as StepId].hd}
               sub={QUESTION[screen as StepId].micro}
               headingRef={headingRef}

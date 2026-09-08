@@ -180,6 +180,23 @@ export const TRAY = {
   daypart: { morning: "reggel", midday: "napközben", evening: "este", varies: "váltakozó" } as Record<Daypart, string>,
 } as const;
 
+
+// ─── Sections ────────────────────────────────────────────────────────────────
+//
+// The progress bar names SECTIONS, not question numbers. "4 / 10" tells
+// somebody how much work is left; it never tells them why they are doing it.
+// Each label here is one or two words naming what that run of questions
+// actually produces, so the chrome carries meaning instead of arithmetic.
+
+export const SECTIONS = [
+  { key: "start", label: "Kiindulás" },   // where they are starting from
+  { key: "week", label: "A heted" },      // the schedule
+  { key: "training", label: "Az edzéseid" }, // which workouts, in what variant
+  { key: "numbers", label: "A számaid" }, // the calorie and macro targets
+] as const;
+
+export type SectionKey = (typeof SECTIONS)[number]["key"];
+
 // ─── §3 Gate ─────────────────────────────────────────────────────────────────
 
 export const GATE = {
@@ -287,7 +304,10 @@ export const ENERGY = {
     "Ha szeretnéd, a testadataidból kiszámoljuk a napi kalória- és fehérjecélod, és a napi lépéscélod. Nem kötelező — a heti terved enélkül is a tiéd.",
   teaserCta: "Kiszámolom",
 
-  formHeading: "Néhány adat, és kész",
+  /** The screen has to answer "why am I being asked this?" before it asks.
+   *  "Alapadatok" named the fields; it never named the outcome. */
+  formHeading: "Kiszámoljuk a kalóriacélod",
+  formSub: "Ebből jön ki a napi kalória- és fehérjecélod, és a napi lépéscélod — a heti terved mellé.",
   formMicro: "Csak a számoláshoz kell. Bármikor kérheted a törlésüket.",
 
   sexLabel: "Nem",
@@ -302,6 +322,7 @@ export const ENERGY = {
   weightLabel: "Testsúly (kg)",
 
   goalLabel: "Mi a célod?",
+  goalSub: "Ez dönti el, hogy a napi célod deficit, fenntartás vagy többlet lesz.",
   goalOptions: [
     { value: "fogyas", label: "Fogyás" },
     { value: "tonus", label: "Tónusosodás" },

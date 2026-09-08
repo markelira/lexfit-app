@@ -269,6 +269,26 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.ok(C.ENERGY.disclaimer.includes("nem minősülnek orvosi"), "hiányzik az orvosi tanács kizárása");
   ok("az eredmény tájékoztató jellege ki van mondva");
 
+  // ── Sections ──
+  // The chrome names sections rather than counting questions, so each label has
+  // to be short enough to sit in the counter slot and specific enough to mean
+  // something. Two words is the ceiling.
+  assert.ok(C.SECTIONS.length >= 3 && C.SECTIONS.length <= 5, "3-5 szekció, különben nem szekció");
+  for (const sec of C.SECTIONS) {
+    assert.ok(sec.label.length <= 14, `túl hosszú szekciónév: ${sec.label}`);
+    assert.ok(sec.label.split(" ").length <= 2, `több mint két szó: ${sec.label}`);
+    assert.ok(!sec.label.includes("!"), "felkiáltójel a szekciónévben");
+  }
+  assert.equal(new Set(C.SECTIONS.map((x) => x.key)).size, C.SECTIONS.length, "egyedi kulcsok");
+  assert.equal(new Set(C.SECTIONS.map((x) => x.label)).size, C.SECTIONS.length, "egyedi címkék");
+  ok("a szekciók rövidek, egyediek, és nem kérdésszámot mondanak");
+
+  // The body step must name its OUTCOME, not its fields - that was the whole
+  // complaint about "Alapadatok".
+  assert.ok(/kalória/i.test(C.ENERGY.formHeading), "a fejléc nem mondja meg, mire jó");
+  assert.ok(/lépéscélod|fehérje/i.test(C.ENERGY.formSub), "az alcím nem sorolja fel, mit kapsz");
+  ok("a testadat-képernyő az eredményt nevezi meg, nem a mezőket");
+
   // The seven questions, in the specced order, with the interstitial after Q4.
   assert.equal(C.Q_CARE.options.length, 4);
   assert.equal(C.Q_ANCHOR.options.length, 5);

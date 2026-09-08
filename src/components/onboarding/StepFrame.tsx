@@ -22,6 +22,7 @@ import { StepProgress } from "./StepProgress";
 export function StepFrame({
   onBack,
   progressCurrent,
+  progressTotal,
   counter,
   heading,
   sub,
@@ -32,6 +33,9 @@ export function StepFrame({
 }: {
   onBack?: () => void;
   progressCurrent?: number; // omit to hide the bar
+  /** Segment count. Omit for the wizard's default of seven questions; the lead
+   *  magnet passes its section count so the bar reads as sections, not steps. */
+  progressTotal?: number;
   counter?: string; // "3 / 5" · "Kész"
   heading: string;
   sub?: string;
@@ -54,7 +58,9 @@ export function StepFrame({
         ) : (
           <span className="fnl-back-spacer" aria-hidden="true" />
         )}
-        {progressCurrent !== undefined && <StepProgress current={progressCurrent} />}
+        {progressCurrent !== undefined && (
+          <StepProgress current={progressCurrent} {...(progressTotal ? { total: progressTotal } : {})} />
+        )}
         {counter && <span className="fnl-counter mono">{counter}</span>}
       </div>
 
