@@ -63,6 +63,7 @@ import GuaranteeRefundConfirm, { subject as guaranteeRefundSubject } from "../..
 import UjrakezdesD0, { subject as ujraD0Subject } from "../../emails/ujrakezdes-d0";
 import UjrakezdesD3, { subject as ujraD3Subject } from "../../emails/ujrakezdes-d3";
 import UjrakezdesD6, { subject as ujraD6Subject } from "../../emails/ujrakezdes-d6";
+import UjrakezdesD9, { subject as ujraD9Subject } from "../../emails/ujrakezdes-d9";
 import WorkoutReminder, { subject as workoutSubject } from "../../emails/workout-reminder";
 import type { DayState } from "../../emails/components/Bits";
 import type { Anchor as UjraAnchor } from "@/lib/ujrakezdes/types";
@@ -463,5 +464,13 @@ export const sendUjrakezdesD6 = (to: string, leadId: string) => {
   return deliver({
     to, subject: ujraD6Subject, category: "marketing", unsub: u.unsub,
     make: () => UjrakezdesD6({ unsubHref: u.href }),
+  });
+};
+
+export const sendUjrakezdesD9 = (to: string, leadId: string) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: ujraD9Subject, category: "marketing", unsub: u.unsub,
+    make: () => UjrakezdesD9({ unsubHref: u.href }),
   });
 };

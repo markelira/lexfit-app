@@ -11,7 +11,7 @@ import {
 import {
   sendQuizHowItWorks, sendQuizLastCall, sendQuizObjections,
   sendQuizObstacle, sendQuizOffer, sendQuizWinback,
-  sendUjrakezdesD3, sendUjrakezdesD6,
+  sendUjrakezdesD3, sendUjrakezdesD6, sendUjrakezdesD9,
   type QuizObstacleKind,
 } from "@/lib/mailer";
 import { LM_HEALTH_FIELDS, LM_VARIANT, type LmLeadDoc } from "@/lib/ujrakezdes/lead";
@@ -61,7 +61,9 @@ async function advanceLmLead(
   const planHref = `${APP_URL}/ujrakezdes`;
   const sent = step === 3
     ? (await sendUjrakezdesD3(lead.email, doc.id, { planHref, segment: lead.computed.segment })).sent
-    : (await sendUjrakezdesD6(lead.email, doc.id)).sent;
+    : step === 6
+      ? (await sendUjrakezdesD6(lead.email, doc.id)).sent
+      : (await sendUjrakezdesD9(lead.email, doc.id)).sent;
 
   if (!sent) return false;
 

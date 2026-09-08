@@ -20,33 +20,111 @@ import { lxPaths } from "@/lib/icons";
 // ─── §1 Landing ──────────────────────────────────────────────────────────────
 
 export const HERO = {
-  headline: "Szeptemberi újrakezdés",
-  sub: "7 kérdés, és kész a heti edzésterved. Otthonra, eszköz nélkül, pihenőnapokkal — Alexával.",
+  /** The campaign wrapper, demoted from headline to eyebrow. Three ad angles
+   *  point at this page; the H1 has to be the thing all three promised, and
+   *  what they all promised is the plan - not the season. Message match is
+   *  worth up to +212% (docs/funnel-research/03-landing-page.md). */
+  eyebrow: "Szeptemberi Újrakezdés",
+  /** Two lines, second emphasised - the homepage's own h1 treatment, so the two
+   *  pages set their headline identically. */
+  headline: ["7 kérdés, és kész", "a heti edzésterved"] as const,
+  sub: "Otthonra, eszköz nélkül, pihenőnapokkal — Alexával.",
   audience: "Azoknak, akik már többször újrakezdték.",
   cta: "Kérem a tervem",
-  chips: ["20–30 perces edzések", "elég egy matrac", "1 200+ fős közösség"],
+  ctaSub: "Nagyjából egy perc. Regisztráció nélkül.",
+  /** The damaging admission, at the CTA. Fewer leads, better ones - and nobody
+   *  meets the pricing band at the end feeling ambushed. Owner decision
+   *  2026-09-08. */
+  honest:
+    "A heti terv ingyenes, és a tiéd marad. A LEXFIT tagság fizetős — az árakat a terved mellett mutatjuk meg.",
+  /** offer v3 §3.1's chips, not lead-magnet v2's. „20–30 perces edzések" was
+   *  the older number; „max 30 perc" is the migrated one. */
+  chips: ["max 30 perc", "elég egy matrac", "heti 2–4 nap — te választod"],
 } as const;
 
 export const ISMEROS = {
   heading: "Ismerős?",
-  body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra — aztán a jövő hétből hónap lett. Nem az akaraterővel van baj. Azzal, hogy minden kihagyás után nulláról kell kezdeni.",
-  /** The answer to the paragraph above. The rules block was cut from the page,
-   *  and a problem statement with no resolution is a liability on a landing
-   *  page - so the resolving clause survives as one line, lifted verbatim from
-   *  MASKEPP's approved body rather than newly written. */
-  answer: "A LEXFIT-ben a pihenőnap nem töri meg a sorozatot, és a kihagyott hét nem nulláz.",
+  body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra — aztán a jövő hétből hónap lett.",
+  /**
+   * The three launch ad angles (restart · óvatos · napvégi), answered on the
+   * page that all three point at. Whichever creative somebody clicked, they
+   * find their own sentence here and then all three converge on one mechanism.
+   *
+   * THIRD PERSON, deliberately. „Van, akinél a derék szól közbe" describes
+   * somebody; „A derekad miatt óvatos vagy" claims knowledge of the reader's
+   * body - which is the second-person health assumption Meta enforces against
+   * and our own rules ban outright.
+   */
+  angles: [
+    { label: "Az ötödik nekifutás", line: "Van, aki már ötödször kezdte újra." },
+    { label: "A derék, a térd", line: "Van, akinél a derék vagy a térd miatt kell óvatosabban." },
+    { label: "A nap vége", line: "Van, akinek a nap végére semmi nem marad." },
+  ],
+  /** The lead on the `.ism-rules` card, in the homepage's own ismeros layout. */
+  convergeLead: "Mind ugyanabba futnak bele.",
+  converge:
+    "Mind ugyanabba futnak bele: minden kihagyás után nulláról kell kezdeni. Nem az akaraterővel van baj.",
 } as const;
 
 export const MASKEPP = {
   heading: "Ezért másképp működik",
-  body: "A LEXFIT-ben a pihenőnap nem töri meg a sorozatot, és a kihagyott hét nem nulláz — ott folytatod, ahol abbahagytad. A tervedet nem neked kell kitalálnod: hét kérdésből elkészül, és minden edzést Alexa vezet végig.",
+  /** Set in `.starter-title`, the homepage's large statement tier. */
+  title: "Egy rossz hét nem dönti el.",
+  lead: "Két szabály, és mindkettő arról szól, mi történik, amikor közbejön valami.",
+  /** The two rules, as two rules. They were one paragraph, and a paragraph is
+   *  where a mechanism goes to be skimmed past - these are the whole product
+   *  argument, so they get to be structural. */
+  rules: [
+    {
+      hd: "A pihenőnap nem töri meg a sorozatot.",
+      body: "Előre be van tervezve. Nem kihagyás, hanem a terv része.",
+    },
+    {
+      hd: "A kihagyott hét nem nulláz.",
+      body: "Ott folytatod, ahol abbahagytad — nem elölről.",
+    },
+  ],
+  foot: "A tervedet nem neked kell kitalálnod: hét kérdésből elkészül, és minden edzést Alexa vezet végig.",
+} as const;
+
+/**
+ * The proof band — text only, and that is a finding, not a shortcut.
+ *
+ * `public/finish-examples/` was assumed to hold member finish cards. It does
+ * not: those files are the raw post-workout SELFIES that feed the Finish Share
+ * overlay - shirtless mirror shots, a gym locker room. Three separate reasons
+ * not to put them on this page:
+ *
+ *   1. Captioning them „valódi befejezett edzések" would be false. They are
+ *      photographs of people, not evidence of a completed workout.
+ *   2. Physique imagery is the body-transformation frame this entire funnel is
+ *      built to avoid, and one of them is shot in a GYM - on the landing page
+ *      for a home programme.
+ *   3. Meta's health policy restricts exactly this kind of body imagery, and a
+ *      young ad account carries account-level risk.
+ *
+ * So the proof is the one true, already-published claim we have. If real finish
+ * cards (selfie + data overlay) get exported, this band is where they go - see
+ * docs/funnel-research/08-audit-and-changes.md §6.
+ */
+export const PROOF = {
+  heading: "Nem vagy egyedül vele",
+  /** From funnel_v2 §2.2 P5, which is approved ad copy. */
+  lead: "1 200+ tag a zárt Facebook-csoportban — a legtöbben nem sportolók, hanem dolgozó felnőttek, akik sokadszorra kezdték újra.",
+  note: "Kérdezni is van kitől.",
 } as const;
 
 export const IGY_NEZ_KI = {
   heading: "Így néz ki",
+  lead: "Három lépés, nagyjából egy perc. A terved azelőtt megvan, hogy fiókot csinálnál.",
   /** The compact form for the hero - the full sentences below are too long for
    *  a three-up row beside a graphic. // COPY-REVIEW */
   stepsShort: ["Válaszolsz 7 kérdésre", "Megkapod a heti terved", "Elindítod az elsőt"],
+  /** Real product screenshots, one per step - the question screen, the plan and
+   *  the player. Owner-approved asset set (2026-09-08); the alternative was
+   *  stock or illustration, and cross-source consensus is that recognized-stock
+   *  erodes trust on exactly this kind of page. */
+  shots: ["/step-1-question.png", "/step-2-plan.png", "/step-3-player.png"],
   steps: [
     "Válaszolsz 7 kérdésre — nagyjából egy perc.",
     "Megkapod a heti tervedet, pihenőnapokkal.",
@@ -56,16 +134,46 @@ export const IGY_NEZ_KI = {
 
 export const ALEXA = {
   heading: "Ki az az Alexa?",
-  body: "Tíz évig versenyszerűen tornáztam, aztán évekig semmit. Nulláról, egy matracon kezdtem újra — ebből lett a LEXFIT. Nem vagyok orvos és nem ígérek csodát. Egy rendszert ígérek, ami kibírja az életet.",
-  /** The signature block in the hero. The last two sentences of the approved
-   *  paragraph, verbatim - the whole thing would crowd the composition, and
-   *  these two are the ones that carry the register. */
-  signature: "Nem vagyok orvos és nem ígérek csodát. Egy rendszert ígérek, ami kibírja az életet.",
+  /** The pull quote, set in the homepage's own `.alexa-pull-big` treatment. Her
+   *  sentence, not a slogan written about her. */
+  pull: "„Nulláról, egy matracon kezdtem újra.”",
+  /** The homepage's founder-facts chips. „1 200+ fős közösség" lives here now
+   *  rather than in a band of its own - it is a fact about her world, and it
+   *  was carrying a whole 276px section on its own before. */
+  facts: ["10 év versenysport", "minden edzést Alexa vezet", "1 200+ fős közösség"],
+  /** Split into two paragraphs: the story, then the promise. As one block the
+   *  disclaimer („nem ígérek csodát") disappeared into the biography, and it is
+   *  the half that answers the hype objection (offer_v2 §2 #10). */
+  story:
+    "Tíz évig versenyszerűen tornáztam, aztán évekig semmit. Nulláról, egy matracon kezdtem újra — ebből lett a LEXFIT.",
+  promise:
+    "Nem vagyok orvos és nem ígérek csodát. Egy rendszert ígérek, ami kibírja az életet.",
   name: "Alexa",
   /** Not "a LEXFIT alapítója": offer v3 §7 bans `alapító` because of the
    *  founder PRICE, and the guard cannot tell the two senses apart. Saying what
    *  she does for the reader is more useful than a job title anyway. */
   role: "ő vezet végig minden edzést",
+} as const;
+
+/** The closing ask. Same words as the hero button - one page, one action, and
+ *  a second verb here would read as a second offer. */
+/**
+ * The eyebrow on each band. Every section carries one, in the same place, in
+ * the same type - so somebody scanning the page reads five labels and knows the
+ * shape of the argument without reading a sentence. Naming the section is
+ * wayfinding; leaving it unnamed makes the reader derive it from the prose.
+ */
+export const SECTION_LABEL = {
+  ismeros: "A probléma",
+  maskepp: "A mechanizmus",
+  igy: "Hogyan működik",
+  alexa: "Kivel csinálod",
+  close: "Az első lépés",
+} as const;
+
+export const FINAL_CTA = {
+  heading: "Kezdjük a heteddel",
+  body: "Hét kérdés, és a terved kész. Ha utána nem folytatod, a heti terved akkor is a tiéd marad.",
 } as const;
 
 // ─── §2 Quiz ─────────────────────────────────────────────────────────────────
@@ -204,8 +312,22 @@ export const TRAY = {
 /** The example week drawn in the hero. Labelled as an EXAMPLE on purpose: it is
  *  rendered before anybody has answered anything, and a week grid that looks
  *  like a personal plan would be promising one that does not exist yet. */
+/**
+ * The sample plan drawn in the hero - and it is drawn as the EMAIL, because the
+ * email is the deliverable. The hero used to show a bare week grid, which
+ * showed the schedule but not the thing that arrives; the same component now
+ * renders here with sample data and at the gate with the person's real answers,
+ * so the promise on the landing page and the artifact at the end of the quiz
+ * are literally the same object.
+ *
+ * Everything below is a TYPICAL answer set, not an average of anything: three
+ * days is the middle option and the one most people pick, 30 minutes is the
+ * median length of the published workouts. Marked „Példa" in the chrome so
+ * nobody reads it as a plan that already exists for them.
+ */
 export const HERO_WEEK = {
   eyebrow: "Példa egy hétre",
+  sampleTag: "Példa",
   note: "Heti 3 nap, pihenőnapokkal. A tiéd a válaszaidból készül.",
   days: [
     { d: "H", on: true }, { d: "K", on: false }, { d: "Sze", on: true },
@@ -214,6 +336,16 @@ export const HERO_WEEK = {
   ],
   train: "edzés",
   rest: "pihenő",
+  /** The plan's own numbers, as the mail states them. */
+  stats: [
+    { k: "nap / hét", v: "3" },
+    { k: "perc", v: "30" },
+    { k: "eszköz", v: "0" },
+  ],
+  /** The answers the plan was built from, echoed exactly as the quiz's own tray
+   *  echoes them - these are real TRAY labels, not invented ones. */
+  answersLead: "A válaszaidból:",
+  answers: ["újrakezdés", "heti 3 nap", "este", "nappali", "térdkímélő"],
 } as const;
 
 // ─── Sections ────────────────────────────────────────────────────────────────
@@ -227,7 +359,11 @@ export const SECTIONS = [
   { key: "start", label: "Kiindulás" },   // where they are starting from
   { key: "week", label: "A heted" },      // the schedule
   { key: "training", label: "Az edzéseid" }, // which workouts, in what variant
-  { key: "numbers", label: "A számaid" }, // the calorie and macro targets
+  // The last section was labelled „A számaid", which was a lie for everyone who
+  // skipped the calculator: they still had to walk through a section promising
+  // numbers they had just declined. „A terved" is true either way, and the
+  // calorie block is part of the plan when it is taken.
+  { key: "plan", label: "A terved" },
 ] as const;
 
 export type SectionKey = (typeof SECTIONS)[number]["key"];
@@ -258,7 +394,33 @@ export const CONSENT_TEXT_VERSION = "consent_lm_v1";
 // ─── §4 Reveal ───────────────────────────────────────────────────────────────
 
 export const REVEAL = {
+  /** The band eyebrows. The reveal borrowed SECTION_LABEL.close for its first
+   *  band, which meant „Az első lépés" appeared twice on the same screen -
+   *  once over the plan and once over the day picker. */
+  eyebrow: "A terved",
+  startEyebrow: "Az első lépés",
   hd: "A heted, készen",
+
+  /**
+   * The artifact's own chrome (S1, master plan Part IV).
+   *
+   * The plan renders as a document with an issuer, a date and a provenance
+   * line - the wallet-pass convention: ownership cues once, at the header.
+   * We hold no name (email only), so the possessive and the provenance carry
+   * the ownership: „a hét válaszodból készült" is the trace-line the IKEA
+   * effect needs - perceived own contribution is what turns a generated
+   * artifact into „mine" (>100% WTP premium, docs/reveal-redesign/01 §2).
+   */
+  art: {
+    title: "A heti terved",
+    meta: (date: string) => `${date} · a hét válaszodból készült`,
+    /** aria for the chip row; sighted users get the chips themselves. */
+    chipsAria: "Amikből a terv készült",
+    /** The document's last line item: the concrete thing they would do first.
+     *  A plan with a named first workout is an itinerary; without one it is a
+     *  calendar (owner addition, 2026-09-08). */
+    firstLabel: "Az első edzésed",
+  },
   /** "3 nap mozgás, 20–30 perc, a te szintedhez igazítva." - the numbers come
    *  from the answers, so the sentence is assembled rather than pasted. */
   sub: (days: number, sessionLabel: string) =>
@@ -271,21 +433,104 @@ export const REVEAL = {
   // exist and promising one would be the funnel's first broken promise. Written
   // in the same register, saying only what is true. Owner decision 2026-09-07,
   // docs/lead-magnet-v2-plan.md §2.
+  //
+  // REWRITTEN 2026-09-08 into an implementation intention. The panel used to
+  // DESCRIBE the first workout; now it asks somebody to name the day they will
+  // do it. Implementation intentions carry a meta-analytic effect of d = 0.65
+  // (docs/funnel-research/02-results-page-offer.md) and are the strongest
+  // measured substitute for the countdown timer this brand refuses to use.
   firstWorkout: {
-    lead: "Az első edzésed",
+    lead: "Melyik nap kezded?",
     body: (minutes: number) =>
-      `${minutes} perc, eszköz nélkül. Ott vár a tagságodban, az első naptól — ma vagy hétfőn kezded, mindegy.`,
-  },
-
-  alexaVideo: {
-    heading: "Alexa neked",
-    /** The 30-second script, verbatim from v2 §4. Used as the caption/transcript
-     *  so the page still says it when the video cannot play. */
-    transcript:
-      "Szia, Alexa vagyok. Ez a terv mostantól a tiéd — és igen, direkt van benne pihenőnap. Nem az a kérdés, hogy bírod-e egyben a tíz hetet. Az a kérdés, mi történik, amikor jön egy rossz hét. Nálunk annyi: ott folytatod, ahol abbahagytad. Az első edzés húsz perc. Nem kell ma elkezdened — de ha ma kezded, holnap már könnyebb lesz. Ott találkozunk.",
+      `${minutes} perc, eszköz nélkül. Válaszd ki a napot — az lesz az első edzésed.`,
+    /** Verbatim the advice D0 gives, so the email and the page agree. */
+    hint: "Ne a legjobb napodra időzítsd. Egy átlagosra.",
+    /** `day` is a weekday name, which Hungarian writes lower-case mid-sentence -
+     *  so it arrives as „csütörtök" and has to be lifted here rather than
+     *  starting the sentence in lower case. */
+    picked: (day: string) =>
+      `${day.charAt(0).toUpperCase()}${day.slice(1)} az első edzésed napja.`,
+    /** Nothing is stored server-side from this - it is a commitment device, not
+     *  a booking, and pretending to schedule something we cannot schedule would
+     *  be the same broken promise as the guest workout. */
+    note: "Ezt csak magadnak jelölöd be. Emlékeztetőt nem küldünk rá.",
   },
 
   footer: "A tervet elküldtük e-mailben is, hogy TV-n vagy laptopon is megnyithasd.",
+
+  /**
+   * The decision rail.
+   *
+   * This page is the last one before somebody either leaves or pays, and until
+   * now the offer sat ~4,600px below the fold at the end of a centred column -
+   * so the decision was only ever visible to the people who scrolled the whole
+   * plan. The rail travels with the content instead: what the membership
+   * contains, the guarantee, one action, and the honest way out.
+   *
+   * The way out is not a concession. „If not now, the plan is still yours" is
+   * what makes the ask safe to consider, and it is already true - the plan was
+   * emailed before this screen rendered.
+   */
+  rail: {
+    eyebrow: "A döntés",
+    /** Reworked per the language track (docs/reveal-redesign/03): the old
+     *  „Ha rendszert csinálnál belőle" was conditional mood - distance exactly
+     *  where continuity is wanted. Indicative, and the same „viszed tovább"
+     *  vocabulary as the lead, so heading and lead speak with one voice. */
+    heading: "Így viszed tovább",
+    lead: "A heti terved a tiéd. A LEXFIT tagság az, ami utána is viszi tovább.",
+    /** The condensed includes list - the rail's own, NOT the shared 10-item
+     *  PRICING_BAND.included: an order summary carries ~6 lines, and the six
+     *  side programmes collapse honestly into one. Every claim here must stay
+     *  a strict subset of what PRICING_BAND.included states. */
+    includes: [
+      "LEXFIT Start — 30 vezetett edzés",
+      "Minden további program (reggeli, esti, kezdő, törzs, láb, tartás)",
+      "16+ heti kihívás, minden héten 5 új videóval",
+      "Mérföldkövek és visszamérés",
+      "Szüneteltetés 1–3 hónapra",
+    ],
+    /** Around the interpolated amounts (rendered in PlanWizard from PRICES -
+     *  no forint may live in this module). */
+    priceMonthSuffix: "/ hó",
+    priceIntroLead: "az első hét",
+    cta: "Megnézem a tagságot",
+    /** Shown under the CTA, in the same slot the pay step uses. */
+    trust: "Bármikor lemondható · 14 napos elállási jog",
+    out: "Ha most nem időszerű: a heti terved akkor is a tiéd marad.",
+  },
+} as const;
+
+/**
+ * The guarantee, restated on the reveal as a ROADMAP rather than as a refund.
+ *
+ * The wording of the guarantee itself is not duplicated here - it comes from
+ * GARANCIA in src/components/landing/offer-copy.ts, which is the single source
+ * for every surface. What lives here is the reveal's framing around it and the
+ * miss-path, which nothing else on the site says yet.
+ *
+ * WHY A MISS-PATH EXISTS AT ALL. StepBet (N = 72,974): people who completed
+ * their challenge raised activity 44%, but people who FAILED it fell 5.3% below
+ * their own baseline. The refund is cheap - GMB sees ~3% across 125k clients -
+ * and the undesigned failure is what actually costs. Objection #30 in offer_v2
+ * §2 („A garancia feltétele stresszel") has been logged since v2 and has never
+ * had an answer on any surface.
+ */
+export const GUARANTEE_BLOCK = {
+  eyebrow: "Mielőtt bármit fizetnél",
+  /** Reads as permission to start, never as a bet against yourself. Second in
+   *  the order since 2026-09-08: every strong live guarantee found in the
+   *  language research states the MECHANISM first and the philosophy after -
+   *  a frame with no numbers in front of it reads as a slogan
+   *  (docs/reveal-redesign/03 §3). */
+  frame: "Nem fogadás. Egy útvonal, aminek a végén te döntesz.",
+  missPath:
+    "És ha nem jön össze a tíz edzés öt hét alatt? Akkor sem történik semmi. Szólunk, mielőtt lejár, és újratervezzük együtt — a programod megvár.",
+  /** Named accountability: a guarantee gains weight when an identified person
+   *  stands behind it, not a logo (docs/reveal-redesign/01 §8). The brand
+   *  speaks as „mi"; the founder signs personally. */
+  signedLead: "Ezt személyesen vállalom.",
+  signedName: "Alexa",
 } as const;
 
 /** Q5 → the one line the reveal adds about how the plan was adjusted. Each is a
@@ -344,6 +589,12 @@ export const ENERGY = {
   formHeading: "Kiszámoljuk a kalóriacélod",
   formSub: "Ebből jön ki a napi kalória- és fehérjecélod, és a napi lépéscélod — a heti terved mellé.",
   formMicro: "Csak a számoláshoz kell. Bármikor kérheted a törlésüket.",
+  /** Shown when every field is filled but the Art. 9 consent is not ticked.
+   *  The consent cannot be required - that is the whole point - but walking on
+   *  in silence and then showing no numbers at the end is a dead end nobody can
+   *  diagnose. So the screen says what will happen, and still lets them pass. */
+  consentMissing:
+    "A számoláshoz a hozzájárulásod is kell. Enélkül is továbbmehetsz — a heti terved ugyanúgy elkészül, csak a napi célok maradnak ki.",
 
   sexLabel: "Nem",
   sexOptions: [
@@ -459,15 +710,58 @@ export const ENERGY = {
 
 // ─── The Foundation programme on the reveal ─────────────────────────────────
 
+/**
+ * The reveal's week, workout by workout.
+ *
+ * The plan card above it answers „mikor"; this answers „mit". The first
+ * training day is expanded with its actual exercise list because that is the
+ * one somebody is deciding about right now - the rest can stay closed without
+ * losing anything.
+ */
+export const WEEK_WORKOUTS = {
+  /** Same section anatomy as every other block: eyebrow + heading + lead. The
+   *  label reuses the quiz's own section vocabulary („Az edzéseid"). */
+  eyebrow: "Az edzéseid",
+  heading: "A heted, edzésről edzésre",
+  lead: (n: number) =>
+    `Ez a ${n} edzés vár rád az első héten, ebben a sorrendben. Az elsőt kibontottuk, hogy lásd, mi van benne.`,
+  firstTag: "Az első edzésed",
+  exercisesLead: "Ebben az edzésben:",
+  /** Shown when the catalogue has fewer sessions than the plan has days. */
+  short: "A hét további napjaira a program következő edzései kerülnek.",
+} as const;
+
 export const PROGRAM_PREVIEW = {
+  eyebrow: "A folytatás",
   heading: "Ez vár rád",
-  /** The count comes from the live catalogue, never from a literal - the
+  /** Both counts come from the live catalogue, never from a literal - the
    *  programme is authored in /admin and a hardcoded number would go stale the
    *  first time somebody adds a session. */
-  lead: (n: number) =>
-    `A LEXFIT Start mind a ${n} edzése, sorrendben. Nyisd meg bármelyiket — megnézheted, mi van benne, mielőtt bármit fizetnél.`,
+  lead: (shown: number, total: number) =>
+    `A heted után ez jön: a következő ${shown} edzés a LEXFIT Startból — összesen ${total} van belőle. Nyisd meg bármelyiket, és megnézheted, mi van benne, mielőtt bármit fizetnél.`,
+  /** Owner decision 2026-09-08: preview the opening of the programme rather
+   *  than its entire contents. The reveal is already long, and the first
+   *  workouts are the ones that answer „mivel kezdem" - the other two dozen
+   *  answer a question nobody is asking yet. */
+  more: (n: number) => `+ még ${n} edzés a tagságban`,
   foot: "Az edzések a tagsággal indíthatók. A heti terved enélkül is a tiéd marad.",
   modalCta: "Ezzel kezdenék",
+} as const;
+
+/**
+ * The calculator's opt-in beat, asked after the seventh question.
+ *
+ * Every ad promises „7 kérdés". The calculator adds three, so it is offered
+ * rather than assumed - which protects the ad-to-page promise AND is the only
+ * shape that makes the Art. 9 consent visibly freely given. Declining goes
+ * straight to the gate; the plan is identical either way.
+ */
+export const CALC_INVITE = {
+  hd: "Kérsz mellé napi kalóriacélt is?",
+  sub: "Három kérdés, és a heti terved mellé megkapod a napi kalória- és fehérjecélod, meg a napi lépéscélod.",
+  helper: "A hét kérdés megvan, a terved kész. Ez ráadás — nélküle is a tiéd.",
+  yes: "Kérem, három kérdés",
+  no: "Köszönöm, elég a terv",
 } as const;
 
 /**

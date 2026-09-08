@@ -33,7 +33,9 @@ import {
 } from "../src/lib/ujrakezdes/energy";
 import { PRICING_BAND } from "../src/components/landing/offer-copy";
 import { CAT } from "../src/lib/categories";
+import { exerciseName } from "../src/lib/blocks";
 import { CAT_HEX, CAT_WORD, catHex, catWordOf } from "../emails/components/WorkoutCards";
+import { subject as ujraD9Subject } from "../emails/ujrakezdes-d9";
 
 const ENERGY_CONSENT = C.ENERGY.consent;
 
@@ -144,13 +146,19 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
 
   // Timed from createdAt, so a missed cron run catches up instead of drifting.
   assert.equal(lmDueAt(now, 6), now + 6 * 24 * 3600_000, "a D6 a 6. napon esedékes");
+  assert.equal(lmDueAt(now, 9), now + 9 * 24 * 3600_000, "a D9 a 9. napon esedékes");
   assert.equal(lmNextStep(3), 6);
-  assert.equal(lmNextStep(6), null, "a sorozat a D6 után véget ér");
-  assert.equal(LM_LAST_STEP, 6, "nincs D10 - határidős levelet nem küldünk");
-  assert.deepEqual(lmScheduleAfter(yes, 6), { nextEmailAt: null, nextEmailStep: null });
+  assert.equal(lmNextStep(6), 9, "a D6 után a D9 következik");
+  assert.equal(lmNextStep(9), null, "a sorozat a D9 után véget ér");
+  assert.equal(LM_LAST_STEP, 9, "a negyedik levél a D9 - bizonyíték, nem határidő");
+  assert.deepEqual(lmScheduleAfter(yes, 9), { nextEmailAt: null, nextEmailStep: null });
+  // The cut D10 was a deadline mail. Its replacement must never become one
+  // again: no step may fall due on a fixed calendar date, and the last mail
+  // says outright that there is none.
+  assert.ok(!/határidő\s*:/i.test(ujraD9Subject), "a D9 tárgya határidőt ígér");
   ok("a sorozat D0 · D3 · D6, createdAt-hoz kötve, D10 nélkül");
 
-  assert.ok(!isLmStep(2) && !isLmStep(7) && isLmStep(3) && isLmStep(6));
+  assert.ok(!isLmStep(2) && !isLmStep(7) && !isLmStep(10) && isLmStep(3) && isLmStep(6) && isLmStep(9));
   ok("a cron csak az ehhez a változathoz tartozó lépéseket küldi");
 
   // Every stop reason, because each one is a mail somebody must not receive.
@@ -158,7 +166,8 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.equal(lmStopReason({ ...yes, unsubscribedAt: now }, 3), "unsubscribed");
   assert.equal(lmStopReason({ ...yes, convertedAt: now }, 6), "converted");
   assert.equal(lmStopReason(no, 3), "no_consent");
-  assert.equal(lmStopReason(yes, 9), "finished");
+  assert.equal(lmStopReason(yes, 9), null, "a D9 még a sorozat része");
+  assert.equal(lmStopReason(yes, 10), "finished");
   ok("leiratkozás, vásárlás és visszavont hozzájárulás mind megállítja a sorozatot");
 
   // A retake must not resurrect a withdrawn consent.
@@ -186,7 +195,10 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   // target is a weight-management number). It is excluded from the sweep below
   // and asserted separately, so the waiver cannot quietly widen into the rest
   // of the funnel.
-  const { ENERGY, ...CORE } = C as Record<string, unknown>;
+  // CALC_INVITE joins the waiver: it is the calculator's own invitation, it has
+  // to name the thing it is offering ("napi kalóriacél"), and it is asserted
+  // with ENERGY below rather than exempted quietly.
+  const { ENERGY, CALC_INVITE, ...CORE } = C as Record<string, unknown>;
   const walk = (v: unknown): void => {
     if (typeof v === "string") strings.push(v);
     else if (typeof v === "function") { try { strings.push(String((v as (...x: never[]) => string)(3 as never, "20–30 perc" as never))); } catch { /* not a copy fn */ } }
@@ -209,7 +221,14 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   ok("nincs fogyás-szókincs és testsúly-ígéret");
 
   // Offer v3 §7 migrations must not reappear through this surface.
-  const migrated = ["12 990", "40 edzés", "12 edzés", "hat héten belül", "szeptember 30", "alapító"];
+  // "tíz hét" / "10 hét" were in offer v3 §0's migration list but never in this
+  // guard, which is exactly how the Alexa video transcript kept saying
+  // „bírod-e egyben a tíz hetet" months after the programme stopped having a
+  // fixed length. Found 2026-09-08 during the funnel audit.
+  const migrated = [
+    "12 990", "40 edzés", "12 edzés", "hat héten belül", "szeptember 30",
+    "alapító", "tíz hét", "tíz het", "10 hét",
+  ];
   for (const s of strings) {
     const low = s.toLowerCase();
     for (const m of migrated) assert.ok(!low.includes(m), `visszaszivárgott: "${m}" — ${s.slice(0, 60)}`);
@@ -222,6 +241,114 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
     assert.ok(!/\d[\d\s ]*Ft/.test(s), `beégetett összeg: ${s.slice(0, 60)}`);
   }
   ok("nincs beégetett forintösszeg - az árak a PRICES-ből jönnek");
+
+  // ── The 2026-09-08 rewrite's own invariants ────────────────────────────
+
+  // The landing sells a free plan and links to a paid product. The admission
+  // that the membership costs money is the reason the pricing band at the end
+  // does not read as an ambush; if it ever disappears, that is a regression in
+  // honesty, not in copy.
+  assert.ok(/fizetős/.test(C.HERO.honest), "a hero nem vallja be, hogy a tagság fizetős");
+  assert.ok(/ingyenes/.test(C.HERO.honest), "a hero nem mondja ki, hogy a terv ingyenes");
+
+  // Three ad angles point at one page; each needs its sentence in `Ismerős?`.
+  assert.equal(C.ISMEROS.angles.length, 3, "nem mind a három hirdetési szög kapott mondatot");
+  // Third person only. „Van, akinél..." describes somebody; „A derekad miatt..."
+  // claims knowledge of the reader's body, which Meta enforces against.
+  for (const a of C.ISMEROS.angles) {
+    assert.ok(a.line.startsWith("Van, aki"), `nem harmadik személyű szög: ${a.line}`);
+    // The label is what a scanner reads instead of the sentence, so it has to
+    // carry the angle on its own - three words at most, and never a claim.
+    // Length, not word count: „A derék, a térd" is four words and two ideas,
+    // while three long words would be a sentence in disguise.
+    assert.ok(a.label.length <= 24, `túl hosszú szög-címke: ${a.label}`);
+    assert.ok(!a.label.includes("."), `a szög-címke mondat: ${a.label}`);
+  }
+
+  // Every band names itself, in the same slot, in the same type. A section
+  // without a label makes the reader derive it from the prose.
+  for (const [k, v] of Object.entries(C.SECTION_LABEL)) {
+    assert.ok(v.length > 0 && v.length <= 24, `rossz szekciócímke: ${k} → ${v}`);
+  }
+
+  // The proof band carries NO member photographs and NO attributed quotes.
+  // `public/finish-examples/` holds raw post-workout selfies (physique shots,
+  // one in a gym), not finish cards - captioning them as completed workouts
+  // would be false, and body imagery is the frame this funnel exists to avoid.
+  // If that ever gets "fixed" by pointing at those files again, this fails.
+  assert.ok(!("cards" in C.PROOF), "a proof-sáv megint tagfotókat tesz ki");
+  assert.ok(
+    !JSON.stringify(C.PROOF).includes("finish-examples"),
+    "a proof-sáv a nyers finish-selfie-ket használja",
+  );
+
+  // The last section is walked by everyone, including the people who decline
+  // the calculator - so it cannot be named after numbers they never asked for.
+  const last = C.SECTIONS[C.SECTIONS.length - 1]!;
+  assert.ok(!/szám/i.test(last.label), "az utolsó szekció számokat ígér annak is, aki kihagyta a kalkulátort");
+  for (const sec of C.SECTIONS) {
+    assert.ok(sec.label.split(" ").length <= 2, `túl hosszú szekciócímke: ${sec.label}`);
+  }
+
+  // The reveal's commitment beat and D0 must give the same advice, or the page
+  // and the email are coaching two different things.
+  assert.ok(
+    /átlagos/i.test(C.REVEAL.firstWorkout.hint),
+    "a reveal nem ismétli meg a D0 tanácsát az átlagos napról",
+  );
+  // It is a commitment device, not a booking - and it must say so, because we
+  // cannot schedule anything and must not imply that we can.
+  assert.ok(
+    /nem küldünk/i.test(C.REVEAL.firstWorkout.note),
+    "a napválasztó emlékeztetőt sugall, amit nem küldünk",
+  );
+
+  // Declining the calculator has to be a real, visible answer.
+  assert.ok(C.CALC_INVITE.no.length > 0, "a kalkulátort nem lehet nemmel elutasítani");
+  // The reveal's first training day lists its real exercises. `items` is a
+  // UNION - a bare string on older records, { name, start } on stamped ones -
+  // and the list must read both. The dev seed only stamps F023 (position 23),
+  // so this path cannot be seen in a local browser; it is guarded here instead.
+  const block = {
+    name: "1. blokk — EMOM 10",
+    items: ["Térdelés-felállás", { name: "Hegymászó (csendes)", start: 7 }],
+  };
+  assert.equal(
+    block.items.map(exerciseName).join(" · "),
+    "Térdelés-felállás · Hegymászó (csendes)",
+    "a gyakorlatlista nem olvassa mindkét item-alakot",
+  );
+  assert.ok(C.WEEK_WORKOUTS.firstTag.length > 0, "az első nap nincs megjelölve");
+  assert.ok(
+    /első/.test(C.WEEK_WORKOUTS.lead(3)),
+    "a heti lista nem mondja meg, hogy az első hétről van szó",
+  );
+  // S1 (the artifact): the provenance line is the IKEA effect's trace back to
+  // their own work, and the chips must come from the SAME mapping the quiz's
+  // tray used - a second mapping is how two surfaces describe one person
+  // differently.
+  assert.ok(/válasz/.test(C.REVEAL.art.meta("szeptember 8.")), "az artifact nem nevezi meg a válaszokat");
+  assert.ok(C.REVEAL.art.title.length > 0 && !C.REVEAL.art.title.includes("!"));
+
+  // The rail is an order summary: at most six includes lines, no forint in any
+  // of them (amounts are interpolated from PRICES in the markup), and every
+  // line a strict subset of what the shared PRICING_BAND.included claims -
+  // checked by keyword so the condensed list cannot quietly promise more.
+  assert.ok(C.REVEAL.rail.includes.length <= 6, "a rail-lista több, mint egy rendelés-összesítő");
+  for (const line of C.REVEAL.rail.includes) {
+    assert.ok(!/\d[\d\s ]*Ft/.test(line), `forint a rail-listában: ${line}`);
+  }
+  const bandBlob = PRICING_BAND.included.join(" ").toLowerCase();
+  for (const kw of ["start", "kihívás", "mérföldkövek", "szünet"]) {
+    assert.ok(bandBlob.includes(kw), `a rail olyat ígér, amit a band nem: ${kw}`);
+  }
+
+  // S4: a named person stands behind the guarantee - and it must never become
+  // a job title, because the §7 `alapító` guard cannot tell the founder from
+  // the founder PRICE.
+  assert.equal(C.GUARANTEE_BLOCK.signedName, "Alexa");
+  assert.ok(!/alapító/i.test(C.GUARANTEE_BLOCK.signedLead), "a garancia-aláírás titulussá vált");
+  ok("a 2026-09-08-i átírás invariánsai állnak");
 
   // The segment postscripts drive D3, so each anchor must resolve predictably.
   for (const seg of ["careful", "no_energy", "stronger", "browsing"] as const) {
@@ -238,6 +365,7 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
     else if (v && typeof v === "object") Object.values(v).forEach(walkEn);
   };
   walkEn(ENERGY);
+  walkEn(CALC_INVITE);
   assert.ok(en.length > 20, "a modul copy bejárása értelmes mennyiséget talált");
 
   for (const s2 of en) assert.ok(!s2.includes("!"), `felkiáltójel a modulban: ${s2.slice(0, 60)}`);

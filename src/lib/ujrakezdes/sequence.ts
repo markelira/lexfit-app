@@ -7,16 +7,21 @@ import type { LmLeadDoc } from "./lead";
 // off the last send would let one slow cron run drag the whole sequence later
 // and later; anchoring to the start means a missed run catches up instead.
 //
-// THREE STEPS, NOT FOUR. The v2 spec lists D0/D3/D6/D10. D10 is not
-// implemented: its entire content is a September 30 deadline, and offer v3 §10
-// lists "add urgency/counters" under *Never*, with §2 stating the position in
-// full - "Urgency: none. No deadlines, no counters, ever." A replacement in the
-// no-urgency register is an open item for Alexa (docs/lead-magnet-v2-plan.md
-// §8); until it is approved, the sequence simply ends after the offer, which is
-// the honest version of "ha most nem időszerű, a heti terved akkor is a tiéd".
+// FOUR STEPS. The v2 spec listed D0/D3/D6/D10; D10 was cut because its entire
+// content was a September 30 deadline, and offer v3 §10 lists "add
+// urgency/counters" under *Never*.
+//
+// D9 is the replacement, and it is NOT the deadline email wearing a new date.
+// It carries proof: what the first ten workouts actually feel like, and the
+// guarantee restated as a roadmap. The evidence supports exactly one more send
+// and no more - a 7-vs-3 sequence test gained 35% conversion while unsubscribes
+// rose 15% after email five, and fitness already carries the highest
+// unsubscribe rate of any vertical at ~0.40%
+// (docs/funnel-research/05-email-sequence.md). Four is inside the safe zone;
+// six would not be.
 
 /** D0 is sent inline by the submit route - the scheduled sequence starts at 3. */
-export type LmStep = 3 | 6;
+export type LmStep = 3 | 6 | 9;
 
 const DAY = 24 * 3600_000;
 
@@ -24,9 +29,10 @@ const DAY = 24 * 3600_000;
 export const LM_STEP_DUE_AT: Record<LmStep, number> = {
   3: 3 * DAY, // D3 - belief: what actually falls apart, and the two rules
   6: 6 * DAY, // D6 - the offer, with the guarantee
+  9: 9 * DAY, // D9 - proof: what the first ten workouts are like. No deadline.
 };
 
-export const LM_LAST_STEP: LmStep = 6;
+export const LM_LAST_STEP: LmStep = 9;
 
 export type LmStopReason = "unsubscribed" | "no_consent" | "converted" | "finished";
 
@@ -46,7 +52,9 @@ export function lmStopReason(lead: LmLeadDoc, step: number): LmStopReason | null
 
 /** The step after `step`, or null when the sequence is over. */
 export function lmNextStep(step: LmStep): LmStep | null {
-  return step === 3 ? 6 : null;
+  if (step === 3) return 6;
+  if (step === 6) return 9;
+  return null;
 }
 
 export const lmDueAt = (createdAt: number, step: LmStep): number =>
@@ -65,4 +73,4 @@ export function lmScheduleAfter(
 }
 
 /** Steps this variant knows how to send - guards the cron's dispatch. */
-export const isLmStep = (n: unknown): n is LmStep => n === 3 || n === 6;
+export const isLmStep = (n: unknown): n is LmStep => n === 3 || n === 6 || n === 9;

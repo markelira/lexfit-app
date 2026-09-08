@@ -61,266 +61,160 @@
   padding: 0 var(--sp-5);
 }
 
-/* ═══ The hero ══════════════════════════════════════════════════════════════
-   ONE composition, nothing below it. Two columns: the argument on the left, the
-   product on the right. Everything is left-aligned - centred type reads as a
-   poster, and this is a page with one job and a lot to say.
+/* ═══ The landing page (/ujrakezdes) ═══════════════════════════════════════
+   The page is `.lxl` - the HOMEPAGE's design system - and imports landing.css.
+   Nothing here restyles it. What follows is only the two things this page has
+   that the homepage does not (the week card in the hero device slot, and the
+   three-angle list), plus the mobile sticky CTA.
 
-   Three tiers of hierarchy, and nothing crosses between them: the ask
-   (headline, sub, CTA), the artifact (the week), and the argument (pain, steps,
-   signature). The week grid is the one element allowed to be bold; if anything
-   else here starts competing with it, that is the bug. */
+   If you find yourself overriding a `.lxl` rule below, the right fix is almost
+   always to use a different landing primitive instead. */
 
-.lxu.u-hero {
-  min-height: 100svh;
-  padding: clamp(20px, 4vw, 44px);
-  background: var(--u-cream);
-  /* `.lxu` is already a COLUMN flex container, so `align-items: center` here
-     would centre horizontally and leave the composition pinned to the top -
-     which is exactly how it rendered. `justify-content` is the cross-axis for
-     a column. */
-  justify-content: center;
+/* ── The week card, in the hero's device slot ─────────────────────────────── */
+
+.lxl.u-lp .u-weekdevice {
+  /* The homepage's `.hero-device` is a fixed-height photo frame - and its mobile
+     rule pins an `aspect-ratio: 320/566`, which recomputes a height even after
+     `height: auto`. Both have to be released or the card floats in 500px of
+     white. No ground of its own: <PlanMail> brings its own card. */
+  height: auto;
+  aspect-ratio: auto;
+  align-self: center;
+  width: min(400px, 100%);
 }
 
-.lxu .u-hero-grid {
-  width: 100%;
-  max-width: 1240px;
-  margin: 0 auto;
-  display: grid;
-  gap: clamp(28px, 5vw, 64px);
+.lxl.u-lp .u-weeknote {
+  font-size: 13px;
+  line-height: 1.5;
+  /* The hero ground is sage, not cream. `--tx-3` (ink at 66%) measures 3.09:1
+     there, under the 4.5 floor; full ink on sage is 5.46:1. */
+  color: var(--ink);
+  margin: 16px 0 0;
+  text-align: center;
 }
-/* ── Mobile order ────────────────────────────────────────────────────────
-   Stacked, the two columns would put the CTA and the week card below a long
-   recognition paragraph - so the graphic lands well past the fold and the ask
-   lands after the complaint. `display: contents` dissolves the two wrappers so
-   every piece becomes a grid item and can be ordered directly: the ask and the
-   artifact first, the argument under them. */
-@media (max-width: 899.98px) {
-  .lxu.u-hero .u-hero-copy,
-  .lxu.u-hero .u-hero-art { display: contents; }
-  .lxu .u-hero-grid { gap: 0; }        /* spacing comes from each element */
 
-  .lxu.u-hero .u-eyebrow { order: 1; }
-  .lxu.u-hero h1 { order: 2; }
-  .lxu.u-hero .u-sub { order: 3; }
-  .lxu.u-hero .u-audience { order: 4; margin-bottom: var(--sp-8); }
-  .lxu .u-hero-cta { order: 5; margin-bottom: var(--sp-8); }
-  .lxu .u-weekcard { order: 6; margin-bottom: var(--sp-8); }
-  .lxu .u-pain { order: 7; margin: 0 0 var(--sp-8); }
-  .lxu .u-flow { order: 8; margin-bottom: var(--sp-8); }
-  .lxu .u-sig { order: 9; }
+
+/* ── Hero adjustments ─────────────────────────────────────────────────────── */
+
+.lxl.u-lp .hero-copy h1 {
+  /* The homepage headline is two short words per line and can carry 80px. This
+     one is a full sentence, so it steps down the same scale rather than
+     wrapping into four lines. Weight, case and tracking are untouched. */
+  font-size: clamp(34px, 5.4vw, 58px);
+  line-height: 1.08;
 }
+/* Not a link - it is the reassurance under the button, and the homepage's
+   `.hero-cta2` is the right type for it but the wrong affordance. */
+.lxl.u-lp .u-ctasub { text-transform: none; letter-spacing: 0.02em; cursor: default; }
+.lxl.u-lp .u-ctasub:hover { color: oklch(from var(--ink) l c h / 0.78); }
+
+/* ── The sections ─────────────────────────────────────────────────────────
+   Every band under the hero now uses a HOMEPAGE layout rather than one invented
+   here: `.ism` + `.ism-rules` for the problem, `heted-band` + `.starter-title` +
+   `.aq-promise` for the mechanism, `.steps` for the how, the Alexa column
+   (`.ax-headin` / `.ax-inner` / `.founder-facts` / `.aq-vow` / `.aq-sign`) for
+   the person, and `.panel.panel-pad > .ticon.center` for the close.
+
+   What is left below is only what those layouts do not already cover: the dark
+   text ramp on the two navy bands (the homepage sets it with inline styles,
+   which is not something to copy) and the two-part rule rows. */
+
+/* The homepage writes these as inline `style={{ color: "#fff" }}` on each
+   element. Same result, one place, and no inline styles to keep in sync.
+
+   BOTH scopes, deliberately: the landing root is `.lxl.u-lp`, the reveal's is
+   `.lxu.lxl.u-rev` - scoped to `.u-lp` alone, these never matched the reveal
+   and its navy guarantee band rendered its eyebrow, heading and body in INK on
+   navy: invisible. Found 2026-09-08, the first time the band was actually
+   looked at rather than measured. */
+:is(.lxl.u-lp, .lxu.u-rev) .u-eyebrow-d { color: var(--tx-d3); }
+:is(.lxl.u-lp, .lxu.u-rev) .u-title-d { color: var(--tx-d1); }
+:is(.lxl.u-lp, .lxu.u-rev) .u-body-d { color: var(--tx-d2); }
+
+/* `.aq-promise` carries one line per item on the homepage; the two rules are a
+   statement plus its explanation, so the row stacks. */
+.lxl.u-lp .u-mech-rules {
+  gap: 18px;
+  margin: 30px 0;
+  text-align: left;
+  max-width: 640px;
+  margin-inline: auto;
+}
+.lxl.u-lp .u-mech-rules li {
+  padding-left: 18px;
+  border-left: 2px solid var(--sage);
+}
+.lxl.u-lp .u-mech-rules b {
+  display: block;
+  font-family: var(--font);
+  font-size: clamp(17px, 2vw, 21px);
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  color: var(--tx-d1);
+}
+.lxl.u-lp .u-mech-rules span {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 25px;
+  letter-spacing: 0;
+  color: var(--tx-d2);
+}
+
+/* The homepage's Alexa band is a photo section; ours is a plain navy one, so
+   the column that is normally pinned over the image is simply centred. */
+.lxl.u-lp .u-ax .ax-headin,
+.lxl.u-lp .u-ax .ax-inner { max-width: 660px; margin-inline: auto; }
+.lxl.u-lp .u-ax .alexa-pull-big { margin-top: 12px; }
+
+/* ── The mobile sticky CTA ───────────────────────────────────────────────── */
+
+.lxl.u-lp .u-sticky {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: oklch(from var(--cream) l c h / 0.86);
+  backdrop-filter: blur(18px) saturate(180%);
+  border-top: 1px solid oklch(from var(--ink) l c h / 0.1);
+  /* `visibility`, not opacity alone: a parked bar that still takes focus puts an
+     invisible link in the tab order on every page. */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity .24s var(--ease-out), transform .24s var(--ease-out),
+    visibility 0s linear .24s;
+}
+.lxl.u-lp .u-sticky.on {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+.lxl.u-lp .u-sticky .pill { width: 100%; }
 
 @media (min-width: 900px) {
-  .lxu .u-hero-grid {
-    /* The type column is the smaller half on purpose - a 45/55 split reads as
-       one composition, where 50/50 reads as two boxes side by side. */
-    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1fr);
-    align-items: center;
-  }
+  /* Desktop keeps the closing CTA in the flow; a docked bar on a wide screen is
+     chrome the page does not need. */
+  .lxl.u-lp .u-sticky { display: none; }
 }
 
-/* ── The argument ───────────────────────────────────────────────────────── */
-
-.lxu .u-hero-copy { max-width: 34rem; }
-
-.lxu .u-eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin: 0 0 var(--sp-5);
+@media (max-width: 899.98px) {
+  .lxl.u-lp .u-rules { grid-template-columns: minmax(0, 1fr); }
+  .lxl.u-lp .u-weekdevice { width: min(340px, 88vw); height: auto; aspect-ratio: auto; }
+  /* Room for the docked bar so the last CTA is never under it. */
+  .lxl.u-lp #close { padding-bottom: 128px; }
 }
 
-.lxu.u-hero h1 {
-  font-size: clamp(38px, 6.4vw, 68px);
-  line-height: 0.98;          /* tight leading, because the type is large */
-  letter-spacing: -0.035em;   /* and negative tracking, because it is larger still */
-  font-weight: 600;
-  margin: 0 0 var(--sp-5);
-  text-wrap: balance;
-}
-.lxu.u-hero .u-sub {
-  font-size: clamp(16.5px, 1.4vw, 19px);
-  line-height: 1.5;
-  color: var(--ink-2);
-  margin: 0 0 var(--sp-3);
-  max-width: 42ch;            /* under 80 characters, well under */
-  text-wrap: pretty;
-}
-.lxu.u-hero .u-sub { margin-bottom: var(--sp-4); }
-.lxu.u-hero .u-audience {
-  font-size: 14.5px;
-  font-weight: 500;
-  color: var(--ink-3);
-  margin: 0;
+@media (prefers-reduced-transparency: reduce) {
+  .lxl.u-lp .u-sticky { background: var(--cream); backdrop-filter: none; }
 }
 
-/* The recognition beat. A rule and an indent rather than a card: it is an
-   aside, and a card would give it the same weight as the week. */
-.lxu .u-pain {
-  margin: var(--sp-8) 0 var(--sp-8);
-  padding-left: var(--sp-5);
-  border-left: 2px solid var(--u-sage);
-}
-.lxu .u-pain h2 {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  margin: 0 0 var(--sp-2);
-}
-.lxu .u-pain p {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--ink-2);
-  margin: 0;
-  max-width: 46ch;
-  text-wrap: pretty;
-}
-/* The answer to the paragraph above it, so it carries the weight the paragraph
-   does not. */
-.lxu .u-pain-answer {
-  margin-top: var(--sp-3) !important;
-  color: var(--ink) !important;
-  font-weight: 500;
-}
-
-.lxu .u-hero-cta { display: grid; gap: var(--sp-4); justify-items: start; }
-.lxu .u-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;          /* they were rendering as bullets */
-}
-.lxu .u-chip {
-  padding: 7px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--ink-2);
-}
-
-/* ── The product ────────────────────────────────────────────────────────── */
-
-.lxu .u-hero-art { display: grid; gap: var(--sp-6); align-content: center; }
-
-.lxu .u-weekcard {
-  margin: 0;
-  padding: clamp(20px, 2.4vw, 30px);
-  border-radius: 24px;
-  background: var(--surface);
-  box-shadow: 0 2px 4px oklch(0.3 0.014 168 / 0.05),
-              0 24px 60px -24px oklch(0.42 0.03 168 / 0.28);
-}
-.lxu .u-weekcard figcaption { margin: 0 0 var(--sp-5); }
-.lxu .u-weekcard .u-eyebrow { margin: 0; }
-
-.lxu .u-weekgrid {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: clamp(5px, 0.6vw, 9px);
-}
-.lxu .u-weekgrid li {
-  border-radius: 12px;
-  background: var(--u-cream);
-  padding: clamp(12px, 1.4vw, 18px) 2px;
-  text-align: center;
-  /* The one orchestrated moment on the page: the week assembles itself once,
-     on load, left to right. Nothing else here animates. */
-  animation: u-drop 520ms var(--ease-settle) both;
-  animation-delay: calc(180ms + var(--i, 0) * 70ms);
-}
-.lxu .u-weekgrid li.on { background: var(--u-navy); color: var(--u-cream); }
-.lxu .u-weekgrid .d {
-  display: block;
-  font-family: var(--mono);
-  font-size: clamp(10px, 0.85vw, 12px);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  opacity: 0.75;
-}
-.lxu .u-weekgrid .m {
-  display: block;
-  font-size: clamp(9.5px, 0.8vw, 11.5px);
-  margin-top: 5px;
-  opacity: 0.62;
-}
-.lxu .u-weeknote {
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--ink-3);
-  margin: var(--sp-5) 0 0;
-}
-
-/* Three steps, genuinely a sequence, so genuinely numbered. */
-.lxu .u-flow {
-  list-style: none;
-  counter-reset: f;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--sp-3);
-}
-@media (min-width: 520px) {
-  .lxu .u-flow { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4); }
-}
-.lxu .u-flow li {
-  counter-increment: f;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--ink-2);
-  display: grid;
-  grid-template-columns: 22px 1fr;
-  gap: 10px;
-  align-items: start;
-}
-.lxu .u-flow li::before {
-  content: counter(f);
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--u-sage);
-  color: var(--u-navy);
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.lxu .u-sig {
-  margin: 0;
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: var(--sp-4);
-  align-items: start;
-  padding-top: var(--sp-5);
-  border-top: 1px solid var(--line);
-}
-.lxu .u-sig-av { border-radius: 50%; object-fit: cover; }
-.lxu .u-sig figcaption { margin: 0; }
-.lxu .u-sig-quote {
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: var(--ink);
-  margin: 0 0 6px;
-  max-width: 44ch;
-  text-wrap: pretty;
-}
-.lxu .u-sig-name { font-size: 13px; color: var(--ink-3); margin: 0; }
-.lxu .u-sig-name b { color: var(--ink-2); font-weight: 600; }
-
-@media (prefers-reduced-motion: reduce) {
-  .lxu .u-weekgrid li { animation: u-fade-in 180ms linear both; animation-delay: 0ms; }
-}
 
 /* ═══ Buttons ═══════════════════════════════════════════════════════════════ */
 
@@ -353,9 +247,7 @@
 .lxu .u-cta:disabled { opacity: 0.45; cursor: default; transform: none; }
 .lxu .u-cta:focus-visible { outline: 2px solid var(--u-navy); outline-offset: 3px; }
 /* On the sage hero the button inverts, so it still reads as the one thing to do. */
-.lxu .u-herocard .u-cta { background: var(--u-navy); color: var(--u-cream); }
 
-.lxu .u-ctawrap { padding: var(--sp-6) 0 0; }
 
 /* ═══ Wizard chrome ═════════════════════════════════════════════════════════ */
 
@@ -659,15 +551,6 @@
 .lxu .u-daymin { font-size: 13.5px; font-weight: 600; margin-top: 5px; font-variant-numeric: tabular-nums; }
 .lxu .u-day.rest .u-daymin { color: var(--ink-3); font-weight: 500; }
 
-.lxu .u-panel {
-  border-radius: 20px;
-  background: var(--u-sage);
-  color: var(--u-navy);
-  padding: var(--sp-6);
-  margin: var(--sp-6) 0;
-}
-.lxu .u-panel h3 { font-size: 15px; font-weight: 700; margin: 0 0 var(--sp-2); letter-spacing: -0.01em; }
-.lxu .u-panel p { font-size: 15.5px; line-height: 1.55; margin: 0; }
 
 .lxu .u-carelist { margin: var(--sp-5) 0 0; padding: 0; list-style: none; display: grid; gap: var(--sp-3); }
 .lxu .u-carelist li {
@@ -679,15 +562,6 @@
   width: 8px; height: 8px; border-radius: 50%; background: var(--u-sage);
 }
 
-.lxu .u-vidh { font-size: 20px; font-weight: 600; letter-spacing: -0.015em; margin: var(--sp-8) 0 var(--sp-4); }
-.lxu .u-video {
-  aspect-ratio: 9 / 16; max-height: 58vh;
-  border-radius: 20px; overflow: hidden;
-  background: var(--u-navy); color: oklch(1 0 0 / 0.5);
-  display: grid; place-items: center;
-  margin: 0 auto var(--sp-4);
-}
-.lxu .u-transcript { font-size: 14.5px; line-height: 1.62; color: var(--ink-2); }
 
 .lxu .u-sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -699,10 +573,6 @@
    only undoes the landing's full-bleed section padding, which assumes a wide
    page rather than a card inside a 560px reveal, and gives the absolutely
    positioned card badges the clearance they lose when the intro wraps. */
-.lxu .u-offer { margin: var(--sp-8) calc(var(--sp-5) * -1) var(--sp-4); }
-.lxu .u-offer .pricing-band { padding: var(--sp-6) 0; background: transparent; }
-.lxu .u-offer .pb-intro { margin-bottom: var(--sp-6); }
-.lxu .u-offer .pb-grid { margin-top: var(--sp-5); }
 
 /* ═══ Accessibility ═════════════════════════════════════════════════════════ */
 
@@ -726,7 +596,6 @@
 
 @media (prefers-reduced-transparency: reduce) {
   .lxu .u-top { background: var(--u-cream); backdrop-filter: none; }
-  .lxu .u-chip { background: oklch(1 0 0 / 0.9); backdrop-filter: none; }
 }
 
 @media (prefers-contrast: more) {
@@ -736,12 +605,7 @@
 
 /* ═══ Desktop ═══════════════════════════════════════════════════════════════ */
 @media (min-width: 720px) {
-  .lxu .u-herocard { padding: var(--sp-10) var(--sp-8); }
   .lxu .u-cta { width: auto; min-width: 300px; margin: 0 auto; }
-  .lxu .u-ctawrap { display: flex; justify-content: center; }
-  /* ...but not in the hero, which is left-aligned throughout. */
-  .lxu .u-hero-cta .u-cta { margin: 0; min-width: 260px; }
-  .lxu .u-proof { gap: var(--sp-4); }
 }
 
 /* ═══ Energy module ═════════════════════════════════════════════════════════ */
@@ -750,31 +614,10 @@
    and its CTA is outlined rather than solid. */
 
 .lxu .u-energy-teaser,
-.lxu .u-energy {
-  margin: var(--sp-8) 0 0;
-  padding: var(--sp-6);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: var(--surface);
-}
 .lxu .u-energy-teaser h3,
-.lxu .u-energy h3 {
-  font-size: 18px; font-weight: 600; letter-spacing: -0.015em;
-  margin: 0 0 var(--sp-3);
-}
-.lxu .u-energy-teaser p { font-size: 15px; line-height: 1.55; color: var(--ink-2); margin: 0 0 var(--sp-5); }
 .lxu .u-en-micro { font-size: 13px; line-height: 1.5; color: var(--ink-3); margin: var(--sp-2) 0 0; }
 
-.lxu .u-cta-quiet {
-  background: transparent;
-  color: var(--ink);
-  border: 1.5px solid var(--ink);
-  box-shadow: none;
-}
-.lxu .u-cta-quiet:active { box-shadow: none; background: oklch(0.235 0.014 168 / 0.05); }
 
-.lxu .u-en-fs { border: 0; padding: 0; margin: 0 0 var(--sp-5); }
-.lxu .u-en-fs .u-label { padding: 0; }
 
 /* Segmented control - one row, equal columns, the selected cell filled. */
 .lxu .u-seg {
@@ -801,43 +644,11 @@
 .lxu .u-seg-b:focus-visible { outline: 2px solid var(--u-sage); outline-offset: 2px; }
 .lxu .u-seg-b.on { background: var(--u-navy); border-color: var(--u-navy); color: var(--u-cream); }
 
-.lxu .u-en-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); margin: 0 0 var(--sp-5); }
-.lxu .u-en-num { display: block; }
-.lxu .u-en-num .u-input { padding: 14px 12px; text-align: center; }
 /* The spinners add nothing on a numeric keypad and crowd a 3-up row. */
 .lxu .u-en-num input::-webkit-outer-spin-button,
-.lxu .u-en-num input::-webkit-inner-spin-button { appearance: none; margin: 0; }
-.lxu .u-en-num input[type="number"] { -moz-appearance: textfield; }
 
 /* The headline figure. One number, unmistakably the answer. */
-.lxu .u-en-hero { text-align: center; padding: var(--sp-4) 0 var(--sp-5); }
-.lxu .u-en-hero strong {
-  display: block;
-  font-size: clamp(40px, 12vw, 56px);
-  line-height: 1;
-  letter-spacing: -0.035em;
-  font-variant-numeric: tabular-nums;
-}
-.lxu .u-en-hero span {
-  display: block; margin-top: var(--sp-2);
-  font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--ink-3);
-}
 
-.lxu .u-en-grid {
-  list-style: none; margin: 0 0 var(--sp-5); padding: 0;
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3);
-}
-.lxu .u-en-grid li {
-  text-align: center; padding: var(--sp-4) var(--sp-2);
-  border-radius: 14px; background: var(--u-cream);
-}
-.lxu .u-en-grid b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
-.lxu .u-en-grid span {
-  display: block; margin-top: 4px;
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.05em;
-  text-transform: uppercase; color: var(--ink-3);
-}
 
 .lxu .u-en-note {
   font-size: 14px; line-height: 1.55; color: var(--ink-2);
@@ -852,38 +663,11 @@
 }
 
 @media (max-width: 380px) {
-  .lxu .u-en-grid { grid-template-columns: repeat(2, 1fr); }
   .lxu .u-seg { font-size: 13px; }
 }
 
 /* The workout half of the calculator. Numbered, because it is an order to
    start in, not a menu. */
-.lxu .u-en-workout { margin: 0 0 var(--sp-5); }
-.lxu .u-en-workout h4 {
-  font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 var(--sp-2);
-}
-.lxu .u-en-workout ol {
-  list-style: none; counter-reset: w; margin: var(--sp-4) 0 0; padding: 0;
-  display: grid; gap: var(--sp-3);
-}
-.lxu .u-en-workout li {
-  counter-increment: w;
-  display: grid; grid-template-columns: 26px 1fr; gap: var(--sp-3);
-  align-items: baseline;
-}
-.lxu .u-en-workout li::before {
-  content: counter(w);
-  grid-row: span 2;
-  align-self: start;
-  display: grid; place-items: center;
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--u-sage); color: var(--u-navy);
-  font-family: var(--mono); font-size: 12px;
-}
-.lxu .u-en-workout li b { font-size: 15.5px; font-weight: 600; }
-.lxu .u-en-workout li span {
-  grid-column: 2; font-size: 14px; line-height: 1.5; color: var(--ink-2);
-}
 
 /* ═══ The tray ══════════════════════════════════════════════════════════════ */
 /* The plan assembling itself while the questions run. This is the funnel's one
@@ -1133,13 +917,7 @@
 .lxu .u-calc-h {
   font-size: 19px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 var(--sp-3);
 }
-.lxu .u-energy-teaser p { font-size: 15px; line-height: 1.55; color: var(--ink-2); margin: 0 0 var(--sp-5); }
 
-.lxu .u-cta-quiet {
-  background: transparent; color: var(--ink);
-  border: 1.5px solid var(--ink); box-shadow: none;
-}
-.lxu .u-cta-quiet:active { box-shadow: none; background: oklch(0.235 0.014 168 / 0.05); }
 
 /* ── Step indicator ──────────────────────────────────────────────────────── */
 .lxu .u-calc-steps {
@@ -1257,68 +1035,9 @@
 .lxu .u-calc-foot { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3); }
 
 /* ── The result ──────────────────────────────────────────────────────────── */
-.lxu .u-res-hero {
-  position: relative; overflow: hidden;
-  border-radius: 22px; padding: var(--sp-8) var(--sp-6);
-  background: linear-gradient(150deg, oklch(0.72 0.05 168) 0%, oklch(0.50 0.046 168) 100%);
-  color: #fff;
-}
-.lxu .u-res-hero .ring {
-  position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.10); pointer-events: none;
-}
-.lxu .u-res-hero .ring.a { width: 190px; height: 190px; top: -54px; right: -48px; }
-.lxu .u-res-hero .ring.b { width: 150px; height: 150px; bottom: -62px; left: -34px; background: rgba(255,255,255,0.06); }
-.lxu .u-res-hero > p { position: relative; margin: 0; }
-.lxu .u-res-hero .eyebrow {
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.13em;
-  text-transform: uppercase; opacity: 0.9;
-}
-.lxu .u-res-hero .big {
-  font-size: clamp(52px, 15vw, 76px); font-weight: 700; line-height: 1;
-  letter-spacing: -0.04em; margin-top: var(--sp-3);
-  font-variant-numeric: tabular-nums;
-}
-.lxu .u-res-hero .big span { font-size: 20px; font-weight: 600; letter-spacing: 0; margin-left: 8px; opacity: 0.85; }
-.lxu .u-res-hero .desc { font-size: 13.5px; line-height: 1.55; margin-top: var(--sp-4); max-width: 34ch; opacity: 0.92; }
 
-.lxu .u-macros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.lxu .u-macro {
-  border: 1.5px solid var(--line); border-radius: 16px; background: var(--surface);
-  padding: var(--sp-4) var(--sp-2); text-align: center;
-}
-.lxu .u-macro .dot { display: block; width: 8px; height: 8px; border-radius: 50%; margin: 0 auto 10px; }
-.lxu .u-macro .dot.p { background: var(--cat-also); }
-.lxu .u-macro .dot.c { background: var(--cat-cardio); }
-.lxu .u-macro .dot.f { background: var(--cat-tartas); }
-.lxu .u-macro .lbl {
-  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px;
-}
-.lxu .u-macro .val { font-size: 26px; font-weight: 700; line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
-.lxu .u-macro .val span { font-size: 13px; font-weight: 600; margin-left: 2px; color: var(--ink-3); }
 
-.lxu .u-split {
-  display: flex; align-items: center; gap: var(--sp-5);
-  border: 1.5px solid var(--line); border-radius: 18px; background: var(--surface);
-  padding: var(--sp-5);
-}
-.lxu .u-split > div { flex: 1; text-align: center; }
-.lxu .u-split .big { font-size: 34px; font-weight: 700; line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
-.lxu .u-split .lbl { font-size: 12px; color: var(--ink-3); margin: 6px 0 0; }
-.lxu .u-split .rule { width: 1px; align-self: stretch; background: var(--line); }
 
-.lxu .u-water {
-  border-radius: 18px; padding: var(--sp-5) var(--sp-6);
-  background: linear-gradient(140deg, oklch(0.95 0.02 225) 0%, oklch(0.90 0.035 225) 100%);
-}
-.lxu .u-water .eyebrow {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.11em;
-  text-transform: uppercase; color: oklch(0.45 0.06 245); margin: 0 0 6px;
-}
-.lxu .u-water .val {
-  font-size: 30px; font-weight: 700; line-height: 1; margin: 0; color: oklch(0.36 0.07 245);
-}
-.lxu .u-water .val span { font-size: 15px; font-weight: 600; margin-left: 6px; }
 
 .lxu .u-en-note {
   font-size: 14px; line-height: 1.55; color: var(--ink-2);
@@ -1326,25 +1045,8 @@
 }
 .lxu .u-en-disclaimer { font-size: 13px; line-height: 1.6; color: var(--ink-2); margin: 0; }
 
-.lxu .u-en-workout h4 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
-.lxu .u-en-workout ol {
-  list-style: none; counter-reset: w; margin: var(--sp-4) 0 0; padding: 0; display: grid; gap: var(--sp-3);
-}
-.lxu .u-en-workout li {
-  counter-increment: w; display: grid; grid-template-columns: 26px 1fr; gap: var(--sp-3); align-items: baseline;
-}
-.lxu .u-en-workout li::before {
-  content: counter(w); grid-row: span 2; align-self: start;
-  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
-  background: var(--u-sage); color: var(--u-navy); font-family: var(--mono); font-size: 12px;
-}
-.lxu .u-en-workout li b { font-size: 15px; font-weight: 600; }
-.lxu .u-en-workout li span { grid-column: 2; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
 
 @media (max-width: 400px) {
-  .lxu .u-macros { grid-template-columns: 1fr; }
-  .lxu .u-split { flex-direction: column; gap: var(--sp-4); }
-  .lxu .u-split .rule { width: 56px; height: 1px; align-self: center; }
   .lxu .u-calc-foot { grid-template-columns: 1fr; }
 }
 
@@ -1552,4 +1254,1716 @@
     animation: u-fade-in 180ms linear both !important; animation-delay: 0ms !important;
   }
   .u-onb .u-inter-bar i { animation: none; }
+}
+
+/* ═══ The reveal ════════════════════════════════════════════════════════════
+   Rebuilt 2026-09-08 onto the SAME band system as /ujrakezdes and the homepage.
+   The root carries both scopes - `.lxl` for the bands, `.wrap` and the type
+   ramp, `.lxu` for the reveal's own atoms below.
+
+   What was here before: a 560px column with hairline rules between sections,
+   which on a desktop pinned the entire plan to the left third of the window and
+   set its headings in a tier used nowhere else. */
+
+.lxu.u-rev {
+  display: block;
+  min-height: 100svh;
+  /* `clip`, NOT `hidden`. The root carries `.lxl` too, and landing.css sets
+     `overflow-x: hidden` on it - which makes this element a scroll container and
+     silently disables `position: sticky` in every descendant, including the
+     decision rail. `clip` contains the same overflow without creating a
+     scrollport, so the rail sticks. */
+  overflow-x: clip;
+}
+
+/* The bands are centred like the landing's; the plan card and the controls
+   inside them are not, because they are content rather than a poster. */
+/* ── The reveal's aesthetic system (2026-09-08 review pass) ────────────────
+   Measured before this pass: FOUR headings at the page-title size (h1, S2, S3,
+   preview all 34px) with the guarantee band at 54px - a flat hierarchy with
+   one inversion - plus SEVEN border radii (24/22/20/16/14/12/10) and a 680px
+   artifact inside a 724px column of 724px cards.
+
+   The system now: exactly three text tiers on this page -
+     · the page title: h1, 34px, ONCE
+     · section headings: 24px/31px, every section, same anatomy
+       (mono eyebrow → heading → one lead line)
+     · body/leads as inherited
+   and exactly two radii - outer cards 20px (--r-lg), inner panels 12px - with
+   every left-column card filling the column, so the right edge is one line. */
+
+.lxu.u-rev h2.h-bold {
+  font-size: 24px;
+  line-height: 31px;
+  letter-spacing: -0.014em;
+}
+.lxu.u-rev .u-rev-main h1.h-bold { font-size: 34px; line-height: 42px; }
+
+/* Left-aligned throughout. A centred column reads as a poster; this is the last
+   page before somebody either leaves or pays, and a decision page has to be
+   scannable down one edge. Only the two full-width bands below (guarantee,
+   footer) stay centred, because they are statements rather than content. */
+.lxu.u-rev .u-rev-head { max-width: 720px; margin-inline: auto; text-align: center; }
+.lxu.u-rev .u-rev-head h1,
+.lxu.u-rev .u-rev-head h2 { margin-top: 10px; }
+.lxu.u-rev .u-rev-head .cap-body { margin-top: 14px; }
+
+/* ── Plan + decision, side by side ───────────────────────────────────────── */
+
+.lxu.u-rev .u-rev-grid { display: grid; gap: clamp(28px, 4vw, 56px); align-items: start; }
+
+@media (min-width: 1000px) {
+  /* The rail is deliberately narrow: it is a summary and one action, not a
+     second page. 1.6fr keeps the plan the subject. */
+  .lxu.u-rev .u-rev-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 340px); }
+}
+
+.lxu.u-rev .u-rev-main { min-width: 0; text-align: left; }
+.lxu.u-rev .u-rev-main h1 { margin-top: 10px; }
+.lxu.u-rev .u-rev-main .cap-body { margin-top: 14px; text-align: left; margin-inline: 0; }
+
+/* The blocks down the main column. A rule rather than a gap: at this length the
+   reader needs to see where one thing ends and the next begins. */
+.lxu.u-rev .u-block {
+  margin-top: clamp(36px, 4vw, 56px);
+  padding-top: clamp(28px, 3vw, 40px);
+  border-top: 1px solid oklch(from var(--ink) l c h / 0.1);
+}
+.lxu.u-rev .u-block h2 { margin-top: 10px; }
+
+/* ── The decision rail ───────────────────────────────────────────────────── */
+
+/* `align-self: stretch` is load-bearing. The grid is `align-items: start`, which
+   shrank this column to exactly the card's own height - and a sticky element can
+   only travel inside its PARENT's box, so it stuck for 0px and simply scrolled
+   away. Stretching the column to the row's full height is what gives it a track
+   to stick along. */
+.lxu.u-rev .u-rail { min-width: 0; align-self: stretch; }
+
+@media (min-width: 1000px) {
+  /* Sticky, so the offer is on screen from the first line of the plan to the
+     last card of the programme - instead of waiting ~4,600px down the page. */
+  .lxu.u-rev .u-rail-in { position: sticky; top: 24px; }
+}
+
+.lxu.u-rev .u-rail-in {
+  background: #fff;
+  border-radius: var(--r-lg);
+  padding: 26px 24px;
+  box-shadow:
+    0 18px 40px -22px oklch(0 0 168 / 0.42),
+    0 0 0 1px oklch(0 0 168 / 0.07);
+  text-align: left;
+}
+.lxu.u-rev .u-rail-h {
+  font-size: 20px;
+  line-height: 27px;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  margin: 10px 0 0;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.lxu.u-rev .u-rail-lead {
+  font-size: 14.5px;
+  line-height: 24px;
+  color: var(--tx-2);
+  margin: 10px 0 0;
+}
+.lxu.u-rev .u-rail-price {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 13.5px;
+  color: var(--tx-2);
+}
+.lxu.u-rev .u-rail-price b {
+  /* Mono for the number, like a receipt - and NOT larger than the includes
+     list's type: the value stack outweighs the price visually (04, law 14). */
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.lxu.u-rev .u-rail-sub {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tx-3);
+  margin: 20px 0 10px;
+}
+.lxu.u-rev .u-rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+}
+.lxu.u-rev .u-rail-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--tx-2);
+}
+.lxu.u-rev .u-rail-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 9px;
+  height: 2px;
+  background: var(--accent-2);
+}
+.lxu.u-rev .u-rail-guar {
+  margin: 18px 0 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--panel);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink);
+}
+.lxu.u-rev .u-rail-cta { width: 100%; margin: 18px 0 10px; }
+.lxu.u-rev .u-rail-out {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid oklch(from var(--ink) l c h / 0.08);
+  font-size: 12.5px;
+  line-height: 19px;
+  color: var(--tx-3);
+}
+
+/* ── The mobile decision bar ─────────────────────────────────────────────── */
+
+.lxu.u-rev .u-revbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 40;
+  display: flex;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: oklch(from var(--cream) l c h / 0.88);
+  backdrop-filter: blur(18px) saturate(180%);
+  border-top: 1px solid oklch(from var(--ink) l c h / 0.1);
+}
+.lxu.u-rev .u-revbar { align-items: center; gap: var(--sp-4); }
+.lxu.u-rev .u-revbar-price { flex: none; display: grid; line-height: 1.25; }
+.lxu.u-rev .u-revbar-price b {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.lxu.u-rev .u-revbar-price i {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.lxu.u-rev .u-revbar .pill { flex: 1; min-width: 0; }
+
+@media (min-width: 1000px) {
+  /* The rail is on screen; a docked bar would be the same ask twice. */
+  .lxu.u-rev .u-revbar { display: none; }
+}
+@media (max-width: 999.98px) {
+  /* Room so the last band is never under the bar. */
+  .lxu.u-rev { padding-bottom: 84px; }
+  /* On one column the rail is a normal card, placed right after the plan - the
+     offer should not be at the bottom of a 4,000px page on a phone either. */
+  .lxu.u-rev .u-rev-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .lxu.u-rev .u-revbar { background: var(--cream); backdrop-filter: none; }
+}
+
+/* Anchor targets clear the docked bar and give the band room to breathe. */
+.lxu.u-rev #arak { scroll-margin-top: 16px; }
+
+/* ── The plan card ───────────────────────────────────────────────────────── */
+
+.lxu.u-rev .u-plancard {
+  margin: 34px auto 0;
+  max-width: none;
+  text-align: left;
+  background: #fff;
+  border-radius: var(--r-lg);
+  padding: clamp(18px, 2.4vw, 26px);
+  box-shadow:
+    0 18px 40px -22px oklch(0 0 168 / 0.42),
+    0 0 0 1px oklch(0 0 168 / 0.07);
+}
+
+.lxu .u-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+/* ── S1 · the artifact's chrome and choreography ─────────────────────────
+   The card assembles in four stages - chips → days → numbers → footnotes -
+   all inside ~1.2s, ending visibly COMPLETE (the IKEA effect only fires on a
+   finished build; docs/reveal-redesign/01 §1). The stagger is the house
+   80-120ms band; every stage is critically damped, nothing overshoots.
+
+   Stage clock: chips land 100-400ms · days draw 380-1,160ms · stats 820ms ·
+   first workout 900ms · numbers 980ms · footnotes 1,080ms. */
+
+.lxu.u-rev .u-art { max-width: none; padding: clamp(24px, 3vw, 32px); }
+/* The week is the artifact's payload, so inside the card it gets more air and
+   taller cells than the compact grid the page used before - the acceptance
+   criterion (05 §S1) is that the artifact outweighs the commitment block in
+   its WEAKEST state, with no calculator and no care notes. */
+.lxu.u-rev .u-art .u-grid { gap: 8px; }
+.lxu.u-rev .u-art .u-day { padding: 20px 4px 18px; border-radius: 12px; }
+
+.lxu .u-art-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-4);
+  margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--line);
+}
+.lxu .u-art-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0;
+}
+.lxu .u-art-meta {
+  /* The document's issue line - mono, like the numbers on a ticket. */
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  margin: 4px 0 0;
+}
+
+.lxu .u-art-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+}
+.lxu .u-art-chips li {
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  animation: u-chip-in 360ms var(--ease-settle) both;
+  animation-delay: calc(var(--i) * 45ms + 100ms);
+}
+@keyframes u-chip-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.lxu .u-art-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: var(--sp-4) 0 0;
+  animation: u-stage-in 420ms var(--ease-settle) both;
+  animation-delay: 820ms;
+}
+.lxu .u-art-stats > div {
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+}
+.lxu .u-art-stats dt {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.lxu .u-art-stats dd {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--ink-3);
+}
+
+.lxu .u-art-first {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  animation: u-stage-in 420ms var(--ease-settle) both;
+  animation-delay: 900ms;
+}
+.lxu .u-art-first-l {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.lxu .u-art-first-t {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+}
+.lxu .u-art-first-m {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin: 3px 0 0;
+}
+
+.lxu .u-art .u-nums {
+  animation: u-stage-in 420ms var(--ease-settle) both;
+  animation-delay: 980ms;
+}
+.lxu .u-art-foot {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px dashed var(--line);
+  animation: u-stage-in 420ms var(--ease-settle) both;
+  animation-delay: 1080ms;
+}
+@keyframes u-stage-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The ORDER survives, the motion does not: same stages, opacity-only,
+     compressed delays (docs/reveal-redesign/04, law 9). */
+  .lxu .u-art-chips li,
+  .lxu .u-art .u-day,
+  .lxu .u-art-stats,
+  .lxu .u-art-first,
+  .lxu .u-art .u-nums,
+  .lxu .u-art-foot {
+    animation: u-fade-in 180ms linear both !important;
+    transform: none !important;
+  }
+  .lxu .u-art-chips li { animation-delay: 0ms !important; }
+  .lxu .u-art .u-day { animation-delay: 120ms !important; }
+  .lxu .u-art-stats { animation-delay: 200ms !important; }
+  .lxu .u-art-first { animation-delay: 240ms !important; }
+  .lxu .u-art .u-nums { animation-delay: 280ms !important; }
+  .lxu .u-art-foot { animation-delay: 300ms !important; }
+}
+
+.lxu .u-day {
+  border-radius: 12px;
+  padding: 14px 4px 12px;
+  text-align: center;
+  background: var(--surface-2);
+  animation: u-day-in 420ms var(--ease-settle) both;
+  /* Stage 2: starts as the chips finish. */
+  animation-delay: calc(var(--i) * 60ms + 380ms);
+}
+.lxu .u-day.train { background: var(--u-navy); color: var(--u-cream); }
+.lxu .u-day.rest { background: var(--surface-2); }
+.lxu .u-dayname {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+.lxu .u-daymin {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-top: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.lxu .u-day.rest .u-daymin { color: var(--ink-3); font-weight: 500; }
+
+@keyframes u-day-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.lxu.u-rev .u-carelist {
+  max-width: 620px;
+  margin: 22px auto 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+.lxu.u-rev .u-carelist li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 14.5px;
+  line-height: 24px;
+  color: var(--tx-2, var(--ink-2));
+}
+.lxu.u-rev .u-carelist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 12px;
+  height: 2px;
+  background: var(--accent-2);
+}
+
+/* ── The start-day control ───────────────────────────────────────────────── */
+
+.lxu.u-rev .u-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  /* Left, like everything else - centred pills under left-aligned copy were a
+     leftover of the centred layout this page moved away from. */
+  justify-content: flex-start;
+  margin: 26px 0 18px;
+}
+/* `.pill` supplies the shape, the type and the press feedback - the same
+   control the rest of the product uses. Only the selected state is new. */
+.lxu.u-rev .u-dayb { min-width: 74px; }
+.lxu.u-rev .u-dayb.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.lxu.u-rev .u-starthint {
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+
+/* ── The guarantee band ──────────────────────────────────────────────────── */
+
+/* The mechanics carry the box - they ARE the guarantee; the frame and the
+   miss-path read as plain prose under it. */
+.lxu.u-rev .u-guar-mech {
+  max-width: 620px;
+  margin-inline: auto;
+  padding: 20px 22px;
+  border-radius: 12px;
+  background: oklch(1 0 0 / 0.07);
+  border: 1px solid oklch(1 0 0 / 0.12);
+  text-align: left;
+}
+.lxu.u-rev .u-guar-mech b { color: var(--tx-d1); }
+.lxu.u-rev .u-guar-frame {
+  font-weight: 500;
+  color: var(--tx-d1);
+}
+.lxu.u-rev .u-guar-sign {
+  margin: 22px 0 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--tx-d3);
+}
+.lxu.u-rev .u-guar-sign b { color: var(--tx-d1); font-weight: 600; }
+.lxu.u-rev .u-fine-d { color: var(--tx-d4); }
+
+/* ── Fine print ──────────────────────────────────────────────────────────── */
+
+.lxu.u-rev .u-fine {
+  font-size: 13px;
+  line-height: 21px;
+  color: var(--tx-3, var(--ink-3));
+  margin: 0;
+}
+
+/* ═══ Accessibility ═════════════════════════════════════════════════════════ */
+
+/* Reduced motion is not "no feedback" - it is a gentler, non-vestibular
+   equivalent. Movement goes; the opacity and colour changes that carry meaning
+   stay, so a commit is still visibly a commit. */
+@media (prefers-reduced-motion: reduce) {
+  .lxu .u-anim-fwd,
+  .lxu .u-anim-back,
+  .lxu .u-opts .u-opt,
+  .lxu .u-day,
+  .lxu .u-inter p {
+    animation: u-fade-in 180ms linear both !important;
+    animation-delay: 0ms !important;
+  }
+  .lxu .u-inter-bar i { animation: none; transform: scaleX(1); }
+  .lxu .u-opt.picked { animation: none; }
+  .lxu *, .lxu *::before, .lxu *::after { transition-duration: 120ms !important; }
+  .lxu .u-cta:active, .lxu .u-opt:active { transform: none; opacity: 0.82; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lxu .u-top { background: var(--u-cream); backdrop-filter: none; }
+}
+
+@media (prefers-contrast: more) {
+  .lxu .u-opt { border-color: var(--ink-2); }
+  .lxu .u-input { border-color: var(--ink-2); }
+}
+
+/* ═══ Desktop ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 720px) {
+  .lxu .u-cta { width: auto; min-width: 300px; margin: 0 auto; }
+}
+
+/* ═══ Energy module ═════════════════════════════════════════════════════════ */
+/* Quiet by construction. It sits below the plan and above the offer, and must
+   not compete with either - so it is a bordered panel rather than a filled one,
+   and its CTA is outlined rather than solid. */
+
+.lxu .u-energy-teaser,
+.lxu .u-energy-teaser h3,
+.lxu .u-en-micro { font-size: 13px; line-height: 1.5; color: var(--ink-3); margin: var(--sp-2) 0 0; }
+
+
+
+/* Segmented control - one row, equal columns, the selected cell filled. */
+.lxu .u-seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6px;
+  margin-top: var(--sp-2);
+}
+.lxu .u-seg-b {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px 6px;
+  font-family: var(--font);
+  font-size: 14.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-settle), color 160ms var(--ease-settle),
+              border-color 160ms var(--ease-settle), transform 110ms var(--ease-settle);
+}
+.lxu .u-seg-b:active { transform: scale(0.97); }
+.lxu .u-seg-b:focus-visible { outline: 2px solid var(--u-sage); outline-offset: 2px; }
+.lxu .u-seg-b.on { background: var(--u-navy); border-color: var(--u-navy); color: var(--u-cream); }
+
+/* The spinners add nothing on a numeric keypad and crowd a 3-up row. */
+.lxu .u-en-num input::-webkit-outer-spin-button,
+
+/* The headline figure. One number, unmistakably the answer. */
+
+
+.lxu .u-en-note {
+  font-size: 14px; line-height: 1.55; color: var(--ink-2);
+  background: var(--accent-soft); border-radius: 12px;
+  padding: var(--sp-4); margin: 0 0 var(--sp-5);
+}
+/* The honesty line is a feature, not fine print to bury - so it is readable
+   body text, not a 10px grey footnote. */
+.lxu .u-en-disclaimer {
+  font-size: 13.5px; line-height: 1.6; color: var(--ink-2);
+  margin: 0 0 var(--sp-5);
+}
+
+@media (max-width: 380px) {
+  .lxu .u-seg { font-size: 13px; }
+}
+
+/* The workout half of the calculator. Numbered, because it is an order to
+   start in, not a menu. */
+
+/* ═══ The tray ══════════════════════════════════════════════════════════════ */
+/* The plan assembling itself while the questions run. This is the funnel's one
+   theatrical moment, and everything around it stays quiet so it can land. */
+
+.lxu .u-tray {
+  max-width: var(--u-max);
+  margin: var(--sp-3) auto 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.lxu .u-tray-chips {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.lxu .u-tchip {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: oklch(0.235 0.014 168 / 0.06);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+/* Only the newest chip animates. Replaying the whole row on every answer makes
+   the tray flicker instead of accumulate, which is the opposite of the point. */
+.lxu .u-tchip.land {
+  animation: u-chip-land 420ms var(--ease-pop) both;
+  background: var(--u-sage);
+  color: var(--u-navy);
+}
+@keyframes u-chip-land {
+  0%   { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.9); }
+  60%  { opacity: 1; transform: translate3d(0, 0, 0) scale(1.04); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* The week, in miniature. Appears only once `days` is answered - before that it
+   would be decoration pretending to be information. */
+.lxu .u-tray-week {
+  list-style: none; margin: 2px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  max-width: 260px;
+}
+.lxu .u-tray-week li {
+  height: 22px;
+  border-radius: 6px;
+  background: oklch(0.235 0.014 168 / 0.06);
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  display: grid; place-items: center;
+  transition: background-color 320ms var(--ease-settle), color 320ms var(--ease-settle);
+}
+.lxu .u-tray-week li.on { background: var(--u-navy); color: var(--u-cream); }
+
+/* ═══ The programme on the reveal ═══════════════════════════════════════════ */
+
+.lxu .u-prog { margin: var(--sp-10) 0 0; }
+.lxu .u-prog-h {
+  font-size: clamp(24px, 6.5vw, 30px);
+  line-height: 1.15; letter-spacing: -0.02em; font-weight: 600;
+  margin: 0 0 var(--sp-3);
+}
+.lxu .u-prog-lead {
+  font-size: 15.5px; line-height: 1.6; color: var(--ink-2);
+  margin: 0 0 var(--sp-6); text-wrap: pretty;
+}
+
+.lxu .u-prog-phase { margin: 0 0 var(--sp-8); }
+.lxu .u-prog-phead { margin: 0 0 var(--sp-4); }
+.lxu .u-prog-phead h3 {
+  font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px;
+}
+.lxu .u-prog-phead p { font-size: 14px; line-height: 1.5; color: var(--ink-3); margin: 0; }
+
+/* One column on a phone, because these are the app's real cards and they are
+   built for a full-width row. Two from tablet up, where the reveal has room. */
+.lxu .u-prog-grid { display: grid; gap: var(--sp-4); }
+@media (min-width: 640px) {
+  .lxu .u-prog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.lxu .u-prog-foot {
+  font-size: 13.5px; line-height: 1.6; color: var(--ink-3);
+  margin: 0; padding-top: var(--sp-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxu .u-tchip.land { animation: u-fade-in 180ms linear both; }
+}
+
+/* The card grid carries `.lx` so the app's card styles apply; that class also
+   paints the app background, which would tile a second surface over the cream. */
+.lxu .u-prog-grid.lx { background: transparent; }
+/* No account exists on this surface, so the save control has nothing to save
+   to. Hidden rather than wired to a no-op, which would be a dead affordance. */
+.lxu .u-prog-grid .wc-save { display: none; }
+
+/* ===== Inside the /register shell ==========================================
+   The quiz now renders in the join wizard's split-screen (.authx/.fnl-*), so
+   the chrome, the option rows and the photography all come from there. Only the
+   pieces that are ours - the tray, the interstitial, the gate fields - need
+   styling, and they are written to sit INSIDE that language rather than beside
+   it. */
+
+/* The tray, inside the question sheet. Quieter here than it was standing alone:
+   the photograph is now carrying the visual weight, so the chips only have to
+   be legible, not loud. */
+.u-onb .u-tray { margin: var(--sp-5) 0 0; display: grid; gap: var(--sp-2); }
+.u-onb .u-tray-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.u-onb .u-tchip {
+  padding: 4px 10px; border-radius: 999px;
+  background: oklch(0.235 0.014 168 / 0.07);
+  color: var(--ink-2); font-size: 12px; font-weight: 500; line-height: 1.35;
+}
+.u-onb .u-tchip.land {
+  animation: u-chip-land 420ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  background: var(--accent); color: var(--ink);
+}
+.u-onb .u-tray-week {
+  list-style: none; margin: 2px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 250px;
+}
+.u-onb .u-tray-week li {
+  height: 20px; border-radius: 6px;
+  background: oklch(0.235 0.014 168 / 0.07); color: var(--ink-3);
+  font-family: var(--mono); font-size: 9px; display: grid; place-items: center;
+}
+.u-onb .u-tray-week li.on { background: var(--ink); color: var(--surface); }
+
+/* A single-select step has no button to press, so the foot says what to do
+   instead of standing empty - an empty action bar reads as a broken screen. */
+.u-onb .u-cta-hint {
+  display: block; text-align: center;
+  font-size: 13.5px; color: var(--ink-3); padding: 4px 0;
+}
+
+
+/* The gate's own fields, matched to the wizard's field metrics. */
+.u-onb .u-label {
+  display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); margin: 0 0 6px;
+}
+.u-onb .u-input {
+  width: 100%; box-sizing: border-box;
+  border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface);
+  font-family: var(--font); font-size: 16.5px; padding: 15px 16px; color: var(--ink);
+}
+.u-onb .u-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px oklch(0.660 0.042 168 / 0.18); }
+.u-onb .u-consent {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13.5px; line-height: 1.5; color: var(--ink-2);
+  cursor: pointer; padding: var(--sp-4) 0 0;
+}
+.u-onb .u-consent input { margin: 1px 0 0; width: 19px; height: 19px; flex: 0 0 auto; accent-color: var(--ink); }
+.u-onb .u-err { font-size: 13px; color: var(--danger); margin: 8px 0 0; }
+.u-onb .u-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .u-onb .u-tchip.land,
+  .u-onb .u-inter-line { animation: u-fade-in 180ms linear both; }
+  .u-onb .u-inter-bar i { animation: none; }
+}
+
+/* The screen-reader sentence in the tray. `.u-sr-only` is defined under `.lxu`,
+   and inside the wizard shell the root is `.u-onb` - so without this the tray
+   printed its own alt text on the page. */
+.u-onb .u-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* Quantity answers get the number as their tile rather than a stand-in icon. */
+.u-onb .u-numtile {
+  display: grid; place-items: center;
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--accent-soft); color: var(--accent-ink);
+  font-family: var(--mono); font-size: 13px; font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Under 768px the wizard's sheet becomes dark glass over the step photo, so the
+   tray has to invert with it - the light chips measured as barely legible there.
+   Matching the breakpoint onbv2.css uses rather than inventing a second one. */
+@media (max-width: 767.98px) {
+  /* The mobile sheet is deliberately tight, and the tray must not win space
+     from the question it is meant to accompany. So: ONE line that scrolls
+     sideways, and no week strip - the week gets its full moment on the reveal,
+     where there is room for it. Two wrapped rows plus a 7-cell grid pushed the
+     strip under the action bar and clipped it. */
+  .u-onb .u-tray { margin-top: var(--sp-4); }
+  .u-onb .u-tray-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    /* The row runs to the sheet's edge rather than stopping at the padding, so
+       a scrolled chip is visibly cut off - the affordance that says "more". */
+    margin: 0 -20px; padding-left: 20px; padding-right: 20px;
+  }
+  .u-onb .u-tray-chips::-webkit-scrollbar { display: none; }
+  .u-onb .u-tchip { flex: 0 0 auto; }
+  .u-onb .u-tray-week { display: none; }
+  .u-onb .u-tchip {
+    background: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .u-onb .u-tchip.land { background: var(--accent); color: #101613; }
+  .u-onb .u-tray-week li {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .u-onb .u-tray-week li.on { background: rgba(255, 255, 255, 0.92); color: #101613; }
+  .u-onb .u-cta-hint { color: rgba(255, 255, 255, 0.66); }
+  .u-onb .u-inter-line { color: #f0f4f3; }
+  .u-onb .u-label { color: rgba(255, 255, 255, 0.78); }
+  .u-onb .u-consent { color: rgba(255, 255, 255, 0.78); }
+  .u-onb .u-input {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #f0f4f3;
+  }
+  .u-onb .u-input::placeholder { color: rgba(255, 255, 255, 0.45); }
+}
+
+/* The reveal container takes focus programmatically so the screen change is
+   announced. Keyboard users still get a ring (:focus-visible); a mouse user
+   should not see one drawn around the whole page. */
+.lxu .u-stage:focus:not(:focus-visible) { outline: none; }
+
+/* ═══ The calculator ════════════════════════════════════════════════════════
+   Ported from szavazzmagadra's own calculator: a three-step flow with numbered
+   section cards and a result built around one very large number. Its shape is
+   the point - a form plus a table would compute the same values and feel like
+   a spreadsheet. Palette is LEXFIT's sage/navy rather than the source's pink. */
+
+.lxu .u-energy-teaser,
+.lxu .u-calc {
+  margin: var(--sp-8) 0 0;
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+.lxu .u-energy-teaser h3,
+.lxu .u-calc-h {
+  font-size: 19px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 var(--sp-3);
+}
+
+
+/* ── Step indicator ──────────────────────────────────────────────────────── */
+.lxu .u-calc-steps {
+  list-style: none; margin: 0 0 var(--sp-6); padding: 0;
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--sp-2);
+  text-align: center;
+}
+.lxu .u-calc-steps li {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.lxu .u-calc-steps .dot {
+  display: block; width: 8px; height: 8px; margin: 0 auto var(--sp-2);
+  border-radius: 50%; background: var(--line);
+  transition: background-color 260ms var(--ease-settle), transform 260ms var(--ease-settle);
+}
+.lxu .u-calc-steps li.done .dot { background: var(--u-sage); }
+.lxu .u-calc-steps li.on { color: var(--ink); }
+.lxu .u-calc-steps li.on .dot { background: var(--u-navy); transform: scale(1.3); }
+
+.lxu .u-calc-body { display: grid; gap: var(--sp-5); }
+
+/* ── Numbered section cards ──────────────────────────────────────────────── */
+.lxu .u-calc-card {
+  border: 1px solid var(--line); border-radius: 18px;
+  background: var(--u-cream); padding: var(--sp-5);
+}
+.lxu .u-calc-card h4 {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15.5px; font-weight: 700; margin: 0 0 var(--sp-4); letter-spacing: -0.01em;
+}
+.lxu .u-calc-card h4 .n {
+  display: grid; place-items: center; flex: 0 0 auto;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--u-sage); color: var(--u-navy);
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+}
+
+.lxu .u-flabel {
+  display: block; font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);
+  margin: 0 0 6px;
+}
+.lxu .u-fhint { font-size: 12.5px; line-height: 1.5; color: var(--ink-3); margin: var(--sp-2) 0 0; }
+
+.lxu .u-seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px;
+}
+.lxu .u-seg-b {
+  appearance: none; border: 1.5px solid var(--line); background: var(--surface);
+  border-radius: 12px; padding: 13px 8px;
+  font-family: var(--font); font-size: 14.5px; color: var(--ink-2); cursor: pointer;
+  transition: border-color 160ms var(--ease-settle), background-color 160ms var(--ease-settle),
+              color 160ms var(--ease-settle), transform 110ms var(--ease-settle);
+}
+.lxu .u-seg-b:active { transform: scale(0.97); }
+.lxu .u-seg-b.on { border-color: var(--u-navy); background: var(--u-navy); color: var(--u-cream); }
+
+.lxu .u-calc-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); margin-top: var(--sp-4); }
+.lxu .u-calc-num .u-input { padding: 13px 10px; text-align: center; }
+.lxu .u-calc-num input::-webkit-outer-spin-button,
+.lxu .u-calc-num input::-webkit-inner-spin-button { appearance: none; margin: 0; }
+.lxu .u-calc-num input[type="number"] { -moz-appearance: textfield; }
+.lxu .u-calc .u-input {
+  width: 100%; box-sizing: border-box;
+  border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface);
+  font-family: var(--font); font-size: 16.5px; color: var(--ink);
+}
+.lxu .u-calc .u-input:focus { outline: none; border-color: var(--u-sage); box-shadow: 0 0 0 4px oklch(0.660 0.042 168 / 0.18); }
+
+.lxu .u-goals { display: grid; gap: 8px; }
+.lxu .u-goal {
+  appearance: none; text-align: left;
+  border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px;
+  padding: 14px 16px; font-family: var(--font); font-size: 15.5px; color: var(--ink);
+  cursor: pointer; transition: border-color 160ms var(--ease-settle), background-color 160ms var(--ease-settle);
+}
+.lxu .u-goal.on { border-color: var(--u-navy); background: var(--u-navy); color: var(--u-cream); }
+
+/* ── Tempo ───────────────────────────────────────────────────────────────── */
+.lxu .u-calc-head { text-align: center; }
+.lxu .u-calc-tag {
+  display: inline-block; padding: 5px 14px; border-radius: 999px;
+  background: var(--u-sage); color: var(--u-navy);
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.lxu .u-calc-head h4 {
+  font-size: clamp(21px, 5.5vw, 27px); font-weight: 600; letter-spacing: -0.02em;
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+.lxu .u-calc-head p { font-size: 14px; line-height: 1.55; color: var(--ink-3); margin: 0; }
+
+.lxu .u-tempos { display: grid; gap: 10px; }
+.lxu .u-tempo {
+  appearance: none; display: grid; gap: 4px; text-align: left;
+  border: 2px solid var(--line); background: var(--surface); border-radius: 14px;
+  padding: 14px 16px; font-family: var(--font); color: var(--ink); cursor: pointer;
+  transition: border-color 160ms var(--ease-settle), background-color 160ms var(--ease-settle);
+}
+.lxu .u-tempo.on { border-color: var(--u-sage); background: var(--accent-soft); }
+.lxu .u-tempo .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lxu .u-tempo b { font-size: 15px; font-weight: 700; }
+.lxu .u-tempo em {
+  font-style: normal; font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--u-navy); color: var(--u-cream);
+  padding: 3px 8px; border-radius: 999px;
+}
+.lxu .u-tempo .korr {
+  margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--accent-ink); font-weight: 600;
+}
+.lxu .u-tempo .desc { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.lxu .u-tempo .rate { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+.lxu .u-calc-foot { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3); }
+
+/* ── The result ──────────────────────────────────────────────────────────── */
+
+
+
+
+.lxu .u-en-note {
+  font-size: 14px; line-height: 1.55; color: var(--ink-2);
+  background: var(--accent-soft); border-radius: 14px; padding: var(--sp-4); margin: 0;
+}
+.lxu .u-en-disclaimer { font-size: 13px; line-height: 1.6; color: var(--ink-2); margin: 0; }
+
+
+@media (max-width: 400px) {
+  .lxu .u-calc-foot { grid-template-columns: 1fr; }
+}
+
+/* The skip under the calculator's first step. Quiet, but a real target - the
+   Art. 9 consent is only valid if declining is as available as agreeing. */
+.u-onb .fnl-skip {
+  display: block; width: 100%; margin-top: 10px;
+  background: none; border: 0; cursor: pointer;
+  font-family: var(--font); font-size: 14px; color: var(--ink-3);
+  padding: 10px; border-radius: 12px;
+}
+.u-onb .fnl-skip:hover { color: var(--ink); }
+.u-onb .fnl-skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 767.98px) {
+  .u-onb .fnl-skip { color: rgba(255, 255, 255, 0.7); }
+  .u-onb .fnl-skip:hover { color: #fff; }
+}
+
+/* The calculator's fields inside the wizard sheet. */
+.u-onb .u-flabel {
+  display: block; font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px;
+}
+.u-onb .u-fhint { font-size: 12.5px; line-height: 1.5; color: var(--ink-3); margin: var(--sp-2) 0 0; }
+.u-onb .u-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+.u-onb .u-seg-b {
+  appearance: none; border: 1.5px solid var(--line); background: var(--surface);
+  border-radius: 12px; padding: 13px 8px;
+  font-family: var(--font); font-size: 14.5px; color: var(--ink-2); cursor: pointer;
+}
+.u-onb .u-seg-b.on { border-color: var(--ink); background: var(--ink); color: var(--surface); }
+.u-onb .u-calc-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: var(--sp-4); }
+.u-onb .u-calc-num .u-input { padding: 13px 10px; text-align: center; }
+.u-onb .u-calc-num input::-webkit-outer-spin-button,
+.u-onb .u-calc-num input::-webkit-inner-spin-button { appearance: none; margin: 0; }
+.u-onb .u-calc-num input[type="number"] { -moz-appearance: textfield; }
+
+.u-onb .u-tempos { display: grid; gap: 10px; }
+.u-onb .u-tempo {
+  appearance: none; display: grid; gap: 4px; text-align: left;
+  border: 2px solid var(--line); background: var(--surface); border-radius: 14px;
+  padding: 13px 15px; font-family: var(--font); color: var(--ink); cursor: pointer;
+}
+.u-onb .u-tempo.on { border-color: var(--accent); background: var(--accent-soft); }
+.u-onb .u-tempo .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.u-onb .u-tempo b { font-size: 15px; font-weight: 700; }
+.u-onb .u-tempo em {
+  font-style: normal; font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--ink); color: var(--surface); padding: 3px 8px; border-radius: 999px;
+}
+.u-onb .u-tempo .korr { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--accent-ink); font-weight: 600; }
+.u-onb .u-tempo .desc { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.u-onb .u-tempo .rate { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+@media (max-width: 767.98px) {
+  .u-onb .u-flabel, .u-onb .u-fhint { color: rgba(255, 255, 255, 0.66); }
+  /* .fnl-helper is coloured for the LIGHT desktop panel (#5c6e66) and never
+     inverted for the dark sheet, where it measures ~3.0:1 - under the 4.5:1 AA
+     floor. Scoped to this funnel; /register renders the same class on the same
+     sheet and has the same problem, but that is its own call to make. */
+  .u-onb .fnl-helper { color: rgba(255, 255, 255, 0.72); }
+  .u-onb .u-seg-b {
+    background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .u-onb .u-seg-b.on { background: #fff; border-color: #fff; color: #101613; }
+  .u-onb .u-tempo {
+    background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.92);
+  }
+  .u-onb .u-tempo.on { border-color: var(--accent); background: rgba(255, 255, 255, 0.12); }
+  .u-onb .u-tempo .desc { color: rgba(255, 255, 255, 0.72); }
+  .u-onb .u-tempo .rate { color: rgba(255, 255, 255, 0.55); }
+  .u-onb .u-tempo em { background: #fff; color: #101613; }
+  .u-onb .u-tempo .korr { color: var(--accent); }
+}
+
+/* ═══ Section labels ════════════════════════════════════════════════════════
+   Every section named, always, aligned under its own bar segment. The current
+   one is lifted by weight and opacity rather than by being the only one there:
+   knowing what is still coming is most of what a progress indicator is for. */
+
+/* The row inherits .fnl-top's padding and gap; only its vertical box is
+   collapsed, so the labels sit hard under the segments instead of a chrome
+   height below them. */
+.u-onb .u-secs-row {
+  height: auto;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: -4px;
+  align-items: start;
+}
+
+.u-onb .u-secs {
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--sp-1);
+}
+.u-onb .u-secs li {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+  opacity: 0.42;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 320ms var(--ease-settle), color 320ms var(--ease-settle);
+}
+.u-onb .u-secs li.done { opacity: 0.7; }
+.u-onb .u-secs li.on { opacity: 1; color: var(--ink); font-weight: 600; }
+
+/* ═══ The interstitial ══════════════════════════════════════════════════════
+   Their week, assembling. Not a loading screen: `days` is answered by this
+   point, so the beat can show something true instead of holding two sentences
+   over a photograph for two seconds. */
+
+/* This step has no action button, so the sheet does not need the band reserved
+   for one - and it was clipping the second rule during a beat nobody scrolls
+   through. Same lever onbv2 uses for the quote step. */
+.u-onb .u-inter-step .fnl-sheet { --fnl-band: var(--fnl-chrome); }
+.u-onb .u-inter-step .fnl-foot { padding-top: var(--sp-3); }
+
+.u-onb .u-inter-eyebrow {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--sp-4);
+  animation: u-fade-in 320ms var(--ease-settle) both;
+}
+
+.u-onb .u-inter-week {
+  list-style: none; margin: 0 0 var(--sp-6); padding: 0;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+}
+.u-onb .u-inter-week li {
+  border-radius: 10px;
+  min-width: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  padding: 10px 2px;
+  text-align: center;
+  /* One cell at a time, left to right - the week builds rather than appears. */
+  animation: u-drop 420ms var(--ease-settle) both;
+  animation-delay: calc(260ms + var(--i, 0) * 70ms);
+}
+.u-onb .u-inter-week li.on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.u-onb .u-inter-week .d {
+  display: block; font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.72;
+}
+.u-onb .u-inter-week .m { display: block; font-size: 9.5px; margin-top: 3px; opacity: 0.62; }
+
+.u-onb .u-inter-line {
+  font-size: clamp(17px, 4.6vw, 21px);
+  line-height: 1.35; letter-spacing: -0.012em; font-weight: 500;
+  margin: 0 0 var(--sp-3); text-wrap: balance;
+  animation: u-rise 560ms var(--ease-settle) both;
+  animation-delay: calc(900ms + var(--i, 0) * 260ms);
+}
+.u-onb .u-inter-bar {
+  display: block; width: 92px; height: 3px; margin: 0 auto;
+  border-radius: 999px; background: oklch(0.235 0.014 168 / 0.14); overflow: hidden;
+}
+.u-onb .u-inter-bar i {
+  display: block; height: 100%; width: 100%; background: var(--accent);
+  transform-origin: left center; animation: u-sweep 2000ms linear both;
+}
+
+@media (max-width: 767.98px) {
+  .u-onb .u-secs li { color: rgba(255, 255, 255, 0.72); }
+  .u-onb .u-secs li.on { color: #fff; }
+  /* This step has no action button, so the sheet does not need the band reserved
+   for one - and it was clipping the second rule during a beat nobody scrolls
+   through. Same lever onbv2 uses for the quote step. */
+.u-onb .u-inter-step .fnl-sheet { --fnl-band: var(--fnl-chrome); }
+.u-onb .u-inter-step .fnl-foot { padding-top: var(--sp-3); }
+
+.u-onb .u-inter-eyebrow { color: rgba(255, 255, 255, 0.6); }
+  .u-onb .u-inter-week li {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .u-onb .u-inter-week li.on { background: #fff; border-color: #fff; color: #101613; }
+  .u-onb .u-inter-line { color: #f0f4f3; }
+  .u-onb .u-inter-bar { background: rgba(255, 255, 255, 0.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u-onb .u-inter-week li,
+  .u-onb .u-inter-line,
+  /* This step has no action button, so the sheet does not need the band reserved
+   for one - and it was clipping the second rule during a beat nobody scrolls
+   through. Same lever onbv2 uses for the quote step. */
+.u-onb .u-inter-step .fnl-sheet { --fnl-band: var(--fnl-chrome); }
+.u-onb .u-inter-step .fnl-foot { padding-top: var(--sp-3); }
+
+.u-onb .u-inter-eyebrow {
+    animation: u-fade-in 180ms linear both !important; animation-delay: 0ms !important;
+  }
+  .u-onb .u-inter-bar i { animation: none; }
+}
+
+/* ═══ The reveal ════════════════════════════════════════════════════════════
+   Rebuilt 2026-09-08 as a SEQUENCE of sections rather than one long scroll.
+   Sequential paywalls convert 12.41% vs 9.07% for a single page across 40M+
+   opens (docs/funnel-research/02-results-page-offer.md); the page is the same
+   length, but each part is now a distinct object with its own edge.
+
+   Order, and the reason for each position:
+     1 the plan as ONE artifact - week grid and the numbers in a single card
+     2 the commitment - pick the day you start (implementation intention)
+     3 what you are joining - the opening of the programme
+     4 the guarantee, framed as a roadmap - last reassurance before the ask
+     5 the offer                                                              */
+
+.lxu.u-reveal .u-stage { padding-bottom: clamp(48px, 8vw, 80px); }
+
+
+
+/* ── 1 · The plan card ────────────────────────────────────────────────────── */
+
+.lxu .u-plancard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: clamp(16px, 2.4vw, 24px);
+  box-shadow: var(--shadow-card);
+  margin-top: var(--sp-5);
+}
+.lxu .u-plancard .u-grid { margin: 0; }
+
+/* The calorie numbers, inside the same card as the week. */
+.lxu .u-nums {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+}
+.lxu .u-nums-head { margin-bottom: var(--sp-4); }
+.lxu .u-nums-h {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--sp-1);
+  color: var(--ink);
+}
+.lxu .u-nums-why {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  margin: 0;
+}
+
+.lxu .u-nums-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+  margin: 0;
+}
+.lxu .u-nums-grid > div {
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 10px 11px;
+}
+.lxu .u-nums-grid > div.lead { background: var(--accent-soft); }
+.lxu .u-nums-grid dt {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--ink-3);
+  margin-bottom: 3px;
+}
+.lxu .u-nums-grid dd {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.lxu .u-nums-grid dd span {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  margin-left: 3px;
+  letter-spacing: 0;
+}
+
+/* ── 2 · The start-day commitment ─────────────────────────────────────────── */
+
+.lxu .u-days { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-4); }
+.lxu .u-dayb {
+  /* 48px clears the 44px accessibility floor with room for mis-taps, which
+     research puts at 60-80% fewer at this size. */
+  min-width: 60px;
+  min-height: 48px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-settle),
+    border-color var(--dur-fast) var(--ease-settle),
+    transform var(--dur-fast) var(--ease-settle);
+}
+.lxu .u-dayb:active { transform: scale(0.96); }
+.lxu .u-dayb:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.lxu .u-dayb.on {
+  background: var(--u-navy);
+  border-color: var(--u-navy);
+  color: var(--u-cream);
+}
+
+.lxu .u-starthint {
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 var(--sp-2);
+}
+
+/* ── 3 · The programme preview ────────────────────────────────────────────── */
+
+.lxu .u-prog-more {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent-2);
+  margin: var(--sp-4) 0 0;
+}
+
+/* ── 4 · The guarantee ────────────────────────────────────────────────────── */
+
+.lxu .u-guar-frame {
+  font-size: 16.5px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 var(--sp-4);
+}
+.lxu .u-guar-miss {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin: 0 0 var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+}
+
+
+/* The "you have not ticked the consent" notice on the calculator's first step.
+   Amber-free on purpose: it is not an error, and colouring it like one would
+   pressure somebody into a consent that then would not be freely given. */
+.lxu .u-consent-warn {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+  border-left: 2px solid var(--accent-2);
+}
+
+/* ═══ The plan, drawn as the email ═══════════════════════════════════════════════
+   <PlanMail> renders in TWO scopes - `.lx` (the quiz shell, as the gate's
+   background) and `.lxl` (the landing hero) - so the card's own rules use
+   `:is(.lx, .lxl)`. Only the PANEL around it is gate-specific.
+
+   The panel replaces the BrandPanel on the `gate` step only. It reuses `.authx-brand
+   .bp-img` so the shell's own geometry applies unchanged - desktop puts it in
+   the left column, mobile makes it the full-viewport layer behind the sheet -
+   and only the contents differ.
+
+   TOKENS: this block is scoped under `.lx`, so it may only use tokens declared
+   on :root in lexfit-tokens.css. `--u-navy` lives on `.lxu` and resolves to
+   nothing here - which rendered the training days and the CTA as white text on
+   a white card, i.e. invisible. Use --ink.
+
+   The card sits WHOLE above the sheet rather than bleeding under it: a preview
+   that is half-hidden makes the reader work out what they are looking at. On a
+   phone it drops its last row to stay inside that budget (see the media query
+   at the end of this block). */
+
+.lx .authx-brand.u-mailpanel {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  /* Same night ground the photo panels fall back to, so a slow frame here looks
+     like the rest of the funnel rather than like a broken panel. */
+  background: #0a0e0c;
+}
+
+:is(.lx, .lxl) .u-mailwrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 5vw, 56px);
+}
+
+:is(.lx, .lxl) .u-mail {
+  width: min(380px, 100%);
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 30px 60px -30px oklch(0 0 168 / 0.7),
+    0 0 0 1px oklch(1 0 0 / 0.06);
+  /* A hair of rotation so it reads as an object resting in the space rather
+     than a panel welded to the grid. */
+  transform: rotate(-1.2deg);
+  animation: u-mail-in 520ms var(--ease-settle) both;
+}
+
+@keyframes u-mail-in {
+  from { opacity: 0; transform: rotate(-1.2deg) translateY(14px); }
+  to   { opacity: 1; transform: rotate(-1.2deg) translateY(0); }
+}
+
+:is(.lx, .lxl) .u-mail-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid oklch(0.90 0.012 168);
+  background: oklch(0.98 0.004 168);
+}
+:is(.lx, .lxl) .u-mail-from { display: flex; align-items: center; gap: 10px; }
+:is(.lx, .lxl) .u-mail-av {
+  width: 30px; height: 30px; flex: none;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 600;
+}
+:is(.lx, .lxl) .u-mail-from b { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+:is(.lx, .lxl) .u-mail-from i {
+  display: block; font-style: normal;
+  font-size: 11.5px; color: var(--ink-3);
+}
+:is(.lx, .lxl) .u-mail-subj {
+  margin: 10px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+:is(.lx, .lxl) .u-mail-body { padding: 18px 16px 20px; }
+:is(.lx, .lxl) .u-mail-eyebrow {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--accent-2);
+}
+:is(.lx, .lxl) .u-mail-h {
+  margin: 8px 0 14px;
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+:is(.lx, .lxl) .u-mail-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+:is(.lx, .lxl) .u-mail-week li {
+  border-radius: 7px;
+  background: oklch(0.952 0.014 168);
+  padding: 8px 2px 7px;
+  text-align: center;
+}
+:is(.lx, .lxl) .u-mail-week li.on { background: var(--ink); color: #fff; }
+:is(.lx, .lxl) .u-mail-week .d { display: block; font-size: 10.5px; font-weight: 600; }
+:is(.lx, .lxl) .u-mail-week .m {
+  display: block; margin-top: 3px;
+  font-size: 9.5px; opacity: 0.72;
+  font-variant-numeric: tabular-nums;
+}
+
+:is(.lx, .lxl) .u-mail-sub {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* A picture of a button, never a button: it is inside an aria-hidden panel and
+   tapping the background must not navigate. */
+:is(.lx, .lxl) .u-mail-cta {
+  display: block;
+  margin-top: 16px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 899.98px) {
+  /* Pull the card up out of the sheet's way: the sheet covers roughly the
+     bottom half, so the mail sits high and its lower edge disappears under the
+     glass rather than being cropped short of it. */
+  /* Clears the section-label row. Those labels are set for a DARK ground, so
+     where the white card slid under them they simply disappeared - the card has
+     to start below them, not behind them. */
+  .lx .u-mailwrap { align-items: flex-start; padding-top: 72px; }
+  .lx .u-mail { width: min(300px, 84%); }
+  /* On a phone the sheet owns most of the screen and this panel is peripheral,
+     so the card carries only its core message - THIS IS AN EMAIL, AND YOUR WEEK
+     IS IN IT - and drops the rest. The full card (stats line, answer chips, the
+     mail's own button) is a desktop-only luxury, where the panel is a whole
+     column instead of the strip above a sheet.
+     Measured: the gate sheet can start as high as 54% of the viewport, which on
+     a short window leaves ~290px. Chrome + heading + week fits that; the full
+     card at ~483px never did, and was being sliced mid-sentence. */
+  .lx .u-mailpanel .u-mail-sub,
+  .lx .u-mailpanel .u-mail-answers,
+  .lx .u-mailpanel .u-mail-cta { display: none; }
+  .lx .u-mailpanel .u-mail-body { padding-bottom: 16px; }
+}
+
+/* A short phone (SE-class, ~667px) puts the sheet at roughly 360px, which the
+   card plus its 72px offset would overrun by the height of the stats row. The
+   week is the payload; the stats are the first thing that can go. */
+@media (max-width: 899.98px) and (max-height: 740px) {
+  .lx .u-mailpanel .u-mail-stats { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lx .u-mail { animation: none; }
+}
+
+/* ── The mail's stats, answers and sample tag ─────────────────────────────── */
+
+:is(.lx, .lxl) .u-mail-tag {
+  margin-left: auto;
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3, #6b7a72);
+  background: oklch(0 0 0 / 0.05);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
+:is(.lx, .lxl) .u-mail-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 12px 0 0;
+}
+:is(.lx, .lxl) .u-mail-stats > div {
+  background: oklch(0.952 0.014 168);
+  border-radius: 8px;
+  padding: 9px 8px;
+  text-align: center;
+}
+:is(.lx, .lxl) .u-mail-stats dt {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+:is(.lx, .lxl) .u-mail-stats dd {
+  margin: 3px 0 0;
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--ink-3, #6b7a72);
+}
+
+/* The answers the plan was built from, echoed the way the quiz's own tray
+   echoes them - so somebody who has not taken the quiz can still see that the
+   plan comes from what they say, not from a template. */
+:is(.lx, .lxl) .u-mail-answers {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed oklch(0 0 0 / 0.12);
+}
+:is(.lx, .lxl) .u-mail-answers-l {
+  display: block;
+  font-size: 10.5px;
+  color: var(--ink-3, #6b7a72);
+  margin-bottom: 7px;
+}
+:is(.lx, .lxl) .u-mail-answers ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+:is(.lx, .lxl) .u-mail-answers li {
+  font-size: 10.5px;
+  line-height: 1;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: oklch(0.952 0.014 168);
+  color: var(--ink-2, #4a5a52);
+}
+
+/* ── The reveal's week, workout by workout ────────────────────────────────
+   The plan card says WHEN; this says WHAT. It uses the app's own WorkoutCard,
+   so the row is styled by workout-card.css - everything here is the frame
+   around it: the weekday, the first-day emphasis and the exercise list. */
+
+.lxu .u-week { margin-top: var(--sp-5); }
+
+.lxu .u-wdays {
+  list-style: none;
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-5);
+}
+
+.lxu .u-wday-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.lxu .u-wday-day {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  /* Capitalized in JS (first character only) - text-transform: capitalize
+     would title-case every word and turn „Jövő hétfő" into „Jövő Hétfő". */
+}
+.lxu .u-wday-tag {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+
+/* The first day is the one being decided about, so it gets a ground and a rule
+   the other days do not. The rest stay plain cards - emphasis on everything is
+   emphasis on nothing. */
+.lxu .u-wday.first {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-card);
+}
+.lxu .u-wday.first .u-wday-head { margin-bottom: var(--sp-3); }
+
+.lxu .u-wex {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+}
+.lxu .u-wex-lead {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin: 0 0 var(--sp-3);
+}
+.lxu .u-wex ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+.lxu .u-wex li { display: grid; gap: 3px; }
+.lxu .u-wex b {
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.lxu .u-wex span {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+@media (min-width: 760px) {
+  /* Days two and three sit side by side; the first keeps the full width because
+     it carries the exercise list. A 2-day plan has only ONE follow-up card -
+     alone in a two-column grid it rendered as a half-width orphan, so a lone
+     second card spans too. */
+  .lxu .u-wdays { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lxu .u-wday.first { grid-column: 1 / -1; }
+  .lxu .u-wday:nth-child(2):last-child { grid-column: 1 / -1; }
 }

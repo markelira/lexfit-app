@@ -21,9 +21,12 @@ import * as C from "../copy";
 // button enters the funnel instead of starting playback.
 
 export default function ProgramPreview({
-  catalog, onCta,
+  catalog, onCta, skip = 0,
 }: {
   catalog: LandingCatalog;
+  /** Workouts already shown by <WeekWorkouts> above. Skipping them is what
+   *  stops the reveal listing the same three cards twice. */
+  skip?: number;
   /** Taking a workout is intent, so the card CTA enters the funnel. */
   onCta: () => void;
 }) {
@@ -72,6 +75,29 @@ export default function ProgramPreview({
   const total = phases.reduce((n, p) => n + p.items.length, 0);
   if (!total) return null;                    // degraded catalogue - show nothing rather than an empty shell
 
+  // Owner decision 2026-09-08: preview the OPENING of the programme, not all of
+  // it. The reveal is already long, the first workouts are the ones that answer
+  // „mivel kezdem", and the running numbers stay honest because `programTotal`
+  // still carries the real count - card 3 of 30 says 3/30, not 3/6.
+  const PREVIEW_N = 6;
+  const shown: typeof phases = [];
+  let drop = skip;                            // workouts the week section showed
+  let left = PREVIEW_N;
+  for (const ph of phases) {
+    if (left <= 0) break;
+    const items = ph.items.slice(drop);
+    drop = Math.max(0, drop - ph.items.length);
+    if (!items.length) continue;
+    shown.push({ ...ph, items: items.slice(0, left) });
+    left -= Math.min(left, items.length);
+  }
+  const shownCount = shown.reduce((n, p) => n + p.items.length, 0);
+  const hidden = Math.max(0, total - skip - shownCount);
+  // The week above may already have shown the whole (small) programme. An
+  // empty „Ez vár rád" shell promising content that is not there is worse than
+  // no section at all.
+  if (!shownCount) return null;
+
   const toCard = (w: LandingWorkout): CardVideo => ({
     code: w.code, title: w.title, theme: w.theme, mins: w.mins, level: w.level,
     format: w.format, types: w.types, blocks: w.blocks, phase: w.phase,
@@ -92,10 +118,11 @@ export default function ProgramPreview({
 
   return (
     <section className="u-prog" aria-labelledby="u-prog-h">
-      <h2 className="u-prog-h" id="u-prog-h">{C.PROGRAM_PREVIEW.heading}</h2>
-      <p className="u-prog-lead">{C.PROGRAM_PREVIEW.lead(total)}</p>
+      <div className="eyebrow">{C.PROGRAM_PREVIEW.eyebrow}</div>
+      <h2 className="h-bold" id="u-prog-h">{C.PROGRAM_PREVIEW.heading}</h2>
+      <p className="cap-body u-prog-lead">{C.PROGRAM_PREVIEW.lead(shownCount, total)}</p>
 
-      {phases.map((ph) => (
+      {shown.map((ph) => (
         <div className="u-prog-phase" key={ph.idx}>
           {ph.name && (
             <div className="u-prog-phead">
@@ -124,6 +151,8 @@ export default function ProgramPreview({
           </div>
         </div>
       ))}
+
+      {hidden > 0 && <p className="u-prog-more">{C.PROGRAM_PREVIEW.more(hidden)}</p>}
 
       <p className="u-prog-foot">{C.PROGRAM_PREVIEW.foot}</p>
 

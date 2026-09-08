@@ -8,7 +8,7 @@ import Landing from "./Landing";
 // to it and none can be broken by it.
 
 export const metadata: Metadata = {
-  title: "Szeptemberi újrakezdés — kész a heti edzésterved | LEXFIT",
+  title: "7 kérdés, és kész a heti edzésterved | LEXFIT",
   description:
     "7 kérdés, és kész a heti edzésterved. Otthonra, eszköz nélkül, pihenőnapokkal — Alexával. Azoknak, akik már többször újrakezdték.",
   // Paid traffic only. A half-funnel entry point is a poor organic result and
