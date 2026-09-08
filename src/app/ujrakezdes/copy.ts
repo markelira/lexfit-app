@@ -19,118 +19,182 @@ import { lxPaths } from "@/lib/icons";
 
 // ─── §1 Landing ──────────────────────────────────────────────────────────────
 
-export const HERO = {
-  /** The campaign wrapper, demoted from headline to eyebrow. Three ad angles
-   *  point at this page; the H1 has to be the thing all three promised, and
-   *  what they all promised is the plan - not the season. Message match is
-   *  worth up to +212% (docs/funnel-research/03-landing-page.md). */
-  eyebrow: "Szeptemberi Újrakezdés",
-  /** Two lines, second emphasised - the homepage's own h1 treatment, so the two
-   *  pages set their headline identically. */
-  headline: ["7 kérdés, és kész", "a heti edzésterved"] as const,
-  sub: "Otthonra, eszköz nélkül, pihenőnapokkal — Alexával.",
-  audience: "Azoknak, akik már többször újrakezdték.",
-  cta: "Kérem a tervem",
-  ctaSub: "Nagyjából egy perc. Regisztráció nélkül.",
-  /** The damaging admission, at the CTA. Fewer leads, better ones - and nobody
-   *  meets the pricing band at the end feeling ambushed. Owner decision
-   *  2026-09-08. */
-  honest:
-    "A heti terv ingyenes, és a tiéd marad. A LEXFIT tagság fizetős — az árakat a terved mellett mutatjuk meg.",
-  /** offer v3 §3.1's chips, not lead-magnet v2's. „20–30 perces edzések" was
-   *  the older number; „max 30 perc" is the migrated one. */
-  chips: ["max 30 perc", "elég egy matrac", "heti 2–4 nap — te választod"],
-} as const;
+// ─── §1 Landing — design-handoff rebuild (2026-09-08) ────────────────────────
+//
+// Source: ~/Downloads/design_handoff_ujrakezdes (README §5-§7 + wireframe).
+// Every Hungarian string is the handoff's paste-ready copy, VERBATIM. The page
+// asks for one thing, once: starting the quiz. No prices, no nav, no popups.
+//
+// Handoff open questions, resolved against repo truth:
+//   Q1/Q2 the quiz lives at /ujrakezdes/terv - the CTA navigates there
+//        client-side, forwarding every utm_* param (readUtm() reads them on
+//        the quiz page at submit).
+//   Q3  the calculator IS optional (built that way) - the page's claims about
+//       it are true as written.
+//   Q4  no consented member photos → S6 does not render, and the hero's
+//       member-HUD card is omitted. No 30s Alexa video exists in the repo →
+//       S7 shows her real photo without a fake play affordance.
 
-export const ISMEROS = {
-  heading: "Ismerős?",
-  body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra — aztán a jövő hétből hónap lett.",
-  /**
-   * The three launch ad angles (restart · óvatos · napvégi), answered on the
-   * page that all three point at. Whichever creative somebody clicked, they
-   * find their own sentence here and then all three converge on one mechanism.
-   *
-   * THIRD PERSON, deliberately. „Van, akinél a derék szól közbe" describes
-   * somebody; „A derekad miatt óvatos vagy" claims knowledge of the reader's
-   * body - which is the second-person health assumption Meta enforces against
-   * and our own rules ban outright.
-   */
-  angles: [
-    { label: "Az ötödik nekifutás", line: "Van, aki már ötödször kezdte újra." },
-    { label: "A derék, a térd", line: "Van, akinél a derék vagy a térd miatt kell óvatosabban." },
-    { label: "A nap vége", line: "Van, akinek a nap végére semmi nem marad." },
-  ],
-  /** The lead on the `.ism-rules` card, in the homepage's own ismeros layout. */
-  convergeLead: "Mind ugyanabba futnak bele.",
-  converge:
-    "Mind ugyanabba futnak bele: minden kihagyás után nulláról kell kezdeni. Nem az akaraterővel van baj.",
-} as const;
-
-export const MASKEPP = {
-  heading: "Ezért másképp működik",
-  /** Set in `.starter-title`, the homepage's large statement tier. */
-  title: "Egy rossz hét nem dönti el.",
-  lead: "Két szabály, és mindkettő arról szól, mi történik, amikor közbejön valami.",
-  /** The two rules, as two rules. They were one paragraph, and a paragraph is
-   *  where a mechanism goes to be skimmed past - these are the whole product
-   *  argument, so they get to be structural. */
-  rules: [
-    {
-      hd: "A pihenőnap nem töri meg a sorozatot.",
-      body: "Előre be van tervezve. Nem kihagyás, hanem a terv része.",
+export const LP = {
+  /** S1 · hero. Three variants, picked SERVER-side from utm_content - an
+   *  unknown or missing value falls back to `base`. The variant only swaps
+   *  headline and lead; everything else is shared. */
+  hero: {
+    eyebrow: "Szeptemberi Újrakezdés",
+    variants: {
+      base: {
+        hd: "7 kérdés, és kész a heti edzésterved.",
+        lead: "Otthonra, eszköz nélkül, pihenőnapokkal - Alexával.",
+      },
+      ovatos: {
+        hd: "Óvatos mozgás, vezetve.",
+        lead: "Minden edzésnek van csendes, fal mellett végezhető változata, és mindet Alexa vezeti végig. Hét kérdés, és a terved ehhez igazodik.",
+      },
+      napvegi: {
+        hd: "A nap végén is elég 20 perc.",
+        lead: "Fáradtan hazaérni és még kitalálni, mi legyen - ez a legnehezebb rész. Ezért nálunk a terv készen vár: 20-30 perc, eszköz nélkül. Este kilenckor is működik.",
+      },
     },
-    {
-      hd: "A kihagyott hét nem nulláz.",
-      body: "Ott folytatod, ahol abbahagytad — nem elölről.",
-    },
-  ],
-  foot: "A tervedet nem neked kell kitalálnod: hét kérdésből elkészül, és minden edzést Alexa vezet végig.",
+    antiAvatar: "Azoknak, akik már többször újrakezdték.",
+    chips: ["Ingyenes", "Kb. 1 perc", "Az első edzés még ma"],
+    second: "20-30 perces edzések · elég egy matrac · 1 200+ fős közösség",
+    cta: "Kérem a tervem",
+    ctaSub:
+      "7 kérdés, nagyjából egy perc. Nem kell fiókot létrehozni - a kész tervet e-mailben küldjük, hogy TV-n és laptopon is megnyisd.",
+    mechanism: "A pihenőnap a terv része. A kihagyott hét nem nulláz.",
+    mechanismSub: "1 200+ fős közösség · a heti terv ingyenes, és a tiéd marad",
+  },
+
+  /** S1 · the card pair - the page's one ownable element (handoff §6): the
+   *  empty week („majd hétfőn") behind, the finished plan in front. */
+  mock: {
+    emptyTag: "Ma",
+    emptyNote: "„majd hétfőn”",
+    bridge: "7 kérdés · kb. 1 perc",
+    doneTag: "Egy perc múlva",
+    doneNote: "Példa · a heti terved",
+    /** H/Sze/P on, like every sample week on this funnel. */
+    days: [
+      { d: "H", on: true }, { d: "K", on: false }, { d: "Sze", on: true },
+      { d: "Cs", on: false }, { d: "P", on: true }, { d: "Szo", on: false },
+      { d: "V", on: false },
+    ],
+    stats1: [
+      { v: "3", l: "nap / hét" },
+      { v: "30", l: "perc" },
+      { v: "0", l: "eszköz" },
+    ],
+    stats2: [
+      { v: "1640", l: "kcal / nap" },
+      { v: "8000", l: "lépés" },
+      { v: "Start", l: "program" },
+    ],
+    /** Sample answer chips - the same tray vocabulary the quiz itself uses. */
+    chips: ["újrakezdés", "heti 3 nap", "este", "nappali", "térdkímélő"],
+    note: "Heti 3 nap, pihenőnapokkal, kalória- és lépéscéllal. A tiéd a válaszaidból készül.",
+    dream: "Nem egy hetet kapsz. Egy hetet, ami kibírja a rossz heteket is.",
+    /** The gate's mail preview echoes the person's REAL answers with this
+     *  lead - shared here so the sample and the real artifact use one word. */
+    answersLead: "A válaszaidból:",
+  },
+
+  /** S2 · what the quiz gives. The free offer is only worth something if it
+   *  can be LISTED - five items, one sentence each, and the seven question
+   *  topics up front so the length is never unknown. */
+  results: {
+    eyebrow: "A kvíz eredménye",
+    hd: "Öt dolog, egy perc alatt.",
+    lead: "Nem általános tanácsokat kapsz, hanem a saját válaszaidra épített tervet - azonnal, e-mailben is.",
+    items: [
+      { b: "A heti edzésterved", d: "Heti 2, 3 vagy 4 nap - te választod. Pihenőnapokkal, a te szintedhez igazítva." },
+      { b: "A napi kalória-célod", d: "A szinten tartó és a célodhoz ajánlott érték, a megadott adataidból számolva." },
+      { b: "A napi lépéscélod", d: "Hol tartasz most, és mi a reális következő lépcső - szakaszosan, nem egyszerre." },
+      { b: "A rád szabott LEXFIT program", d: "Melyik programmal érdemes kezdened, és miért pont azzal." },
+      { b: "Az első edzésed", d: "Konkrét videó, 20-30 perc, eszköz nélkül. Ma is elindíthatod." },
+    ],
+    qTitle: "Ezt kérdezzük",
+    qChips: [
+      "Mi a célod", "Mennyit mozogsz most", "Hány nap fér bele",
+      "Mennyi idő egy alkalomra", "Mire figyeljünk", "Hol mozogsz", "Melyik napszak",
+    ],
+    qNote: "Hét kérdés, egy koppintás mindegyik. A kalória- és lépéscélhoz jön még három - az opcionális.",
+  },
+
+  /** S3 · the problem mirror. The first chip carries the ad's angle. */
+  problem: {
+    eyebrow: "A probléma",
+    hd: "Ismerős?",
+    body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra - aztán a jövő hétből hónap lett. Nem az akaraterővel van baj: azzal, hogy minden kihagyás után nulláról kell kezdeni.",
+    listTitle: "Mind ugyanabba futnak bele.",
+    chips: ["Az ötödik nekifutás", "A derék, a térd", "A nap vége"],
+    lines: [
+      "Van, aki már ötödször kezdte újra.",
+      "Van, akinek a derék vagy a térd miatt kell óvatosabban.",
+      "Van, akinek a nap végére semmi nem marad.",
+    ],
+  },
+
+  /** S4 · the mechanism (navy). */
+  mech: {
+    eyebrow: "A mechanizmus",
+    hd: "Egy rossz hét nem dönti el.",
+    rules: [
+      { b: "A pihenőnap nem töri meg a sorozatot.", d: "Előre be van tervezve. Nem kihagyás, hanem a terv része." },
+      { b: "A kihagyott hét nem nulláz.", d: "Ott folytatod, ahol abbahagytad - nem elölről." },
+    ],
+    foot: "A LEXFIT-ben a pihenőnap nem töri meg a sorozatot, és a kihagyott hét nem nulláz - ott folytatod, ahol abbahagytad. A tervedet nem neked kell kitalálnod: hét kérdésből elkészül, és minden edzést Alexa vezet végig.",
+  },
+
+  /** S5 · how it looks - three real app screens. */
+  how: {
+    eyebrow: "Hogyan működik",
+    hd: "Így néz ki",
+    lead: "Három lépés, nagyjából egy perc.",
+    shots: ["/step-1-question.png", "/step-2-plan.png", "/step-3-player.png"],
+    steps: [
+      "Válaszolsz 7 kérdésre - nagyjából egy perc.",
+      "Megadod az e-mail címed, és megkapod a heti tervedet, pihenőnapokkal. A kalória- és lépéscélhoz három plusz kérdés jön - ez opcionális, a terved enélkül is kész.",
+      "Az első edzést azonnal elindíthatod - 20-30 perc, eszköz nélkül.",
+    ],
+    foot: "A heti terv ingyenes, és a tiéd marad. A LEXFIT tagság fizetős - az árakat a terved mellett mutatjuk meg.",
+  },
+
+  /** S7 · Alexa (navy). Story + promise come from the shared ALEXA block. */
+  alexa: {
+    eyebrow: "Kivel csinálod",
+    quote: "„Nulláról, egy matracon kezdtem újra.”",
+    chips: ["10 év versenysport", "Minden edzést Alexa vezet", "1 200+ fős közösség"],
+  },
+
+  /** S8 · the close (accent). */
+  close: {
+    eyebrow: "Az első lépés",
+    hd: "Kezdjük a heteddel.",
+    lead: "Hét kérdés, és a terved kész. A heti terv ingyenes, és a tiéd marad. A LEXFIT tagság fizetős - az árakat a terved mellett mutatjuk meg.",
+    cta: "Kérem a tervem",
+    ctaSub: "7 kérdés · kb. 1 perc · ingyenes",
+    legal: "Az e-mail címed a tervhez kell, hogy meg is maradjon. Bármikor leiratkozhatsz.",
+    privacy: "Adatkezelési tájékoztató",
+  },
+
+  /** S · the mobile sticky bar. */
+  sticky: {
+    line: "7 kérdés, kb. 1 perc",
+    sub: "ingyenes · nem kell regisztrálni",
+    go: "Kérem a tervem",
+  },
 } as const;
 
-/**
- * The proof band — text only, and that is a finding, not a shortcut.
- *
- * `public/finish-examples/` was assumed to hold member finish cards. It does
- * not: those files are the raw post-workout SELFIES that feed the Finish Share
- * overlay - shirtless mirror shots, a gym locker room. Three separate reasons
- * not to put them on this page:
- *
- *   1. Captioning them „valódi befejezett edzések" would be false. They are
- *      photographs of people, not evidence of a completed workout.
- *   2. Physique imagery is the body-transformation frame this entire funnel is
- *      built to avoid, and one of them is shot in a GYM - on the landing page
- *      for a home programme.
- *   3. Meta's health policy restricts exactly this kind of body imagery, and a
- *      young ad account carries account-level risk.
- *
- * So the proof is the one true, already-published claim we have. If real finish
- * cards (selfie + data overlay) get exported, this band is where they go - see
- * docs/funnel-research/08-audit-and-changes.md §6.
- */
-export const PROOF = {
-  heading: "Nem vagy egyedül vele",
-  /** From funnel_v2 §2.2 P5, which is approved ad copy. */
-  lead: "1 200+ tag a zárt Facebook-csoportban — a legtöbben nem sportolók, hanem dolgozó felnőttek, akik sokadszorra kezdték újra.",
-  note: "Kérdezni is van kitől.",
-} as const;
-
-export const IGY_NEZ_KI = {
-  heading: "Így néz ki",
-  lead: "Három lépés, nagyjából egy perc. A terved azelőtt megvan, hogy fiókot csinálnál.",
-  /** The compact form for the hero - the full sentences below are too long for
-   *  a three-up row beside a graphic. // COPY-REVIEW */
-  stepsShort: ["Válaszolsz 7 kérdésre", "Megkapod a heti terved", "Elindítod az elsőt"],
-  /** Real product screenshots, one per step - the question screen, the plan and
-   *  the player. Owner-approved asset set (2026-09-08); the alternative was
-   *  stock or illustration, and cross-source consensus is that recognized-stock
-   *  erodes trust on exactly this kind of page. */
-  shots: ["/step-1-question.png", "/step-2-plan.png", "/step-3-player.png"],
-  steps: [
-    "Válaszolsz 7 kérdésre — nagyjából egy perc.",
-    "Megkapod a heti tervedet, pihenőnapokkal.",
-    "Az első edzést azonnal elindíthatod — 20–30 perc, eszköz nélkül.",
-  ],
-} as const;
+/** The utm_content → hero-variant map (funnel_v2 §2.4 ad codes). Server-side
+ *  only: the page component reads searchParams and passes the resolved
+ *  variant down, so there is no client flash. Unknown → base. */
+export type LpVariant = keyof typeof LP.hero.variants;
+export function lpVariantFor(utmContent: string | undefined): LpVariant {
+  if (!utmContent) return "base";
+  if (/^(s4_|s5_|s15_)/.test(utmContent)) return "ovatos";
+  if (/^s7_/.test(utmContent)) return "napvegi";
+  return "base";
+}
 
 export const ALEXA = {
   heading: "Ki az az Alexa?",
@@ -153,27 +217,6 @@ export const ALEXA = {
    *  founder PRICE, and the guard cannot tell the two senses apart. Saying what
    *  she does for the reader is more useful than a job title anyway. */
   role: "ő vezet végig minden edzést",
-} as const;
-
-/** The closing ask. Same words as the hero button - one page, one action, and
- *  a second verb here would read as a second offer. */
-/**
- * The eyebrow on each band. Every section carries one, in the same place, in
- * the same type - so somebody scanning the page reads five labels and knows the
- * shape of the argument without reading a sentence. Naming the section is
- * wayfinding; leaving it unnamed makes the reader derive it from the prose.
- */
-export const SECTION_LABEL = {
-  ismeros: "A probléma",
-  maskepp: "A mechanizmus",
-  igy: "Hogyan működik",
-  alexa: "Kivel csinálod",
-  close: "Az első lépés",
-} as const;
-
-export const FINAL_CTA = {
-  heading: "Kezdjük a heteddel",
-  body: "Hét kérdés, és a terved kész. Ha utána nem folytatod, a heti terved akkor is a tiéd marad.",
 } as const;
 
 // ─── §2 Quiz ─────────────────────────────────────────────────────────────────
@@ -312,42 +355,6 @@ export const TRAY = {
 /** The example week drawn in the hero. Labelled as an EXAMPLE on purpose: it is
  *  rendered before anybody has answered anything, and a week grid that looks
  *  like a personal plan would be promising one that does not exist yet. */
-/**
- * The sample plan drawn in the hero - and it is drawn as the EMAIL, because the
- * email is the deliverable. The hero used to show a bare week grid, which
- * showed the schedule but not the thing that arrives; the same component now
- * renders here with sample data and at the gate with the person's real answers,
- * so the promise on the landing page and the artifact at the end of the quiz
- * are literally the same object.
- *
- * Everything below is a TYPICAL answer set, not an average of anything: three
- * days is the middle option and the one most people pick, 30 minutes is the
- * median length of the published workouts. Marked „Példa" in the chrome so
- * nobody reads it as a plan that already exists for them.
- */
-export const HERO_WEEK = {
-  eyebrow: "Példa egy hétre",
-  sampleTag: "Példa",
-  note: "Heti 3 nap, pihenőnapokkal. A tiéd a válaszaidból készül.",
-  days: [
-    { d: "H", on: true }, { d: "K", on: false }, { d: "Sze", on: true },
-    { d: "Cs", on: false }, { d: "P", on: true }, { d: "Szo", on: false },
-    { d: "V", on: false },
-  ],
-  train: "edzés",
-  rest: "pihenő",
-  /** The plan's own numbers, as the mail states them. */
-  stats: [
-    { k: "nap / hét", v: "3" },
-    { k: "perc", v: "30" },
-    { k: "eszköz", v: "0" },
-  ],
-  /** The answers the plan was built from, echoed exactly as the quiz's own tray
-   *  echoes them - these are real TRAY labels, not invented ones. */
-  answersLead: "A válaszaidból:",
-  answers: ["újrakezdés", "heti 3 nap", "este", "nappali", "térdkímélő"],
-} as const;
-
 // ─── Sections ────────────────────────────────────────────────────────────────
 //
 // The progress bar names SECTIONS, not question numbers. "4 / 10" tells

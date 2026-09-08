@@ -58,7 +58,7 @@ export default function MailPreview({
                 sub: C.REVEAL.b1.sub(plan.trainingCount, plan.sessionLabel),
               }
             : {})}
-          {...(chips.length ? { answersLead: C.HERO_WEEK.answersLead, answers: chips } : {})}
+          {...(chips.length ? { answersLead: C.LP.mock.answersLead, answers: chips } : {})}
         />
       </div>
 

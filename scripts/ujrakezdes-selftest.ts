@@ -23,6 +23,7 @@ import {
 import {
   isLmStep, lmDueAt, lmNextStep, lmScheduleAfter, lmStopReason, LM_LAST_STEP,
 } from "../src/lib/ujrakezdes/sequence";
+import { lpVariantFor } from "../src/app/ujrakezdes/copy";
 import { onboardingDraftFromQuiz } from "../src/lib/ujrakezdes/handoff";
 import type { Answers, Days, Focus } from "../src/lib/ujrakezdes/types";
 import * as C from "../src/app/ujrakezdes/copy";
@@ -199,7 +200,10 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   // CALC_INVITE joins the waiver: it is the calculator's own invitation, it has
   // to name the thing it is offering ("napi kalóriacél"), and it is asserted
   // with ENERGY below rather than exempted quietly.
-  const { ENERGY, CALC_INVITE, ...CORE } = C as Record<string, unknown>;
+  // LP joins the waiver too: the landing MARKETS the calculator's deliverable
+  // („napi kalória-cél"), which is the same sanctioned naming as ENERGY's own
+  // strings. The walkEn sweep below still bans the harmful vocabulary there.
+  const { ENERGY, CALC_INVITE, LP, ...CORE } = C as Record<string, unknown>;
   const walk = (v: unknown): void => {
     if (typeof v === "string") strings.push(v);
     else if (typeof v === "function") { try { strings.push(String((v as (...x: never[]) => string)(3 as never, "20–30 perc" as never))); } catch { /* not a copy fn */ } }
@@ -246,45 +250,53 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   }
   ok("nincs beégetett forintösszeg - az árak a PRICES-ből jönnek");
 
-  // ── The 2026-09-08 rewrite's own invariants ────────────────────────────
+  // ── The LP (design-handoff landing) invariants ─────────────────────────
 
-  // The landing sells a free plan and links to a paid product. The admission
-  // that the membership costs money is the reason the pricing band at the end
-  // does not read as an ambush; if it ever disappears, that is a regression in
-  // honesty, not in copy.
-  assert.ok(/fizetős/.test(C.HERO.honest), "a hero nem vallja be, hogy a tagság fizetős");
-  assert.ok(/ingyenes/.test(C.HERO.honest), "a hero nem mondja ki, hogy a terv ingyenes");
+  // The damaging admission: the page sells a free plan and links to a paid
+  // product, and says so before anyone clicks. If it disappears, that is a
+  // regression in honesty, not in copy.
+  assert.ok(/fizetős/.test(C.LP.how.foot) && /ingyenes/.test(C.LP.how.foot));
+  assert.ok(/fizetős/.test(C.LP.close.lead), "a zárás nem vallja be, hogy a tagság fizetős");
 
-  // Three ad angles point at one page; each needs its sentence in `Ismerős?`.
-  assert.equal(C.ISMEROS.angles.length, 3, "nem mind a három hirdetési szög kapott mondatot");
-  // Third person only. „Van, akinél..." describes somebody; „A derekad miatt..."
-  // claims knowledge of the reader's body, which Meta enforces against.
-  for (const a of C.ISMEROS.angles) {
-    assert.ok(a.line.startsWith("Van, aki"), `nem harmadik személyű szög: ${a.line}`);
-    // The label is what a scanner reads instead of the sentence, so it has to
-    // carry the angle on its own - three words at most, and never a claim.
-    // Length, not word count: „A derék, a térd" is four words and two ideas,
-    // while three long words would be a sentence in disguise.
-    assert.ok(a.label.length <= 24, `túl hosszú szög-címke: ${a.label}`);
-    assert.ok(!a.label.includes("."), `a szög-címke mondat: ${a.label}`);
+  // One button, one sentence - every CTA on the page says the same thing, and
+  // it names what they GET, not what they must do (handoff acceptance list).
+  assert.equal(C.LP.hero.cta, "Kérem a tervem");
+  assert.equal(C.LP.close.cta, C.LP.hero.cta);
+  assert.equal(C.LP.sticky.go, C.LP.hero.cta);
+
+  // Three ad angles, third person only - „Van, aki..." describes somebody;
+  // second person would claim knowledge of the reader's body.
+  assert.equal(C.LP.problem.lines.length, 3);
+  for (const l of C.LP.problem.lines) {
+    assert.ok(l.startsWith("Van, aki"), `nem harmadik személyű szög: ${l}`);
   }
+  assert.equal(C.LP.problem.chips.length, 3);
 
-  // Every band names itself, in the same slot, in the same type. A section
-  // without a label makes the reader derive it from the prose.
-  for (const [k, v] of Object.entries(C.SECTION_LABEL)) {
-    assert.ok(v.length > 0 && v.length <= 24, `rossz szekciócímke: ${k} → ${v}`);
-  }
+  // The hero variant map: the funnel_v2 ad codes route to their angle, and
+  // anything unknown falls back to base - a wrong variant on a cold click is
+  // worse than the default one.
+  assert.equal(lpVariantFor("s4_h6p1v1"), "ovatos");
+  assert.equal(lpVariantFor("s5_h12p1v1"), "ovatos");
+  assert.equal(lpVariantFor("s15_h6p3v5"), "ovatos");
+  assert.equal(lpVariantFor("s7_h5p3v5"), "napvegi");
+  assert.equal(lpVariantFor("s1_h1p2v2"), "base");
+  assert.equal(lpVariantFor("valami_uj"), "base");
+  assert.equal(lpVariantFor(undefined), "base");
 
-  // The proof band carries NO member photographs and NO attributed quotes.
-  // `public/finish-examples/` holds raw post-workout selfies (physique shots,
-  // one in a gym), not finish cards - captioning them as completed workouts
-  // would be false, and body imagery is the frame this funnel exists to avoid.
-  // If that ever gets "fixed" by pointing at those files again, this fails.
-  assert.ok(!("cards" in C.PROOF), "a proof-sáv megint tagfotókat tesz ki");
-  assert.ok(
-    !JSON.stringify(C.PROOF).includes("finish-examples"),
-    "a proof-sáv a nyers finish-selfie-ket használja",
-  );
+  // No member photographs anywhere on the LP: the only photo files we hold
+  // (finish-examples/) are physique selfies without usable consent, and the
+  // handoff itself excludes the HUD section without real, consented images.
+  assert.ok(!JSON.stringify(C.LP).includes("finish-examples"), "az LP tagfotókat tesz ki");
+
+  // The LP shows NO price, ever (handoff acceptance: „az oldalon nincs ár") -
+  // and since LP sits in the waiver group, the main forint-sweep does not see
+  // it, so the guarantee lives here instead.
+  assert.ok(!/\d[\d\s ]*Ft/.test(JSON.stringify(C.LP)), "forintösszeg került az LP-re");
+
+  // The quiz-length promise must match the quiz: seven question topics
+  // previewed, and the calculator named as optional.
+  assert.equal(C.LP.results.qChips.length, 7);
+  assert.ok(/opcionális/.test(C.LP.results.qNote), "a kalkulátor opcionalitása eltűnt");
 
   // The last section is walked by everyone, including the people who decline
   // the calculator - so it cannot be named after numbers they never asked for.
@@ -414,6 +426,7 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   };
   walkEn(ENERGY);
   walkEn(CALC_INVITE);
+  walkEn(LP);
   assert.ok(en.length > 20, "a modul copy bejárása értelmes mennyiséget talált");
 
   for (const s2 of en) assert.ok(!s2.includes("!"), `felkiáltójel a modulban: ${s2.slice(0, 60)}`);

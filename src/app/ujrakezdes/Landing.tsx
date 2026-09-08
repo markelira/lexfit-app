@@ -1,275 +1,307 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-// The homepage's stylesheet IS this page's stylesheet. Everything below is
-// scoped under `.lxl` and built from the landing's own primitives - `.hero`,
-// `.wrap`, `.band-cream`, `.h-bold`, `.cap-body`, `.pill`, `.steps`, `.ism-*` -
-// so /ujrakezdes and / are the same design rather than two designs that merely
-// resemble each other. ujrakezdes.css then adds only what this page has and the
-// homepage does not: the week card, and a few page-scoped adjustments.
-import "@/app/landing.css";
 import "./ujrakezdes.css";
-import { LexMark } from "@/components/LexMark";
-import PlanMail from "./PlanMail";
 import * as C from "./copy";
-import {
-  ALEXA, FINAL_CTA, HERO, HERO_WEEK, IGY_NEZ_KI, ISMEROS, MASKEPP, PROOF,
-  SECTION_LABEL,
-} from "./copy";
-import { trackUjrakezdesQuizStart, trackUjrakezdesView } from "@/lib/track";
+import { trackUjrakezdesLpCta, trackUjrakezdesView } from "@/lib/track";
 
-// The ad landing page for the Szeptemberi Újrakezdés lead magnet.
+// /ujrakezdes — the quiz-starter page (design-handoff rebuild, 2026-09-08).
 //
-// ── WHY IT LOOKS LIKE THE HOMEPAGE ───────────────────────────────────────────
-// It is the same company and, for most of these visitors, the first and second
-// page they will ever see of it. A funnel whose landing page has its own visual
-// language teaches people that the ad and the product are different things,
-// which is the one impression a cold-traffic page cannot afford.
+// Section order per the handoff §5 - the order IS the design: S0 logo-only
+// header → S1 sage hero with the CARD PAIR (empty week behind, finished plan
+// in front - the transformation is the visual) → S2 what the quiz gives →
+// S3 the problem mirror → S4 mechanism (navy) → S5 three real app screens →
+// (S6 hidden: no consented member photos) → S7 Alexa (navy) → S8 close
+// (accent) → S sticky bar (mobile).
 //
-// ── WHERE IT DELIBERATELY DIVERGES ───────────────────────────────────────────
-// The homepage exists to let somebody explore; this page exists to get one
-// click. So the hero nav carries the wordmark and NO links - a nav here is a row
-// of exits - and the page has exactly one destination, repeated three times.
+// One interactive element type on the whole page: the CTA, and it says the
+// same sentence everywhere - „Kérem a tervem". It names what they GET.
 //
-// Research: docs/funnel-research/03-landing-page.md, 06-design-craft.md.
+// The hero variant arrives as a PROP, resolved server-side in page.tsx from
+// utm_content - no client flash, unknown values fall back to base.
 
-/** Scroll-reveal, mirroring the homepage's own `Rise` so both pages animate
- *  identically: one shot, unobserved after firing, and flattened by the
- *  reduced-motion rules that already cover `.rise`. */
-function Rise({
-  className = "", children, id, style,
-}: { className?: string; children: ReactNode; id?: string; style?: CSSProperties }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { setShown(true); io.unobserve(e.target); } }),
-      { threshold: 0.12 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return (
-    <div ref={ref} id={id} style={style} className={`${className} rise${shown ? " in" : ""}`}>
-      {children}
-    </div>
-  );
+/** The CTA target. utm_* params are forwarded because the quiz's readUtm()
+ *  reads them on ITS page at submit - a bare link would drop attribution. */
+function quizHref(): string {
+  if (typeof window === "undefined") return "/ujrakezdes/terv";
+  const p = new URLSearchParams(window.location.search);
+  const keep = new URLSearchParams();
+  for (const [k, v] of p) if (k.startsWith("utm_")) keep.set(k, v);
+  const q = keep.toString();
+  return q ? `/ujrakezdes/terv?${q}` : "/ujrakezdes/terv";
 }
 
-/** The one link on the page, used three times. Module scope, not inline: a
- *  component created during render gets a new identity on every pass. */
-function Cta({ variant = "dark" }: { variant?: "dark" | "outline" | "sage" }) {
+function Cta({ position, small = false }: { position: "hero" | "sticky" | "close"; small?: boolean }) {
+  // The rendered href is the bare route (so Link prefetches it and SSR/client
+  // markup agree); the utm-carrying URL is computed at CLICK time and pushed
+  // client-side - which is also what M2 asks for: no full reload between the
+  // landing and the first question.
+  const router = useRouter();
   return (
     <Link
       href="/ujrakezdes/terv"
-      className={`pill pill-${variant}`}
-      onClick={trackUjrakezdesQuizStart}
+      className={`lp-cta${small ? " lp-cta-sm" : ""}`}
+      onClick={(e) => {
+        e.preventDefault();
+        trackUjrakezdesLpCta(position);
+        router.push(quizHref());
+      }}
     >
-      {HERO.cta}
+      {C.LP.hero.cta}
     </Link>
   );
 }
 
-export default function Landing() {
-  useEffect(() => { trackUjrakezdesView(); }, []);
+export default function Landing({ variant = "base" }: { variant?: C.LpVariant }) {
+  useEffect(() => { trackUjrakezdesView(variant); }, [variant]);
 
-  // The sticky bar REPLACES the hero's button once it leaves the screen. Two
-  // live CTAs at once is two asks, not one reinforced.
-  const heroCta = useRef<HTMLDivElement>(null);
-  const [stuck, setStuck] = useState(false);
+  const v = C.LP.hero.variants[variant];
+
+  // S · sticky bar (M3): in once the hero CTA scrolls out, out at the close.
+  const heroCtaRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLElement>(null);
+  const [stickyOn, setStickyOn] = useState(false);
   useEffect(() => {
-    const el = heroCta.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      ([e]) => setStuck(!!e && !e.isIntersecting),
-      { rootMargin: "-8px 0px 0px 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
+    const h = heroCtaRef.current, c = closeRef.current;
+    if (!h || !c || typeof IntersectionObserver === "undefined") return;
+    let past = false, closeVis = false;
+    const upd = () => setStickyOn(past && !closeVis);
+    const io1 = new IntersectionObserver(([e]) => {
+      past = !!e && !e.isIntersecting && e.boundingClientRect.top < 0;
+      upd();
+    });
+    const io2 = new IntersectionObserver(([e]) => { closeVis = !!e && e.isIntersecting; upd(); });
+    io1.observe(h);
+    io2.observe(c);
+    return () => { io1.disconnect(); io2.disconnect(); };
   }, []);
 
   return (
-    <div className="lxl u-lp">
-      {/* ═══ Hero ══════════════════════════════════════════════════════════ */}
-      <header className="hero">
-        <div className="wrap hero-inner">
-          <div className="hero-nav">
-            <span className="wordmark"><LexMark />LEXFIT</span>
-          </div>
-
-          <div className="hero-body">
-            <div className="hero-copy">
-              <div className="hero-eyebrow">{HERO.eyebrow}</div>
-              <h1>{HERO.headline[0]}<br /><b>{HERO.headline[1]}</b></h1>
-              <p className="body">{HERO.sub}</p>
-
-              <div className="hero-row" ref={heroCta}>
-                <Cta />
-                <span className="hero-cta2 u-ctasub">{HERO.ctaSub}</span>
-              </div>
-
-              <div className="hero-chips">
-                {HERO.chips.map((c) => <span key={c}>{c}</span>)}
-              </div>
-
-              {/* The damaging admission, in the slot the homepage gives its price
-                  line - same position, same weight, same job. */}
-              <div className="hero-price">{HERO.honest}</div>
-            </div>
-
-            {/* The homepage puts a photograph of Alexa here. This page puts
-                the thing the quiz actually hands over - and puts it in the form
-                it arrives in, as the email. Same <PlanMail> the gate renders
-                with a real week, so the sample here cannot drift away from what
-                the funnel produces. A portrait is not evidence of a plan. */}
-            <div className="hero-device u-weekdevice">
-              <PlanMail
-                headline={C.REVEAL.b1.hd}
-                sampleTag={HERO_WEEK.sampleTag}
-                cta="Megnyitom a tervem"
-                stats={[...HERO_WEEK.stats]}
-                answersLead={HERO_WEEK.answersLead}
-                answers={HERO_WEEK.answers}
-                days={HERO_WEEK.days.map((d) => ({
-                  key: d.d,
-                  short: d.d,
-                  training: d.on,
-                  ...(d.on ? { minutes: 30 } : {}),
-                }))}
-              />
-              <p className="u-weeknote">{HERO_WEEK.note}</p>
-            </div>
-          </div>
-        </div>
+    <div className="lxu lp">
+      {/* ── S0 · header: the logo, and deliberately nothing else. A nav on an
+          ad landing page is a row of exits. ─────────────────────────────── */}
+      <header className="lp-head">
+        <span className="lp-mark">LEXFIT</span>
       </header>
 
-      {/* ═══ 1 · The problem ═══════════════════════════════════════════════
-          The homepage's own `#ismeros` layout, class for class: a narrow centred
-          column (`.ism`) with the white rule card (`.ism-rules`) under it. The
-          three ad angles ride in the homepage's `.starter-facts` chips, which is
-          what that page uses for a scannable row of short facts. */}
-      <div className="band-cream sec-first" id="ismeros">
-        <Rise className="wrap seq ism">
-          <div className="eyebrow">{SECTION_LABEL.ismeros}</div>
-          <h2 className="h-bold ism-h">{ISMEROS.heading}</h2>
-          <p className="cap-body ism-b">{ISMEROS.body}</p>
+      {/* ── S1 · hero (sage) ───────────────────────────────────────────────── */}
+      <section className="lp-hero">
+        <div className="lp-hero-grid">
+          <div className="lp-hero-copy">
+            <p className="lp-eyebrow lp-m1" style={{ ["--i" as string]: 0 }}>{C.LP.hero.eyebrow}</p>
 
-          <div className="starter-facts">
-            {ISMEROS.angles.map((a) => <span key={a.label}>{a.label}</span>)}
-          </div>
+            {/* The two-weight headline; the base variant sets the „7" in
+                display size (handoff §6). */}
+            <h1 className="lp-m1" style={{ ["--i" as string]: 1 }}>
+              {variant === "base" ? (
+                <><span className="lp-h-num">7</span><span className="lp-h-rest"><em>kérdés,</em> és kész a heti edzésterved.</span></>
+              ) : (
+                v.hd
+              )}
+            </h1>
 
-          <div className="ism-rules">
-            <b className="ism-lead">{ISMEROS.convergeLead}</b>
-            <ul>
-              {ISMEROS.angles.map((a) => <li key={a.line}>{a.line}</li>)}
+            <p className="lp-lead lp-m1" style={{ ["--i" as string]: 2 }}>{v.lead}</p>
+            <p className="lp-anti lp-m1" style={{ ["--i" as string]: 3 }}>{C.LP.hero.antiAvatar}</p>
+
+            <ul className="lp-chips lp-m1" style={{ ["--i" as string]: 4 }}>
+              {C.LP.hero.chips.map((c) => <li key={c}>{c}</li>)}
             </ul>
+            <p className="lp-second lp-m1" style={{ ["--i" as string]: 5 }}>{C.LP.hero.second}</p>
+
           </div>
-        </Rise>
-      </div>
 
-      {/* ═══ 2 · The mechanism ════════════════════════════════════════════
-          The homepage's `heted-band` layout: navy ground, eyebrow, a large
-          `.starter-title` statement, body, the payload, then a sage pill. On the
-          homepage the payload is the WeekPicker; here it is the two rules, set
-          in `.aq-promise` - the same mono list that carries her three promises
-          in the homepage's Alexa section. */}
-      <div className="band-navy sec heted-band" id="maskepp">
-        <Rise className="wrap seq">
-          <div className="eyebrow u-eyebrow-d">{SECTION_LABEL.maskepp}</div>
-          <h2 className="starter-title u-title-d">{MASKEPP.title}</h2>
-          <p className="cap-body u-body-d">{MASKEPP.lead}</p>
+          {/* The card pair (M4): the empty week stays perfectly still - the
+              contrast is the point - while the finished plan assembles once. */}
+          <div className="lp-pair lp-m1" style={{ ["--i" as string]: 8 }} aria-hidden="true">
+            <div className="lp-mock lp-mock-empty">
+              <p className="lp-tag"><b>{C.LP.mock.emptyTag}</b><span>{C.LP.mock.emptyNote}</span></p>
+              <ul className="lp-week">
+                {C.LP.mock.days.map((d) => (
+                  <li key={d.d}><span className="d">{d.d}</span><span className="dot" /></li>
+                ))}
+              </ul>
+            </div>
 
-          <ul className="aq-promise u-mech-rules">
-            {MASKEPP.rules.map((r) => (
-              <li key={r.hd}>
-                <b>{r.hd}</b>
-                <span>{r.body}</span>
+            <p className="lp-bridge">{C.LP.mock.bridge}</p>
+
+            <div className="lp-mock lp-mock-done">
+              <p className="lp-tag"><b>{C.LP.mock.doneTag}</b><span>{C.LP.mock.doneNote}</span></p>
+              <ul className="lp-week">
+                {C.LP.mock.days.map((d, i) => (
+                  <li key={d.d} className={d.on ? "on lp-m4" : ""} style={{ ["--i" as string]: i }}>
+                    <span className="d">{d.d}</span><span className="dot" />
+                  </li>
+                ))}
+              </ul>
+              <dl className="lp-bar3 lp-m4" style={{ ["--i" as string]: 8 }}>
+                {C.LP.mock.stats1.map((f) => (
+                  <div key={f.l}><dt>{f.v}</dt><dd>{f.l}</dd></div>
+                ))}
+              </dl>
+              <dl className="lp-bar3 lp-m4" style={{ ["--i" as string]: 10 }}>
+                {C.LP.mock.stats2.map((f) => (
+                  <div key={f.l}><dt>{f.v}</dt><dd>{f.l}</dd></div>
+                ))}
+              </dl>
+              <ul className="lp-mchips lp-m4" style={{ ["--i" as string]: 12 }}>
+                {C.LP.mock.chips.map((c) => <li key={c}>{c}</li>)}
+              </ul>
+            </div>
+
+            <p className="lp-mocknote">{C.LP.mock.note}</p>
+            <p className="lp-dream">{C.LP.mock.dream}</p>
+          </div>
+
+          {/* The CTA block. Third grid area on purpose: the wireframe's mobile
+              order is headline → card pair → CTA, while desktop keeps the CTA
+              under the copy - grid areas do the repositioning, the DOM order
+              stays the mobile one. */}
+          <div className="lp-hero-after">
+            <div className="lp-ctarow lp-m1" style={{ ["--i" as string]: 6 }} ref={heroCtaRef}>
+              <Cta position="hero" />
+              <p className="lp-ctasub">{C.LP.hero.ctaSub}</p>
+            </div>
+
+            <div className="lp-mechrow lp-m1" style={{ ["--i" as string]: 7 }}>
+              <p><b>{C.LP.hero.mechanism}</b></p>
+              <p className="lp-xs">{C.LP.hero.mechanismSub}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── S2 · what the quiz gives ───────────────────────────────────────── */}
+      <section className="lp-band">
+        <div className="lp-col">
+          <p className="lp-eyebrow">{C.LP.results.eyebrow}</p>
+          <h2>{C.LP.results.hd}</h2>
+          <p className="lp-body">{C.LP.results.lead}</p>
+
+          <ol className="lp-deliv">
+            {C.LP.results.items.map((it, i) => (
+              <li key={it.b}>
+                <span className="n">{String(i + 1).padStart(2, "0")}</span>
+                <span><b>{it.b}</b> {it.d}</span>
               </li>
             ))}
+          </ol>
+
+          <div className="lp-qprev">
+            <p className="lp-label">{C.LP.results.qTitle}</p>
+            <ul>
+              {C.LP.results.qChips.map((q) => <li key={q}>{q}</li>)}
+            </ul>
+            <p className="lp-xs">{C.LP.results.qNote}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── S3 · the problem mirror ────────────────────────────────────────── */}
+      <section className="lp-band lp-tight">
+        <div className="lp-col">
+          <p className="lp-eyebrow">{C.LP.problem.eyebrow}</p>
+          <h2>{C.LP.problem.hd}</h2>
+          <p className="lp-body">{C.LP.problem.body}</p>
+
+          <ul className="lp-segchips">
+            {C.LP.problem.chips.map((c, i) => <li key={c} className={i === 0 ? "on" : ""}>{c}</li>)}
           </ul>
+          <p className="lp-listtitle">{C.LP.problem.listTitle}</p>
+          <ul className="lp-lines">
+            {C.LP.problem.lines.map((l) => <li key={l}>{l}</li>)}
+          </ul>
+        </div>
+      </section>
 
-          <p className="cap-body u-body-d">{MASKEPP.foot}</p>
-          <Cta variant="sage" />
-        </Rise>
-      </div>
-
-      {/* ═══ 3 · How it works ═════════════════════════════════════════════
-          The homepage's `#hogyan` band, unchanged: centred head, `.steps` row of
-          three real screenshots. */}
-      <div className="band-cream sec-sm" id="igy">
-        <div className="wrap">
-          <Rise className="seq" style={{ textAlign: "center" }}>
-            <div className="eyebrow">{SECTION_LABEL.igy}</div>
-            <h2 className="h-bold" style={{ marginTop: 10 }}>{IGY_NEZ_KI.heading}</h2>
-            <p className="cap-body">{IGY_NEZ_KI.lead}</p>
-          </Rise>
-          <Rise className="steps seq">
-            {IGY_NEZ_KI.steps.map((s, i) => (
-              <div className="step" key={s}>
-                <span className="step-n">{i + 1}</span>
-                <div className="frame step-shot">
-                  <Image
-                    src={IGY_NEZ_KI.shots[i]!}
-                    alt=""
-                    fill
-                    sizes="(max-width: 900px) 60vw, 208px"
-                  />
-                </div>
-                <span className="step-b">{s}</span>
-              </div>
+      {/* ── S4 · the mechanism (navy) ──────────────────────────────────────── */}
+      <section className="lp-band lp-dark">
+        <div className="lp-col">
+          <p className="lp-eyebrow">{C.LP.mech.eyebrow}</p>
+          <h2>{C.LP.mech.hd}</h2>
+          <ol className="lp-rules">
+            {C.LP.mech.rules.map((r, i) => (
+              <li key={r.b}>
+                <span className="n">{String(i + 1).padStart(2, "0")}</span>
+                <span><b>{r.b}</b> {r.d}</span>
+              </li>
             ))}
-          </Rise>
+          </ol>
+          <p className="lp-body">{C.LP.mech.foot}</p>
         </div>
-      </div>
+      </section>
 
-      {/* ═══ 4 · Alexa ════════════════════════════════════════════════════
-          The homepage's Alexa layout: pull quote, `.ax-story` column, the
-          `.founder-facts` chips, the vow and the signature. The community count
-          is one of those chips now - it was carrying a 276px band by itself. */}
-      <div className="band-navy sec u-ax" id="alexa">
-        <div className="wrap">
-          <Rise className="ax-headin seq">
-            <div className="eyebrow u-eyebrow-d">{SECTION_LABEL.alexa}</div>
-            <h2 className="alexa-pull-big">{ALEXA.pull}</h2>
-          </Rise>
-          <Rise className="ax-inner seq">
-            <div className="ax-story">
-              <p>{ALEXA.story}</p>
-              <p>{PROOF.lead}</p>
-            </div>
-            <div className="starter-facts founder-facts">
-              {ALEXA.facts.map((f) => <span key={f}>{f}</span>)}
-            </div>
-            <p className="aq-vow">{ALEXA.promise}</p>
-            <p className="aq-sign">- {ALEXA.name}</p>
-          </Rise>
+      {/* ── S5 · how it looks ──────────────────────────────────────────────── */}
+      <section className="lp-band">
+        <div className="lp-col lp-col-wide">
+          <p className="lp-eyebrow">{C.LP.how.eyebrow}</p>
+          <h2>{C.LP.how.hd}</h2>
+          <p className="lp-body">{C.LP.how.lead}</p>
+
+          <ol className="lp-steps">
+            {C.LP.how.steps.map((s, i) => (
+              <li key={s}>
+                <div className="lp-shot">
+                  <Image src={C.LP.how.shots[i]!} alt="" fill sizes="(max-width: 1023px) 60vw, 280px" />
+                </div>
+                <span className="n">{i + 1}</span>
+                <p>{s}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="lp-xs lp-honest">{C.LP.how.foot}</p>
         </div>
-      </div>
+      </section>
 
-      {/* ═══ 5 · The ask ══════════════════════════════════════════════════
-          The homepage's `Panel` interior: `.ticon.center` - thin heading, body,
-          pill - inside a `.panel.panel-pad`. */}
-      <div className="band-cream sec" id="close">
-        <div className="wrap">
-          <Rise className="panel panel-pad">
-            <div className="ticon center">
-              <div className="eyebrow">{SECTION_LABEL.close}</div>
-              <h3 className="h-thin">{FINAL_CTA.heading}</h3>
-              <div className="body">{FINAL_CTA.body}</div>
-              <Cta />
-            </div>
-          </Rise>
+      {/* S6 · „Akik már csinálják" does NOT render: no member photos with
+          written consent exist, and the handoff excludes the section without
+          them - invented or stock imagery is out of the question. */}
+
+      {/* ── S7 · Alexa (navy) ──────────────────────────────────────────────── */}
+      <section className="lp-band lp-dark">
+        <div className="lp-col lp-alexa">
+          <div>
+            <p className="lp-eyebrow">{C.LP.alexa.eyebrow}</p>
+            <h2>{C.LP.alexa.quote}</h2>
+            <p className="lp-body">{C.ALEXA.story}</p>
+            <p className="lp-body">{C.ALEXA.promise}</p>
+            <ul className="lp-chips lp-chips-d">
+              {C.LP.alexa.chips.map((c) => <li key={c}>{c}</li>)}
+            </ul>
+          </div>
+          {/* Her real photo. No play chrome: a 30s video does not exist in the
+              repo, and a play button over a still would be a false affordance.
+              If the video lands, this is where the tap-to-play poster goes. */}
+          <div className="lp-alexa-photo">
+            <Image src="/alexa-gymnastics.jpg" alt="Alexa" width={420} height={520} sizes="(max-width: 1023px) 80vw, 380px" />
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Mobile sticky bar. Hidden with `visibility`, so its link never sits in
-          the tab order while parked. */}
-      <div className={`u-sticky${stuck ? " on" : ""}`} aria-hidden={!stuck}>
-        <Cta />
+      {/* ── S8 · the close (accent) ────────────────────────────────────────── */}
+      <section className="lp-band lp-acc" ref={closeRef}>
+        <div className="lp-col lp-close">
+          <p className="lp-eyebrow">{C.LP.close.eyebrow}</p>
+          <h2>{C.LP.close.hd}</h2>
+          <p className="lp-body">{C.LP.close.lead}</p>
+          <Cta position="close" />
+          <p className="lp-xs">{C.LP.close.ctaSub}</p>
+          <p className="lp-legal">
+            {C.LP.close.legal}{" "}
+            <Link href="/adatvedelem" className="lp-privacy">{C.LP.close.privacy}</Link>
+          </p>
+        </div>
+      </section>
+
+      {/* ── S · sticky bar (mobile only, M3) ───────────────────────────────── */}
+      <div className={`lp-sticky${stickyOn ? " on" : ""}`} aria-hidden={!stickyOn}>
+        <div className="lp-sticky-p">
+          <b>{C.LP.sticky.line}</b>
+          <span>{C.LP.sticky.sub}</span>
+        </div>
+        <Cta position="sticky" small />
       </div>
     </div>
   );

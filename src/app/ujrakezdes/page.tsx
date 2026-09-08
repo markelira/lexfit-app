@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Landing from "./Landing";
+import { lpVariantFor } from "./copy";
 
 // Lead magnet v2 - the ad landing page.
 //
@@ -16,6 +17,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default function UjrakezdesPage() {
-  return <Landing />;
+export default async function UjrakezdesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // The hero variant is chosen HERE, on the server, from the ad's utm_content
+  // (design handoff §7 S1b) - so the right headline is in the first byte of
+  // HTML and there is no client-side flash. Unknown or missing → base.
+  const sp = await searchParams;
+  const utm = typeof sp.utm_content === "string" ? sp.utm_content : undefined;
+  return <Landing variant={lpVariantFor(utm)} />;
 }

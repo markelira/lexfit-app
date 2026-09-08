@@ -61,161 +61,6 @@
   padding: 0 var(--sp-5);
 }
 
-/* ═══ The landing page (/ujrakezdes) ═══════════════════════════════════════
-   The page is `.lxl` - the HOMEPAGE's design system - and imports landing.css.
-   Nothing here restyles it. What follows is only the two things this page has
-   that the homepage does not (the week card in the hero device slot, and the
-   three-angle list), plus the mobile sticky CTA.
-
-   If you find yourself overriding a `.lxl` rule below, the right fix is almost
-   always to use a different landing primitive instead. */
-
-/* ── The week card, in the hero's device slot ─────────────────────────────── */
-
-.lxl.u-lp .u-weekdevice {
-  /* The homepage's `.hero-device` is a fixed-height photo frame - and its mobile
-     rule pins an `aspect-ratio: 320/566`, which recomputes a height even after
-     `height: auto`. Both have to be released or the card floats in 500px of
-     white. No ground of its own: <PlanMail> brings its own card. */
-  height: auto;
-  aspect-ratio: auto;
-  align-self: center;
-  width: min(400px, 100%);
-}
-
-.lxl.u-lp .u-weeknote {
-  font-size: 13px;
-  line-height: 1.5;
-  /* The hero ground is sage, not cream. `--tx-3` (ink at 66%) measures 3.09:1
-     there, under the 4.5 floor; full ink on sage is 5.46:1. */
-  color: var(--ink);
-  margin: 16px 0 0;
-  text-align: center;
-}
-
-
-/* ── Hero adjustments ─────────────────────────────────────────────────────── */
-
-.lxl.u-lp .hero-copy h1 {
-  /* The homepage headline is two short words per line and can carry 80px. This
-     one is a full sentence, so it steps down the same scale rather than
-     wrapping into four lines. Weight, case and tracking are untouched. */
-  font-size: clamp(34px, 5.4vw, 58px);
-  line-height: 1.08;
-}
-/* Not a link - it is the reassurance under the button, and the homepage's
-   `.hero-cta2` is the right type for it but the wrong affordance. */
-.lxl.u-lp .u-ctasub { text-transform: none; letter-spacing: 0.02em; cursor: default; }
-.lxl.u-lp .u-ctasub:hover { color: oklch(from var(--ink) l c h / 0.78); }
-
-/* ── The sections ─────────────────────────────────────────────────────────
-   Every band under the hero now uses a HOMEPAGE layout rather than one invented
-   here: `.ism` + `.ism-rules` for the problem, `heted-band` + `.starter-title` +
-   `.aq-promise` for the mechanism, `.steps` for the how, the Alexa column
-   (`.ax-headin` / `.ax-inner` / `.founder-facts` / `.aq-vow` / `.aq-sign`) for
-   the person, and `.panel.panel-pad > .ticon.center` for the close.
-
-   What is left below is only what those layouts do not already cover: the dark
-   text ramp on the two navy bands (the homepage sets it with inline styles,
-   which is not something to copy) and the two-part rule rows. */
-
-/* The homepage writes these as inline `style={{ color: "#fff" }}` on each
-   element. Same result, one place, and no inline styles to keep in sync.
-
-   BOTH scopes, deliberately: the landing root is `.lxl.u-lp`, the reveal's is
-   `.lxu.lxl.u-rev` - scoped to `.u-lp` alone, these never matched the reveal
-   and its navy guarantee band rendered its eyebrow, heading and body in INK on
-   navy: invisible. Found 2026-09-08, the first time the band was actually
-   looked at rather than measured. */
-:is(.lxl.u-lp, .lxu.u-rev) .u-eyebrow-d { color: var(--tx-d3); }
-:is(.lxl.u-lp, .lxu.u-rev) .u-title-d { color: var(--tx-d1); }
-:is(.lxl.u-lp, .lxu.u-rev) .u-body-d { color: var(--tx-d2); }
-
-/* `.aq-promise` carries one line per item on the homepage; the two rules are a
-   statement plus its explanation, so the row stacks. */
-.lxl.u-lp .u-mech-rules {
-  gap: 18px;
-  margin: 30px 0;
-  text-align: left;
-  max-width: 640px;
-  margin-inline: auto;
-}
-.lxl.u-lp .u-mech-rules li {
-  padding-left: 18px;
-  border-left: 2px solid var(--sage);
-}
-.lxl.u-lp .u-mech-rules b {
-  display: block;
-  font-family: var(--font);
-  font-size: clamp(17px, 2vw, 21px);
-  line-height: 1.3;
-  font-weight: 600;
-  letter-spacing: -0.018em;
-  color: var(--tx-d1);
-}
-.lxl.u-lp .u-mech-rules span {
-  display: block;
-  margin-top: 6px;
-  font-family: var(--font);
-  font-size: 15px;
-  line-height: 25px;
-  letter-spacing: 0;
-  color: var(--tx-d2);
-}
-
-/* The homepage's Alexa band is a photo section; ours is a plain navy one, so
-   the column that is normally pinned over the image is simply centred. */
-.lxl.u-lp .u-ax .ax-headin,
-.lxl.u-lp .u-ax .ax-inner { max-width: 660px; margin-inline: auto; }
-.lxl.u-lp .u-ax .alexa-pull-big { margin-top: 12px; }
-
-/* ── The mobile sticky CTA ───────────────────────────────────────────────── */
-
-.lxl.u-lp .u-sticky {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  display: flex;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: oklch(from var(--cream) l c h / 0.86);
-  backdrop-filter: blur(18px) saturate(180%);
-  border-top: 1px solid oklch(from var(--ink) l c h / 0.1);
-  /* `visibility`, not opacity alone: a parked bar that still takes focus puts an
-     invisible link in the tab order on every page. */
-  visibility: hidden;
-  opacity: 0;
-  transform: translateY(100%);
-  transition: opacity .24s var(--ease-out), transform .24s var(--ease-out),
-    visibility 0s linear .24s;
-}
-.lxl.u-lp .u-sticky.on {
-  visibility: visible;
-  opacity: 1;
-  transform: none;
-  transition-delay: 0s;
-}
-.lxl.u-lp .u-sticky .pill { width: 100%; }
-
-@media (min-width: 900px) {
-  /* Desktop keeps the closing CTA in the flow; a docked bar on a wide screen is
-     chrome the page does not need. */
-  .lxl.u-lp .u-sticky { display: none; }
-}
-
-@media (max-width: 899.98px) {
-  .lxl.u-lp .u-rules { grid-template-columns: minmax(0, 1fr); }
-  .lxl.u-lp .u-weekdevice { width: min(340px, 88vw); height: auto; aspect-ratio: auto; }
-  /* Room for the docked bar so the last CTA is never under it. */
-  .lxl.u-lp #close { padding-bottom: 128px; }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .lxl.u-lp .u-sticky { background: var(--cream); backdrop-filter: none; }
-}
-
-
 /* ═══ Buttons ═══════════════════════════════════════════════════════════════ */
 
 .lxu .u-cta {
@@ -1948,4 +1793,452 @@
   /* Everything lands in its final state immediately (handoff §7). */
   .lxu .u2-m1 { animation: none; }
   .lxu .u2-sticky { transition: none; }
+}
+
+/* ═══ /ujrakezdes — the quiz-starter page (lp) ══════════════════════════════
+   Design-handoff rebuild. Visual direction per the wireframe's own note:
+   sage fold → light sections → two navy bands → accent close. One accent
+   colour, generous spacing, no gradients. The hero's card pair is the page's
+   single ownable element: the empty week tilted behind at 70%, the finished
+   plan in front on a HARD (unblurred) shadow. */
+
+.lxu.lp {
+  display: block;
+  min-height: 100svh;
+  background: var(--surface);
+  overflow-x: clip;
+}
+
+/* ── S0 · header ──────────────────────────────────────────────────────────── */
+
+.lxu .lp-head {
+  display: flex;
+  align-items: center;
+  padding: 14px clamp(16px, 4vw, 32px);
+}
+.lxu .lp-mark { font-weight: 800; font-size: 16px; letter-spacing: 0.02em; color: var(--ink); }
+
+/* ── Shared atoms ─────────────────────────────────────────────────────────── */
+
+.lxu .lp-eyebrow {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin: 0 0 var(--sp-3);
+}
+.lxu .lp-band h2 {
+  font-size: clamp(23px, 5vw, 29px);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 var(--sp-3);
+}
+.lxu .lp-body { font-size: 15.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 var(--sp-4); }
+.lxu .lp-xs { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: var(--sp-2) 0 0; }
+.lxu .lp-label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 var(--sp-3);
+}
+
+.lxu .lp-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 26px;
+  border-radius: var(--r-md);
+  background: var(--ink);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15.5px;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: transform var(--dur-fast) var(--ease-settle);
+}
+.lxu .lp-cta:active { transform: scale(0.98); }
+.lxu .lp-cta:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+.lxu .lp-cta-sm { min-height: 44px; padding: 0 20px; font-size: 14px; }
+
+/* ── S1 · hero (sage) ─────────────────────────────────────────────────────── */
+
+.lxu .lp-hero {
+  background: #cfdcd5;
+  padding: clamp(28px, 5vw, 64px) clamp(16px, 4vw, 32px) clamp(36px, 6vw, 72px);
+}
+.lxu .lp-hero-grid {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-areas: "copy" "pair" "after";
+  gap: clamp(24px, 4vw, 56px);
+}
+.lxu .lp-hero-copy { grid-area: copy; }
+.lxu .lp-pair { grid-area: pair; }
+.lxu .lp-hero-after { grid-area: after; }
+@media (min-width: 1024px) {
+  .lxu .lp-hero-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    grid-template-areas: "copy pair" "after pair";
+    align-items: start;
+  }
+}
+
+.lxu .lp-hero h1 {
+  margin: 0 0 var(--sp-4);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: clamp(30px, 7vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+/* The two-weight base headline: the 7 in display size, „kérdés," light. */
+.lxu .lp-h-num {
+  display: inline-block;
+  font-size: clamp(54px, 12vw, 72px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  margin-right: 0.12em;
+  vertical-align: -0.06em;
+}
+.lxu .lp-h-rest em { font-style: normal; font-weight: 300; }
+
+.lxu .lp-lead { font-size: clamp(15.5px, 1.8vw, 17px); line-height: 1.55; color: var(--ink-2); margin: 0 0 var(--sp-2); max-width: 34rem; }
+.lxu .lp-anti { font-size: 15px; font-weight: 600; color: var(--ink); margin: 0 0 var(--sp-4); }
+
+.lxu .lp-chips { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0 0 var(--sp-2); padding: 0; }
+.lxu .lp-chips li {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: oklch(1 0 0 / 0.65);
+  color: var(--ink);
+}
+.lxu .lp-second { font-size: 12.5px; color: var(--ink-2); margin: 0 0 var(--sp-5); }
+
+.lxu .lp-ctarow { margin: 0 0 var(--sp-5); }
+.lxu .lp-ctasub { font-size: 12.5px; line-height: 1.55; color: var(--ink-2); margin: var(--sp-3) 0 0; max-width: 30rem; }
+
+/* Accent is LIGHT — the text on it is ink, never white (handoff §10). */
+.lxu .lp-mechrow {
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  padding: 14px 16px;
+}
+.lxu .lp-mechrow p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink); }
+.lxu .lp-mechrow .lp-xs { margin-top: 4px; color: var(--accent-ink); }
+
+/* ── S1 · the card pair ──────────────────────────────────────────────────── */
+
+.lxu .lp-pair { max-width: 420px; }
+@media (min-width: 1024px) { .lxu .lp-pair { justify-self: end; width: 100%; } }
+
+.lxu .lp-mock {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 16px;
+}
+.lxu .lp-mock-empty {
+  opacity: 0.7;
+  transform: rotate(-2.2deg);
+}
+.lxu .lp-mock-done {
+  position: relative;
+  z-index: 1;
+  margin-top: -6px;
+  transform: rotate(0.6deg);
+  /* Hard shadow, deliberately unblurred - the wireframe's one texture call. */
+  box-shadow: 9px 9px 0 oklch(from var(--ink) l c h / 0.18);
+}
+
+.lxu .lp-tag {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-3);
+}
+.lxu .lp-tag b {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.lxu .lp-tag span { font-size: 11.5px; color: var(--ink-3); }
+
+.lxu .lp-bridge {
+  margin: 10px 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.lxu .lp-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lxu .lp-week li {
+  border-radius: 9px;
+  background: var(--surface-2);
+  padding: 9px 2px 8px;
+  text-align: center;
+}
+.lxu .lp-week .d {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+.lxu .lp-week .dot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin: 5px auto 0;
+  background: var(--line);
+}
+.lxu .lp-week li.on { background: var(--ink); }
+.lxu .lp-week li.on .d { color: var(--bg); }
+.lxu .lp-week li.on .dot { background: var(--accent); }
+
+.lxu .lp-bar3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: var(--sp-3) 0 0;
+}
+.lxu .lp-bar3 > div {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 9px 6px;
+  text-align: center;
+}
+.lxu .lp-bar3 dt {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.lxu .lp-bar3 dd { margin: 2px 0 0; font-size: 9.5px; line-height: 1.25; color: var(--ink-3); }
+
+.lxu .lp-mchips { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; margin: var(--sp-3) 0 0; padding: 0; }
+.lxu .lp-mchips li {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.lxu .lp-mocknote { margin: var(--sp-3) 0 0; font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+.lxu .lp-dream { margin: var(--sp-3) 0 0; font-size: 14.5px; line-height: 1.5; font-weight: 600; color: var(--ink); }
+
+/* ── Bands ────────────────────────────────────────────────────────────────── */
+
+.lxu .lp-band { padding: clamp(44px, 7vw, 76px) clamp(16px, 4vw, 32px); }
+.lxu .lp-band.lp-tight { padding-top: clamp(28px, 4vw, 44px); }
+.lxu .lp-col { max-width: 640px; margin: 0 auto; }
+.lxu .lp-col-wide { max-width: 960px; }
+
+.lxu .lp-dark { background: var(--d-bg, #18201d); }
+.lxu .lp-dark h2 { color: var(--d-ink, #f5f8f6); }
+.lxu .lp-dark .lp-eyebrow { color: oklch(0.73 0.03 168); }
+.lxu .lp-dark .lp-body { color: oklch(0.965 0.008 168 / 0.85); }
+.lxu .lp-acc { background: var(--accent-soft); }
+
+/* ── S2 · deliverables ────────────────────────────────────────────────────── */
+
+.lxu .lp-deliv { list-style: none; margin: var(--sp-4) 0 0; padding: 0; display: grid; gap: var(--sp-3); }
+.lxu .lp-deliv li { display: flex; gap: var(--sp-3); font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
+.lxu .lp-deliv b { color: var(--ink); display: block; }
+.lxu .lp-deliv .n { flex: none; font-family: var(--mono); font-size: 11px; color: var(--accent-ink); padding-top: 2px; }
+
+.lxu .lp-qprev {
+  margin-top: var(--sp-6);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  padding: 18px;
+}
+.lxu .lp-qprev ul { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.lxu .lp-qprev li {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+}
+
+/* ── S3 · the problem ─────────────────────────────────────────────────────── */
+
+.lxu .lp-segchips { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: var(--sp-4) 0; padding: 0; }
+.lxu .lp-segchips li {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+.lxu .lp-segchips li.on { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+.lxu .lp-listtitle { font-size: 15px; font-weight: 600; color: var(--ink); margin: 0 0 var(--sp-3); }
+.lxu .lp-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.lxu .lp-lines li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.lxu .lp-lines li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 11px;
+  height: 2px;
+  background: var(--accent-2, var(--accent));
+}
+
+/* ── S4 · rules ───────────────────────────────────────────────────────────── */
+
+.lxu .lp-rules { list-style: none; margin: var(--sp-4) 0; padding: 0; display: grid; gap: var(--sp-4); }
+@media (min-width: 720px) { .lxu .lp-rules { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lxu .lp-rules li { display: flex; gap: var(--sp-3); font-size: 14.5px; line-height: 1.55; color: oklch(0.965 0.008 168 / 0.75); }
+.lxu .lp-rules b { display: block; color: #fff; font-size: 15.5px; }
+.lxu .lp-rules .n { flex: none; font-family: var(--mono); font-size: 11px; color: oklch(0.73 0.03 168); padding-top: 2px; }
+
+/* ── S5 · steps ───────────────────────────────────────────────────────────── */
+
+.lxu .lp-steps { list-style: none; margin: var(--sp-5) 0 0; padding: 0; display: grid; gap: var(--sp-6); }
+@media (min-width: 760px) { .lxu .lp-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
+.lxu .lp-steps li { display: grid; justify-items: start; }
+.lxu .lp-shot {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 9 / 16;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface-2);
+  box-shadow: 0 0 0 1px oklch(from var(--ink) l c h / 0.08);
+  margin-bottom: var(--sp-3);
+}
+.lxu .lp-shot img { object-fit: cover; object-position: top center; }
+.lxu .lp-steps .n {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent-ink);
+  margin-bottom: var(--sp-1);
+}
+.lxu .lp-steps p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-2); max-width: 30ch; }
+.lxu .lp-honest { margin-top: var(--sp-5); font-weight: 500; color: var(--ink-2); }
+
+/* ── S7 · Alexa ───────────────────────────────────────────────────────────── */
+
+.lxu .lp-alexa { display: grid; gap: var(--sp-6); }
+@media (min-width: 1024px) {
+  .lxu .lp-col.lp-alexa { max-width: 960px; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: center; }
+}
+.lxu .lp-alexa h2 { font-size: clamp(22px, 4.6vw, 27px); }
+.lxu .lp-chips-d li { background: oklch(1 0 0 / 0.1); color: oklch(0.965 0.008 168 / 0.85); }
+.lxu .lp-alexa-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-lg);
+  object-fit: cover;
+}
+
+/* ── S8 · close ───────────────────────────────────────────────────────────── */
+
+.lxu .lp-close { text-align: center; }
+.lxu .lp-close .lp-body { margin-inline: auto; max-width: 34rem; }
+.lxu .lp-close .lp-cta { margin-top: var(--sp-2); }
+.lxu .lp-legal { margin-top: var(--sp-6); font-size: 12px; line-height: 1.6; color: var(--accent-ink); }
+.lxu .lp-privacy { color: var(--accent-ink); text-decoration: underline; }
+
+/* ── S · sticky (mobile) ──────────────────────────────────────────────────── */
+
+.lxu .lp-sticky {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: oklch(1 0 0 / 0.92);
+  backdrop-filter: blur(16px) saturate(160%);
+  border-top: 1px solid var(--line);
+  visibility: hidden;
+  transform: translateY(110%);
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.34s;
+}
+.lxu .lp-sticky.on { visibility: visible; transform: none; transition-delay: 0s; }
+.lxu .lp-sticky-p { flex: 1; min-width: 0; display: grid; line-height: 1.3; }
+.lxu .lp-sticky-p b { font-size: 13px; font-weight: 600; color: var(--ink); }
+.lxu .lp-sticky-p span { font-size: 10.5px; color: var(--ink-3); }
+@media (min-width: 1024px) { .lxu .lp-sticky { display: none; } }
+@media (max-width: 1023.98px) { .lxu.lp { padding-bottom: 72px; } }
+@media (prefers-reduced-transparency: reduce) {
+  .lxu .lp-sticky { background: #fff; backdrop-filter: none; }
+}
+
+/* ── M1 + M4 ─────────────────────────────────────────────────────────────── */
+
+.lxu .lp-m1 {
+  animation: lp-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i) * 55ms);
+}
+/* M4: the finished plan assembles 200ms after the hero settles; the empty
+   week never moves - the contrast is the point. */
+.lxu .lp-m4 {
+  animation: lp-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i) * 55ms + 900ms);
+}
+@keyframes lp-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Composed transforms need their own final state - `transform: none` would
+   erase the mock cards' tilt. */
+.lxu .lp-mock-done .lp-week li.on.lp-m4 { animation-name: lp-in-flat; }
+@keyframes lp-in-flat {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxu .lp-m1, .lxu .lp-m4 { animation: none; }
+  .lxu .lp-sticky { transition: none; }
 }

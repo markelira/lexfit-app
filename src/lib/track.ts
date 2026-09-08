@@ -170,8 +170,16 @@ export function trackOnbWhisperView(): void {
 // back" is not something to put in a dataLayer.
 
 /** The /ujrakezdes landing was viewed. */
-export function trackUjrakezdesView(): void {
-  push("lx_ujrakezdes_view");
+export function trackUjrakezdesView(variant?: string): void {
+  // The variant is the utm_content-derived hero angle - attribution, never an
+  // answer, so it clears the no-answer-params rule.
+  push("lx_ujrakezdes_view", variant ? { variant } : undefined);
+}
+
+/** LP CTA clicks, broken down by position so each placement's contribution is
+ *  measurable (design handoff §9). */
+export function trackUjrakezdesLpCta(position: "hero" | "sticky" | "close"): void {
+  push("lx_ujrakezdes_lp_cta", { position });
 }
 
 /** The landing CTA was taken into the wizard. */
