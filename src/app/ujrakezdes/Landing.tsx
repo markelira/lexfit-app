@@ -149,11 +149,13 @@ export default function Landing({ variant = "base" }: { variant?: C.LpVariant })
                   <div key={f.l}><dt>{f.v}</dt><dd>{f.l}</dd></div>
                 ))}
               </dl>
-              <dl className="lp-bar3 lp-m4" style={{ ["--i" as string]: 10 }}>
-                {C.LP.mock.stats2.map((f) => (
-                  <div key={f.l}><dt>{f.v}</dt><dd>{f.l}</dd></div>
-                ))}
-              </dl>
+              {C.LP.mock.stats2.length > 0 && (
+                <dl className="lp-bar3 lp-m4" style={{ ["--i" as string]: 10 }}>
+                  {C.LP.mock.stats2.map((f) => (
+                    <div key={f.l}><dt>{f.v}</dt><dd>{f.l}</dd></div>
+                  ))}
+                </dl>
+              )}
               <ul className="lp-mchips lp-m4" style={{ ["--i" as string]: 12 }}>
                 {C.LP.mock.chips.map((c) => <li key={c}>{c}</li>)}
               </ul>

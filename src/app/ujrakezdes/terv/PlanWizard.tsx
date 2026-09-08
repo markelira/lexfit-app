@@ -214,6 +214,10 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
       // GATE instead: one submit away from the plan, and the lead upsert
       // dedupes on the email hash, so resubmitting is harmless.
       if (d.screen === "reveal") setScreen("gate");
+      // A draft saved while the calculator was live must not resume into a
+      // branch that no longer exists (or is flagged off) - land on the gate.
+      else if (!C.ENERGY_LIVE && d.screen && (["calc_invite", "body", "goal", "tempo"] as Screen[]).includes(d.screen))
+        setScreen("gate");
       else if (d.screen && d.screen !== "interstitial") setScreen(d.screen);
     } catch { /* ignore */ }
   }, []);
@@ -232,9 +236,12 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
       ...CORE,
       // The invitation stays in the order even after a decline, so Vissza from
       // the gate lands back on the offer rather than skipping past it - saying
-      // no once should not be irreversible.
-      "calc_invite" as Screen,
-      ...(skipCalc ? [] : CALC),
+      // no once should not be irreversible. While the energy module is off
+      // (Art. 9 amendment unsigned), the whole calculator branch leaves the
+      // flow: no invitation, no body-metric form, nothing to consent to.
+      ...(C.ENERGY_LIVE
+        ? ["calc_invite" as Screen, ...(skipCalc ? [] : CALC)]
+        : []),
       "gate" as Screen,
       "reveal" as Screen,
     ],

@@ -17,6 +17,13 @@
 import type { Anchor, Care, Daypart, Days, Focus, Level, Place } from "@/lib/ujrakezdes/types";
 import { lxPaths } from "@/lib/icons";
 
+// Evaluated here, before first use - ENERGY_LIVE at the bottom of the file
+// would be a TDZ error in the strings below. Same switch, same meaning: while
+// the Art. 9 amendment is unsigned the module is off, and every calorie/step
+// PROMISE must disappear with it, or the landing sells something the reveal
+// cannot deliver.
+const ENERGY_ON = process.env.NEXT_PUBLIC_ENERGY_MODULE !== "0";
+
 // ─── §1 Landing ──────────────────────────────────────────────────────────────
 
 // ─── §1 Landing — design-handoff rebuild (2026-09-08) ────────────────────────
@@ -84,14 +91,18 @@ export const LP = {
       { v: "30", l: "perc" },
       { v: "0", l: "eszköz" },
     ],
-    stats2: [
-      { v: "1640", l: "kcal / nap" },
-      { v: "8000", l: "lépés" },
-      { v: "Start", l: "program" },
-    ],
+    stats2: ENERGY_ON
+      ? [
+          { v: "1640", l: "kcal / nap" },
+          { v: "8000", l: "lépés" },
+          { v: "Start", l: "program" },
+        ]
+      : [],
     /** Sample answer chips - the same tray vocabulary the quiz itself uses. */
     chips: ["újrakezdés", "heti 3 nap", "este", "nappali", "térdkímélő"],
-    note: "Heti 3 nap, pihenőnapokkal, kalória- és lépéscéllal. A tiéd a válaszaidból készül.",
+    note: ENERGY_ON
+      ? "Heti 3 nap, pihenőnapokkal, kalória- és lépéscéllal. A tiéd a válaszaidból készül."
+      : "Heti 3 nap, pihenőnapokkal. A tiéd a válaszaidból készül.",
     dream: "Nem egy hetet kapsz. Egy hetet, ami kibírja a rossz heteket is.",
     /** The gate's mail preview echoes the person's REAL answers with this
      *  lead - shared here so the sample and the real artifact use one word. */
@@ -107,8 +118,12 @@ export const LP = {
     lead: "Nem általános tanácsokat kapsz, hanem a saját válaszaidra épített tervet - azonnal, e-mailben is.",
     items: [
       { b: "A heti edzésterved", d: "Heti 2, 3 vagy 4 nap - te választod. Pihenőnapokkal, a te szintedhez igazítva." },
-      { b: "A napi kalória-célod", d: "A szinten tartó és a célodhoz ajánlott érték, a megadott adataidból számolva." },
-      { b: "A napi lépéscélod", d: "Hol tartasz most, és mi a reális következő lépcső - szakaszosan, nem egyszerre." },
+      ...(ENERGY_ON
+        ? [
+            { b: "A napi kalória-célod", d: "A szinten tartó és a célodhoz ajánlott érték, a megadott adataidból számolva." },
+            { b: "A napi lépéscélod", d: "Hol tartasz most, és mi a reális következő lépcső - szakaszosan, nem egyszerre." },
+          ]
+        : []),
       { b: "A rád szabott LEXFIT program", d: "Melyik programmal érdemes kezdened, és miért pont azzal." },
       { b: "Az első edzésed", d: "Konkrét videó, 20-30 perc, eszköz nélkül. Ma is elindíthatod." },
     ],
@@ -117,7 +132,9 @@ export const LP = {
       "Mi a célod", "Mennyit mozogsz most", "Hány nap fér bele",
       "Mennyi idő egy alkalomra", "Mire figyeljünk", "Hol mozogsz", "Melyik napszak",
     ],
-    qNote: "Hét kérdés, egy koppintás mindegyik. A kalória- és lépéscélhoz jön még három - az opcionális.",
+    qNote: ENERGY_ON
+      ? "Hét kérdés, egy koppintás mindegyik. A kalória- és lépéscélhoz jön még három - az opcionális."
+      : "Hét kérdés, egy koppintás mindegyik.",
   },
 
   /** S3 · the problem mirror. The first chip carries the ad's angle. */
@@ -153,7 +170,9 @@ export const LP = {
     shots: ["/step-1-question.png", "/step-2-plan.png", "/step-3-player.png"],
     steps: [
       "Válaszolsz 7 kérdésre - nagyjából egy perc.",
-      "Megadod az e-mail címed, és megkapod a heti tervedet, pihenőnapokkal. A kalória- és lépéscélhoz három plusz kérdés jön - ez opcionális, a terved enélkül is kész.",
+      ENERGY_ON
+        ? "Megadod az e-mail címed, és megkapod a heti tervedet, pihenőnapokkal. A kalória- és lépéscélhoz három plusz kérdés jön - ez opcionális, a terved enélkül is kész."
+        : "Megadod az e-mail címed, és megkapod a heti tervedet, pihenőnapokkal.",
       "Az első edzést azonnal elindíthatod - 20-30 perc, eszköz nélkül.",
     ],
     foot: "A heti terv ingyenes, és a tiéd marad. A LEXFIT tagság fizetős - az árakat a terved mellett mutatjuk meg.",
