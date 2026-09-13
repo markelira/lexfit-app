@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { fetchEmbeddedClientSecret, startCheckout, type Consents } from "@/lib/billing";
 import { inMetaWebview } from "@/lib/webview";
@@ -14,9 +14,26 @@ import { nextChargeLabel, type RenewalRole } from "@/lib/pricing/renewal";
 import { GARANCIA, GUARANTEE_LIVE, PAY_STEP } from "@/components/landing/offer-copy";
 import { trackGuaranciaView } from "@/lib/track";
 
-// Stripe.js is loaded lazily, once, at module scope (publishable key is public).
+// Stripe.js is loaded LAZILY and RETRYABLY - not at module scope. The eager
+// module-scope promise fired the js.stripe.com fetch the moment any page
+// pulled this chunk (a reveal prefetch was enough), and a single flaky fetch
+// left a forever-rejected promise: the pay step then mounted an empty
+// checkout with no error and no retry (Sentry JAVASCRIPT-NEXTJS-Q, 75% of
+// events on /register). Now the fetch starts on the pay CTA, a failure
+// clears the memo so the next tap retries, and the rejection is HANDLED -
+// it surfaces on the step's own error line instead of onunhandledrejection.
 const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-const stripePromise = pk ? loadStripe(pk) : null;
+let stripeMemo: Promise<Stripe | null> | null = null;
+function getStripe(): Promise<Stripe | null> | null {
+  if (!pk) return null;
+  if (!stripeMemo) {
+    stripeMemo = loadStripe(pk).catch((e) => {
+      stripeMemo = null; // a failed load must not poison every later attempt
+      throw e;
+    });
+  }
+  return stripeMemo;
+}
 
 // The funnel's recurring plans need both consents (J1 auto-renew + J2 immediate
 // start); the single compact checkbox below covers both, and the server records
@@ -67,6 +84,11 @@ export function EmbeddedPay({
   const [ready, setReady] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [redirecting, setRedirecting] = useState(false);
+  // The RESOLVED Stripe instance - the provider gets this, never a promise, so
+  // a load failure can never reach it. Set on the pay CTA, kept across
+  // "Módosítás" round-trips.
+  const [stripe, setStripe] = useState<Stripe | null>(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
   // Meta's in-app browser breaks EMBEDDED checkout (iframe + third-party
   // cookies + no Google Pay + no autofill; 3/3 payment attempts of the first
   // campaign flight died here - docs/lead-conversion-diagnosis.md L1). Inside
@@ -156,10 +178,27 @@ export function EmbeddedPay({
           </label>
           <button
             className="fnl-cta"
-            disabled={!consented || redirecting}
+            disabled={!consented || redirecting || stripeLoading}
             onClick={() => {
               setErr(null);
-              if (!webview) { setReady(true); return; }
+              if (!webview) {
+                // Stripe.js must be IN HAND before the step flips - flipping
+                // first and letting the provider await a promise is how the
+                // silent empty-checkout dead end happened. Failure lands on
+                // the error line, and the same tap retries (getStripe clears
+                // its memo on failure).
+                const p = getStripe();
+                if (!p) { setErr("A fizetés jelenleg nem elérhető."); return; }
+                setStripeLoading(true);
+                p.then((s) => {
+                  if (!s) throw new Error("Stripe.js resolved null");
+                  setStripe(s);
+                  setReady(true);
+                }).catch(() => {
+                  setErr("A fizetést most nem tudtuk elindítani. Próbáld újra.");
+                }).finally(() => setStripeLoading(false));
+                return;
+              }
               // Hosted-checkout redirect for webview traffic. startCheckout
               // records the consent server-side exactly like the embedded
               // path, then navigates the whole page to Stripe.
@@ -170,7 +209,9 @@ export function EmbeddedPay({
               });
             }}
           >
-            {redirecting ? "Átirányítás a fizetéshez…" : "Tovább a fizetéshez"}
+            {redirecting ? "Átirányítás a fizetéshez…"
+              : stripeLoading ? "A fizetés betöltése…"
+              : "Tovább a fizetéshez"}
           </button>
           {err && <p className="fnl-formerr">{err}</p>}
           <p className="fnl-alt">{PAY_STEP.cancelLine}</p>
@@ -188,14 +229,14 @@ export function EmbeddedPay({
             <button type="button" className="fnl-payedit" onClick={() => setReady(false)}>Módosítás</button>
           </div>
 
-          {stripePromise && !err && (
+          {stripe && !err && (
             <div className="fnl-embed">
-              <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
+              <EmbeddedCheckoutProvider stripe={stripe} options={{ fetchClientSecret }}>
                 <EmbeddedCheckout />
               </EmbeddedCheckoutProvider>
             </div>
           )}
-          {!stripePromise && <p className="fnl-formerr">A fizetés jelenleg nem elérhető.</p>}
+          {!stripe && <p className="fnl-formerr">A fizetés jelenleg nem elérhető.</p>}
           {err && (
             <div>
               <p className="fnl-formerr">{err}</p>
