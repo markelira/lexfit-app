@@ -843,6 +843,17 @@ export default function PlanWizard({
               <h2 id="u2-entry-h">{C.REVEAL.entry.hd(intro)}</h2>
               <p className="u2-body">{C.REVEAL.entry.lead(weekStd)}</p>
 
+              {/* C7 · certainty before catalogue: the same four personalized
+                  lines the desktop rail carries, on the surface ~100% of the
+                  traffic actually uses. The audience's objection is "will I
+                  stick with it" - answer it before listing what she gets. */}
+              <p className="u2-label">{C.REVEAL.rail.fitTitle}</p>
+              <ul className="u2-fit">
+                {fitLines.map((f) => (
+                  <li key={f}><span className="fk" aria-hidden="true">✓</span>{f}</li>
+                ))}
+              </ul>
+
               <p className="u2-label">{C.REVEAL.entry.listTitle}</p>
               <ul className="u2-inc u2-stack">
                 {C.REVEAL.entry.items.map((it) => (

@@ -2878,3 +2878,9 @@
   .lxu .u2-stats { gap: 6px; }
   .lxu .u2-stats dt { font-size: 20px; }
 }
+
+/* C7 · the certainty lines on mobile read at the mobile floor. */
+@media (max-width: 700px) {
+  .lxu .u2-entry .u2-fit li { font-size: 14.5px; }
+  .lxu .u2-entry .u2-fit { margin-bottom: var(--sp-5); }
+}
