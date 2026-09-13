@@ -2813,3 +2813,68 @@
 .lxu .u2-fit .fk { flex: none; color: var(--accent); font-weight: 700; font-size: 12px; }
 .lxu .u2-rail-allin { margin: 0 0 var(--sp-2); font-size: 12px; line-height: 1.5; color: var(--ink-2); }
 .lxu .u2-rail-in .u2-proof { font-size: 12px; }
+
+/* ── Mobile maximization (≤700px) — the primary surface ────────────────────
+   ~100% of ad traffic is a phone inside the FB webview, and the audience is
+   35-54: raised type floors, ≥44px touch targets, edge-to-edge media, and a
+   curve whose labels survive a 360px screen. */
+
+@media (max-width: 700px) {
+  /* Type floors: nothing informational under ~12.5px on the primary surface. */
+  .lxu .u2-xs { font-size: 13px; }
+  .lxu .u2-renew { font-size: 13px; }
+  .lxu .u2-calm { font-size: 12.5px; }
+  .lxu .u2-chips li { font-size: 10.5px; padding: 7px 11px; }
+  .lxu .u2-card-t b { font-size: 14.5px; }
+  .lxu .u2-card-t span { font-size: 12.5px; }
+  .lxu .u2-sticky-p b { font-size: 14.5px; }
+  .lxu .u2-sticky-p span { font-size: 11.5px; }
+  .lxu .u2-cv-cap { font-size: 14px; }
+  .lxu .u2-start-line { font-size: 15px; }
+
+  /* Touch targets ≥44px (start-day chips were 40). */
+  .lxu .u2-start-opts button { min-height: 46px; padding: 10px 18px; font-size: 14.5px; }
+  .lxu .u2-cta.u2-cta-sm { min-height: 46px; }
+  .lxu .u2-faq summary { min-height: 52px; }
+
+  /* The curve's labels: SVG text scales with the viewBox, so at 360-440px
+     the desktop sizes land at ~9px. These bumps keep them ≥11px effective
+     on a 375px screen; the dip annotation is the page's one extravagance
+     and must never be the smallest thing on it. */
+  .lxu .u2-cv-mile text { font-size: 20px; }
+  .lxu .u2-cv-dip text { font-size: 23px; font-weight: 700; }
+  .lxu .u2-cv-ax { font-size: 18px; }
+  .lxu .u2-cv-y { font-size: 19px; }
+  .lxu .u2-cv-line { stroke-width: 3.5; }
+
+  /* The shelf scrolls edge-to-edge: cards bleed into the grid's own gutter
+     and snap back to it, so the row reads as a real carousel, not a boxed
+     list (matches the grid's clamp(16px, 4vw, 28px) padding). */
+  .lxu .u2-shelf-row {
+    margin-inline: calc(-1 * clamp(16px, 4vw, 28px));
+    padding-inline: clamp(16px, 4vw, 28px);
+    scroll-padding-inline: clamp(16px, 4vw, 28px);
+    scroll-snap-type: x mandatory;
+  }
+
+  /* The plan-build checklist: a long care chip ("térdkímélő · derékkímélő")
+     next to its label must wrap as a unit, never push the row off-screen. */
+  .lxu .u2-build-steps li { flex-wrap: wrap; }
+  .lxu .u2-build-steps .chip { white-space: normal; }
+
+  /* The hero card's badges: keep the free pill from colliding with the
+     minutes chip on narrow screens. */
+  .lxu .u2-first-free { font-size: 11px; padding: 5px 9px; max-width: 60%; }
+
+  /* Milestone chips read at a glance. */
+  .lxu .u2-miles li { font-size: 10.5px; }
+
+  /* Rhythm anchor cards: two abreast stay legible; under 340px they stack. */
+  .lxu .u2-price2 span { font-size: 11px; }
+}
+
+@media (max-width: 340px) {
+  .lxu .u2-price2 { grid-template-columns: 1fr; }
+  .lxu .u2-stats { gap: 6px; }
+  .lxu .u2-stats dt { font-size: 20px; }
+}
