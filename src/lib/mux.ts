@@ -83,3 +83,37 @@ export async function signPlaybackTokens(playbackId: string) {
     storyboard: tokens["storyboard-token"],
   };
 }
+
+/**
+ * Sign IMAGE-ONLY tokens for a playback id - poster (thumbnail) and animated
+ * preview (gif aud covers animated.webp too). For the reveal's workout cards:
+ * the cards must show the real product, but a card may never leak a video
+ * token, or one plan token would open the whole library. Full playback is
+ * signed separately, for the first workout alone.
+ *
+ * The frame/clip selection lives IN the token claims - Mux ignores URL query
+ * params when a token is present (verified 2026-09-13: t=12 and no-time URLs
+ * returned byte-identical images). The workouts open on a dark branded intro,
+ * so the poster frame and the preview clip are taken from 60s in, where the
+ * actual training is on screen.
+ */
+export async function signPreviewTokens(playbackId: string) {
+  const base = {
+    keyId: process.env.MUX_SIGNING_KEY_ID,
+    keySecret: process.env.MUX_SIGNING_PRIVATE_KEY,
+    expiration: "6h" as const,
+  };
+  const [thumb, gif] = await Promise.all([
+    mux.jwt.signPlaybackId(playbackId, {
+      ...base,
+      type: "thumbnail",
+      params: { time: "60", width: "960" },
+    }),
+    mux.jwt.signPlaybackId(playbackId, {
+      ...base,
+      type: "gif",
+      params: { start: "60", end: "65", width: "480" },
+    }),
+  ]);
+  return { thumbnail: thumb as unknown as string, gif: gif as unknown as string };
+}

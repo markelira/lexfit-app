@@ -524,6 +524,25 @@ export const REVEAL = {
       `Az első edzésed: ${when} · ${mins} perc, eszköz nélkül.`,
   },
 
+  /** The first workout's free watch (owner decision 2026-09-13: the
+   *  strongest proof for a "will I stick with it" audience is the product
+   *  itself, at the moment of peak investment). */
+  first: {
+    eyebrow: "Az első edzésed",
+    free: "Nézd meg most — ingyen",
+    sub: "ugyanaz a lejátszó, mint a tagságban",
+    hd: "Az első pipa ma este megvan.",
+  },
+
+  /** The shelf: the entry programme's next sessions, as real cards. */
+  shelf: {
+    eyebrow: "A folytatás",
+    hd: "Ez vár rád a Start programban",
+    aria: "A Start program következő edzései",
+    lock: "a tagsággal",
+    note: "Minden kártya a valódi edzés — érintsd meg, és belenézhetsz.",
+  },
+
   /** B2 / desktop rail / sticky bar - one offer, three placements. */
   offer: {
     proofGuar: "10 edzés garancia",

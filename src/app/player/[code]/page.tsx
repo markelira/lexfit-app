@@ -65,6 +65,13 @@ function PlayerScreen({ code }: { code: string }) {
   const [notFound, setNotFound] = useState(false);
   const [sessionOrder, setSessionOrder] = useState(0);
   const [resumeAt, setResumeAt] = useState(0);
+  /** GUEST MODE (?lt= plan token, 2026-09-13): the /ujrakezdes reveal opens
+   *  the FIRST workout here so the free watch is the app's real player - same
+   *  HUD, same blocks, same everything. The lead-gated /watch endpoint serves
+   *  the video doc + tokens (anonymous visitors can't read Firestore and get
+   *  no entitled tokens); progress, resume, save and share stay account-only
+   *  via the existing `if (user)` guards. */
+  const [guestLt, setGuestLt] = useState<string | null>(null);
 
   const [stage, setStage] = useState<"preview" | "playing" | "finished">("preview");
   const [wantAutostart, setWantAutostart] = useState(false);
@@ -120,6 +127,33 @@ function PlayerScreen({ code }: { code: string }) {
     })();
     return () => { active = false; };
   }, [user, code]);
+
+  // Guest mode: read ?lt= once, then load video + tokens from the lead-gated
+  // endpoint. Tokens land BEFORE the video (same render), so an autostarted
+  // guest start() never falls through to the entitled token route.
+  useEffect(() => {
+    const lt = new URLSearchParams(window.location.search).get("lt");
+    if (lt && /^[0-9a-f]{32}$/.test(lt)) setGuestLt(lt);
+  }, []);
+  useEffect(() => {
+    if (!guestLt || user || video) return;
+    let active = true;
+    (async () => {
+      const res = await fetch(
+        `/api/ujrakezdes-lead/watch?lt=${guestLt}&code=${encodeURIComponent(code)}`,
+      ).catch(() => null);
+      if (!active) return;
+      if (!res?.ok) return setNotFound(true);
+      const data = (await res.json()) as {
+        video: Video;
+        playbackId: string;
+        tokens: PlaybackResponse["tokens"];
+      };
+      setPb({ playbackId: data.playbackId, tokens: data.tokens });
+      setVideo(data.video);
+    })();
+    return () => { active = false; };
+  }, [guestLt, user, video, code]);
 
   // Seed duration from the stored Mux duration so stamped block math is correct
   // before the player's own `loadedmetadata` fires (which then sets the exact value).
@@ -465,7 +499,9 @@ function PlayerScreen({ code }: { code: string }) {
   };
   const fsActive = fs || fakeFs;
   const toggleFs = () => (fsActive ? exitFs() : enterFs());
-  const exit = () => router.push("/app");
+  // Guests exit to their persisted plan, members to the app (spatial
+  // consistency: you leave the way you came in).
+  const exit = () => router.push(guestLt ? `/ujrakezdes/terv/${guestLt}` : "/app");
 
   // Keep the fullscreen icon (maximize ⇄ minimize) in sync with the browser
   // state - including the iPhone NATIVE video fullscreen, which reports via
@@ -646,7 +682,7 @@ function PlayerScreen({ code }: { code: string }) {
     return (
       <div className="lx szm-player" style={{ alignItems: "center", justifyContent: "center" }}>
         <p style={{ color: "var(--d-ink-2)" }}>Ez az edzés nem található.</p>
-        <button className="btn ghost" onClick={() => router.push("/app")}>← Vissza</button>
+        <button className="btn ghost" onClick={exit}>← Vissza</button>
       </div>
     );
   if (!video) return <PlayerSkeleton />;
@@ -659,7 +695,7 @@ function PlayerScreen({ code }: { code: string }) {
     return (
       <div className="lx szm-player szm-pl-prevwrap">
         <div className="szm-pl-stagebg" style={{ background: grad(video.theme) }} aria-hidden="true" />
-        <button onClick={() => router.push("/app")} className="btn ghost" style={{ position: "absolute", top: 22, left: 26, zIndex: 3 }}>
+        <button onClick={exit} className="btn ghost" style={{ position: "absolute", top: 22, left: 26, zIndex: 3 }}>
           ← Vissza
         </button>
         <div className="szm-pl-prev wide">
@@ -819,7 +855,7 @@ function PlayerScreen({ code }: { code: string }) {
                 title={video.title}
                 mins={video.mins}
                 streak={result?.streak ?? 1}
-                onShare={() => setShareOpen(true)}
+                onShare={guestLt ? exit : () => setShareOpen(true)}
                 onSkip={exit}
               />
             )}
@@ -968,13 +1004,14 @@ function PlayerScreen({ code }: { code: string }) {
           </div>
         </div>
 
-        {/* MOBILE tab bar stays (L5 - page, not takeover) */}
-        <nav className="pf-mtabs">
+        {/* MOBILE tab bar stays (L5 - page, not takeover); app chrome, so
+            guests (reveal free watch) don't get dead tabs into a paywall */}
+        {!guestLt && <nav className="pf-mtabs">
           <button className="pf-mtab on" onClick={() => router.push("/app")}><LxIcon d={lxPaths.house} size={20} /> Kezdőlap</button>
           <button className="pf-mtab" onClick={() => router.push("/app/library")}><LxIcon d={lxPaths.layoutGrid} size={20} /> Videótár</button>
           <button className="pf-mtab" onClick={() => router.push("/app/progress")}><LxIcon d={lxPaths.chartColumn} size={20} /> Haladásom</button>
           <button className="pf-mtab" onClick={() => router.push("/app/challenges")}><LxIcon d={lxPaths.trophy} size={20} /> Kihívások</button>
-        </nav>
+        </nav>}
       </div>
     </div>
   );
@@ -983,6 +1020,19 @@ function PlayerScreen({ code }: { code: string }) {
 export default function Page() {
   const params = useParams();
   const code = String(params.code);
+  // GUEST BYPASS: a valid-shaped ?lt= skips the auth gate - the reveal's free
+  // first workout must play for someone with no account. The lt is only a
+  // ROUTING decision here; actual access is enforced by the /watch endpoint,
+  // which validates the lead token server-side and only ever serves the entry
+  // programme's first session. A forged lt shape reaches PlayerScreen, gets a
+  // 404 from /watch, and sees the not-found state - no content leaks.
+  const [guest, setGuest] = useState<boolean | null>(null);
+  useEffect(() => {
+    const lt = new URLSearchParams(window.location.search).get("lt");
+    setGuest(!!lt && /^[0-9a-f]{32}$/.test(lt));
+  }, []);
+  if (guest === null) return <PlayerSkeleton />;
+  if (guest) return <PlayerScreen code={code} />;
   return (
     <Protected requirePaid fallback={<PlayerSkeleton />}>
       <PlayerScreen code={code} />

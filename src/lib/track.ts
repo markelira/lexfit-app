@@ -232,6 +232,16 @@ export function trackUjrakezdesLoaderDone(): void {
   push("lx_ujrakezdes_loader_done");
 }
 
+/** The first workout's theater was opened on the reveal (the free watch). */
+export function trackUjrakezdesWatchOpen(code: string): void {
+  push("lx_ujrakezdes_watch_open", { code });
+}
+
+/** A locked workout card was tapped (peek → sent to the offer). */
+export function trackUjrakezdesCardPeek(code: string): void {
+  push("lx_ujrakezdes_card_peek", { code });
+}
+
 /** The offer CTA on the reveal was clicked. */
 export function trackUjrakezdesOfferClick(): void {
   push("lx_ujrakezdes_offer_click");

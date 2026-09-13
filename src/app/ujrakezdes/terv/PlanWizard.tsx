@@ -25,6 +25,7 @@ import MailPreview from "./MailPreview";
 import HabitCurve from "./HabitCurve";
 import StartDayPick, { type StartPick } from "./StartDayPick";
 import PlanBuild, { type BuildStep } from "./PlanBuild";
+import { FirstWorkoutCard, WorkoutCardsRow, type MediaCard, type FirstMedia } from "./WorkoutCards";
 import { useSectionView } from "./useSectionView";
 import { nextChargeLabel } from "@/lib/pricing/renewal";
 import { BrandPanel } from "@/components/onboarding/BrandPanel";
@@ -44,7 +45,7 @@ import {
   marketingContext, newEventId, trackUjrakezdesGateView, trackUjrakezdesLead,
   trackUjrakezdesLoaderDone, trackUjrakezdesOfferClick, trackUjrakezdesQuizStart,
   trackUjrakezdesRevealView, trackUjrakezdesStartDay, trackUjrakezdesStep,
-  trackUjrakezdesStickyClick, trackUjrakezdesStickyView,
+  trackUjrakezdesStickyClick, trackUjrakezdesStickyView, trackUjrakezdesWatchOpen,
 } from "@/lib/track";
 
 // The lead magnet v2 wizard: Q1-Q7 → interstitial → gate → reveal.
@@ -216,6 +217,10 @@ export default function PlanWizard({
   /** R4 · the chosen start day. Session-remembered; personalises the
    *  first-workout block and the curve's footing, writes nothing upstream. */
   const [startPick, setStartPick] = useState<StartPick>("today");
+  /** The reveal's media (v2): the first workout's full playback + the next
+   *  sessions' poster/preview cards, fetched by plan token. Null until (and
+   *  unless) it loads - every media surface degrades to the token-free UI. */
+  const [media, setMedia] = useState<{ first: FirstMedia | null; cards: MediaCard[] } | null>(null);
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [hp, setHp] = useState("");
@@ -468,6 +473,21 @@ export default function PlanWizard({
   const offerRailRef = useSectionView("offer");
   const faqRef = useSectionView("faq");
   const closeSecRef = useSectionView("close");
+
+  // Fetch the reveal's media once per session on entering the reveal. A
+  // failure (expired token, offline, emulator without videos) is silent: the
+  // page renders its non-media fallbacks and sells exactly as before.
+  useEffect(() => {
+    if (screen !== "reveal" || !leadToken || media) return;
+    let live = true;
+    fetch(`/api/ujrakezdes-lead/media?lt=${leadToken}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((b: { first: FirstMedia | null; cards: MediaCard[] } | null) => {
+        if (live && b) setMedia(b);
+      })
+      .catch(() => { /* fallbacks render */ });
+    return () => { live = false; };
+  }, [screen, leadToken, media]);
 
   /** R4's pick handler - state, session memory and the event in one place. */
   const pickStart = useCallback((p: StartPick) => {
@@ -725,6 +745,42 @@ export default function PlanWizard({
             {/* ── R4 · when do you start ──────────────────────────────────── */}
             <StartDayPick pick={startPick} onPick={pickStart} mins={plan.firstWorkoutMinutes} />
 
+            {/* ── The first workout, watchable free (v2). The card is the
+                real video; playing opens the REAL /player page in guest mode
+                (?lt=) - same HUD the membership gets. Falls back to the
+                static cover while media hasn't loaded (or can't). ─────────── */}
+            <section className="u2-blk u2-firstblk">
+              <p className="u2-eyebrow">
+                {C.REVEAL.b4.eyebrow(startPick === "today" ? "ma este" : "hétfő")}
+              </p>
+              <h2>{C.REVEAL.b4.hd}</h2>
+              {media?.first ? (
+                <FirstWorkoutCard
+                  title={media.first.title}
+                  theme={media.first.theme}
+                  mins={media.first.mins}
+                  poster={media.first.poster}
+                  onPlay={() => {
+                    // The REAL player, guest mode: same HUD, same blocks,
+                    // same everything the membership plays in. ?lt= carries
+                    // access; autostart skips the redundant preview - she
+                    // already pressed play on the real poster.
+                    trackUjrakezdesWatchOpen(media.first!.code);
+                    window.location.href = `/player/${media.first!.code}?lt=${leadToken}&autostart=1`;
+                  }}
+                />
+              ) : (
+                firstW && (
+                  <div className="u2-cover" aria-hidden="true">
+                    <span className="mono">LEXFIT · {firstW.code}</span>
+                    <b>{firstW.theme}</b>
+                    <i>{firstW.mins} PERC</i>
+                  </div>
+                )
+              )}
+              <p className="u2-xs">{C.REVEAL.b4.sub(plan.firstWorkoutMinutes)}</p>
+            </section>
+
             {/* ── B3 · the mechanism's opening mirror. The two rules moved
                 under the curve — they are what it draws; restating them here
                 made the same argument twice. ─────────────────────────────── */}
@@ -745,6 +801,16 @@ export default function PlanWizard({
                 <p className="u2-cohort">{C.REVEAL.alexaCohort}</p>
               </div>
             </section>
+
+            {/* ── The shelf: the Start programme's next sessions as real
+                cards (v2) — the product proving itself just before the
+                offer. Locked taps land on the offer, honestly. ───────────── */}
+            {media && media.cards.length > 0 && (
+              <WorkoutCardsRow
+                cards={media.cards}
+                onLockedTap={() => b2Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+              />
+            )}
 
             {/* B5 · „Akik már csinálják" does NOT render: no consented member
                 photos exist, and the handoff forbids the section without them
@@ -772,22 +838,7 @@ export default function PlanWizard({
               <p className="u2-body u2-yt">{C.REVEAL.entry.youtube}</p>
             </section>
 
-            {/* ── B4 · the first workout — after the offer now: product
-                proof for scrollers, keyed to the chosen start day (R4). ──── */}
-            <section className="u2-blk">
-              <p className="u2-eyebrow">
-                {C.REVEAL.b4.eyebrow(startPick === "today" ? "ma este" : "hétfő")}
-              </p>
-              {firstW && (
-                <div className="u2-cover" aria-hidden="true">
-                  <span className="mono">LEXFIT · {firstW.code}</span>
-                  <b>{firstW.theme}</b>
-                  <i>{firstW.mins} PERC</i>
-                </div>
-              )}
-              <h2>{C.REVEAL.b4.hd}</h2>
-              <p className="u2-xs">{C.REVEAL.b4.sub(plan.firstWorkoutMinutes)}</p>
-            </section>
+            {/* B4 folded into the first-workout watch block above (v2). */}
           </div>
 
           {/* ── The decision rail (desktop only) ──────────────────────────── */}
@@ -884,6 +935,7 @@ export default function PlanWizard({
             {C.REVEAL.sticky.go}
           </a>
         </div>
+
       </main>
     );
   }

@@ -2582,3 +2582,175 @@
     box-shadow: 0 12px 32px oklch(0.2 0.02 168 / 0.14);
   }
 }
+
+/* ═══ Reveal v2 — white ground, real video, Apple-grade surfaces ═══════════
+   Scoped to .lxu.u2 (the reveal + its build beat) so the landing, the quiz
+   and the gate keep the funnel's cream. One accent survives on white: the
+   brand green — CTA, curve, selection, the "free" badge. Everything else is
+   ink, three grays and hairlines. */
+
+.lxu.u2 { background: #fff; }
+.lxu.u2 .u2-top { background: rgba(255, 255, 255, 0.78); backdrop-filter: blur(18px) saturate(160%); }
+
+/* Cards define themselves with hairline + layered shadow instead of a tinted
+   ground. */
+.lxu.u2 .u2-plan,
+.lxu.u2 .u2-rail-in {
+  background: #fff;
+  border: 1px solid rgba(17, 24, 21, 0.07);
+  box-shadow:
+    0 1px 2px rgba(17, 24, 21, 0.04),
+    0 12px 32px -18px rgba(17, 24, 21, 0.18);
+}
+.lxu.u2 .u2-stats > div,
+.lxu.u2 .u2-day { background: #f4f6f5; }
+.lxu.u2 .u2-chips li { background: #f4f6f5; color: var(--ink-2); }
+.lxu.u2 .u2-close { background: #fff; border-top: 1px solid rgba(17, 24, 21, 0.08); }
+.lxu.u2 .u2-sticky {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(17, 24, 21, 0.08);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .lxu.u2 .u2-sticky, .lxu.u2 .u2-top { background: #fff; backdrop-filter: none; }
+}
+
+/* ── The first workout — hero card + free watch ───────────────────────────── */
+
+.lxu .u2-firstblk h2 { margin-bottom: var(--sp-3); }
+.lxu .u2-first {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  font: inherit;
+}
+.lxu .u2-card-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0a0e0c;
+  box-shadow:
+    0 1px 2px rgba(17, 24, 21, 0.06),
+    0 16px 40px -20px rgba(17, 24, 21, 0.35);
+  transform: translateZ(0);
+  transition: transform 180ms var(--ease-settle), box-shadow 180ms var(--ease-settle);
+}
+.lxu .u2-card-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lxu .u2-card-media .anim { opacity: 0; transition: opacity 320ms ease; }
+.lxu .u2-card-media .anim.on { opacity: 1; }
+.lxu .u2-first:hover .u2-card-media { box-shadow: 0 2px 4px rgba(17, 24, 21, 0.06), 0 22px 48px -20px rgba(17, 24, 21, 0.42); }
+.lxu .u2-first:active .u2-card-media,
+.lxu .u2-card:active .u2-card-media { transform: scale(0.975); }
+.lxu .u2-first:focus-visible, .lxu .u2-card:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 4px; border-radius: 16px; }
+
+.lxu .u2-first-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #10201a;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px) saturate(160%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  transition: transform 180ms var(--ease-settle);
+}
+.lxu .u2-first-play svg { margin-left: 3px; }
+.lxu .u2-first:hover .u2-first-play { transform: scale(1.06); }
+.lxu .u2-card-mins {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: rgba(10, 14, 12, 0.55);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  padding: 4px 9px;
+}
+.lxu .u2-first-free {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 5px 11px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.lxu .u2-card-lock {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: rgba(10, 14, 12, 0.5);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  padding: 4px 8px;
+}
+.lxu .u2-card-t { display: grid; gap: 1px; }
+.lxu .u2-card-t b { font-size: 13.5px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; }
+.lxu .u2-card-t span { font-size: 11.5px; color: var(--ink-3); }
+
+/* ── The shelf ────────────────────────────────────────────────────────────── */
+
+.lxu .u2-shelf h2 { margin-bottom: var(--sp-4); }
+.lxu .u2-shelf-row {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: 4px 4px 14px;
+  margin: 0 -4px;
+  scrollbar-width: none;
+}
+.lxu .u2-shelf-row::-webkit-scrollbar { display: none; }
+.lxu .u2-card {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  flex: none;
+  width: clamp(180px, 46vw, 224px);
+  display: grid;
+  gap: 8px;
+  scroll-snap-align: start;
+}
+.lxu .u2-shelf .u2-xs { margin-top: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lxu .u2-card-media, .lxu .u2-first-play { transition: none; }
+  .lxu .u2-first:active .u2-card-media, .lxu .u2-card:active .u2-card-media { transform: none; }
+  .lxu .u2-card-media .anim { transition: none; }
+}
