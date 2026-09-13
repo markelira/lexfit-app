@@ -136,24 +136,34 @@ function PlayerScreen({ code }: { code: string }) {
     if (lt && /^[0-9a-f]{32}$/.test(lt)) setGuestLt(lt);
   }, []);
   useEffect(() => {
-    if (!guestLt || user || video) return;
+    // Keyed on missing TOKENS, not on auth state: a signed-in but UNPAID
+    // user arriving with ?lt= (the registered checkout-abandoner returning
+    // from their plan page - the hottest cohort there is) must get the free
+    // watch too, not a 403 → /subscribe bounce from the entitled token
+    // route. For paid members the lead tokens are equivalent (same video),
+    // and their progress attribution rides on viewer_user_id regardless.
+    if (!guestLt || pb) return;
     let active = true;
     (async () => {
       const res = await fetch(
         `/api/ujrakezdes-lead/watch?lt=${guestLt}&code=${encodeURIComponent(code)}`,
       ).catch(() => null);
       if (!active) return;
-      if (!res?.ok) return setNotFound(true);
+      if (!res?.ok) { if (!video) setNotFound(true); return; }
       const data = (await res.json()) as {
         video: Video;
         playbackId: string;
         tokens: PlaybackResponse["tokens"];
       };
       setPb({ playbackId: data.playbackId, tokens: data.tokens });
-      setVideo(data.video);
+      setVideo((v) => v ?? data.video);
+      setNotFound(false);
     })();
     return () => { active = false; };
-  }, [guestLt, user, video, code]);
+    // `video` is deliberately NOT a dependency: the user-path effect setting
+    // it must not cancel a guest token fetch already in flight.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guestLt, pb, code]);
 
   // Seed duration from the stored Mux duration so stamped block math is correct
   // before the player's own `loadedmetadata` fires (which then sets the exact value).
@@ -295,7 +305,18 @@ function PlayerScreen({ code }: { code: string }) {
     try {
       // Reuse the token prefetched while the preview was shown (see effect below);
       // only fetch here if the prefetch hasn't landed (or was skipped).
-      const data = pb ?? (await getPlaybackTokens(code));
+      // With a lead token present the fallback is the GUEST route, never the
+      // entitled one - an autostarted signed-in-but-unpaid visitor racing the
+      // guest prefetch must not be 403-bounced off their free watch.
+      const fetchGuest = async (): Promise<PlaybackResponse> => {
+        const res = await fetch(
+          `/api/ujrakezdes-lead/watch?lt=${guestLt}&code=${encodeURIComponent(code)}`,
+        );
+        if (!res.ok) throw new Error("A videó nem elérhető.");
+        const d = (await res.json()) as { playbackId: string; tokens: PlaybackResponse["tokens"] };
+        return { playbackId: d.playbackId, tokens: d.tokens };
+      };
+      const data = pb ?? (guestLt ? await fetchGuest() : await getPlaybackTokens(code));
       if (user) await ensureProgress(user.uid);
       setPb(data);
       setStage("playing");
