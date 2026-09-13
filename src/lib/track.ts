@@ -177,8 +177,9 @@ export function trackUjrakezdesView(variant?: string): void {
 }
 
 /** LP CTA clicks, broken down by position so each placement's contribution is
- *  measurable (design handoff §9). */
-export function trackUjrakezdesLpCta(position: "hero" | "sticky" | "close"): void {
+ *  measurable (design handoff §9). `members` is the S6 belt - tapping a member
+ *  card is a quiz start on this page. */
+export function trackUjrakezdesLpCta(position: "hero" | "sticky" | "close" | "members"): void {
   push("lx_ujrakezdes_lp_cta", { position });
 }
 

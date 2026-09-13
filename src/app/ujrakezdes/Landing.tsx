@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import "./ujrakezdes.css";
 import * as C from "./copy";
+import { FinishExamples } from "@/components/finish/FinishExamples";
 import { trackUjrakezdesLpCta, trackUjrakezdesView } from "@/lib/track";
 
 // /ujrakezdes — the quiz-starter page (design-handoff rebuild, 2026-09-08).
@@ -56,25 +57,30 @@ function Cta({ position, small = false }: { position: "hero" | "sticky" | "close
 }
 
 export default function Landing({ variant = "base" }: { variant?: C.LpVariant }) {
+  const router = useRouter();
   useEffect(() => { trackUjrakezdesView(variant); }, [variant]);
 
   const v = C.LP.hero.variants[variant];
 
-  // S · sticky bar (M3): in once the hero CTA scrolls out, out at the close.
+  // S · sticky bar (M3, revised per the 2026-09-14 mobile review P1/3): the
+  // first viewport has no CTA at all - the hero CTA sits below the card pair -
+  // so the bar now arms on the FIRST scroll instead of only after the hero CTA
+  // has passed. It still yields whenever an in-flow CTA is on screen (hero or
+  // close), so two identical buttons are never visible at once.
   const heroCtaRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLElement>(null);
   const [stickyOn, setStickyOn] = useState(false);
   useEffect(() => {
     const h = heroCtaRef.current, c = closeRef.current;
     if (!h || !c || typeof IntersectionObserver === "undefined") return;
-    let past = false, closeVis = false;
-    const upd = () => setStickyOn(past && !closeVis);
+    let ctaVis = true, closeVis = false, scrolled = window.scrollY > 120;
+    const upd = () => setStickyOn(scrolled && !ctaVis && !closeVis);
     // Read the LAST entry of each batch: a flick can cross "enters viewport"
     // and "leaves above" between two frames, and the observer then delivers
     // both crossings in ONE callback - entries[0] is the stale one.
     const io1 = new IntersectionObserver((es) => {
       const e = es[es.length - 1];
-      past = !!e && !e.isIntersecting && e.boundingClientRect.top < 0;
+      ctaVis = !!e && e.isIntersecting;
       upd();
     });
     const io2 = new IntersectionObserver((es) => {
@@ -82,9 +88,11 @@ export default function Landing({ variant = "base" }: { variant?: C.LpVariant })
       closeVis = !!e && e.isIntersecting;
       upd();
     });
+    const onScroll = () => { scrolled = window.scrollY > 120; upd(); };
+    window.addEventListener("scroll", onScroll, { passive: true });
     io1.observe(h);
     io2.observe(c);
-    return () => { io1.disconnect(); io2.disconnect(); };
+    return () => { io1.disconnect(); io2.disconnect(); window.removeEventListener("scroll", onScroll); };
   }, []);
 
   return (
@@ -215,6 +223,7 @@ export default function Landing({ variant = "base" }: { variant?: C.LpVariant })
           <p className="lp-eyebrow">{C.LP.problem.eyebrow}</p>
           <h2>{C.LP.problem.hd}</h2>
           <p className="lp-body">{C.LP.problem.body}</p>
+          <p className="lp-body">{C.LP.problem.body2}</p>
 
           <ul className="lp-segchips">
             {C.LP.problem.chips.map((c, i) => <li key={c} className={i === 0 ? "on" : ""}>{c}</li>)}
@@ -265,9 +274,27 @@ export default function Landing({ variant = "base" }: { variant?: C.LpVariant })
         </div>
       </section>
 
-      {/* S6 · „Akik már csinálják" does NOT render: no member photos with
-          written consent exist, and the handoff excludes the section without
-          them - invented or stock imagery is out of the question. */}
+      {/* ── S6 · „Akik már csinálják" — UNLOCKED 2026-09-14: the consented
+          member photos shipped on the reveal B5; the same belt renders here.
+          Tapping a card is a quiz start - on this page every road leads to
+          the same door. ───────────────────────────────────────────────────── */}
+      <section className="lp-band lp-tight lp-members">
+        <div className="lp-col">
+          <p className="lp-eyebrow">{C.LP.members.eyebrow}</p>
+          <h2>{C.LP.members.hd}</h2>
+        </div>
+        <div className="lp-members-belt">
+          <FinishExamples
+            onPick={() => {
+              trackUjrakezdesLpCta("members");
+              router.push(quizHref());
+            }}
+          />
+        </div>
+        <div className="lp-col">
+          <p className="lp-xs">{C.LP.members.honesty}</p>
+        </div>
+      </section>
 
       {/* ── S7 · Alexa (navy) ──────────────────────────────────────────────── */}
       <section className="lp-band lp-dark">
@@ -283,9 +310,12 @@ export default function Landing({ variant = "base" }: { variant?: C.LpVariant })
           </div>
           {/* Her real photo. No play chrome: a 30s video does not exist in the
               repo, and a play button over a still would be a false affordance.
-              If the video lands, this is where the tap-to-play poster goes. */}
+              If the video lands, this is where the tap-to-play poster goes.
+              The mat shot, not the gymnastics one (review 2026-09-14 P2/5): a
+              contortion pose beside „egy matracon kezdtem újra" argues with
+              the quote; the credential lives in the „10 év versenysport" chip. */}
           <div className="lp-alexa-photo">
-            <Image src="/alexa-gymnastics.jpg" alt="Alexa" width={420} height={520} sizes="(max-width: 1023px) 80vw, 380px" />
+            <Image src="/hero-alexa.jpg" alt="Alexa" width={420} height={520} sizes="(max-width: 1023px) 80vw, 380px" />
           </div>
         </div>
       </section>

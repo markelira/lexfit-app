@@ -2923,3 +2923,13 @@
   .lxu .u2-priceline { font-size: 14px; }
   .lxu .u2-guarline { font-size: 13.5px; }
 }
+
+/* ── S6 · real members on the landing (unlocked 2026-09-14 - the reveal B5
+   belt, on the landing's white ground). The belt bleeds to the viewport edge
+   with the exact negative of the band's own padding - a marquee inside a
+   boxed column reads as a screenshot of a marquee. ───────────────────────── */
+.lxu .lp-members h2 { margin-bottom: var(--sp-4); }
+.lxu .lp-members-belt { margin-inline: calc(-1 * clamp(16px, 4vw, 32px)); }
+.lxu .lp-members .fex-name { color: var(--ink-3); }
+.lxu .lp-members .fex-card:focus-visible .fex-frame { outline-color: var(--accent-2); }
+.lxu .lp-members .lp-xs { margin-top: var(--sp-3); text-align: center; }

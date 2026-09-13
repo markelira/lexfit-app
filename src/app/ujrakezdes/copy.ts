@@ -114,7 +114,10 @@ export const LP = {
    *  topics up front so the length is never unknown. */
   results: {
     eyebrow: "A kvíz eredménye",
-    hd: "Öt dolog, egy perc alatt.",
+    /** The count is the list's length, and the list shrinks with ENERGY_ON -
+     *  a hardcoded "öt" over three items is a trust crack (mobile review
+     *  2026-09-14 P0/1). */
+    hd: ENERGY_ON ? "Öt dolog, egy perc alatt." : "Három dolog, egy perc alatt.",
     lead: "Nem általános tanácsokat kapsz, hanem a saját válaszaidra épített tervet - azonnal, e-mailben is.",
     items: [
       { b: "A heti edzésterved", d: "Heti 2, 3 vagy 4 nap - te választod. Pihenőnapokkal, a te szintedhez igazítva." },
@@ -141,7 +144,10 @@ export const LP = {
   problem: {
     eyebrow: "A probléma",
     hd: "Ismerős?",
-    body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra - aztán a jövő hétből hónap lett. Nem az akaraterővel van baj: azzal, hogy minden kihagyás után nulláról kell kezdeni.",
+    /** Two paragraphs on purpose: the mirror, then the absolution - one block
+     *  was a five-line wall on mobile (review 2026-09-14 P2/7). */
+    body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra - aztán a jövő hétből hónap lett.",
+    body2: "Nem az akaraterővel van baj: azzal, hogy minden kihagyás után nulláról kell kezdeni.",
     listTitle: "Mind ugyanabba futnak bele.",
     chips: ["Az ötödik nekifutás", "A derék, a térd", "A nap vége"],
     lines: [
@@ -159,7 +165,9 @@ export const LP = {
       { b: "A pihenőnap nem töri meg a sorozatot.", d: "Előre be van tervezve. Nem kihagyás, hanem a terv része." },
       { b: "A kihagyott hét nem nulláz.", d: "Ott folytatod, ahol abbahagytad - nem elölről." },
     ],
-    foot: "A LEXFIT-ben a pihenőnap nem töri meg a sorozatot, és a kihagyott hét nem nulláz - ott folytatod, ahol abbahagytad. A tervedet nem neked kell kitalálnod: hét kérdésből elkészül, és minden edzést Alexa vezet végig.",
+    /** No restating the two rules above it - the foot only adds what the
+     *  rules did not say (review 2026-09-14 P2/6). */
+    foot: "A tervedet nem neked kell kitalálnod: hét kérdésből elkészül, és minden edzést Alexa vezet végig.",
   },
 
   /** S5 · how it looks - three real app screens. */
@@ -176,6 +184,15 @@ export const LP = {
       "Az első edzést azonnal elindíthatod - 20-30 perc, eszköz nélkül.",
     ],
     foot: "A heti terv ingyenes, és a tiéd marad. A LEXFIT tagság fizetős - az árakat a terved mellett mutatjuk meg.",
+  },
+
+  /** S6 · real members (unlocked 2026-09-14: the consented photos shipped on
+   *  the reveal B5 - the same belt, the same honesty line; the line ships
+   *  with the section or the section does not ship). */
+  members: {
+    eyebrow: "Akik már csinálják",
+    hd: "Valódi tagok, az edzésük után",
+    honesty: "A fotók valódi tagoké, az ő engedélyükkel.",
   },
 
   /** S7 · Alexa (navy). Story + promise come from the shared ALEXA block. */
