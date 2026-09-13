@@ -2,18 +2,7 @@
 
 **LEXFIT — online otthoni edzésprogram-szolgáltatás**
 
-Hatályos: 2026. [hónap] [nap] napjától visszavonásig, illetve módosításig.
-
----
-
-## **[KITÖLTENDŐ]** — a tulajdonos által megadandó, még hiányzó adatok
-
-| # | Mező | Helye a dokumentumban |
-|---|------|----------------------|
-| 1 | Hatálybalépés dátuma: 2026. [hónap] [nap] — az éles indulás napján töltendő ki | fejléc, 16. pont |
-| 2 | Ügyvédi ellenőrzés (a dokumentum végén lévő megjegyzések szerint) | teljes dokumentum |
-
-*Kitöltve 2026-08-08: képviselő (Kecskeméti Ádám), weboldal (https://lexfit.hu), értesítési idő (30 nap), rendelkezésre állás (konkrét vállalás nélkül). Telefonszám szándékosan nincs — az Ekertv. szerint az e-mail elegendő.*
+Hatályos: 2026. szeptember 13. napjától visszavonásig, illetve módosításig.
 
 ---
 
@@ -146,12 +135,6 @@ A határidő megtartottnak minősül, ha a Fogyasztó nyilatkozatát a határid�
 
 ## 10/A. „10 edzés garancia" — a Szolgáltató önkéntes kereskedelmi garanciája
 
-> **[JOGI ELLENŐRZÉST IGÉNYEL]** — ez a szakasz a Szolgáltató önkéntes vállalása, nem
-> jogszabályon alapuló kötelezettség. A szöveget a közzététel előtt jogi szakértővel jóvá kell
-> hagyatni. A garancia hirdetése és e szakasz hatályba lépése **egyszerre** kell történjen: a
-> marketingfelületeken a garancia csak akkor jelenhet meg, ha ez a szakasz már közzétett és
-> hatályos (a kódban ezt a `NEXT_PUBLIC_GUARANTEE_LIVE` kapcsoló vezérli).
-
 10/A.1. **A vállalás.** A Szolgáltató a jogszabályon alapuló elállási jogon (10. pont) **felül**, önkéntesen vállalja, hogy a jelen pontban meghatározott feltételek teljesülése esetén a Fogyasztó részére **visszatéríti a Szolgáltatás igénybevételéért az adott előfizetői jogviszony keretében addig ténylegesen megfizetett teljes tagsági díjat**. Ez a vállalás a Ptk. szerinti **kereskedelmi garancia**: a Szolgáltató önkéntes többletvállalása, amelyre jogszabály nem kötelezi.
 
 10/A.2. **A feltétel.** A garancia akkor vehető igénybe, ha a Fogyasztó az előfizetése kezdőnapjától számított **35 napon (öt héten) belül legalább 10 különböző vezetett edzést teljesít** a Szolgáltatásban. Teljesítettnek minősül az az edzés, amelyet a rendszer befejezettként rögzít; **a gyakorlatok könnyített változatának végrehajtása is teljes értékű teljesítésnek számít**. Ugyanazon edzés ismételt megtekintése egy teljesítésnek számít.
@@ -198,11 +181,11 @@ A határidő megtartottnak minősül, ha a Fogyasztó nyilatkozatát a határid�
 
 14.1. A Felhasználó panaszát a Szolgáltató elérhetőségein (info@amstudios.hu, illetve az alkalmazáson belüli Súgó felületen) teheti meg. A Szolgáltató az írásbeli panaszt a beérkezésétől számított **30 napon belül** érdemben, írásban megválaszolja; elutasítás esetén azt indokolja, és tájékoztatást ad a jogorvoslati lehetőségekről (a fogyasztóvédelemről szóló 1997. évi CLV. törvény szerint).
 
-14.2. **Békéltető testület.** A panasz elutasítása esetén a Fogyasztó a lakóhelye vagy tartózkodási helye szerint illetékes békéltető testülethez fordulhat. A Szolgáltató székhelye (Miskolc) szerint illetékes testület: **Borsod-Abaúj-Zemplén Vármegyei Békéltető Testület** (cím: 3525 Miskolc, Szentpáli u. 1.; e-mail: bekeltetes@bokik.hu) — *az elérhetőségi adatok közzététel előtt ellenőrizendők*. A Szolgáltatót a békéltető testületi eljárásban együttműködési kötelezettség terheli.
+14.2. **Békéltető testület.** A panasz elutasítása esetén a Fogyasztó a lakóhelye vagy tartózkodási helye szerint illetékes békéltető testülethez fordulhat. A Szolgáltató székhelye (Miskolc) szerint illetékes testület: **Borsod-Abaúj-Zemplén Vármegyei Békéltető Testület** (cím: 3525 Miskolc, Szentpáli u. 1.; e-mail: bekeltetes@bokik.hu). A Szolgáltatót a békéltető testületi eljárásban együttműködési kötelezettség terheli.
 
 14.3. **Fogyasztóvédelmi hatóság.** A Fogyasztó panaszával a fogyasztóvédelmi hatósági jogkörben eljáró, illetékes vármegyei (fővárosi) kormányhivatalhoz is fordulhat.
 
-14.4. **Online vitarendezés.** Az Európai Bizottság korábbi online vitarendezési (ODR) platformja 2025. július 20. napjával megszűnt; határon átnyúló ügyekben a Fogyasztó az Európai Fogyasztói Központok Hálózatához (ECC-Net) fordulhat. *(Ügyvédi ellenőrzést igényel — lásd a záró megjegyzéseket.)*
+14.4. **Online vitarendezés.** Az Európai Bizottság korábbi online vitarendezési (ODR) platformja 2025. július 20. napjával megszűnt; határon átnyúló ügyekben a Fogyasztó az Európai Fogyasztói Központok Hálózatához (ECC-Net) fordulhat.
 
 14.5. A fentiek nem érintik a Fogyasztó azon jogát, hogy igényét bírósági úton érvényesítse.
 
@@ -235,17 +218,3 @@ A személyes adatok kezelésének részletes szabályait a Weboldalon elérhető
 > **A fogyasztó aláírása** (kizárólag papíron tett nyilatkozat esetén): ………………………………
 > **Kelt:** ………………………………
 
-<!--
-LAWYER REVIEW NOTES (nem publikálandó — a magyar jogász figyelmébe):
-
-0. ÁFA — ALANYI ADÓMENTESSÉG: a Szolgáltató megerősítetten alanyi adómentes, a Billingo-integráció AAM-számlát állít ki; az ÁSZF ezt tényként rögzíti (6.1., 8.1.). Ellenőrizendő: az alanyi adómentesség értékhatár-figyelési kötelezettsége (az értékhatár átlépésekor követendő eljárás és az árak/ÁSZF ekkor szükséges módosítása), valamint az AAM-számlák kötelező záradékszövege.
-
-1. Elállási jog digitális szolgáltatásnál (10. pont): a szöveg a 45/2014. Korm. r. 13. §, 20. §, 26. § és 29. § (1) m) pontjának összjátékára épül — folyamatos digitális SZOLGÁLTATÁSKÉNT kezeljük (arányos elszámolással), nem egyszeri digitális tartalomként (teljes jogvesztéssel). Kérjük megerősíteni, hogy a streaming-előfizetés minősítése (szolgáltatás vs. digitális tartalom) és a kifejezett kérés + tudomásulvétel checkout-szövegezése megfelel a CJEU gyakorlatnak.
-2. „Kiérdemelt Ár" (6.4): aktivitásfüggő kedvezmények + 72 órás ajánlati határidő UCPD/Fttv. szempontból (megtévesztő sürgetés tilalma). Az implementáció valós, végleges határidőt kényszerít ki — kérjük ennek fogyasztóvédelmi megfelelőségét ellenőrizni, ideértve a „bevezető ár egyszer vehető igénybe" korlátozás közlési módját.
-3. Árváltoztatási értesítési idő (6.5, 16.1): a 30 nap javaslat — kérjük a megfelelő minimum megerősítését, és hogy kell-e külön hozzájárulás (opt-in) az emelt áron való megújuláshoz, vagy elegendő az értesítés + lemondási lehetőség.
-4. ODR (14.4): az EU ODR-platform 2025. júliusi megszűnése miatti szövegezés ellenőrzendő a hatályos magyar/EU szabályokkal (fennmaradó hivatkozási kötelezettség van-e).
-5. Lemondógomb / (EU) 2023/2673 irányelv (9.2): a magyar átültetés pontos követelményeinek (elnevezés, elhelyezés) megfeleltetés.
-6. Sikertelen fizetés utáni 7 napos hozzáférés (7.3) és a szüneteltetés (9.3) díjmentessége — szerződéses minősítésük ellenőrzendő.
-7. 11.6 rendelkezésre állási vállalás [99%] — üzleti döntés, egyeztetendő; a felelősségkorlátozás fogyasztói szerződésben csak a Ptk. 6:152. § keretei közt érvényes.
-8. Az 5.3 (azonnali felfelmondás visszatérítési szabálya) méltányossági egyensúlya.
--->
