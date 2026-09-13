@@ -2904,3 +2904,22 @@
      viewport - the rail sits to the right. */
   .lxu .u2-members-belt { margin-inline: 0; }
 }
+
+/* ── Sprint P1-2 · offer-moment reinforcement ─────────────────────────────── */
+.lxu .u2-priceline {
+  margin: 0 0 var(--sp-3);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.lxu .u2-guarline {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+@media (max-width: 700px) {
+  .lxu .u2-priceline { font-size: 14px; }
+  .lxu .u2-guarline { font-size: 13.5px; }
+}

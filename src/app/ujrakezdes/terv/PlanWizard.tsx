@@ -44,7 +44,7 @@ import { validateEmail } from "@/lib/quiz/validate";
 import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes/types";
 import {
   marketingContext, newEventId, trackUjrakezdesGateView, trackUjrakezdesLead,
-  trackUjrakezdesLoaderDone, trackUjrakezdesOfferClick, trackUjrakezdesQuizStart,
+  trackUjrakezdesLoaderDone, trackUjrakezdesOfferClick, trackUjrakezdesOfferView, trackUjrakezdesQuizStart,
   trackUjrakezdesRevealView, trackUjrakezdesStartDay, trackUjrakezdesStep,
   trackUjrakezdesStickyClick, trackUjrakezdesStickyView, trackUjrakezdesWatchOpen,
 } from "@/lib/track";
@@ -215,6 +215,12 @@ export default function PlanWizard({
    *  whole grid instead: bar appears once grid — offer, tiers and all — has
    *  scrolled fully past (R10: no CTA deserts). */
   const gridRef = useRef<HTMLDivElement>(null);
+  /** Sprint P1-2: the sticky bar arms when the PLAN CARD leaves - the offer
+   *  must be reachable the moment she scrolls past her plan, not only after
+   *  the fold offer has gone by. */
+  const planCardEl = useRef<HTMLElement | null>(null);
+  /** Sprint P1-2: rail CTA element for the offer_view (50%) observer. */
+  const railCtaEl = useRef<HTMLAnchorElement | null>(null);
   /** R4 · the chosen start day. Session-remembered; personalises the
    *  first-workout block and the curve's footing, writes nothing upstream. */
   const [startPick, setStartPick] = useState<StartPick>("today");
@@ -357,6 +363,21 @@ export default function PlanWizard({
     // `initial` is a mount-time prop - the reveal-view rule doesn't change mid-session.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen]);
+  // Sprint P0-2 · orphan-rescue prefill: the recovery mail links here with
+  // ?e=<base64url email> so the gate arrives pre-filled - the form lead
+  // already typed this address once on Facebook; asking again is friction
+  // with a memory. Invalid/absent → silently nothing.
+  useEffect(() => {
+    if (initial) return;
+    try {
+      const e = new URLSearchParams(window.location.search).get("e");
+      if (!e) return;
+      const decoded = atob(e.replace(/-/g, "+").replace(/_/g, "/"));
+      if (!validateEmail(decoded)) setEmail(decoded);
+    } catch { /* malformed param - the field just stays empty */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // The landing CTA was taken into the wizard - defined since the first
   // build (track.ts:186) but never fired; landing→quiz bounce was
   // unmeasurable until now. Once per mount, fresh-quiz visits only.
@@ -407,10 +428,29 @@ export default function PlanWizard({
       gridPast = !!e && !e.isIntersecting && e.boundingClientRect.bottom < 0;
       upd();
     });
-    io1.observe(b2);
+    // P1-2: the bar arms as soon as the PLAN CARD scrolls out (not the fold
+    // offer) - reachable offer from the second screenful onward.
+    io1.observe(planCardEl.current ?? b2);
     io2.observe(cl);
     if (grid) io3.observe(grid);
-    return () => { io1.disconnect(); io2.disconnect(); io3.disconnect(); };
+
+    // THE sprint event (P1-2): offer box 50% visible, once. Mobile = the
+    // fold offer section; desktop = the rail CTA (the rail itself is taller
+    // than a viewport, so the CTA stands in for "the offer is on screen").
+    let offerSeen = false;
+    const seeOffer = () => {
+      if (offerSeen) return;
+      offerSeen = true;
+      trackUjrakezdesOfferView();
+      io4.disconnect();
+    };
+    const io4 = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting)) seeOffer();
+    }, { threshold: 0.5 });
+    io4.observe(b2);
+    if (railCtaEl.current) io4.observe(railCtaEl.current);
+
+    return () => { io1.disconnect(); io2.disconnect(); io3.disconnect(); io4.disconnect(); };
   }, [screen]);
 
   /**
@@ -708,7 +748,11 @@ export default function PlanWizard({
         <div className="u2-grid" ref={gridRef}>
           <div className="u2-main">
             {/* ── B1 · the plan card ──────────────────────────────────────── */}
-            <section className="u2-plan" aria-labelledby="u2-h1" ref={planRef}>
+            <section
+              className="u2-plan"
+              aria-labelledby="u2-h1"
+              ref={(el) => { planRef(el); planCardEl.current = el; }}
+            >
               <p className="u2-eyebrow u2-m1" style={{ ["--i" as string]: 0 }}>{C.REVEAL.b1.eyebrow}</p>
               <h1 id="u2-h1" className="u2-m1" style={{ ["--i" as string]: 1 }}>{C.REVEAL.b1.hd}</h1>
               <p className="u2-sub u2-m1" style={{ ["--i" as string]: 2 }}>
@@ -907,7 +951,7 @@ export default function PlanWizard({
               <h2>{C.REVEAL.entry.hd(intro)}</h2>
               <RenewLine intro={intro} weekStd={weekStd} />
 
-              <a className="u2-cta u2-rail-cta" href={ctaHref} onClick={goCheckout(false)}>
+              <a className="u2-cta u2-rail-cta" href={ctaHref} onClick={goCheckout(false)} ref={railCtaEl}>
                 {C.REVEAL.offer.cta(intro)}
               </a>
               <p className="u2-calm">{C.REVEAL.offer.calm}</p>
@@ -1399,9 +1443,15 @@ function RevealOffer({ intro, weekStd, href, onGo }: {
           ? <><b>{C.REVEAL.offer.proofGuar}</b> · <b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}</>
           : <><b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}</>}
       </p>
+      {/* P1-2 · the whole price story in one line, above the button. */}
+      <p className="u2-priceline">
+        {C.REVEAL.offer.priceLine(intro, weekStd, formatHuf(perDayHuf()))}
+      </p>
       <a className="u2-cta" href={href} onClick={onGo}>
         {C.REVEAL.offer.cta(intro)}
       </a>
+      {/* P1-2 · the guarantee touches the button. */}
+      {GUARANTEE_LIVE && <p className="u2-guarline">{C.REVEAL.offer.guarLine}</p>}
       <RenewLine intro={intro} weekStd={weekStd} />
       <p className="u2-calm">{C.REVEAL.offer.calm}</p>
     </>

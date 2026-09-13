@@ -232,6 +232,13 @@ export function trackUjrakezdesLoaderDone(): void {
   push("lx_ujrakezdes_loader_done");
 }
 
+/** THE sprint event (CRO spec P1-2): the offer box reached 50% visibility.
+ *  Splits "never saw the offer" from "saw it and didn't click" - without it
+ *  the reveal→checkout leak is unattributable. Fires once per view. */
+export function trackUjrakezdesOfferView(): void {
+  push("lx_ujrakezdes_offer_view");
+}
+
 /** The first workout's theater was opened on the reveal (the free watch). */
 export function trackUjrakezdesWatchOpen(code: string): void {
   push("lx_ujrakezdes_watch_open", { code });

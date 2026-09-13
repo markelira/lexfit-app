@@ -607,6 +607,14 @@ export const REVEAL = {
      *  §weekly-day5) and annual gets −30/−7 mails. Do not ship copy here the
      *  mail system cannot keep. */
     calm: "A megújulás előtt e-mailben szólunk. Bármikor lemondható, két kattintás.",
+    /** Sprint P1-2 · the one-line price frame above the button. All three
+     *  numbers true on their own terms (the 109 belongs to annual - pinning
+     *  it to the weekly price would be a GVH-grade misdirection). */
+    priceLine: (intro: string, weekStd: string, perDay: string) =>
+      `${intro} az első hét · utána ${weekStd} / hét · évesre váltva ${perDay} / nap`,
+    /** Sprint P1-2 · the guarantee touching the button, not only its own
+     *  section. Renders only while GUARANTEE_LIVE. */
+    guarLine: "10 edzés garancia — ha nem vált be, visszakapod.",
   },
 
   /** B3 · the mechanism. The failure is written onto the system, never the

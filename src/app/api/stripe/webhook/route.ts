@@ -481,10 +481,11 @@ async function maybeCheckoutAbandoned(event: Stripe.Event): Promise<void> {
       ctaHref,
       roleName: spec.nickname,
       introLine,
+      stage: "24h",
     });
     if (sent.sent) {
       await subscriptionRef(uid).set({ resumeEmailSentAt: now }, { merge: true });
-      await logEvent("resume_email_sent", { uid, props: { role } });
+      await logEvent("resume_email_sent", { uid, props: { role, stage: "24h" } });
     }
   } catch (e) {
     console.error("[webhook] checkout abandoned", e);

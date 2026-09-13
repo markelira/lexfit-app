@@ -60,7 +60,8 @@ import WeeklyRecap, { subjectFor as recapSubject } from "../../emails/weekly-rec
 import Welcome, { subject as welcomeSubject } from "../../emails/welcome";
 import WithdrawalConfirm, { subject as withdrawalSubject } from "../../emails/withdrawal-confirm";
 import GuaranteeRefundConfirm, { subject as guaranteeRefundSubject } from "../../emails/guarantee-refund-confirm";
-import CheckoutResume, { subject as checkoutResumeSubject } from "../../emails/checkout-resume";
+import CheckoutResume, { subjectFor as checkoutResumeSubjectFor, type ResumeStage } from "../../emails/checkout-resume";
+import FormRecovery, { subject as formRecoverySubject } from "../../emails/form-recovery";
 import UjrakezdesD0, { subject as ujraD0Subject } from "../../emails/ujrakezdes-d0";
 import UjrakezdesD3, { subject as ujraD3Subject } from "../../emails/ujrakezdes-d3";
 import UjrakezdesD6, { subject as ujraD6Subject } from "../../emails/ujrakezdes-d6";
@@ -489,8 +490,20 @@ export const sendUjrakezdesD9 = (to: string, leadId: string, p?: { ctaHref?: str
  * caller; capped there to one send per episode.
  */
 export const sendCheckoutResume = (
-  to: string, p: { ctaHref: string; roleName: string; introLine: string },
+  to: string,
+  p: { ctaHref: string; roleName: string; introLine: string; stage?: ResumeStage },
 ) => deliver({
-  to, subject: checkoutResumeSubject, category: "billing",
+  to, subject: checkoutResumeSubjectFor(p.stage ?? "24h"), category: "billing",
   make: () => CheckoutResume(p),
 });
+
+/**
+ * Orphan-rescue (sprint P0-2): one-time fulfilment mail to Meta instant-form
+ * leads who never reached the site. Transactional - it delivers the thing
+ * they asked the form for; the copy itself promises no further mail.
+ */
+export const sendFormRecovery = (to: string, p: { ctaHref: string }) =>
+  deliver({
+    to, subject: formRecoverySubject, category: "habit",
+    make: () => FormRecovery(p),
+  });

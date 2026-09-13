@@ -18,12 +18,18 @@ import { Cta, Panel, PanelText, Sign } from "./components/Bits";
 import { styles } from "./tokens";
 import { GUARANTEE_LIVE } from "@/components/landing/offer-copy";
 
-export const subject = "Egy lépésre álltál meg";
+/** Two stages (sprint P1-1): the 2h nudge while the decision is still warm,
+ *  the 24h version with the full reassurance once the session expired. */
+export type ResumeStage = "2h" | "24h";
+
+export const subjectFor = (stage: ResumeStage) =>
+  stage === "2h" ? "Ott maradt félbe — segítsek?" : "Egy lépésre álltál meg";
+export const subject = subjectFor("24h");
 
 const preview = "A terved és a választott csomagod is megvan még.";
 
 export default function CheckoutResume({
-  ctaHref, roleName, introLine,
+  ctaHref, roleName, introLine, stage = "24h",
 }: {
   /** The plan-preselected join wizard - lands on the pay step's plan picker. */
   ctaHref: string;
@@ -32,7 +38,31 @@ export default function CheckoutResume({
   /** The price sentence for the chosen plan, composed by the mailer from
    *  PRICES - no forint literal lives in a template (F0.5 hard rule). */
   introLine: string;
+  stage?: ResumeStage;
 }) {
+  if (stage === "2h") {
+    return (
+      <EmailLayout preview="A fizetés félbemaradt — a fiókod és a terved megvan.">
+        <Text style={styles.eyebrow}>LEXFIT</Text>
+        <Text style={styles.h1}>{subjectFor("2h")}</Text>
+        <Text style={styles.body}>Szia,</Text>
+        <Text style={styles.body}>
+          elindítottad a csatlakozást ({roleName}), de a fizetés félbemaradt —
+          a Facebook beépített böngészője sokszor elakad a kártyánál; ez a
+          levél már a saját böngésződben nyílik. A fiókod és a terved megvan,
+          egy kattintással ott folytatod. {introLine}
+        </Text>
+        {GUARANTEE_LIVE && (
+          <Text style={styles.body}>
+            És áll a garancia: csináld végig az első 10 edzést — ha nem vált
+            be, <strong>visszakapod a pénzed.</strong>
+          </Text>
+        )}
+        <Cta href={ctaHref}>Folytatom a fizetést</Cta>
+        <Sign />
+      </EmailLayout>
+    );
+  }
   return (
     <EmailLayout preview={preview}>
       <Text style={styles.eyebrow}>LEXFIT</Text>
