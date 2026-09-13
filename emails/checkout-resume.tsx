@@ -16,6 +16,7 @@ import { Text } from "react-email";
 import { EmailLayout } from "./components/EmailLayout";
 import { Cta, Panel, PanelText, Sign } from "./components/Bits";
 import { styles } from "./tokens";
+import { GUARANTEE_LIVE } from "@/components/landing/offer-copy";
 
 export const subject = "Egy lépésre álltál meg";
 
@@ -53,6 +54,13 @@ export default function CheckoutResume({
       </Panel>
 
       <Text style={styles.body}>{introLine}</Text>
+
+      {GUARANTEE_LIVE && (
+        <Text style={styles.body}>
+          És áll a garancia: csináld végig az első 10 edzést — ha nem vált be,{" "}
+          <strong>visszakapod a pénzed.</strong>
+        </Text>
+      )}
 
       <Cta href={ctaHref}>Folytatom a fizetést</Cta>
 

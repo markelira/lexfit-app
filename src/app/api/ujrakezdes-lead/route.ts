@@ -179,10 +179,15 @@ export async function POST(req: Request) {
     // mail is the one surface a person keeps.
     let workouts: EmailWorkout[] = [];
     let workoutTotal = 0;
+    // The FREE first workout, watchable from the mail in the real player's
+    // guest mode (?lt=). Absent when the catalogue can't name a session.
+    let watchHref: string | undefined;
     try {
       const cat = await loadLandingCatalog();
       const byCode = new Map(cat.workouts.map((w) => [w.code, w]));
       const sessions = cat.entry?.sessions ?? [];
+      const firstCode = sessions.find((s) => byCode.has(s.code))?.code;
+      if (firstCode) watchHref = `${appUrl}/player/${firstCode}?lt=${planToken}`;
       workoutTotal = sessions.filter((s) => byCode.has(s.code)).length;
       workouts = sessions
         .map((s, i) => ({ s, w: byCode.get(s.code), step: i + 1 }))
@@ -204,6 +209,7 @@ export async function POST(req: Request) {
       consented: consentMarketing,
       workouts,
       workoutTotal,
+      watchHref,
     });
     // Record the send on the document (step 0). Without this the lead looks
     // never-mailed in every query, and a silent SendGrid outage on D0 is

@@ -8,18 +8,23 @@
 // them, and a postscript restating it would be filler.
 
 import * as React from "react";
-import { Text } from "react-email";
+import { Link, Text } from "react-email";
 import { EmailLayout } from "./components/EmailLayout";
 import { Cta, Panel, PanelText, Sign } from "./components/Bits";
-import { styles } from "./tokens";
+import { color, styles } from "./tokens";
 import type { Anchor } from "@/lib/ujrakezdes/types";
 import { SEGMENT_PS } from "@/app/ujrakezdes/copy";
 
 export const subject = "Mi esik szét a 9. napon";
 
 export default function UjrakezdesD3({
-  planHref, segment, unsubHref,
-}: { planHref: string; segment: Anchor; unsubHref: string }) {
+  planHref, segment, unsubHref, watchHref,
+}: {
+  planHref: string; segment: Anchor; unsubHref: string;
+  /** The free first workout (guest player) - the belief mail's postscript
+   *  is the watch push (audit P3). */
+  watchHref?: string;
+}) {
   const ps = SEGMENT_PS[segment];
   return (
     <EmailLayout
@@ -60,6 +65,15 @@ export default function UjrakezdesD3({
       <Sign />
 
       {ps && <Text style={styles.small}>{ps}</Text>}
+      {watchHref && (
+        <Text style={styles.small}>
+          Ui. Az első edzésedet <strong>ingyen megnézheted</strong> — 20–30
+          perc, akár ma este:{" "}
+          <Link href={watchHref} style={{ color: color.accentInk }}>
+            Megnézem az első edzést
+          </Link>
+        </Text>
+      )}
     </EmailLayout>
   );
 }

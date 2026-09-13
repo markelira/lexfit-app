@@ -208,7 +208,10 @@ export function buildLead(i: BuildInput): LmLeadDoc {
       // the audit trail should retain.
       health: withBody,
       ...(withBody ? { healthTextVersion: "consent_lm_health_v1", healthAt: i.now } : {}),
-      textVersion: "consent_lm_v1",
+      // v2 (2026-09-13): the checkbox wording changed - the false "6 napos"
+      // series promise became "induló leveleit". Existing leads keep their
+      // recorded v1; only new consents carry v2.
+      textVersion: "consent_lm_v2",
       policyVersion: CONSENT_POLICY_VERSION,
       at: i.now,
       ip: i.ip,

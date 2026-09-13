@@ -447,11 +447,15 @@ export const sendDay2Nudge = (to: string, uid: string, motiv?: string) =>
 
 export const sendUjrakezdesD0 = (
   to: string,
-  p: { planHref: string; consented: boolean; workouts?: UjraEmailWorkout[]; workoutTotal?: number },
+  p: {
+    planHref: string; consented: boolean; workouts?: UjraEmailWorkout[];
+    workoutTotal?: number; watchHref?: string;
+  },
 ) => deliver({ to, subject: ujraD0Subject, category: "habit", make: () => UjrakezdesD0(p) });
 
 export const sendUjrakezdesD3 = (
-  to: string, leadId: string, p: { planHref: string; segment: UjraAnchor },
+  to: string, leadId: string,
+  p: { planHref: string; segment: UjraAnchor; watchHref?: string },
 ) => {
   const u = leadUnsub(leadId);
   return deliver({

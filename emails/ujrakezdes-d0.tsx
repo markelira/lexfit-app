@@ -18,7 +18,7 @@ import { APP_URL, color, styles } from "./tokens";
 export const subject = "A heti terved";
 
 export default function UjrakezdesD0({
-  planHref, consented, workouts = [], workoutTotal = 0,
+  planHref, consented, workouts = [], workoutTotal = 0, watchHref,
 }: {
   planHref: string;
   consented: boolean;
@@ -27,6 +27,10 @@ export default function UjrakezdesD0({
    *  then simply omits the block rather than showing an empty frame. */
   workouts?: EmailWorkout[];
   workoutTotal?: number;
+  /** The FREE first workout in the real player (guest mode, ?lt=). The
+   *  funnel's strongest asset was absent from every mail (audit F2); when the
+   *  catalogue can't name the session the block simply doesn't render. */
+  watchHref?: string;
 }) {
   return (
     <EmailLayout preview="Bent van minden, az első edzéssel együtt.">
@@ -59,6 +63,16 @@ export default function UjrakezdesD0({
         </>
       )}
 
+      {watchHref && (
+        <>
+          <Text style={styles.body}>
+            <strong>Az első edzésed ingyen megnézheted</strong> — ugyanabban a
+            lejátszóban, mint a tagságban. Fiók és fizetés nélkül.
+          </Text>
+          <Cta href={watchHref}>Megnézem az első edzést — ingyen</Cta>
+        </>
+      )}
+
       <Panel>
         <PanelText>
           Egy tanács az első hétre: ne a legjobb napodra időzítsd az első
@@ -68,7 +82,7 @@ export default function UjrakezdesD0({
 
       {consented && (
         <Text style={styles.body}>
-          Holnaptól hat napon át küldök egy-egy rövid levelet arról, hogyan
+          A következő napokban három rövid levelet küldök arról, hogyan
           szokott szétesni az első hét — és mit lehet ellene tenni.
         </Text>
       )}

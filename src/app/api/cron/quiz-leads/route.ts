@@ -16,7 +16,24 @@ import {
 } from "@/lib/mailer";
 import { LM_HEALTH_FIELDS, LM_VARIANT, type LmLeadDoc } from "@/lib/ujrakezdes/lead";
 import { isLmStep, lmScheduleAfter, lmStopReason } from "@/lib/ujrakezdes/sequence";
+import { loadLandingCatalog } from "@/lib/landing-catalog.server";
 import { APP_URL } from "../../../../../emails/tokens";
+
+/**
+ * The entry programme's first session code, for D3's free-watch link. One
+ * lookup per cron run (module-level memo would outlive the invocation on a
+ * warm lambda, which is fine, but a fresh read per run keeps it honest with
+ * the admin CMS). Null degrades to a D3 without the watch postscript.
+ */
+async function firstWatchCode(): Promise<string | null> {
+  try {
+    const cat = await loadLandingCatalog();
+    const byCode = new Set(cat.workouts.map((w) => w.code));
+    return cat.entry?.sessions.find((s) => byCode.has(s.code))?.code ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -50,6 +67,7 @@ async function advanceLmLead(
   doc: FirebaseFirestore.QueryDocumentSnapshot,
   lead: LmLeadDoc,
   now: number,
+  watchCode: string | null,
 ): Promise<"sent" | "stopped" | "failed"> {
   const step = lead.nextEmailStep ?? 0;
   const stop = lmStopReason(lead, step);
@@ -68,8 +86,12 @@ async function advanceLmLead(
   // 490 Ft intro this funnel is built around.
   const ctaHref = `${APP_URL}/register?q=plan&plan=week_intro${
     lead.planToken ? `&lt=${lead.planToken}` : ""}`;
+  // D3's postscript: the FREE first workout in the real player (audit P3).
+  const watchHref = watchCode && lead.planToken
+    ? `${APP_URL}/player/${watchCode}?lt=${lead.planToken}`
+    : undefined;
   const sent = step === 3
-    ? (await sendUjrakezdesD3(lead.email, doc.id, { planHref, segment: lead.computed.segment })).sent
+    ? (await sendUjrakezdesD3(lead.email, doc.id, { planHref, segment: lead.computed.segment, watchHref })).sent
     : step === 6
       ? (await sendUjrakezdesD6(lead.email, doc.id, { ctaHref })).sent
       : (await sendUjrakezdesD9(lead.email, doc.id, { ctaHref })).sent;
@@ -127,6 +149,7 @@ export async function GET(req: Request) {
     if (snap.empty) return;
 
     const catalog = await loadQuizCatalog();
+    const watchCode = await firstWatchCode();
 
     for (const doc of snap.docs) {
       const raw = doc.data() as LeadDoc | LmLeadDoc;
@@ -135,7 +158,7 @@ export async function GET(req: Request) {
       // The branch is additive: a document with no `variant` is an original
       // quiz lead and takes the path below completely unchanged.
       if ((raw as LmLeadDoc).variant === LM_VARIANT) {
-        const outcome = await advanceLmLead(doc, raw as LmLeadDoc, now);
+        const outcome = await advanceLmLead(doc, raw as LmLeadDoc, now, watchCode);
         if (outcome === "sent") stats.sent++;
         else if (outcome === "stopped") stats.stopped++;
         else stats.failed++;

@@ -401,8 +401,12 @@ export const GATE = {
   sub: "Hova küldjük, hogy meg is maradjon?",
   emailPlaceholder: "e-mail címed",
   emailLabel: "E-mail cím",
+  /** P1 (email audit 2026-09-13): the box used to promise a "6 napos"
+   *  DAILY series while the sequence sends three letters on days 3/6/9 -
+   *  the funnel's first promise to a consented lead was false. The wording
+   *  change bumps the consent record to consent_lm_v2 (lead.ts). */
   consent:
-    "Kérem mellé Alexa 6 napos induló sorozatát és a LEXFIT híreit e-mailben. Bármikor, egy kattintással leiratkozhatsz.",
+    "Kérem mellé Alexa induló leveleit és a LEXFIT híreit e-mailben. Bármikor, egy kattintással leiratkozhatsz.",
   cta: "Mutasd a tervem",
   ctaBusy: "Küldjük…",
   fine: "A tervet enélkül is elküldjük erre a címre.",
@@ -415,7 +419,7 @@ export const GATE = {
 /** The consent text version recorded with every submission (spec §3). Bump this
  *  string and the copy above together, never one alone: a consent log naming a
  *  version whose wording nobody kept is a log that proves nothing. */
-export const CONSENT_TEXT_VERSION = "consent_lm_v1";
+export const CONSENT_TEXT_VERSION = "consent_lm_v2";
 
 // ─── §4 Reveal ───────────────────────────────────────────────────────────────
 

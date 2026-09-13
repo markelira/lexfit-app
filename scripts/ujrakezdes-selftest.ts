@@ -15,6 +15,7 @@
  * Run:  node --import tsx scripts/ujrakezdes-selftest.ts
  */
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { buildWeekPlan, daysCount, trainingDays, DEFAULT_SESSION_MIN } from "../src/lib/ujrakezdes/plan";
 import {
   buildLead, leadId, LM_BODY_FIELDS, LM_HEALTH_FIELDS, LM_VARIANT, parseAnswers,
@@ -136,7 +137,7 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.equal(yes.email, "teszt@example.hu", "az e-mail normalizálva tárolódik");
   assert.equal(leadId("TESZT@example.hu"), leadId("teszt@example.hu "), "az azonosító a normalizált címből");
   assert.equal(yes.variant, LM_VARIANT, "a rekord megjelöli, melyik tölcsérből jött");
-  assert.equal(yes.consents.textVersion, "consent_lm_v1", "a hozzájárulás szövegverziója rögzítve");
+  assert.equal(yes.consents.textVersion, "consent_lm_v2", "a hozzájárulás szövegverziója rögzítve (v2: a hamis »6 napos« ígéret javítva)");
   assert.equal(yes.consents.textVersion, C.CONSENT_TEXT_VERSION, "a copy és a rekord ugyanazt a verziót mondja");
   ok("a lead rekord azonosítója, változata és hozzájárulás-verziója rögzített");
 
@@ -387,6 +388,24 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   // R5: the dated timeline drops the date's trailing dot before -től (AkH.).
   assert.ok(!/\.\-től|\.-től/.test(C.REVEAL.offer.timeline("490 Ft", "1 990 Ft", "2026. szeptember 22.")));
   assert.ok(/szeptember 22-től/.test(C.REVEAL.offer.timeline("490 Ft", "1 990 Ft", "2026. szeptember 22.")));
+
+  // Email audit P1 (2026-09-13): the gate may never again promise a series
+  // the cron does not send. The "6 napos / hat napon át" daily-series claim
+  // was false from day one (three letters, days 3/6/9) - these guards make
+  // the regression a test failure instead of a broken promise.
+  assert.ok(!/6 napos|hat nap/i.test(C.GATE.consent),
+    "a gate checkbox napra pontos sorozatot ígér, amit a cron nem küld");
+  {
+    const d0src = readFileSync("emails/ujrakezdes-d0.tsx", "utf8");
+    assert.ok(!/hat napon|6 napos|naponta/i.test(d0src),
+      "a D0 napi sorozatot ígér, amit a cron nem küld");
+    assert.ok(/watchHref/.test(d0src), "a D0 elvesztette az ingyenes első edzés linkjét");
+    const d3src = readFileSync("emails/ujrakezdes-d3.tsx", "utf8");
+    assert.ok(/watchHref/.test(d3src), "a D3 elvesztette az ingyenes első edzés utóiratát");
+    const boxSrc = readFileSync("emails/components/OfferBox.tsx", "utf8");
+    assert.ok(/Az első heted \{intro\}/.test(boxSrc),
+      "az ajánlat-doboz elvesztette az egy lélegzetű árat");
+  }
 
   // R12 guards: the honesty assets survive every future cleanup.
   assert.ok(C.REVEAL.entry.honesty("X", "Y").length > 0 && C.REVEAL.entry.honestyLead.length > 0,

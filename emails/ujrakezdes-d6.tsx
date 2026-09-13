@@ -22,10 +22,11 @@
 import * as React from "react";
 import { Text } from "react-email";
 import { EmailLayout } from "./components/EmailLayout";
-import { Cta, Panel, PanelText, Sign } from "./components/Bits";
+import { Panel, PanelText, Sign } from "./components/Bits";
+import { OfferBox } from "./components/OfferBox";
 import { APP_URL, styles } from "./tokens";
 import { PRICES } from "@/lib/pricing/config";
-import { formatHuf, perMonthHuf } from "@/lib/pricing/display";
+import { formatHuf } from "@/lib/pricing/display";
 import { GUARANTEE_LIVE } from "@/components/landing/offer-copy";
 
 export const subject = GUARANTEE_LIVE
@@ -47,9 +48,9 @@ export default function UjrakezdesD6({
   ctaHref?: string;
 }) {
   const intro = formatHuf(PRICES.week_intro.amountHuf);
+  const weekStd = formatHuf(PRICES.week_std.amountHuf);
   const month = formatHuf(PRICES.month_std.amountHuf);
   const annual = formatHuf(PRICES.annual_std.amountHuf);
-  const annualPerMonth = formatHuf(perMonthHuf());
 
   return (
     <EmailLayout
@@ -63,51 +64,32 @@ export default function UjrakezdesD6({
 
       <Text style={styles.body}>Szia,</Text>
       <Text style={styles.body}>
-        a heti terv egy hét. Ha rendszert szeretnél belőle, arra való a{" "}
-        <strong>LEXFIT Start</strong>: 30 edzés a te tempódban, mindet én
-        vezetem, és úgy épül, hogy egy rossz hét ne döntse el.
+        a heti terv egy hét. Ha rendszert szeretnél belőle, arra való a
+        tagság — és az ajánlat belefér három mondatba:
       </Text>
 
-      {GUARANTEE_LIVE ? (
-        <>
-          <Text style={styles.body}>Van hozzá egy vállalásom.</Text>
-          <Panel>
-            <PanelText>
-              <strong>
-                Csináld végig az első 10 edzést öt héten belül — a könnyített
-                változat is számít. Ha utána úgy érzed, ez nem a tiéd, egy
-                e-mail elég, és visszautaljuk az addig befizetett tagsági díjad.
-              </strong>{" "}
-              Nem kérdezünk, nem győzködünk.
-            </PanelText>
-          </Panel>
-        </>
-      ) : (
+      {/* The offer in one breath (audit P4): price, scope, guarantee - then
+          one action. The four-price paragraph parade this replaces made a
+          6th grader assemble the deal from six paragraphs. */}
+      <OfferBox intro={intro} weekStd={weekStd} month={month} annual={annual} ctaHref={ctaHref} />
+
+      {GUARANTEE_LIVE && (
         <Panel>
           <PanelText>
-            A lemondás bármikor egy kattintás, és a 14 napos elállási jog a
-            vásárlástól számítva megillet — ilyenkor a fel nem használt
-            időszakra eső díjat időarányosan visszatérítjük.
+            A garancia pontosan így szól:{" "}
+            <strong>
+              csináld végig az első 10 edzést öt héten belül — a könnyített
+              változat is számít. Ha utána úgy érzed, ez nem a tiéd, egy
+              e-mail elég, és visszautaljuk az addig befizetett tagsági díjad.
+            </strong>{" "}
+            Nem kérdezünk, nem győzködünk.
           </PanelText>
         </Panel>
       )}
 
       <Text style={styles.body}>
-        Egy tagság, minden benne: a Start program, az összes többi program, és
-        minden héten 5 új kihívás-videó. Havi {month}, vagy {annual} egy évre —
-        így {annualPerMonth} havonta.
-      </Text>
-
-      <Text style={styles.body}>
-        Az indulás pedig nem nagy döntés: <strong>az első heted {intro}</strong>.
-        Kipróbálod a saját terveddel, és utána döntesz.
-      </Text>
-
-      <Text style={styles.body}>
         Ha most nem időszerű, a heti terved akkor is a tiéd marad.
       </Text>
-
-      <Cta href={ctaHref}>Kezdem — az első hét {intro}</Cta>
 
       <Sign />
 

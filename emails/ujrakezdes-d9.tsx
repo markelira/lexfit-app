@@ -21,7 +21,8 @@
 import * as React from "react";
 import { Text } from "react-email";
 import { EmailLayout } from "./components/EmailLayout";
-import { Cta, Panel, PanelText, Sign } from "./components/Bits";
+import { Panel, PanelText, Sign } from "./components/Bits";
+import { OfferBox } from "./components/OfferBox";
 import { APP_URL, styles } from "./tokens";
 import { PRICES } from "@/lib/pricing/config";
 import { formatHuf } from "@/lib/pricing/display";
@@ -88,7 +89,15 @@ export default function UjrakezdesD9({
         </Panel>
       )}
 
-      <Cta href={ctaHref}>Kezdem — az első hét {intro}</Cta>
+      {/* The last mail a lead ever gets closes with the offer's three facts
+          in one breath (audit P5) - the goodbye must not forfeit the box. */}
+      <OfferBox
+        intro={intro}
+        weekStd={formatHuf(PRICES.week_std.amountHuf)}
+        month={formatHuf(PRICES.month_std.amountHuf)}
+        annual={formatHuf(PRICES.annual_std.amountHuf)}
+        ctaHref={ctaHref}
+      />
 
       <Sign />
 
