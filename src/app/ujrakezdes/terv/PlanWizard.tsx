@@ -26,6 +26,7 @@ import HabitCurve from "./HabitCurve";
 import StartDayPick, { type StartPick } from "./StartDayPick";
 import PlanBuild, { type BuildStep } from "./PlanBuild";
 import { FirstWorkoutCard, WorkoutCardsRow, type MediaCard, type FirstMedia } from "./WorkoutCards";
+import { FinishExamples } from "@/components/finish/FinishExamples";
 import { useSectionView } from "./useSectionView";
 import { nextChargeLabel } from "@/lib/pricing/renewal";
 import { BrandPanel } from "@/components/onboarding/BrandPanel";
@@ -471,6 +472,7 @@ export default function PlanWizard({
   const alexaRef = useSectionView("alexa");
   const offerMobRef = useSectionView("offer");
   const offerRailRef = useSectionView("offer");
+  const membersRef = useSectionView("members");
   const faqRef = useSectionView("faq");
   const closeSecRef = useSectionView("close");
 
@@ -833,9 +835,22 @@ export default function PlanWizard({
               />
             )}
 
-            {/* B5 · „Akik már csinálják" does NOT render: no consented member
-                photos exist, and the handoff forbids the section without them
-                (invented or stock imagery is excluded outright). */}
+            {/* ── B5 · „Akik már csinálják" — UNLOCKED 2026-09-13: consented
+                member photos exist now (owner-supplied). Same finish-card
+                marquee as the landing and the post-workout screen, adapted to
+                the reveal's white ground; the honesty line ships with it, or
+                the section does not ship. Tapping a card lands on the offer,
+                same as the locked shelf cards. ─────────────────────────────── */}
+            <section className="u2-blk u2-members" ref={membersRef}>
+              <p className="u2-eyebrow">{C.REVEAL.members.eyebrow}</p>
+              <h2>{C.REVEAL.members.hd}</h2>
+              <div className="u2-members-belt">
+                <FinishExamples
+                  onPick={() => b2Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                />
+              </div>
+              <p className="u2-xs">{C.REVEAL.members.honesty}</p>
+            </section>
 
             {/* ── B6 · the entry (mobile; desktop = the rail) ─────────────── */}
             <section className="u2-blk u2-entry u2-mobile" aria-labelledby="u2-entry-h" ref={offerMobRef}>

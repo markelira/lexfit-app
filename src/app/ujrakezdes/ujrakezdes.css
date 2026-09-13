@@ -2884,3 +2884,23 @@
   .lxu .u2-entry .u2-fit li { font-size: 14.5px; }
   .lxu .u2-entry .u2-fit { margin-bottom: var(--sp-5); }
 }
+
+/* ── B5 · real members on the reveal (same finish-card marquee as the
+   landing, adapted to the white ground) ──────────────────────────────────── */
+
+.lxu .u2-members h2 { margin-bottom: var(--sp-4); }
+/* The belt bleeds to the viewport edge like the shelf - a marquee inside a
+   boxed column reads as a screenshot of a marquee. */
+.lxu .u2-members-belt {
+  margin-inline: calc(-1 * clamp(16px, 4vw, 28px));
+}
+/* The name label was tuned for dark grounds (50% white); on the reveal's
+   white it takes the page's own muted ink. */
+.lxu .u2-members .fex-name { color: var(--ink-3); }
+.lxu .u2-members .fex-card:focus-visible .fex-frame { outline-color: var(--accent-2); }
+.lxu .u2-members .u2-xs { margin-top: var(--sp-2); }
+@media (min-width: 1024px) {
+  /* Inside the grid's main column the belt stops at the column, not the
+     viewport - the rail sits to the right. */
+  .lxu .u2-members-belt { margin-inline: 0; }
+}

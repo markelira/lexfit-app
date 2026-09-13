@@ -24,6 +24,10 @@ const EXAMPLES: Example[] = [
   { name: "Lilla", img: "/finish-examples/lilla.jpg", dir: "B", scrim: true, pos: "50% 38%", data: { mins: 22, streak: 34, exercises: 9 } },
   { name: "Alexa", img: "/finish-examples/alexa.jpg", dir: "A", scrim: true, pos: "50% 30%", data: { mins: 28, streak: 18, exercises: 13 } },
   { name: "Ákos", img: "/finish-examples/akos.jpg", dir: "A", scrim: true, pos: "48% 32%", data: { mins: 24, streak: 5, exercises: 10 } },
+  // Owner-supplied 2026-09-13 (consent owner-confirmed with the handover).
+  { name: "Viki", img: "/finish-examples/viki.jpg", dir: "C", scrim: true, pos: "50% 30%", data: { mins: 27, streak: 11, exercises: 12 } },
+  { name: "Peti", img: "/finish-examples/peti.jpg", dir: "F", scrim: true, pos: "50% 32%", data: { mins: 33, streak: 16, exercises: 14 } },
+  { name: "Lujza", img: "/finish-examples/lujza.jpg", dir: "A", scrim: false, pos: "50% 35%", data: { mins: 25, streak: 8, exercises: 10 } },
 ];
 
 // Duplicated so the marquee loops seamlessly (translateX(-50%) = exactly one set).

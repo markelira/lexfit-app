@@ -534,6 +534,16 @@ export const REVEAL = {
     hd: "Az első pipa ma este megvan.",
   },
 
+  /** B5 · real members (unlocked 2026-09-13 - consented photos now exist).
+   *  Same finish-card design as the landing and the post-workout screen; the
+   *  honesty line is what keeps the cards from reading as testimonials, and
+   *  it ships with the section or the section does not ship. */
+  members: {
+    eyebrow: "Akik már csinálják",
+    hd: "Valódi tagok, az edzésük után",
+    honesty: "A fotók valódi tagoké, az ő engedélyükkel.",
+  },
+
   /** The shelf: the entry programme's next sessions, as real cards. */
   shelf: {
     eyebrow: "A folytatás",
