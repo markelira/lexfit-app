@@ -203,9 +203,33 @@ export function trackUjrakezdesLead(eventId: string): void {
   push("lx_ujrakezdes_lead", { event_id: eventId });
 }
 
-/** The plan reveal was shown. */
-export function trackUjrakezdesRevealView(): void {
-  push("lx_ujrakezdes_reveal_view");
+/** The plan reveal was shown. `src: "email"` marks the persisted-plan page
+ *  (/ujrakezdes/terv/[token]) so email-revisit traffic separates from
+ *  fresh-quiz traffic in every reveal funnel report. */
+export function trackUjrakezdesRevealView(src?: "email"): void {
+  push("lx_ujrakezdes_reveal_view", src ? { src } : undefined);
+}
+
+/** A reveal section became ≥50% visible, once per view. The council's
+ *  compress-vs-educate dispute (analysis §disagreement 1) is unfalsifiable
+ *  without this: it is the scroll-depth map of the sales page. */
+export function trackUjrakezdesSection(s: string): void {
+  push("lx_ujrakezdes_section", { s });
+}
+
+/** The sticky price bar became visible (impressions, vs. its clicks). */
+export function trackUjrakezdesStickyView(): void {
+  push("lx_ujrakezdes_sticky_view");
+}
+
+/** The start-day choice on the reveal (R4). */
+export function trackUjrakezdesStartDay(pick: "today" | "monday"): void {
+  push("lx_ujrakezdes_start_day", { pick });
+}
+
+/** The plan-build transition finished and the reveal was entered. */
+export function trackUjrakezdesLoaderDone(): void {
+  push("lx_ujrakezdes_loader_done");
 }
 
 /** The offer CTA on the reveal was clicked. */

@@ -25,6 +25,7 @@ import {
 } from "../src/lib/ujrakezdes/sequence";
 import { lpVariantFor } from "../src/app/ujrakezdes/copy";
 import { onboardingDraftFromQuiz } from "../src/lib/ujrakezdes/handoff";
+import { curveModel } from "../src/lib/ujrakezdes/curve";
 import type { Answers, Days, Focus } from "../src/lib/ujrakezdes/types";
 import * as C from "../src/app/ujrakezdes/copy";
 import {
@@ -362,10 +363,60 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.ok(!/kérek|váltok|kezdem/i.test(C.REVEAL.entry.monthTag + C.REVEAL.entry.annualTag("X", 44)),
     "a ritmus-kártyák gombként beszélnek");
 
-  // B10: five questions, exactly one gated on the guarantee so it can go dark
-  // with the guarantee itself.
-  assert.equal(C.REVEAL.faq.length, 5);
+  // B10: six questions (the billing one leads - R10), exactly one gated on
+  // the guarantee so it can go dark with the guarantee itself.
+  assert.equal(C.REVEAL.faq.length, 6);
   assert.equal(C.REVEAL.faq.filter((f) => f.guar).length, 1, "pontosan egy GYIK-tétel függ a garanciától");
+  assert.ok(C.REVEAL.faq[0]!.billing, "a számlázási kérdés vezeti a GYIK-et (R10)");
+  assert.ok(/e-mailben szólunk/.test(C.REVEAL.faqBilling("490 Ft", "1 990 Ft")),
+    "a számlázási válasz elvesztette az emlékeztető-ígéretet");
+
+  // ── The reveal redesign (R1-R12, 2026-09-13) ───────────────────────────
+
+  // R7 interim: the milestone chip may only say „garancia" while the
+  // guarantee is live - a chip referencing a promise the page never explains
+  // was the reveal's one internal inconsistency.
+  assert.ok(C.REVEAL.b1.milestones(true).some((m) => /garancia/.test(m)));
+  assert.ok(!C.REVEAL.b1.milestones(false).some((m) => /garancia/.test(m)),
+    "sötét garanciánál a mérföldkő-lánc nem hivatkozhat rá");
+  assert.equal(C.REVEAL.b1.milestones(true).length, C.REVEAL.b1.milestones(false).length);
+
+  // R6: the cancel-anxiety line's promise must stay the reminder email - the
+  // weekly day-5 cron is what makes the sentence true.
+  assert.ok(/e-mailben szólunk/.test(C.REVEAL.offer.calm), "a megnyugtató sor elvesztette az e-mail ígéretet");
+  // R5: the dated timeline drops the date's trailing dot before -től (AkH.).
+  assert.ok(!/\.\-től|\.-től/.test(C.REVEAL.offer.timeline("490 Ft", "1 990 Ft", "2026. szeptember 22.")));
+  assert.ok(/szeptember 22-től/.test(C.REVEAL.offer.timeline("490 Ft", "1 990 Ft", "2026. szeptember 22.")));
+
+  // R12 guards: the honesty assets survive every future cleanup.
+  assert.ok(C.REVEAL.entry.honesty("X", "Y").length > 0 && C.REVEAL.entry.honestyLead.length > 0,
+    "a „havi olcsóbb” őszinteség-sor kötelező");
+  assert.ok(C.REVEAL.close.later.length > 0, "a „most nem? a terved így is a tiéd” sor kötelező");
+
+  // R3: the curve's shape contract - rises, dips ONCE mid-way, recovers
+  // ABOVE the pre-dip level, never leaves unit space, milestones on-domain.
+  for (const count of [2, 3, 4]) {
+    const m = curveModel(count);
+    assert.equal(m.weeks, Math.ceil(30 / count), `hetek száma (${count}/hét)`);
+    assert.ok(m.points.every((p) => p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1),
+      "a görbe kilóg az egységnégyzetből");
+    const first = m.points[0]!, last = m.points[m.points.length - 1]!;
+    assert.ok(last.y > first.y + 0.5, "a görbének emelkednie kell");
+    // The valley opens half a week before dip.week (curve.ts vStart).
+    const preDip = m.points.filter((p) => p.x <= (m.dip.week - 0.5) / m.weeks + 1e-9);
+    assert.ok(preDip.every((p, i) => i === 0 || p.y >= preDip[i - 1]!.y - 1e-9),
+      "a völgy előtt a görbe monoton nő");
+    const dipStartY = Math.max(...preDip.map((p) => p.y));
+    assert.ok(m.dip.y < dipStartY, "a völgy ténylegesen visszaesés");
+    assert.ok(last.y > dipStartY, "a kihagyott hét után MAGASABBAN folytatódik - különben a felirat hazudik");
+    assert.equal(m.milestones.length, 5);
+    assert.ok(m.milestones.every((mi) => mi.x >= 0 && mi.x <= 1), "mérföldkő a tartományon kívül");
+    assert.equal(m.milestones[4]!.n, 30, "az utolsó mérföldkő a 30. edzés");
+  }
+  // The y-axis is szokáserő and NEVER a body metric.
+  assert.ok(!/kg|kal[oó]ria|s[uú]ly/i.test(C.REVEAL.curve.yLabel + C.REVEAL.curve.caption + C.REVEAL.curve.dip),
+    "a görbe testadatot említ - tilos (ASA/DFA)");
+  assert.ok(/nem nulláz/.test(C.REVEAL.curve.dip), "a völgy-felirat a mechanizmus - nem cserélhető le");
 
   // The reveal → /register handoff: skipping the wizard's questions may not
   // lose a single preference, so every translation rule is pinned. Anything

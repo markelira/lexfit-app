@@ -441,10 +441,39 @@ export const CONSENT_TEXT_VERSION = "consent_lm_v1";
 //   Q5 the 490 intro continues as weekly 1 990 (repo reality); the honesty
 //      line about monthly being cheaper stays.
 
+/**
+ * R1 · the plan-build transition (gate → reveal). Labor illusion done honestly
+ * (Buell & Norton 2011): every line names a derivation buildWeekPlan actually
+ * performs, echoing the answer it uses — the effect dies when the labor isn't
+ * believable, so there is no line here the code cannot vouch for.
+ */
+export const BUILD = {
+  eyebrow: "Még egy pillanat",
+  hd: "Összeállítjuk a terved…",
+  /** Per-step lines; the chip label rendered next to each is the user's own
+   *  answer (trayChips), which is what makes the work legible as THEIRS. */
+  steps: {
+    level: "A szinted beállítása",
+    days: "Heti napok beosztása, pihenőnapokkal",
+    care: "Kímélő változatok kiválasztása",
+    focus: "Fókusz és a gyakorlatok sorrendje",
+  },
+  done: "A terved összeállt.",
+  /** Total run: long enough to read as work, short enough that nobody waits. */
+  holdMs: 5600,
+  stepMs: 1100,
+  reducedHoldMs: 1400,
+} as const;
+
 export const REVEAL = {
   /** B0 · the quiz's own progress, held at 88% until payment. The bar not
-   *  reaching 100% is the point: the quiz is done, the plan is not. */
-  progress: { done: "Kész a kvíz", left: "1 lépés", pct: 88 },
+   *  reaching 100% is the point: the quiz is done, the plan is not.
+   *  The caption reads the bar as work ALREADY DONE (endowed progress,
+   *  Nunes & Drèze 2006): payment is the last 12%, not a new decision. */
+  progress: {
+    done: "Kész a kvíz", left: "1 lépés", pct: 88,
+    caption: "A terved 88%-ban kész — már csak az indulást válaszd.",
+  },
 
   /** B1 · the plan card. */
   b1: {
@@ -456,22 +485,68 @@ export const REVEAL = {
     chipsAria: "Amikből a terv készült",
     /** The milestone chain. Labels are the handoff's (15 = „félidő" here even
      *  though the shared MILESTONES notes it as visszamérés - display copy
-     *  follows the handoff verbatim). Index 2 (the 10th) carries the accent. */
-    milestones: ["1. edzés", "5.", "10. — garancia", "15. félidő", "30. visszamérés"],
+     *  follows the handoff verbatim). Index 2 (the 10th) carries the accent.
+     *  The „garancia" word renders ONLY while the guarantee is live — a chip
+     *  referencing a promise the page never explains was the reveal's one
+     *  internal inconsistency (council audit, 2026-09-13). */
+    milestones: (guar: boolean) =>
+      ["1. edzés", "5.", guar ? "10. — garancia" : "10.", "15. félidő", "30. visszamérés"],
     guardIdx: 2,
     stats: { days: "nap / hét", mins: "perc / edzés", equip: "eszköz" },
     calc: (kcal: string, steps: string) =>
       `Ha a kalkulátort is kitöltötted: ${kcal} kcal napi cél · ${steps} lépés — becslés a megadott adataid alapján.`,
   },
 
+  /** R3 · the habit-strength curve. Y-axis has no units and NEVER a body
+   *  number; the dip annotation is the page's one deliberate extravagance. */
+  curve: {
+    eyebrow: "Így épül fel",
+    hd: (weeks: number) => `${weeks} hét, ami kibírja az életet`,
+    yLabel: "szokáserő",
+    xStart: "1. hét",
+    xEnd: (weeks: number) => `${weeks}. hét`,
+    dip: "kihagyott hét — nem nulláz",
+    /** The two rules become the curve's caption (they ARE what it draws). */
+    caption:
+      "A pihenőnap nem töri meg a sorozatot. A kihagyott hét pedig nem nulláz — ott folytatod, ahol abbahagytad. Ezért van a görbén egy völgy: benne van a tervben.",
+    aria: (weeks: number) =>
+      `Szokáserő-görbe ${weeks} héten át: emelkedik, a közepén egy kihagyott hét miatt visszaesik, majd magasabban folytatódik. Mérföldkövek az 1., 5., 10., 15. és 30. edzésnél.`,
+  },
+
+  /** R4 · the start-day choice. One tap of ownership, and the only honest
+   *  deadline that exists — the calendar (Fresh Start Effect). */
+  start: {
+    eyebrow: "Mikor indulsz?",
+    today: "Ma este",
+    monday: (date: string) => `Hétfőn (${date})`,
+    mondayToday: "Ma, hétfőn",
+    firstLine: (when: string, mins: number) =>
+      `Az első edzésed: ${when} · ${mins} perc, eszköz nélkül.`,
+  },
+
   /** B2 / desktop rail / sticky bar - one offer, three placements. */
   offer: {
     proofGuar: "10 edzés garancia",
-    proofRest: " · 1 200+ ember mozog velünk otthon",
-    proofNoGuar: "1 200+ ember mozog velünk otthon",
+    /** Split so the count can carry visual weight (R9) — an honest scale
+     *  number set like small print was proof wasted. */
+    proofCount: "1 200+",
+    proofTail: " ember mozog velünk otthon",
     cta: (intro: string) => `Kezdem — az első hét ${intro}`,
     renew: (weekStd: string) =>
       `Utána ${weekStd} / hét — a megújítás dátumát a fizetés előtt megmutatjuk. Bármikor lemondható.`,
+    /** The dated version, once the client knows today (SSR-safe: the page is
+     *  prerendered, so the date resolves after mount; until then `renew`
+     *  stands in). Naming the exact date and amount is the anti-bait move —
+     *  the fear is never the 490, it is the invisible 1 990. */
+    timeline: (intro: string, weekStd: string, date: string) =>
+      // nextChargeLabel ends with a dot ("szeptember 22."); the -től suffix
+      // attaches without it (AkH. 298.).
+      `Ma: ${intro} → ${date.replace(/\.$/, "")}-től ${weekStd} / hét. Bármikor lemondható.`,
+    /** R6 · the cancel-anxiety line. The promise is mechanically true: the
+     *  weekly day-5 reminder fires inside the intro week (cron/reminders
+     *  §weekly-day5) and annual gets −30/−7 mails. Do not ship copy here the
+     *  mail system cannot keep. */
+    calm: "A megújulás előtt e-mailben szólunk. Bármikor lemondható, két kattintás.",
   },
 
   /** B3 · the mechanism. The failure is written onto the system, never the
@@ -512,6 +587,8 @@ export const REVEAL = {
       { k: "16+", b: "Heti kihívás archívum", d: "minden héten 5 új videó." },
       { k: "✓", b: "Mérföldkövek és visszamérés", d: "1 · 5 · 10 · 15 · 30 · szünet 1-3 hónapra" },
     ],
+    /** R5 · the stack lands on one number. */
+    sum: (intro: string) => `Mindez az első héten: ${intro}.`,
     rhythmTitle: "A ritmust később is átállíthatod",
     monthTag: "/ hó · mint egy edzőóra",
     annualTag: (perMonth: string, pct: number) => `/ év · ${perMonth} / hó · −${pct}%`,
@@ -527,9 +604,13 @@ export const REVEAL = {
    *  GARANCIA (offer-copy) - one source for every surface. */
   guarEyebrow: "Mielőtt bármit fizetnél",
 
-  /** B8 · Alexa. Story + promise from the shared ALEXA block above. */
+  /** B8 · Alexa. Story + promise from the shared ALEXA block above. Moved
+   *  ABOVE the offer (council R8): the story earns the price, not the other
+   *  way around. The cohort line is true by construction — the offer is named
+   *  Szeptemberi Újrakezdés; REVISIT THE WORDING IN OCTOBER. */
   alexaEyebrow: "Ki az az Alexa?",
   alexaSigned: "„Ezt személyesen vállalom.” — Alexa",
+  alexaCohort: "A szeptemberi újrakezdők most kezdik az első hetüket.",
 
   /** B9 · the anti-avatar. */
   notFor: {
@@ -537,15 +618,20 @@ export const REVEAL = {
     body: "Minden edzésnek van csendes, ugrálásmentes és fal mellett végezhető változata. De nem vagyunk orvosok: ha kezelés alatt állsz, előbb kérdezd meg az orvosod.",
   },
 
-  /** B10 · FAQ. #3 references the guarantee, so it is filtered while the
-   *  guarantee is dark. */
+  /** B10 · FAQ. Billing/cancel questions FIRST (council R10: the money
+   *  objections live within one scroll of the CTA); the guarantee item is
+   *  filtered while the guarantee is dark. `billing` items get their answer
+   *  from `faqBilling` with real interpolated amounts. */
   faq: [
-    { q: "Mi van, ha kihagyok egy hetet?", a: "Ott folytatod, ahol abbahagytad — nálunk nincs „lemaradás”.", guar: false },
-    { q: "Meddig tart a Start program?", a: "30 edzés, a te tempódban. Nem az idő számít, hanem hogy a 30 meglegyen.", guar: false },
-    { q: "Hogyan működik a 10 edzés garancia?", a: "Egy e-mail a hi@lexfit.hu-ra, és visszautaljuk a befizetett díjaidat.", guar: true },
-    { q: "Szüneteltethetem?", a: "Igen, 1–3 hónapra, egy kattintással — a haladásod megmarad.", guar: false },
-    { q: "Kell hozzá eszköz?", a: "Nem. Elég egy matrac és 2×2 méter.", guar: false },
+    { q: "Mikor és mennyit vonnak le?", a: "", guar: false, billing: true },
+    { q: "Szüneteltethetem?", a: "Igen, 1–3 hónapra, egy kattintással — a haladásod megmarad.", guar: false, billing: false },
+    { q: "Hogyan működik a 10 edzés garancia?", a: "Egy e-mail a hi@lexfit.hu-ra, és visszautaljuk a befizetett díjaidat.", guar: true, billing: false },
+    { q: "Mi van, ha kihagyok egy hetet?", a: "Ott folytatod, ahol abbahagytad — nálunk nincs „lemaradás”.", guar: false, billing: false },
+    { q: "Meddig tart a Start program?", a: "30 edzés, a te tempódban. Nem az idő számít, hanem hogy a 30 meglegyen.", guar: false, billing: false },
+    { q: "Kell hozzá eszköz?", a: "Nem. Elég egy matrac és 2×2 méter.", guar: false, billing: false },
   ],
+  faqBilling: (intro: string, weekStd: string) =>
+    `Ma ${intro}-ot vonunk le. Hét nap múlva vált át ${weekStd} / hétre — a pontos dátumot a fizetés előtt is kiírjuk, és a megújulás előtt e-mailben szólunk. Bármikor lemondható.`,
   faqTitle: "GYIK",
 
   /** B11 · the close. */

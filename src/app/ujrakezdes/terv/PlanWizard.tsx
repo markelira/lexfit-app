@@ -19,9 +19,14 @@ import * as C from "../copy";
 import Image from "next/image";
 import { GARANCIA, GUARANTEE_LIVE } from "@/components/landing/offer-copy";
 import { PRICES } from "@/lib/pricing/config";
-import { annualSavingsPct, formatHuf, perMonthHuf } from "@/lib/pricing/display";
+import { annualSavingsPct, formatHuf, perDayHuf, perMonthHuf } from "@/lib/pricing/display";
 import PlanTray, { trayChips } from "./PlanTray";
 import MailPreview from "./MailPreview";
+import HabitCurve from "./HabitCurve";
+import StartDayPick, { type StartPick } from "./StartDayPick";
+import PlanBuild, { type BuildStep } from "./PlanBuild";
+import { useSectionView } from "./useSectionView";
+import { nextChargeLabel } from "@/lib/pricing/renewal";
 import { BrandPanel } from "@/components/onboarding/BrandPanel";
 import { StepFrame } from "@/components/onboarding/StepFrame";
 import { OptionList } from "@/components/onboarding/OptionList";
@@ -37,8 +42,9 @@ import { validateEmail } from "@/lib/quiz/validate";
 import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes/types";
 import {
   marketingContext, newEventId, trackUjrakezdesGateView, trackUjrakezdesLead,
-  trackUjrakezdesOfferClick, trackUjrakezdesRevealView, trackUjrakezdesStep,
-  trackUjrakezdesStickyClick,
+  trackUjrakezdesLoaderDone, trackUjrakezdesOfferClick, trackUjrakezdesQuizStart,
+  trackUjrakezdesRevealView, trackUjrakezdesStartDay, trackUjrakezdesStep,
+  trackUjrakezdesStickyClick, trackUjrakezdesStickyView,
 } from "@/lib/track";
 
 // The lead magnet v2 wizard: Q1-Q7 → interstitial → gate → reveal.
@@ -61,6 +67,9 @@ type Screen =
   /** The calculator's own questions, asked HERE rather than on the reveal,
    *  behind an explicit invitation so the „7 kérdés" promise stays true. */
   | "calc_invite" | "body" | "goal" | "tempo"
+  /** R1 · the plan-build transition. Not in ORDER — it advances by itself
+   *  and Vissza can never land on it. Gate submit → building → reveal. */
+  | "building"
   | "gate" | "reveal";
 
 /** Screen order. The interstitial sits between Q4 and Q5 exactly as specced:
@@ -126,6 +135,7 @@ const BRAND_STEP: Record<Screen, string> = {
   goal: "reassure",
   tempo: "reassure",
   gate: "reveal",          // the promise photo, as the plan is handed over
+  building: "reveal",      // unused - the build screen carries its own chrome
   reveal: "plan",
 };
 
@@ -157,7 +167,7 @@ const SECTION_OF: Record<Screen, number> = {
   days: 1, daypart: 1, interstitial: 1,
   focus: 2, care: 2, place: 2,
   calc_invite: 3, body: 3, goal: 3, tempo: 3,
-  gate: 3, reveal: 3,
+  gate: 3, building: 3, reveal: 3,
 };
 
 const isComplete = (d: Draft): d is Answers =>
@@ -198,6 +208,14 @@ export default function PlanWizard({
   const [stickyOn, setStickyOn] = useState(false);
   const b2Ref = useRef<HTMLElement>(null);
   const closeCtaRef = useRef<HTMLAnchorElement>(null);
+  /** ≥1024 the fold offer lives in the rail (b2Ref's section is display:none
+   *  there and never intersects), so the desktop sticky trigger observes the
+   *  whole grid instead: bar appears once grid — offer, tiers and all — has
+   *  scrolled fully past (R10: no CTA deserts). */
+  const gridRef = useRef<HTMLDivElement>(null);
+  /** R4 · the chosen start day. Session-remembered; personalises the
+   *  first-workout block and the curve's footing, writes nothing upstream. */
+  const [startPick, setStartPick] = useState<StartPick>("today");
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [hp, setHp] = useState("");
@@ -225,13 +243,16 @@ export default function PlanWizard({
       const d = JSON.parse(raw) as { a?: Draft; screen?: Screen; token?: string };
       if (d.a) setA({ care: [], ...d.a });
       if (d.token) setLeadToken(d.token);
-      // Never resume INTO the reveal: it depends on a submit whose result did
-      // not survive the refresh, and re-showing it would imply a lead we never
-      // confirmed. But dropping them to Q1 with every answer pre-filled made
-      // them re-tap seven answered questions - so a lost reveal resumes at the
-      // GATE instead: one submit away from the plan, and the lead upsert
-      // dedupes on the email hash, so resubmitting is harmless.
-      if (d.screen === "reveal") setScreen("gate");
+      const sp = sessionStorage.getItem("lexfit_ujra_start");
+      if (sp === "today" || sp === "monday") setStartPick(sp);
+      // Never resume INTO the reveal (or the build beat before it): both
+      // depend on a submit whose result did not survive the refresh, and
+      // re-showing them would imply a lead we never confirmed. But dropping
+      // them to Q1 with every answer pre-filled made them re-tap seven
+      // answered questions - so a lost reveal resumes at the GATE instead:
+      // one submit away from the plan, and the lead upsert dedupes on the
+      // email hash, so resubmitting is harmless.
+      if (d.screen === "reveal" || d.screen === "building") setScreen("gate");
       // A draft saved while the calculator was live must not resume into a
       // branch that no longer exists (or is flagged off) - land on the gate.
       else if (!C.ENERGY_LIVE && d.screen && (["calc_invite", "body", "goal", "tempo"] as Screen[]).includes(d.screen))
@@ -243,13 +264,17 @@ export default function PlanWizard({
   }, [initial]);
 
   useEffect(() => {
+    // The persisted-plan page never writes the draft: its answers came from
+    // the lead document, and letting them shadow (or overwrite) a genuinely
+    // in-progress quiz draft in this browser would be a silent hijack.
+    if (initial) return;
     try {
       sessionStorage.setItem(
         STORE_KEY,
         JSON.stringify({ a, screen, ...(leadToken ? { token: leadToken } : {}) }),
       );
     } catch { /* ignore */ }
-  }, [a, screen, leadToken]);
+  }, [a, screen, leadToken, initial]);
 
   // The order depends on whether they are still in the calculator branch: once
   // somebody skips it, the three steps leave the flow entirely rather than
@@ -319,17 +344,42 @@ export default function PlanWizard({
   }, [screen, advance]);
 
   useEffect(() => { if (screen === "gate") trackUjrakezdesGateView(); }, [screen]);
-  useEffect(() => { if (screen === "reveal") trackUjrakezdesRevealView(); }, [screen]);
+  // `src: "email"` separates persisted-plan (token URL) traffic from
+  // fresh-quiz reveals in every funnel report.
+  useEffect(() => {
+    if (screen === "reveal") trackUjrakezdesRevealView(initial ? "email" : undefined);
+    // `initial` is a mount-time prop - the reveal-view rule doesn't change mid-session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen]);
+  // The landing CTA was taken into the wizard - defined since the first
+  // build (track.ts:186) but never fired; landing→quiz bounce was
+  // unmeasurable until now. Once per mount, fresh-quiz visits only.
+  const quizStarted = useRef(false);
+  useEffect(() => {
+    if (initial || quizStarted.current) return;
+    quizStarted.current = true;
+    trackUjrakezdesQuizStart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // M4. Two observers rather than scroll math: the bar appears when the fold
   // offer leaves upward, and yields while the closing CTA is visible so the
   // page never shows the same ask twice at once.
+  const stickySeen = useRef(false);
   useEffect(() => {
     if (screen !== "reveal") return;
-    const b2 = b2Ref.current, cl = closeCtaRef.current;
+    const b2 = b2Ref.current, cl = closeCtaRef.current, grid = gridRef.current;
     if (!b2 || !cl || typeof IntersectionObserver === "undefined") return;
-    let past = false, closeVis = false;
-    const upd = () => setStickyOn(past && !closeVis);
+    let past = false, gridPast = false, closeVis = false;
+    const upd = () => {
+      const on = (past || gridPast) && !closeVis;
+      // Impressions, once - so the bar's click-through has a denominator.
+      if (on && !stickySeen.current) {
+        stickySeen.current = true;
+        trackUjrakezdesStickyView();
+      }
+      setStickyOn(on);
+    };
     // Read the LAST entry of each batch: a flick can cross "enters viewport"
     // and "leaves above" between two frames, and the observer then delivers
     // both crossings in ONE callback - entries[0] is the stale one.
@@ -343,9 +393,18 @@ export default function PlanWizard({
       closeVis = !!e && e.isIntersecting;
       upd();
     });
+    // Desktop trigger (R10): b2's section is display:none ≥1024 (the rail
+    // carries the fold offer there), so the bar arms once the WHOLE grid -
+    // offer, tiers, stack - has scrolled above the viewport.
+    const io3 = new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
+      gridPast = !!e && !e.isIntersecting && e.boundingClientRect.bottom < 0;
+      upd();
+    });
     io1.observe(b2);
     io2.observe(cl);
-    return () => { io1.disconnect(); io2.disconnect(); };
+    if (grid) io3.observe(grid);
+    return () => { io1.disconnect(); io2.disconnect(); io3.disconnect(); };
   }, [screen]);
 
   /**
@@ -397,6 +456,25 @@ export default function PlanWizard({
     () => (bodyInput && isComplete(a) ? computeEnergy(bodyInput, a.level, a.days, a.focus, sessionMin) : null),
     [bodyInput, a, sessionMin],
   );
+
+  // R11 · the reveal's scroll map. One ref per instrumented section; the
+  // mobile fold-offer and the desktop rail share the "offer" name because
+  // exactly one of them is visible at any viewport. Declared unconditionally
+  // (hooks) even though they only attach on the reveal.
+  const planRef = useSectionView("plan_card");
+  const mechRef = useSectionView("mechanism");
+  const alexaRef = useSectionView("alexa");
+  const offerMobRef = useSectionView("offer");
+  const offerRailRef = useSectionView("offer");
+  const faqRef = useSectionView("faq");
+  const closeSecRef = useSectionView("close");
+
+  /** R4's pick handler - state, session memory and the event in one place. */
+  const pickStart = useCallback((p: StartPick) => {
+    setStartPick(p);
+    try { sessionStorage.setItem("lexfit_ujra_start", p); } catch { /* ignore */ }
+    trackUjrakezdesStartDay(p);
+  }, []);
 
   /**
    * The one place this funnel talks to the server. The gate calls it, and the
@@ -474,7 +552,9 @@ export default function PlanWizard({
       const body = (await res.json().catch(() => ({}))) as { token?: string };
       if (body.token) setLeadToken(body.token);
       trackUjrakezdesLead(eventId);
-      go("reveal");
+      // R1: the build beat between gate and reveal. Watched work is valued
+      // work - the plan appearing instantly read as a plan worth nothing.
+      go("building");
     } catch {
       // The plan is theirs either way - but we cannot claim to have mailed it,
       // so the error says what actually failed and invites a retry.
@@ -484,6 +564,30 @@ export default function PlanWizard({
     }
   }, [busy, email, a, back, go, post]);
 
+
+  // ── R1 · the plan-build beat (gate → reveal only) ──────────────────────────
+  // Its own full-screen branch: it is not in ORDER, has no back button, and
+  // advances by itself. The steps echo the person's OWN answers - the labor
+  // must be legible as theirs, or the illusion is just a spinner.
+  if (screen === "building") {
+    const by = (step: string) => chips.find((c) => c.step === step)?.label;
+    const careLabels = chips
+      .filter((c) => c.step === "care" && c.key !== "care-none")
+      .map((c) => c.label)
+      .join(" · ");
+    const steps: BuildStep[] = [
+      { label: C.BUILD.steps.level, chip: by("level") },
+      { label: C.BUILD.steps.days, chip: by("days") },
+      ...(careLabels ? [{ label: C.BUILD.steps.care, chip: careLabels }] : []),
+      { label: C.BUILD.steps.focus, chip: by("focus") },
+    ];
+    return (
+      <PlanBuild
+        steps={steps}
+        onDone={() => { trackUjrakezdesLoaderDone(); go("reveal"); }}
+      />
+    );
+  }
 
   // ââ The reveal is NOT a wizard step ââââââââââââââââââââââââââââââââââââââââ
   // It carries the week, the whole Foundation programme, the calculator and the
@@ -514,7 +618,6 @@ export default function PlanWizard({
     // The honesty comparison: weekly rhythm at monthly scale. Computed, never
     // typed - 1 990 × 4.33 rounded to the nearest hundred (handoff §8).
     const weeklyMonthly = formatHuf(Math.round((PRICES.week_std.amountHuf * 4.33) / 100) * 100);
-    const firstDayName = plan.days.find((d) => d.training)?.full ?? "hétfő";
 
     /** The CTA target. `q=plan` opens the join wizard on the plan picker,
      *  `plan=week_intro` preselects the intro, and `lt` carries the plan token
@@ -555,11 +658,14 @@ export default function PlanWizard({
             <i style={{ width: `${C.REVEAL.progress.pct}%` }} />
           </span>
         </div>
+        {/* R2 · endowed progress: the bar read as work ALREADY DONE, so the
+            last step is a completion, not a new decision. */}
+        <p className="u2-top-cap">{C.REVEAL.progress.caption}</p>
 
-        <div className="u2-grid">
+        <div className="u2-grid" ref={gridRef}>
           <div className="u2-main">
             {/* ── B1 · the plan card ──────────────────────────────────────── */}
-            <section className="u2-plan" aria-labelledby="u2-h1">
+            <section className="u2-plan" aria-labelledby="u2-h1" ref={planRef}>
               <p className="u2-eyebrow u2-m1" style={{ ["--i" as string]: 0 }}>{C.REVEAL.b1.eyebrow}</p>
               <h1 id="u2-h1" className="u2-m1" style={{ ["--i" as string]: 1 }}>{C.REVEAL.b1.hd}</h1>
               <p className="u2-sub u2-m1" style={{ ["--i" as string]: 2 }}>
@@ -589,7 +695,7 @@ export default function PlanWizard({
               </div>
 
               <ol className="u2-miles u2-m1" style={{ ["--i" as string]: 12 }} aria-label="Mérföldkövek">
-                {C.REVEAL.b1.milestones.map((m, i) => (
+                {C.REVEAL.b1.milestones(GUARANTEE_LIVE).map((m, i) => (
                   <li key={m} className={i === C.REVEAL.b1.guardIdx ? "guard" : i === 0 ? "now" : ""}>{m}</li>
                 ))}
               </ol>
@@ -597,7 +703,8 @@ export default function PlanWizard({
               <dl className="u2-stats u2-m1" style={{ ["--i" as string]: 13 }}>
                 <div><dt><Count to={plan.trainingCount} /></dt><dd>{C.REVEAL.b1.stats.days}</dd></div>
                 <div><dt><Count to={plan.firstWorkoutMinutes} /></dt><dd>{C.REVEAL.b1.stats.mins}</dd></div>
-                <div><dt>0</dt><dd>{C.REVEAL.b1.stats.equip}</dd></div>
+                {/* "0 eszköz" read as an empty state; "0 Ft eszköz" is a benefit. */}
+                <div><dt>0 Ft</dt><dd>{C.REVEAL.b1.stats.equip}</dd></div>
               </dl>
 
               {C.ENERGY_LIVE && energy && (
@@ -612,20 +719,65 @@ export default function PlanWizard({
               <RevealOffer intro={intro} weekStd={weekStd} href={ctaHref} onGo={goCheckout(false)} />
             </section>
 
-            {/* ── B3 · the mechanism ──────────────────────────────────────── */}
-            <section className="u2-blk">
+            {/* ── R3 · the habit-strength curve — the mechanism, drawn ────── */}
+            <HabitCurve trainingCount={plan.trainingCount} />
+
+            {/* ── R4 · when do you start ──────────────────────────────────── */}
+            <StartDayPick pick={startPick} onPick={pickStart} mins={plan.firstWorkoutMinutes} />
+
+            {/* ── B3 · the mechanism's opening mirror. The two rules moved
+                under the curve — they are what it draws; restating them here
+                made the same argument twice. ─────────────────────────────── */}
+            <section className="u2-blk" ref={mechRef}>
               <p className="u2-eyebrow">{C.REVEAL.b3.eyebrow}</p>
               <p className="u2-body">{C.REVEAL.b3.body}</p>
-              <ol className="u2-rules">
-                {C.REVEAL.b3.rules.map((r, i) => (
-                  <li key={r}><span className="n">{String(i + 1).padStart(2, "0")}</span>{r}</li>
-                ))}
-              </ol>
             </section>
 
-            {/* ── B4 · the first workout ──────────────────────────────────── */}
+            {/* ── B8 · Alexa — moved ABOVE the offer (R8): the story earns
+                the price. Cohort line is the tribe's door. ───────────────── */}
+            <section className="u2-blk u2-alexa" ref={alexaRef}>
+              <Image src="/alexa-av.jpg" alt="Alexa" width={96} height={96} className="u2-face u2-face-lg" />
+              <div>
+                <p className="u2-eyebrow">{C.REVEAL.alexaEyebrow}</p>
+                <h2>{C.ALEXA.name}</h2>
+                <p className="u2-body">{C.ALEXA.story} {C.ALEXA.promise}</p>
+                <p className="u2-signed">{C.REVEAL.alexaSigned}</p>
+                <p className="u2-cohort">{C.REVEAL.alexaCohort}</p>
+              </div>
+            </section>
+
+            {/* B5 · „Akik már csinálják" does NOT render: no consented member
+                photos exist, and the handoff forbids the section without them
+                (invented or stock imagery is excluded outright). */}
+
+            {/* ── B6 · the entry (mobile; desktop = the rail) ─────────────── */}
+            <section className="u2-blk u2-entry u2-mobile" aria-labelledby="u2-entry-h" ref={offerMobRef}>
+              <p className="u2-eyebrow">{C.REVEAL.entry.eyebrow}</p>
+              <h2 id="u2-entry-h">{C.REVEAL.entry.hd(intro)}</h2>
+              <p className="u2-body">{C.REVEAL.entry.lead(weekStd)}</p>
+
+              <p className="u2-label">{C.REVEAL.entry.listTitle}</p>
+              <ul className="u2-inc u2-stack">
+                {C.REVEAL.entry.items.map((it) => (
+                  <li key={it.b}>
+                    <span className="k">{it.k}</span>
+                    <span><b>{it.b}</b> — {it.d}</span>
+                  </li>
+                ))}
+              </ul>
+              {/* R5 · the stack lands on one number. */}
+              <p className="u2-sum">{C.REVEAL.entry.sum(intro)}</p>
+
+              <RevealRhythm month={month} annual={annual} perMonth={perMonth} weeklyMonthly={weeklyMonthly} />
+              <p className="u2-body u2-yt">{C.REVEAL.entry.youtube}</p>
+            </section>
+
+            {/* ── B4 · the first workout — after the offer now: product
+                proof for scrollers, keyed to the chosen start day (R4). ──── */}
             <section className="u2-blk">
-              <p className="u2-eyebrow">{C.REVEAL.b4.eyebrow(firstDayName)}</p>
+              <p className="u2-eyebrow">
+                {C.REVEAL.b4.eyebrow(startPick === "today" ? "ma este" : "hétfő")}
+              </p>
               {firstW && (
                 <div className="u2-cover" aria-hidden="true">
                   <span className="mono">LEXFIT · {firstW.code}</span>
@@ -636,35 +788,11 @@ export default function PlanWizard({
               <h2>{C.REVEAL.b4.hd}</h2>
               <p className="u2-xs">{C.REVEAL.b4.sub(plan.firstWorkoutMinutes)}</p>
             </section>
-
-            {/* B5 · „Akik már csinálják" does NOT render: no consented member
-                photos exist, and the handoff forbids the section without them
-                (invented or stock imagery is excluded outright). */}
-
-            {/* ── B6 · the entry (mobile; desktop = the rail) ─────────────── */}
-            <section className="u2-blk u2-entry u2-mobile" aria-labelledby="u2-entry-h">
-              <p className="u2-eyebrow">{C.REVEAL.entry.eyebrow}</p>
-              <h2 id="u2-entry-h">{C.REVEAL.entry.hd(intro)}</h2>
-              <p className="u2-body">{C.REVEAL.entry.lead(weekStd)}</p>
-
-              <p className="u2-label">{C.REVEAL.entry.listTitle}</p>
-              <ul className="u2-inc">
-                {C.REVEAL.entry.items.map((it) => (
-                  <li key={it.b}>
-                    <span className="k">{it.k}</span>
-                    <span><b>{it.b}</b> — {it.d}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <RevealRhythm month={month} annual={annual} perMonth={perMonth} weeklyMonthly={weeklyMonthly} />
-              <p className="u2-body u2-yt">{C.REVEAL.entry.youtube}</p>
-            </section>
           </div>
 
           {/* ── The decision rail (desktop only) ──────────────────────────── */}
           <aside className="u2-rail" aria-label="A belépő">
-            <div className="u2-rail-in">
+            <div className="u2-rail-in" ref={offerRailRef}>
               <p className="u2-eyebrow">{C.REVEAL.entry.eyebrow}</p>
               <h2>{C.REVEAL.entry.hd(intro)}</h2>
               <p className="u2-xs">{C.REVEAL.entry.lead(weekStd)}</p>
@@ -693,18 +821,7 @@ export default function PlanWizard({
           </section>
         )}
 
-        {/* ── B8 · Alexa ──────────────────────────────────────────────────── */}
-        <section className="u2-band">
-          <div className="u2-col u2-alexa">
-            <Image src="/alexa-av.jpg" alt="Alexa" width={72} height={72} className="u2-face" />
-            <div>
-              <p className="u2-eyebrow">{C.REVEAL.alexaEyebrow}</p>
-              <h2>{C.ALEXA.name}</h2>
-              <p className="u2-body">{C.ALEXA.story} {C.ALEXA.promise}</p>
-              <p className="u2-signed">{C.REVEAL.alexaSigned}</p>
-            </div>
-          </div>
-        </section>
+        {/* B8 moved into the main column, above the offer (R8). */}
 
         {/* ── B9 · who it is not for ──────────────────────────────────────── */}
         <section className="u2-band u2-tight">
@@ -714,8 +831,9 @@ export default function PlanWizard({
           </div>
         </section>
 
-        {/* ── B10 · FAQ ───────────────────────────────────────────────────── */}
-        <section className="u2-band u2-tight">
+        {/* ── B10 · FAQ — billing questions first (R10): the money
+            objections live within one scroll of the offer. ───────────────── */}
+        <section className="u2-band u2-tight" ref={faqRef}>
           <div className="u2-col">
             <p className="u2-eyebrow">{C.REVEAL.faqTitle}</p>
             <div className="u2-faq">
@@ -724,7 +842,7 @@ export default function PlanWizard({
                 .map((f) => (
                   <details key={f.q}>
                     <summary>{f.q}</summary>
-                    <p>{f.a}</p>
+                    <p>{f.billing ? C.REVEAL.faqBilling(intro, weekStd) : f.a}</p>
                   </details>
                 ))}
             </div>
@@ -732,7 +850,7 @@ export default function PlanWizard({
         </section>
 
         {/* ── B11 · the close ─────────────────────────────────────────────── */}
-        <section className="u2-band u2-close">
+        <section className="u2-band u2-close" ref={closeSecRef}>
           <div className="u2-col">
             <blockquote>
               <p>{C.REVEAL.close.quote}</p>
@@ -746,9 +864,11 @@ export default function PlanWizard({
             >
               {C.REVEAL.offer.cta(intro)}
             </a>
-            <p className="u2-xs">
-              {GUARANTEE_LIVE ? C.REVEAL.close.sub : C.REVEAL.close.subNoGuar}
-            </p>
+            {GUARANTEE_LIVE && <p className="u2-xs">{C.REVEAL.close.sub}</p>}
+            {/* R6 · the cancel-anxiety line replaces the bare "bármikor
+                lemondhatod" - naming the reminder email is what kills the
+                quiet-charge fear (and the mail system really sends it). */}
+            <p className="u2-xs u2-calm">{C.REVEAL.offer.calm}</p>
             <p className="u2-later">{C.REVEAL.close.later}</p>
             <p className="u2-trust">{C.REVEAL.close.trust}</p>
           </div>
@@ -1124,22 +1244,35 @@ export default function PlanWizard({
 const CTA_HREF = "/register?q=plan&plan=week_intro";
 
 /** B2 / rail: the offer. Module scope - a component created during render gets
- *  a new identity every pass. */
+ *  a new identity every pass.
+ *
+ *  The renewal line upgrades itself once the client knows today's date
+ *  (post-mount - the route is statically prerendered, so a render-time date
+ *  would be frozen at build time): "Ma: 490 Ft → szept 22-től 1 990 Ft/hét".
+ *  Naming the exact date and amount is the anti-bait move - the fear is never
+ *  the 490, it is the invisible 1 990 (R5/R6). Until it resolves, the undated
+ *  promise stands in. */
 function RevealOffer({ intro, weekStd, href, onGo }: {
   intro: string; weekStd: string; href: string;
   onGo: (e: React.MouseEvent) => void;
 }) {
+  const [today, setToday] = useState<number | null>(null);
+  useEffect(() => setToday(Date.now()), []);
+  const line = today == null
+    ? C.REVEAL.offer.renew(weekStd)
+    : C.REVEAL.offer.timeline(intro, weekStd, nextChargeLabel("week_intro", today));
   return (
     <>
       <p className="u2-proof">
         {GUARANTEE_LIVE
-          ? <><b>{C.REVEAL.offer.proofGuar}</b>{C.REVEAL.offer.proofRest}</>
-          : C.REVEAL.offer.proofNoGuar}
+          ? <><b>{C.REVEAL.offer.proofGuar}</b> · <b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}</>
+          : <><b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}</>}
       </p>
       <a className="u2-cta" href={href} onClick={onGo}>
         {C.REVEAL.offer.cta(intro)}
       </a>
-      <p className="u2-renew">{C.REVEAL.offer.renew(weekStd)}</p>
+      <p className="u2-renew">{line}</p>
+      <p className="u2-calm">{C.REVEAL.offer.calm}</p>
     </>
   );
 }
@@ -1153,7 +1286,12 @@ function RevealRhythm({ month, annual, perMonth, weeklyMonthly }: {
       <p className="u2-label">{C.REVEAL.entry.rhythmTitle}</p>
       <div className="u2-price2">
         <div className="on"><b>{month}</b><span>{C.REVEAL.entry.monthTag}</span></div>
-        <div><b>{annual}</b><span>{C.REVEAL.entry.annualTag(perMonth, annualSavingsPct())}</span></div>
+        <div>
+          <b>{annual}</b>
+          <span>{C.REVEAL.entry.annualTag(perMonth, annualSavingsPct())}</span>
+          {/* R5 · pennies-a-day, NEXT TO the full amount, never instead of it. */}
+          <span className="u2-perday">{formatHuf(perDayHuf())} / nap</span>
+        </div>
       </div>
       <p className="u2-xs">{C.REVEAL.entry.same}</p>
       <p className="u2-honesty">

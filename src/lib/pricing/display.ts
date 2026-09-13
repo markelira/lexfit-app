@@ -35,6 +35,14 @@ export function perMonthHuf(annualHuf: number = PRICES.annual_std.amountHuf): nu
   return Math.round(annualHuf / 12);
 }
 
+/** Annual price as Ft/day - the pennies-a-day reframe on the annual card
+ *  ("39 900 Ft / év - 109 Ft / nap"). Gourville 1998; Adapty measures a
+ *  10-18% trial-start lift from per-period framing NEXT TO the full amount -
+ *  the total must always render beside it, never instead of it. */
+export function perDayHuf(annualHuf: number = PRICES.annual_std.amountHuf): number {
+  return Math.round(annualHuf / 365);
+}
+
 /**
  * Savings % of the annual plan vs paying the monthly plan for 12 months -
  * the one legitimate "Spórolj X%" comparison (monthly-annualized ↔ annual).
