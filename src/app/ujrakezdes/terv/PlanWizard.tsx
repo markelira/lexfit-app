@@ -31,6 +31,7 @@ import {
   type BodyInput, type EnergyGoal, type EnergyResult as Energy, type Tempo,
 } from "@/lib/ujrakezdes/energy";
 import { writeQuizHandoff } from "@/lib/ujrakezdes/handoff";
+import { externalBrowserHref } from "@/lib/webview";
 import { buildWeekPlan } from "@/lib/ujrakezdes/plan";
 import { validateEmail } from "@/lib/quiz/validate";
 import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes/types";
@@ -162,15 +163,30 @@ const SECTION_OF: Record<Screen, number> = {
 const isComplete = (d: Draft): d is Answers =>
   !!(d.anchor && d.level && d.days && d.focus && d.place && d.daypart && d.care);
 
-export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
-  const [screen, setScreen] = useState<Screen>("anchor");
+export default function PlanWizard({
+  catalog,
+  initial,
+}: {
+  catalog: LandingCatalog;
+  /** Seeded render for the persisted-plan URL (/ujrakezdes/terv/[token]): the
+   *  emails link straight to the reveal with the stored answers, no re-quiz.
+   *  When present, the sessionStorage restore is skipped - the server already
+   *  knows this person's answers better than this browser does. */
+  initial?: { answers: Answers; token: string };
+}) {
+  const [screen, setScreen] = useState<Screen>(initial ? "reveal" : "anchor");
   // The option being committed to, during the brief beat between the tap and
   // the advance. Null the rest of the time.
   const [picked, setPicked] = useState<string | null>(null);
   /** The step whose chip should animate into the tray. Cleared on navigation so
    *  going back does not replay a landing for an answer already sitting there. */
   const [landed, setLanded] = useState<string | null>(null);
-  const [a, setA] = useState<Draft>({ care: [] });
+  const [a, setA] = useState<Draft>(initial ? { ...initial.answers } : { care: [] });
+  /** The lead's plan token, returned by the gate submit (or seeded on the
+   *  persisted-plan page). The reveal's CTAs append it as ?lt= so /register
+   *  can rebuild the answers server-side - the webview breakout below opens a
+   *  DIFFERENT browser, where the localStorage handoff does not exist. */
+  const [leadToken, setLeadToken] = useState<string | null>(initial?.token ?? null);
   /** The calculator's answers. Separate from `a` because they are Art. 9 data
    *  with their own consent and their own retention clock. */
   const [body, setBody] = useState<BodyDraft>(EMPTY_BODY);
@@ -202,11 +218,13 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
   // Restore once on mount. Failure is non-fatal: Safari private mode throws on
   // storage access, and a quiz that refuses to start is worse than a lost draft.
   useEffect(() => {
+    if (initial) return; // the persisted-plan page IS the state - nothing to restore
     try {
       const raw = sessionStorage.getItem(STORE_KEY);
       if (!raw) return;
-      const d = JSON.parse(raw) as { a?: Draft; screen?: Screen };
+      const d = JSON.parse(raw) as { a?: Draft; screen?: Screen; token?: string };
       if (d.a) setA({ care: [], ...d.a });
+      if (d.token) setLeadToken(d.token);
       // Never resume INTO the reveal: it depends on a submit whose result did
       // not survive the refresh, and re-showing it would imply a lead we never
       // confirmed. But dropping them to Q1 with every answer pre-filled made
@@ -220,13 +238,18 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
         setScreen("gate");
       else if (d.screen && d.screen !== "interstitial") setScreen(d.screen);
     } catch { /* ignore */ }
-  }, []);
+    // `initial` is a mount-time prop (the persisted-plan page); the restore
+    // genuinely runs once.
+  }, [initial]);
 
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORE_KEY, JSON.stringify({ a, screen }));
+      sessionStorage.setItem(
+        STORE_KEY,
+        JSON.stringify({ a, screen, ...(leadToken ? { token: leadToken } : {}) }),
+      );
     } catch { /* ignore */ }
-  }, [a, screen]);
+  }, [a, screen, leadToken]);
 
   // The order depends on whether they are still in the calculator branch: once
   // somebody skips it, the three steps leave the flow entirely rather than
@@ -448,6 +471,8 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     try {
       const res = await post({ eventId });
       if (!res.ok) throw new Error(String(res.status));
+      const body = (await res.json().catch(() => ({}))) as { token?: string };
+      if (body.token) setLeadToken(body.token);
       trackUjrakezdesLead(eventId);
       go("reveal");
     } catch {
@@ -491,13 +516,31 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
     const weeklyMonthly = formatHuf(Math.round((PRICES.week_std.amountHuf * 4.33) / 100) * 100);
     const firstDayName = plan.days.find((d) => d.training)?.full ?? "hétfő";
 
+    /** The CTA target. `q=plan` opens the join wizard on the plan picker,
+     *  `plan=week_intro` preselects the intro, and `lt` carries the plan token
+     *  so the wizard can rebuild the answers even in a different browser. */
+    const ctaHref = leadToken ? `${CTA_HREF}&lt=${leadToken}` : CTA_HREF;
+
     /** Every CTA runs through here before the browser follows the link: the
      *  quiz's answers become the join wizard's draft (so /register skips its
      *  questions without losing a single preference), then the click is
-     *  counted. localStorage is synchronous - the write always lands. */
-    const goCheckout = (sticky: boolean) => () => {
+     *  counted. localStorage is synchronous - the write always lands.
+     *
+     *  ANDROID META WEBVIEW: the link is rerouted to the system browser via
+     *  intent:// BEFORE any account exists. Embedded Stripe checkout inside
+     *  the FB/IG webview killed 3/3 payment attempts of the first campaign
+     *  flight (docs/lead-conversion-diagnosis.md L1) - and this is the one
+     *  point in the funnel where escaping costs nothing: no auth state, no
+     *  localStorage the next page cannot live without (?lt= carries the
+     *  answers). */
+    const goCheckout = (sticky: boolean) => (e: React.MouseEvent) => {
       if (isComplete(a)) writeQuizHandoff(a);
       (sticky ? trackUjrakezdesStickyClick : trackUjrakezdesOfferClick)();
+      const ext = externalBrowserHref(ctaHref);
+      if (ext) {
+        e.preventDefault();
+        window.location.href = ext;
+      }
     };
 
     return (
@@ -566,7 +609,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
 
             {/* ── B2 · the offer at the fold (mobile; desktop = the rail) ──── */}
             <section className="u2-offer u2-mobile u2-m1" style={{ ["--i" as string]: 15 }} ref={b2Ref}>
-              <RevealOffer intro={intro} weekStd={weekStd} onGo={goCheckout(false)} />
+              <RevealOffer intro={intro} weekStd={weekStd} href={ctaHref} onGo={goCheckout(false)} />
             </section>
 
             {/* ── B3 · the mechanism ──────────────────────────────────────── */}
@@ -630,7 +673,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
                   <li key={it.b}><span className="k">{it.k}</span><b>{it.b}</b></li>
                 ))}
               </ul>
-              <RevealOffer intro={intro} weekStd={weekStd} onGo={goCheckout(false)} />
+              <RevealOffer intro={intro} weekStd={weekStd} href={ctaHref} onGo={goCheckout(false)} />
               <RevealRhythm month={month} annual={annual} perMonth={perMonth} weeklyMonthly={weeklyMonthly} />
             </div>
           </aside>
@@ -697,7 +740,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
             </blockquote>
             <a
               className="u2-cta"
-              href={CTA_HREF}
+              href={ctaHref}
               ref={closeCtaRef}
               onClick={goCheckout(false)}
             >
@@ -717,7 +760,7 @@ export default function PlanWizard({ catalog }: { catalog: LandingCatalog }) {
             <b>{C.REVEAL.sticky.line(intro)}</b>
             <span>{C.REVEAL.sticky.sub(weekStd)}</span>
           </div>
-          <a className="u2-cta u2-cta-sm" href={CTA_HREF} onClick={goCheckout(true)}>
+          <a className="u2-cta u2-cta-sm" href={ctaHref} onClick={goCheckout(true)}>
             {C.REVEAL.sticky.go}
           </a>
         </div>
@@ -1082,8 +1125,9 @@ const CTA_HREF = "/register?q=plan&plan=week_intro";
 
 /** B2 / rail: the offer. Module scope - a component created during render gets
  *  a new identity every pass. */
-function RevealOffer({ intro, weekStd, onGo }: {
-  intro: string; weekStd: string; onGo: () => void;
+function RevealOffer({ intro, weekStd, href, onGo }: {
+  intro: string; weekStd: string; href: string;
+  onGo: (e: React.MouseEvent) => void;
 }) {
   return (
     <>
@@ -1092,7 +1136,7 @@ function RevealOffer({ intro, weekStd, onGo }: {
           ? <><b>{C.REVEAL.offer.proofGuar}</b>{C.REVEAL.offer.proofRest}</>
           : C.REVEAL.offer.proofNoGuar}
       </p>
-      <a className="u2-cta" href={CTA_HREF} onClick={onGo}>
+      <a className="u2-cta" href={href} onClick={onGo}>
         {C.REVEAL.offer.cta(intro)}
       </a>
       <p className="u2-renew">{C.REVEAL.offer.renew(weekStd)}</p>

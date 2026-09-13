@@ -50,28 +50,40 @@ async function advanceLmLead(
   doc: FirebaseFirestore.QueryDocumentSnapshot,
   lead: LmLeadDoc,
   now: number,
-): Promise<boolean> {
+): Promise<"sent" | "stopped" | "failed"> {
   const step = lead.nextEmailStep ?? 0;
   const stop = lmStopReason(lead, step);
   if (stop || !isLmStep(step)) {
     await doc.ref.set({ nextEmailAt: null, nextEmailStep: null }, { merge: true });
-    return false;
+    return "stopped";
   }
 
-  const planHref = `${APP_URL}/ujrakezdes`;
+  // The PERSISTED plan when the lead has a token (all of them since
+  // 2026-09-13 + the backfill); the landing is the degraded fallback only.
+  const planHref = lead.planToken
+    ? `${APP_URL}/ujrakezdes/terv/${lead.planToken}`
+    : `${APP_URL}/ujrakezdes`;
+  // The sales mails land on the plan-preselected join wizard, carrying the
+  // token so the quiz's answers travel too - /arak knew nothing about the
+  // 490 Ft intro this funnel is built around.
+  const ctaHref = `${APP_URL}/register?q=plan&plan=week_intro${
+    lead.planToken ? `&lt=${lead.planToken}` : ""}`;
   const sent = step === 3
     ? (await sendUjrakezdesD3(lead.email, doc.id, { planHref, segment: lead.computed.segment })).sent
     : step === 6
-      ? (await sendUjrakezdesD6(lead.email, doc.id)).sent
-      : (await sendUjrakezdesD9(lead.email, doc.id)).sent;
+      ? (await sendUjrakezdesD6(lead.email, doc.id, { ctaHref })).sent
+      : (await sendUjrakezdesD9(lead.email, doc.id, { ctaHref })).sent;
 
-  if (!sent) return false;
+  // A transport failure leaves `nextEmailAt` untouched (tomorrow retries) and
+  // must be reported as a failure, not as a drop-out - the two used to share
+  // one counter, which made a SendGrid outage read as leads leaving.
+  if (!sent) return "failed";
 
   await doc.ref.set(
     { ...lmScheduleAfter(lead, step), lastEmailAt: now, lastEmailStep: step },
     { merge: true },
   );
-  return true;
+  return "sent";
 }
 
 
@@ -106,7 +118,7 @@ export async function GET(req: Request) {
   }
 
   const now = Date.now();
-  const stats = { due: 0, sent: 0, stopped: 0, healthPurged: 0, deleted: 0 };
+  const stats = { due: 0, sent: 0, stopped: 0, failed: 0, healthPurged: 0, deleted: 0 };
 
   // ── Nurture sequence (E2-E6, W1) ──
   await section("sequence", async () => {
@@ -123,8 +135,10 @@ export async function GET(req: Request) {
       // The branch is additive: a document with no `variant` is an original
       // quiz lead and takes the path below completely unchanged.
       if ((raw as LmLeadDoc).variant === LM_VARIANT) {
-        const handled = await advanceLmLead(doc, raw as LmLeadDoc, now);
-        if (handled) stats.sent++; else stats.stopped++;
+        const outcome = await advanceLmLead(doc, raw as LmLeadDoc, now);
+        if (outcome === "sent") stats.sent++;
+        else if (outcome === "stopped") stats.stopped++;
+        else stats.failed++;
         continue;
       }
 

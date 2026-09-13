@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { hasOnboarded } from "@/lib/user";
 import { paidDestination } from "@/lib/billing";
 import { readDraft, writeDraft, clearDraft, type DraftAnswers } from "@/lib/onboarding-draft";
+import { PLAN_STEP_IDX } from "@/lib/ujrakezdes/handoff";
 import { planFromSearch } from "@/lib/pricing/preselect";
 import { captureAttribution } from "@/lib/attribution";
 import { trackCheckoutStart, trackOnboardingStart, trackOnbWhisperView } from "@/lib/track";
@@ -215,6 +216,28 @@ export function OnboardingV2() {
   // must run ahead of the resume effect below, which is itself a navigation.
   useEffect(() => {
     captureAttribution();
+  }, []);
+
+  // The /ujrakezdes quiz → register handoff, by token (?lt=). The reveal's
+  // CTAs used to rely on localStorage alone, which stopped surviving the
+  // journey on 2026-09-13: the Android webview breakout opens this page in a
+  // DIFFERENT browser, and the D6/D9 emails link it directly. When a token is
+  // present and no local draft exists, the quiz's answers are rebuilt from the
+  // server so the person's preferences still arrive with them. A local draft
+  // always wins - it is newer than anything the token knows.
+  useEffect(() => {
+    const lt = new URLSearchParams(window.location.search).get("lt");
+    if (!lt || !/^[0-9a-f]{32}$/.test(lt) || readDraft()) return;
+    let active = true;
+    fetch(`/api/ujrakezdes-lead/handoff?lt=${lt}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((b: { draft?: DraftAnswers } | null) => {
+        if (!active || !b?.draft) return;
+        writeDraft({ v: 1, idx: PLAN_STEP_IDX, answers: b.draft, startedAt: Date.now() });
+        setAnswers(initialAnswers());
+      })
+      .catch(() => { /* the wizard works without the prefill */ });
+    return () => { active = false; };
   }, []);
 
   // Resume once, on cold open: if a draft has a step past welcome and the URL is

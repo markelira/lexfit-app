@@ -23,13 +23,24 @@ import { Text } from "react-email";
 import { EmailLayout } from "./components/EmailLayout";
 import { Cta, Panel, PanelText, Sign } from "./components/Bits";
 import { APP_URL, styles } from "./tokens";
+import { PRICES } from "@/lib/pricing/config";
+import { formatHuf } from "@/lib/pricing/display";
 import { GUARANTEE_LIVE } from "@/components/landing/offer-copy";
 
 export const subject = "Mi történik az első tíz edzés alatt";
 
 const preview = "A harmadik környékén szokott eldőlni.";
 
-export default function UjrakezdesD9({ unsubHref }: { unsubHref: string }) {
+export default function UjrakezdesD9({
+  unsubHref,
+  ctaHref = `${APP_URL}/register?q=plan&plan=week_intro`,
+}: {
+  unsubHref: string;
+  /** The plan-preselected join wizard, with the lead's ?lt= token so their
+   *  quiz answers travel with them. */
+  ctaHref?: string;
+}) {
+  const intro = formatHuf(PRICES.week_intro.amountHuf);
   return (
     <EmailLayout
       preview={preview}
@@ -77,7 +88,7 @@ export default function UjrakezdesD9({ unsubHref }: { unsubHref: string }) {
         </Panel>
       )}
 
-      <Cta href={`${APP_URL}/arak`}>Megnézem a Start programot</Cta>
+      <Cta href={ctaHref}>Kezdem — az első hét {intro}</Cta>
 
       <Sign />
 

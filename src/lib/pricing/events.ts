@@ -18,6 +18,7 @@ export type PricingEvent =
   | "downgrade_scheduled"
   | "dunning_started"
   | "dunning_recovered"
+  | "resume_email_sent"
   | "earned_unlocked"
   | "grand_slam_viewed"
   | "grand_slam_redeemed"

@@ -130,6 +130,10 @@ export async function POST(req: Request) {
   // the same answers arriving again with the energy module attached. It decides
   // whether D0 goes out - see below.
   let resend = true;
+  // The plan token that ends up on the document - the emails link the plan
+  // through it. A retake keeps the existing token so links in already-sent
+  // mail stay alive; a legacy doc without one gets the fresh token backfilled.
+  let planToken = fresh.planToken;
   try {
     await adminDb.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
@@ -140,6 +144,8 @@ export async function POST(req: Request) {
         retake = true;
         resend = !sameAnswers(prev.answers, fresh.answers);
         const patch: Record<string, unknown> = { ...retakePatch(prev, fresh) };
+        if (prev.planToken) planToken = prev.planToken;
+        else patch.planToken = planToken;
         // Re-answering WITHOUT the module is a withdrawal of the health
         // consent, so the metrics are deleted rather than left behind. A merge
         // write leaves absent keys untouched, which here would mean quietly
@@ -147,6 +153,10 @@ export async function POST(req: Request) {
         if (!fresh.body) for (const f of LM_BODY_FIELDS) patch[f] = FieldValue.delete();
         tx.set(ref, patch, { merge: true });
       } else {
+        if (prev?.planToken) {
+          planToken = prev.planToken; // upgraded original-quiz lead keeps its token
+          fresh.planToken = prev.planToken;
+        }
         tx.set(ref, fresh, { merge: true });
       }
     });
@@ -186,12 +196,21 @@ export async function POST(req: Request) {
       // simply ships without the card block.
     }
 
-    await sendUjrakezdesD0(fresh.email, {
-      planHref: `${appUrl}/ujrakezdes`,
+    // The PERSISTED plan, not the landing page. The gate promises "a kész
+    // tervet e-mailben küldjük" - a link that re-opens the seven questions
+    // would break that promise (and did, until 2026-09-13).
+    const d0 = await sendUjrakezdesD0(fresh.email, {
+      planHref: `${appUrl}/ujrakezdes/terv/${planToken}`,
       consented: consentMarketing,
       workouts,
       workoutTotal,
     });
+    // Record the send on the document (step 0). Without this the lead looks
+    // never-mailed in every query, and a silent SendGrid outage on D0 is
+    // invisible in Firestore.
+    if (d0.sent) {
+      await ref.set({ lastEmailAt: Date.now(), lastEmailStep: 0 }, { merge: true });
+    }
   } catch (e) {
     console.error("[ujrakezdes-lead] D0 send failed", e);
   }
@@ -222,5 +241,8 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, retake });
+  // The token rides back to the reveal so its CTAs can carry the answers to
+  // /register (?lt=) across a browser boundary - the Android webview breakout
+  // means localStorage handoff alone no longer survives the journey.
+  return NextResponse.json({ ok: true, retake, token: planToken });
 }

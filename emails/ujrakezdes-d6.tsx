@@ -36,7 +36,17 @@ const preview = GUARANTEE_LIVE
   ? "A 10 edzés garancia — öt héten belül."
   : "Egy tagság, minden benne — és bármikor lemondható.";
 
-export default function UjrakezdesD6({ unsubHref }: { unsubHref: string }) {
+export default function UjrakezdesD6({
+  unsubHref,
+  ctaHref = `${APP_URL}/register?q=plan&plan=week_intro`,
+}: {
+  unsubHref: string;
+  /** The plan-preselected join wizard, with the lead's ?lt= token so their
+   *  quiz answers travel with them. Falls back to the tokenless URL - the
+   *  funnel's hook must never depend on a field an old lead might not have. */
+  ctaHref?: string;
+}) {
+  const intro = formatHuf(PRICES.week_intro.amountHuf);
   const month = formatHuf(PRICES.month_std.amountHuf);
   const annual = formatHuf(PRICES.annual_std.amountHuf);
   const annualPerMonth = formatHuf(perMonthHuf());
@@ -89,10 +99,15 @@ export default function UjrakezdesD6({ unsubHref }: { unsubHref: string }) {
       </Text>
 
       <Text style={styles.body}>
+        Az indulás pedig nem nagy döntés: <strong>az első heted {intro}</strong>.
+        Kipróbálod a saját terveddel, és utána döntesz.
+      </Text>
+
+      <Text style={styles.body}>
         Ha most nem időszerű, a heti terved akkor is a tiéd marad.
       </Text>
 
-      <Cta href={`${APP_URL}/arak`}>Megnézem a Start programot</Cta>
+      <Cta href={ctaHref}>Kezdem — az első hét {intro}</Cta>
 
       <Sign />
 

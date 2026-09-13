@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { normalizeEmail, validateEmail } from "@/lib/quiz/validate";
 import {
   CONSENT_POLICY_VERSION, HEALTH_RETENTION_MS, LEAD_RETENTION_MS,
@@ -132,6 +132,20 @@ export interface LmLeadDoc {
    *  quiz's body metrics - see docs/lead-magnet-v2-plan.md §4. */
   healthPurgeAt: number;
   purgeAt: number;
+  /**
+   * Unguessable capability token for the persisted plan URL
+   * (/ujrakezdes/terv/{token}) and the register handoff (?lt=). D0/D3 promise
+   * "the plan arrives by email" - without this the emails could only link the
+   * landing page and the person had to re-answer all seven questions. Stable
+   * across retakes so links in already-sent mail keep working.
+   */
+  planToken: string;
+  /** Registration is NOT conversion. `registeredAt` = created an account;
+   *  `paidAt` = completed checkout (stamped by the Stripe webhook). The nurture
+   *  sequence stops on `paidAt` - a registered-but-unpaid lead is exactly who
+   *  D6/D9 exist for. `convertedAt` is kept for continuity of old queries. */
+  registeredAt?: number | null;
+  paidAt?: number | null;
   convertedAt: number | null;
   unsubscribedAt: number | null;
   nextEmailAt: number | null;
@@ -216,6 +230,9 @@ export function buildLead(i: BuildInput): LmLeadDoc {
     updatedAt: i.now,
     healthPurgeAt: i.now + HEALTH_RETENTION_MS,
     purgeAt: i.now + LEAD_RETENTION_MS,
+    planToken: randomBytes(16).toString("hex"),
+    registeredAt: null,
+    paidAt: null,
     convertedAt: null,
     unsubscribedAt: null,
     // No marketing consent → no sequence at all, only the transactional D0

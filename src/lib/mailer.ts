@@ -60,6 +60,7 @@ import WeeklyRecap, { subjectFor as recapSubject } from "../../emails/weekly-rec
 import Welcome, { subject as welcomeSubject } from "../../emails/welcome";
 import WithdrawalConfirm, { subject as withdrawalSubject } from "../../emails/withdrawal-confirm";
 import GuaranteeRefundConfirm, { subject as guaranteeRefundSubject } from "../../emails/guarantee-refund-confirm";
+import CheckoutResume, { subject as checkoutResumeSubject } from "../../emails/checkout-resume";
 import UjrakezdesD0, { subject as ujraD0Subject } from "../../emails/ujrakezdes-d0";
 import UjrakezdesD3, { subject as ujraD3Subject } from "../../emails/ujrakezdes-d3";
 import UjrakezdesD6, { subject as ujraD6Subject } from "../../emails/ujrakezdes-d6";
@@ -459,18 +460,33 @@ export const sendUjrakezdesD3 = (
   });
 };
 
-export const sendUjrakezdesD6 = (to: string, leadId: string) => {
+export const sendUjrakezdesD6 = (to: string, leadId: string, p?: { ctaHref?: string }) => {
   const u = leadUnsub(leadId);
   return deliver({
     to, subject: ujraD6Subject, category: "marketing", unsub: u.unsub,
-    make: () => UjrakezdesD6({ unsubHref: u.href }),
+    make: () => UjrakezdesD6({ unsubHref: u.href, ctaHref: p?.ctaHref }),
   });
 };
 
-export const sendUjrakezdesD9 = (to: string, leadId: string) => {
+export const sendUjrakezdesD9 = (to: string, leadId: string, p?: { ctaHref?: string }) => {
   const u = leadUnsub(leadId);
   return deliver({
     to, subject: ujraD9Subject, category: "marketing", unsub: u.unsub,
-    make: () => UjrakezdesD9({ unsubHref: u.href }),
+    make: () => UjrakezdesD9({ unsubHref: u.href, ctaHref: p?.ctaHref }),
   });
 };
+
+/**
+ * Checkout-abandonment recovery (P0-2, 2026-09-13). Fired by the Stripe
+ * webhook on `checkout.session.expired` for a user with no access. The single
+ * most winnable segment: they chose a plan, registered, and stalled at the
+ * card form - very often inside the Facebook in-app browser, which is exactly
+ * why the email matters (it opens in the real browser). Consent-gated by the
+ * caller; capped there to one send per episode.
+ */
+export const sendCheckoutResume = (
+  to: string, p: { ctaHref: string; roleName: string; introLine: string },
+) => deliver({
+  to, subject: checkoutResumeSubject, category: "billing",
+  make: () => CheckoutResume(p),
+});

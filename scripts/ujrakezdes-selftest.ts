@@ -166,11 +166,19 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   // Every stop reason, because each one is a mail somebody must not receive.
   assert.equal(lmStopReason(yes, 3), null);
   assert.equal(lmStopReason({ ...yes, unsubscribedAt: now }, 3), "unsubscribed");
-  assert.equal(lmStopReason({ ...yes, convertedAt: now }, 6), "converted");
+  // PAYMENT stops the sequence; registration alone must NOT (2026-09-13):
+  // the register wizard ends in a paid checkout, so a lead with convertedAt
+  // but no paidAt abandoned at the pay step - exactly who D6/D9 are for.
+  assert.equal(lmStopReason({ ...yes, paidAt: now }, 6), "converted");
+  assert.equal(
+    lmStopReason({ ...yes, convertedAt: now, registeredAt: now }, 6),
+    null,
+    "a regisztráció önmagában nem állítja meg a sorozatot - a fizetés igen",
+  );
   assert.equal(lmStopReason(no, 3), "no_consent");
   assert.equal(lmStopReason(yes, 9), null, "a D9 még a sorozat része");
   assert.equal(lmStopReason(yes, 10), "finished");
-  ok("leiratkozás, vásárlás és visszavont hozzájárulás mind megállítja a sorozatot");
+  ok("leiratkozás, fizetés és visszavont hozzájárulás mind megállítja a sorozatot");
 
   // A retake must not resurrect a withdrawn consent.
   const again = mk(false);

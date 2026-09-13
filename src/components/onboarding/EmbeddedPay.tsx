@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { fetchEmbeddedClientSecret, type Consents } from "@/lib/billing";
+import { fetchEmbeddedClientSecret, startCheckout, type Consents } from "@/lib/billing";
+import { inMetaWebview } from "@/lib/webview";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { type PayPlan } from "./paywall";
@@ -65,6 +66,15 @@ export function EmbeddedPay({
   const [consented, setConsented] = useState(false);
   const [ready, setReady] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
+  // Meta's in-app browser breaks EMBEDDED checkout (iframe + third-party
+  // cookies + no Google Pay + no autofill; 3/3 payment attempts of the first
+  // campaign flight died here - docs/lead-conversion-diagnosis.md L1). Inside
+  // a webview the pay step therefore redirects to Stripe's HOSTED page
+  // instead of mounting the iframe. Resolved after mount: /register is
+  // statically prerendered, so navigator does not exist at render time.
+  const [webview, setWebview] = useState(false);
+  useEffect(() => setWebview(inMetaWebview()), []);
   const selected = plans.find((p) => p.role === role) ?? plans[0];
   const renewalLine = useRenewalLine(selected.role);
 
@@ -144,9 +154,25 @@ export function EmbeddedPay({
               díj számolható el - <a href="/aszf">részletek</a>.
             </span>
           </label>
-          <button className="fnl-cta" disabled={!consented} onClick={() => setReady(true)}>
-            Tovább a fizetéshez
+          <button
+            className="fnl-cta"
+            disabled={!consented || redirecting}
+            onClick={() => {
+              setErr(null);
+              if (!webview) { setReady(true); return; }
+              // Hosted-checkout redirect for webview traffic. startCheckout
+              // records the consent server-side exactly like the embedded
+              // path, then navigates the whole page to Stripe.
+              setRedirecting(true);
+              startCheckout(selected.role, CONSENTS).catch(() => {
+                setRedirecting(false);
+                setErr("A fizetést most nem tudtuk elindítani. Próbáld újra.");
+              });
+            }}
+          >
+            {redirecting ? "Átirányítás a fizetéshez…" : "Tovább a fizetéshez"}
           </button>
+          {err && <p className="fnl-formerr">{err}</p>}
           <p className="fnl-alt">{PAY_STEP.cancelLine}</p>
           <div className="fnl-paytrust">
             {PAY_STEP.trust.map((t) => <span key={t}>{t}</span>)}

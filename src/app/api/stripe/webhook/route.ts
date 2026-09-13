@@ -12,7 +12,12 @@ import { markOfferRedeemed } from "@/lib/pricing/earning-server";
 import { logEvent } from "@/lib/pricing/events";
 import { issueInvoice, type InvoiceParty } from "@/lib/pricing/invoice";
 import { budapestDay } from "@/lib/pricing/keys";
-import { planDisplay, sendDunningDay0, sendSubscriptionStarted } from "@/lib/mailer";
+import { planDisplay, sendCheckoutResume, sendDunningDay0, sendSubscriptionStarted } from "@/lib/mailer";
+import { leadId } from "@/lib/quiz/lead";
+import { LM_VARIANT, type LmLeadDoc } from "@/lib/ujrakezdes/lead";
+import { PRICES, type PriceRole } from "@/lib/pricing/config";
+import { formatHuf } from "@/lib/pricing/display";
+import { hasAccessFromData } from "@/lib/pricing/types";
 import { sendPurchase } from "@/lib/meta-capi";
 import { sendTikTokPurchase } from "@/lib/tiktok-capi";
 import { getAuth } from "firebase-admin/auth";
@@ -382,6 +387,110 @@ async function resolveWrite(event: Stripe.Event): Promise<PendingWrite> {
   }
 }
 
+/**
+ * Payment closes the lead-nurture loop (P0-2, docs/lead-conversion-diagnosis.md).
+ * `paidAt` is the field lmStopReason keys on - registration alone no longer
+ * stops the sequence, this does. Best-effort: a lead-side failure must never
+ * fail the webhook (Stripe would retry the whole event).
+ */
+async function maybeMarkLeadPaid(event: Stripe.Event, write: PendingWrite): Promise<void> {
+  if (event.type !== "checkout.session.completed" || !write) return;
+  try {
+    const email = await emailForUid(write.uid);
+    if (!email) return;
+    const ref = adminDb.doc(`quizLeads/${leadId(email)}`);
+    const snap = await ref.get();
+    if (!snap.exists) return;
+    const now = Date.now();
+    const lead = snap.data() as LmLeadDoc;
+    await ref.set(
+      {
+        paidAt: lead.paidAt ?? now,
+        convertedAt: lead.convertedAt ?? now,
+        nextEmailAt: null,
+        nextEmailStep: null,
+      },
+      { merge: true },
+    );
+  } catch (e) {
+    console.error("[webhook] lead paid marker", e);
+  }
+}
+
+/** How long one recovery email suppresses the next - several expired sessions
+ *  in one shopping episode must not become several emails. */
+const RESUME_EMAIL_COOLDOWN_MS = 72 * 3600_000;
+
+/**
+ * Checkout-abandonment recovery (P0-2). `checkout.session.expired` fires ~24h
+ * after an abandoned session - for this funnel that person very often stalled
+ * inside the Facebook webview's broken card form, and email is the escape
+ * hatch into their real browser.
+ *
+ * Guards, in order: our own session (has uid metadata) → user still has no
+ * access → consent (account marketing opt-in OR the quiz lead's marketing
+ * consent - no consent, no mail) → 72h cooldown so one episode = one email.
+ *
+ * ⚠️ Delivery depends on `checkout.session.expired` being among the webhook
+ * endpoint's enabled events - scripts/stripe-enable-expired-event.mjs adds it.
+ */
+async function maybeCheckoutAbandoned(event: Stripe.Event): Promise<void> {
+  if (event.type !== "checkout.session.expired") return;
+  try {
+    const session = event.data.object as Stripe.Checkout.Session;
+    const uid = (session.metadata?.uid as string | undefined) ?? session.client_reference_id;
+    if (!uid) return;
+    const role = (session.metadata?.role ?? "week_intro") as PriceRole;
+
+    const subSnap = await subscriptionRef(uid).get();
+    const sub = subSnap.data() as (SubscriptionDoc & { resumeEmailSentAt?: number }) | undefined;
+    const now = Date.now();
+    if (sub && hasAccessFromData(sub, now)) return; // they finished another session
+    if (sub?.resumeEmailSentAt && now - sub.resumeEmailSentAt < RESUME_EMAIL_COOLDOWN_MS) return;
+
+    const email = await emailForUid(uid);
+    if (!email) return;
+
+    // Consent: the account's own opt-in, or the quiz lead's marketing consent.
+    const userDoc = (await adminDb.doc(`users/${uid}`).get()).data() as
+      | { marketingOptIn?: boolean }
+      | undefined;
+    let consented = userDoc?.marketingOptIn === true;
+    let lt: string | null = null;
+    const leadSnap = await adminDb.doc(`quizLeads/${leadId(email)}`).get();
+    if (leadSnap.exists) {
+      const lead = leadSnap.data() as LmLeadDoc;
+      if (lead.variant === LM_VARIANT) {
+        if (lead.consents?.marketing && !lead.unsubscribedAt) consented = true;
+        lt = lead.planToken ?? null;
+      }
+    }
+    if (!consented) return;
+
+    const spec = PRICES[role] ?? PRICES.week_intro;
+    const introLine =
+      role === "week_intro"
+        ? `Az első heted ${formatHuf(PRICES.week_intro.amountHuf)}, utána ${formatHuf(PRICES.week_std.amountHuf)} hetente — bármikor lemondható.`
+        : role === "annual_std"
+          ? `${formatHuf(spec.amountHuf)} egy évre — bármikor lemondható.`
+          : `${formatHuf(spec.amountHuf)} havonta — bármikor lemondható.`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
+    const ctaHref = `${appUrl}/register?q=plan&plan=${role}${lt ? `&lt=${lt}` : ""}`;
+
+    const sent = await sendCheckoutResume(email, {
+      ctaHref,
+      roleName: spec.nickname,
+      introLine,
+    });
+    if (sent.sent) {
+      await subscriptionRef(uid).set({ resumeEmailSentAt: now }, { merge: true });
+      await logEvent("resume_email_sent", { uid, props: { role } });
+    }
+  } catch (e) {
+    console.error("[webhook] checkout abandoned", e);
+  }
+}
+
 /** Stripe webhook → mirror into subscriptions/{uid}. Signature-verified, and
  *  idempotent: dedup-create + business write happen in ONE transaction. */
 export async function POST(req: Request) {
@@ -426,6 +535,9 @@ export async function POST(req: Request) {
     // never throw here). Called on every delivery so a post-commit crash still
     // issues on Stripe's retry.
     await maybeIssueInvoice(event);
+    // P0-2: payment stops the lead nurture; abandonment triggers the recovery.
+    await maybeMarkLeadPaid(event, write);
+    await maybeCheckoutAbandoned(event);
     // F5.1: day-0 dunning email (gated once per episode).
     await maybeDunning(event);
     // "Elindult az előfizetésed" (gated once per checkout session).

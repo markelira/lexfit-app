@@ -39,13 +39,17 @@ export type LmStopReason = "unsubscribed" | "no_consent" | "converted" | "finish
 /**
  * Why a lead should drop out, or null to keep going.
  *
- * Conversion stops everything. D6 pitches a membership; mailing that to
- * somebody who already bought is worse than sending nothing.
+ * PAYMENT stops everything - D6 pitches a membership; mailing that to somebody
+ * who already bought is worse than sending nothing. Registration alone does
+ * NOT stop the sequence (changed 2026-09-13): the register wizard ends in a
+ * paid checkout, so a registered-but-unpaid lead is someone who abandoned at
+ * the pay step - exactly who the remaining sends are for. `paidAt` is stamped
+ * by the Stripe webhook on checkout.session.completed.
  */
 export function lmStopReason(lead: LmLeadDoc, step: number): LmStopReason | null {
   if (lead.unsubscribedAt) return "unsubscribed";
   if (!lead.consents?.marketing) return "no_consent";
-  if (lead.convertedAt) return "converted";
+  if (lead.paidAt) return "converted";
   if (step > LM_LAST_STEP) return "finished";
   return null;
 }

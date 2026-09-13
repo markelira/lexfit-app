@@ -6,6 +6,7 @@ import { verifyRequest } from "@/lib/auth-server";
 import { milestoneClear, milestoneOnce } from "@/lib/milestones";
 import { sendVerifyEmail, sendWelcome } from "@/lib/mailer";
 import { leadId } from "@/lib/quiz/lead";
+import { LM_VARIANT, type LmLeadDoc } from "@/lib/ujrakezdes/lead";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -71,16 +72,32 @@ export async function POST(req: Request) {
   }
 
   // Close the quiz funnel's measurement loop: if this address came in as a
-  // lead, stamp the conversion. It also STOPS the nurture sequence - E4 and E6
-  // pitch "your first week is 490 Ft", which is the wrong mail for someone who
-  // just registered. Best-effort: a lead-side failure must not break signup.
+  // lead, stamp the registration. Best-effort: a lead-side failure must not
+  // break signup.
+  //
+  // TWO VARIANTS, TWO RULES (changed 2026-09-13):
+  //  - lm_v2 (/ujrakezdes): registration does NOT stop the nurture sequence.
+  //    The register wizard ends in a PAID checkout, so "registered" here means
+  //    "abandoned at the pay step" until the Stripe webhook stamps `paidAt` -
+  //    and a lead in that state is exactly who D6/D9 exist for. The sequence's
+  //    stop rule (lmStopReason) keys on `paidAt`, which the webhook writes.
+  //  - original quiz: unchanged - conversion stamps and stops, as before.
   try {
     const ref = adminDb.doc(`quizLeads/${leadId(user.email)}`);
-    if ((await ref.get()).exists) {
-      await ref.set(
-        { convertedAt: Date.now(), nextEmailAt: null, nextEmailStep: null },
-        { merge: true },
-      );
+    const snap = await ref.get();
+    if (snap.exists) {
+      const now = Date.now();
+      if ((snap.data() as LmLeadDoc).variant === LM_VARIANT) {
+        await ref.set(
+          { convertedAt: (snap.data() as LmLeadDoc).convertedAt ?? now, registeredAt: now },
+          { merge: true },
+        );
+      } else {
+        await ref.set(
+          { convertedAt: now, nextEmailAt: null, nextEmailStep: null },
+          { merge: true },
+        );
+      }
       results.leadConverted = true;
     }
   } catch (e) {
