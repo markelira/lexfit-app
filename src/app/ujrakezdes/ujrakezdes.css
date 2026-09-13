@@ -2754,3 +2754,62 @@
   .lxu .u2-first:active .u2-card-media, .lxu .u2-card:active .u2-card-media { transform: none; }
   .lxu .u2-card-media .anim { transition: none; }
 }
+
+/* ── The decision rail v3 (conversion order; 35-54 legibility) ─────────────
+   Type floors raised for the audience: nothing interactive below 13.5px,
+   nothing informational below 11.5px inside the rail. */
+
+.lxu .u2-rail-done {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 var(--sp-2);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.lxu .u2-rail-done .tick {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+}
+.lxu .u2-rail-chips { margin-bottom: var(--sp-4); }
+.lxu .u2-rail-chips li { font-size: 9.5px; padding: 5px 9px; }
+.lxu .u2-rail-in h2 { margin-bottom: var(--sp-2); }
+.lxu .u2-rail-in .u2-renew { font-size: 12px; color: var(--ink-2); }
+.lxu .u2-rail-cta { margin-top: var(--sp-3); font-size: 15.5px; padding-top: 15px; padding-bottom: 15px; }
+.lxu .u2-rail-in .u2-calm { font-size: 11.5px; }
+.lxu .u2-rail-trust {
+  margin: var(--sp-3) 0 var(--sp-5);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid rgba(17, 24, 21, 0.07);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+.lxu .u2-fit {
+  list-style: none;
+  margin: var(--sp-2) 0 var(--sp-4);
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.lxu .u2-fit li {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  font-size: 13.5px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: var(--ink);
+}
+.lxu .u2-fit .fk { flex: none; color: var(--accent); font-weight: 700; font-size: 12px; }
+.lxu .u2-rail-allin { margin: 0 0 var(--sp-2); font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+.lxu .u2-rail-in .u2-proof { font-size: 12px; }

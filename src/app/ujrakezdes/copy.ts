@@ -543,6 +543,33 @@ export const REVEAL = {
     note: "Minden kártya a valódi edzés — érintsd meg, és belenézhetsz.",
   },
 
+  /**
+   * The desktop decision rail, v3 (2026-09-13). Conversion order per the
+   * F-pattern/heatmap read: the top ~350px must carry (1) personal echo -
+   * proof the offer is HER plan, (2) the price with its dated timeline,
+   * (3) the CTA with the cancel-anxiety line, (4) trust. Certainty content
+   * replaces the nine-row programme list: for a 60%-sedentary 35-54 audience
+   * the objection is "will I stick with it", never "how many videos".
+   * The full programme list stays on the mobile B6 block.
+   */
+  rail: {
+    done: "A terved kész",
+    /** Personalized certainty lines, from HER answers. Max 4 render. */
+    fitTitle: "A tervedhez igazítva",
+    fit: {
+      levelLow: "Kezdőknek tervezve — nulláról is elindulsz",
+      levelMid: "A szintedhez igazítva, fokozatos felépítéssel",
+      knee: "Minden gyakorlatnak van térdkímélő párja",
+      back: "Derékbarát felépítés, biztonságos sorrend",
+      quiet: "Csendes változat — alvó gyerek mellett is megy",
+      home: "Otthon, eszköz nélkül — elég 2×2 méter",
+      days: (n: number) => `Heti ${n} nap, pihenőnapokkal — később átállítható`,
+      flex: "Rugalmas heti ritmus, pihenőnapokkal",
+    },
+    allIn: "Egy tagság, minden benne: a 30 edzéses Start, az összes program, heti 5 új kihívás.",
+    trust: "Stripe · 14 napos elállás · bármikor lemondható",
+  },
+
   /** B2 / desktop rail / sticky bar - one offer, three placements. */
   offer: {
     proofGuar: "10 edzés garancia",

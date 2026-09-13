@@ -644,6 +644,27 @@ export default function PlanWizard({
      *  so the wizard can rebuild the answers even in a different browser. */
     const ctaHref = leadToken ? `${CTA_HREF}&lt=${leadToken}` : CTA_HREF;
 
+    /** Rail v3's certainty lines, from HER answers - the personalized
+     *  counter to "will I stick with it". Care picks ONE line by prevalence
+     *  in the lead base (knee 48 > back 38 > quiet 15); four lines total,
+     *  because a certainty list long enough to scroll stops being certain. */
+    const fitLines = [
+      a.level === "none" || a.level === "rare"
+        ? C.REVEAL.rail.fit.levelLow
+        : C.REVEAL.rail.fit.levelMid,
+      a.care?.includes("knee")
+        ? C.REVEAL.rail.fit.knee
+        : a.care?.includes("back")
+          ? C.REVEAL.rail.fit.back
+          : a.care?.includes("quiet")
+            ? C.REVEAL.rail.fit.quiet
+            : null,
+      C.REVEAL.rail.fit.home,
+      a.days === "flex"
+        ? C.REVEAL.rail.fit.flex
+        : C.REVEAL.rail.fit.days(plan.trainingCount),
+    ].filter((f): f is string => !!f);
+
     /** Every CTA runs through here before the browser follows the link: the
      *  quiz's answers become the join wizard's draft (so /register skips its
      *  questions without losing a single preference), then the click is
@@ -841,18 +862,43 @@ export default function PlanWizard({
             {/* B4 folded into the first-workout watch block above (v2). */}
           </div>
 
-          {/* ── The decision rail (desktop only) ──────────────────────────── */}
+          {/* ── The decision rail, v3 (desktop only) ────────────────────────
+              Conversion order per the F-pattern read: the sticky rail's top
+              ~350px is the page's highest-attention real estate, so it opens
+              with the personal echo (her plan, not a product), the price with
+              its dated timeline, the CTA and the trust line - all above the
+              rail's own fold. The nine-row programme list is gone: for this
+              audience (60% train never/rarely) the objection is "will I stick
+              with it", answered by four certainty lines built from HER
+              answers. The full programme list stays on mobile B6. */}
           <aside className="u2-rail" aria-label="A belépő">
             <div className="u2-rail-in" ref={offerRailRef}>
-              <p className="u2-eyebrow">{C.REVEAL.entry.eyebrow}</p>
+              <p className="u2-rail-done"><span className="tick" aria-hidden="true">✓</span>{C.REVEAL.rail.done}</p>
+              <ul className="u2-chips u2-rail-chips" aria-hidden="true">
+                {chips.slice(0, 3).map((c) => <li key={c.key}>{c.label}</li>)}
+              </ul>
+
               <h2>{C.REVEAL.entry.hd(intro)}</h2>
-              <p className="u2-xs">{C.REVEAL.entry.lead(weekStd)}</p>
-              <ul className="u2-inc u2-inc-slim">
-                {C.REVEAL.entry.items.map((it) => (
-                  <li key={it.b}><span className="k">{it.k}</span><b>{it.b}</b></li>
+              <RenewLine intro={intro} weekStd={weekStd} />
+
+              <a className="u2-cta u2-rail-cta" href={ctaHref} onClick={goCheckout(false)}>
+                {C.REVEAL.offer.cta(intro)}
+              </a>
+              <p className="u2-calm">{C.REVEAL.offer.calm}</p>
+              <p className="u2-rail-trust">
+                {GUARANTEE_LIVE ? `${C.REVEAL.offer.proofGuar} · ${C.REVEAL.rail.trust}` : C.REVEAL.rail.trust}
+              </p>
+
+              <p className="u2-label">{C.REVEAL.rail.fitTitle}</p>
+              <ul className="u2-fit">
+                {fitLines.map((f) => (
+                  <li key={f}><span className="fk" aria-hidden="true">✓</span>{f}</li>
                 ))}
               </ul>
-              <RevealOffer intro={intro} weekStd={weekStd} href={ctaHref} onGo={goCheckout(false)} />
+
+              <p className="u2-rail-allin">{C.REVEAL.rail.allIn}</p>
+              <p className="u2-proof"><b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}</p>
+
               <RevealRhythm month={month} annual={annual} perMonth={perMonth} weeklyMonthly={weeklyMonthly} />
             </div>
           </aside>
@@ -1304,15 +1350,22 @@ const CTA_HREF = "/register?q=plan&plan=week_intro";
  *  Naming the exact date and amount is the anti-bait move - the fear is never
  *  the 490, it is the invisible 1 990 (R5/R6). Until it resolves, the undated
  *  promise stands in. */
-function RevealOffer({ intro, weekStd, href, onGo }: {
-  intro: string; weekStd: string; href: string;
-  onGo: (e: React.MouseEvent) => void;
-}) {
+/** The dated renewal line, resolved post-mount (the route is statically
+ *  prerendered; a render-time date would freeze at build). Shared by the
+ *  mobile fold offer and the rail. */
+function RenewLine({ intro, weekStd }: { intro: string; weekStd: string }) {
   const [today, setToday] = useState<number | null>(null);
   useEffect(() => setToday(Date.now()), []);
   const line = today == null
     ? C.REVEAL.offer.renew(weekStd)
     : C.REVEAL.offer.timeline(intro, weekStd, nextChargeLabel("week_intro", today));
+  return <p className="u2-renew">{line}</p>;
+}
+
+function RevealOffer({ intro, weekStd, href, onGo }: {
+  intro: string; weekStd: string; href: string;
+  onGo: (e: React.MouseEvent) => void;
+}) {
   return (
     <>
       <p className="u2-proof">
@@ -1323,7 +1376,7 @@ function RevealOffer({ intro, weekStd, href, onGo }: {
       <a className="u2-cta" href={href} onClick={onGo}>
         {C.REVEAL.offer.cta(intro)}
       </a>
-      <p className="u2-renew">{line}</p>
+      <RenewLine intro={intro} weekStd={weekStd} />
       <p className="u2-calm">{C.REVEAL.offer.calm}</p>
     </>
   );
