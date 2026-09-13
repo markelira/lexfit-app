@@ -9,7 +9,13 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { sendFormRecovery } from "../src/lib/mailer";
+
+// The mailer is `server-only`-guarded; stub the guard in the require cache
+// before loading it — same pattern as scripts/send-test-emails.ts.
+/* eslint-disable @typescript-eslint/no-require-imports */
+const soPath = require.resolve("server-only");
+require.cache[soPath] = { id: soPath, filename: soPath, loaded: true, exports: {} } as never;
+const { sendFormRecovery } = require("../src/lib/mailer") as typeof import("../src/lib/mailer");
 
 if (process.env.FIRESTORE_EMULATOR_HOST) { console.error("emulator set — abort"); process.exit(1); }
 const file = process.argv[2];
