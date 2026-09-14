@@ -43,7 +43,8 @@ import { buildWeekPlan } from "@/lib/ujrakezdes/plan";
 import { validateEmail } from "@/lib/quiz/validate";
 import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes/types";
 import {
-  marketingContext, newEventId, trackUjrakezdesGateView, trackUjrakezdesLead,
+  marketingContext, newEventId, trackUjrakezdesFinishCta, trackUjrakezdesFinishView,
+  trackUjrakezdesGateView, trackUjrakezdesLead,
   trackUjrakezdesLoaderDone, trackUjrakezdesOfferClick, trackUjrakezdesOfferView, trackUjrakezdesQuizStart,
   trackUjrakezdesRevealView, trackUjrakezdesStartDay, trackUjrakezdesStep,
   trackUjrakezdesStickyClick, trackUjrakezdesStickyView, trackUjrakezdesWatchOpen,
@@ -224,6 +225,10 @@ export default function PlanWizard({
   /** R4 · the chosen start day. Session-remembered; personalises the
    *  first-workout block and the curve's footing, writes nothing upstream. */
   const [startPick, setStartPick] = useState<StartPick>("today");
+  /** True when the player sent her back here after the free workout (`?w=1`).
+   *  Resolved post-mount - the route is prerendered - and the URL is cleaned
+   *  afterwards so a refresh or a shared link does not replay the greeting. */
+  const [justWatched, setJustWatched] = useState(false);
   /** The reveal's media (v2): the first workout's full playback + the next
    *  sessions' poster/preview cards, fetched by plan token. Null until (and
    *  unless) it loads - every media surface degrades to the token-free UI. */
@@ -356,6 +361,18 @@ export default function PlanWizard({
   }, [screen, advance]);
 
   useEffect(() => { if (screen === "gate") trackUjrakezdesGateView(); }, [screen]);
+  // Back from the free workout (`?w=1`). The flag is lifted into state and the
+  // parameter stripped in the same pass: the greeting belongs to this return,
+  // not to every later visit to the same token URL.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const u = new URL(window.location.href);
+    if (u.searchParams.get("w") !== "1") return;
+    setJustWatched(true);
+    trackUjrakezdesFinishView();
+    u.searchParams.delete("w");
+    window.history.replaceState(null, "", u.pathname + u.search);
+  }, []);
   // `src: "email"` separates persisted-plan (token URL) traffic from
   // fresh-quiz reveals in every funnel report.
   useEffect(() => {
@@ -719,9 +736,11 @@ export default function PlanWizard({
      *  point in the funnel where escaping costs nothing: no auth state, no
      *  localStorage the next page cannot live without (?lt= carries the
      *  answers). */
-    const goCheckout = (sticky: boolean) => (e: React.MouseEvent) => {
+    const goCheckout = (where: "offer" | "sticky" | "finish") => (e: React.MouseEvent) => {
       if (isComplete(a)) writeQuizHandoff(a);
-      (sticky ? trackUjrakezdesStickyClick : trackUjrakezdesOfferClick)();
+      if (where === "sticky") trackUjrakezdesStickyClick();
+      else if (where === "finish") trackUjrakezdesFinishCta();
+      else trackUjrakezdesOfferClick();
       const ext = externalBrowserHref(ctaHref);
       if (ext) {
         e.preventDefault();
@@ -747,6 +766,23 @@ export default function PlanWizard({
 
         <div className="u2-grid" ref={gridRef}>
           <div className="u2-main">
+            {/* ── B-W · back from the free workout. Renders ONLY on the return
+                from the player (`?w=1`), above everything else: she has just
+                been inside the product, and the one thing worth saying at that
+                moment is that every other session looks exactly like it. The
+                block claims no completion - the guest player reports none. ── */}
+            {justWatched && (
+              <section className="u2-blk u2-finish u2-m1" style={{ ["--i" as string]: 0 }}>
+                <p className="u2-eyebrow">{C.REVEAL.finish.eyebrow}</p>
+                <h2>{C.REVEAL.finish.hd}</h2>
+                <p className="u2-body">{C.REVEAL.finish.body}</p>
+                <a className="u2-cta" href={ctaHref} onClick={goCheckout("finish")}>
+                  {C.REVEAL.offer.cta(intro)}
+                </a>
+                {GUARANTEE_LIVE && <p className="u2-guarline">{C.REVEAL.offer.guarLine}</p>}
+              </section>
+            )}
+
             {/* ── B1 · the plan card ──────────────────────────────────────── */}
             <section
               className="u2-plan"
@@ -803,7 +839,7 @@ export default function PlanWizard({
 
             {/* ── B2 · the offer at the fold (mobile; desktop = the rail) ──── */}
             <section className="u2-offer u2-mobile u2-m1" style={{ ["--i" as string]: 15 }} ref={b2Ref}>
-              <RevealOffer intro={intro} weekStd={weekStd} href={ctaHref} onGo={goCheckout(false)} />
+              <RevealOffer intro={intro} weekStd={weekStd} href={ctaHref} onGo={goCheckout("offer")} />
             </section>
 
             {/* ── R3 · the habit-strength curve — the mechanism, drawn ────── */}
@@ -951,7 +987,7 @@ export default function PlanWizard({
               <h2>{C.REVEAL.entry.hd(intro)}</h2>
               <RenewLine intro={intro} weekStd={weekStd} />
 
-              <a className="u2-cta u2-rail-cta" href={ctaHref} onClick={goCheckout(false)} ref={railCtaEl}>
+              <a className="u2-cta u2-rail-cta" href={ctaHref} onClick={goCheckout("offer")} ref={railCtaEl}>
                 {C.REVEAL.offer.cta(intro)}
               </a>
               <p className="u2-calm">{C.REVEAL.offer.calm}</p>
@@ -1027,7 +1063,7 @@ export default function PlanWizard({
               className="u2-cta"
               href={ctaHref}
               ref={closeCtaRef}
-              onClick={goCheckout(false)}
+              onClick={goCheckout("offer")}
             >
               {C.REVEAL.offer.cta(intro)}
             </a>
@@ -1047,7 +1083,7 @@ export default function PlanWizard({
             <b>{C.REVEAL.sticky.line(intro)}</b>
             <span>{C.REVEAL.sticky.sub(weekStd)}</span>
           </div>
-          <a className="u2-cta u2-cta-sm" href={ctaHref} onClick={goCheckout(true)}>
+          <a className="u2-cta u2-cta-sm" href={ctaHref} onClick={goCheckout("sticky")}>
             {C.REVEAL.sticky.go}
           </a>
         </div>
@@ -1432,16 +1468,40 @@ function RenewLine({ intro, weekStd }: { intro: string; weekStd: string }) {
   return <p className="u2-renew">{line}</p>;
 }
 
+/**
+ * The offer, rebuilt 2026-09-14 for the offer_view → offer_click leak.
+ *
+ * What was here before: proof, price, button, guarantee footnote, renewal,
+ * reassurance - six elements, none of which said what the money buys. On
+ * Sep 14, 42 visitors reached this block and none clicked. The fix is not
+ * louder copy, it is the missing half of the offer: the deliverable list now
+ * opens the block, the guarantee is a framed promise instead of a footnote,
+ * and the cohort has a name and a real end date.
+ *
+ * Order is the argument: what you join → what you get → who else is here →
+ * what it costs → the button → what happens if it fails → when you are
+ * charged → how to leave → how long this price lasts.
+ */
 function RevealOffer({ intro, weekStd, href, onGo }: {
   intro: string; weekStd: string; href: string;
   onGo: (e: React.MouseEvent) => void;
 }) {
   return (
     <>
+      <p className="u2-offername">{C.REVEAL.offer.name}</p>
+
+      {/* The deliverable. The first line deliberately sells the SAME plan she
+          already has for free, guided - not a bigger library she has no
+          appetite for yet. */}
+      <p className="u2-getstitle">{C.REVEAL.offer.getsTitle}</p>
+      <ul className="u2-gets">
+        {C.REVEAL.offer.gets.map((g) => (
+          <li key={g.b}><b>{g.b}</b><span>{g.d}</span></li>
+        ))}
+      </ul>
+
       <p className="u2-proof">
-        {GUARANTEE_LIVE
-          ? <><b>{C.REVEAL.offer.proofGuar}</b> · <b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}</>
-          : <><b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}</>}
+        <b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}
       </p>
       {/* P1-2 · the whole price story in one line, above the button. */}
       <p className="u2-priceline">
@@ -1450,8 +1510,14 @@ function RevealOffer({ intro, weekStd, href, onGo }: {
       <a className="u2-cta" href={href} onClick={onGo}>
         {C.REVEAL.offer.cta(intro)}
       </a>
-      {/* P1-2 · the guarantee touches the button. */}
-      {GUARANTEE_LIVE && <p className="u2-guarline">{C.REVEAL.offer.guarLine}</p>}
+      {/* The risk reversal, given its own weight: this is the sentence that
+          makes a 490 Ft decision reversible, and it was set as small print. */}
+      {GUARANTEE_LIVE && (
+        <div className="u2-guarbox">
+          <b>{GARANCIA.heading}</b>
+          <span>{GARANCIA.bodyLead}<b>{GARANCIA.bodyStrong}</b>{GARANCIA.bodyTail}</span>
+        </div>
+      )}
       <RenewLine intro={intro} weekStd={weekStd} />
       <p className="u2-calm">{C.REVEAL.offer.calm}</p>
     </>

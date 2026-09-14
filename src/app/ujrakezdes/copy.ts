@@ -565,6 +565,20 @@ export const REVEAL = {
     honesty: "A fotók valódi tagoké, az ő engedélyükkel.",
   },
 
+  /** The return-from-the-player moment (offer rebuild 2026-09-14). The 8
+   *  people a day who open the free workout are the warmest segment on the
+   *  funnel, and until now the player simply dropped them back on the reveal
+   *  with nothing said. This block greets them at the top instead.
+   *
+   *  It claims only that the workout was OPENED - the guest player reports no
+   *  completion, so "megcsináltad" would be a guess. What it sells is
+   *  continuity: the thing she just experienced, for every other session. */
+  finish: {
+    eyebrow: "Az első edzésed",
+    hd: "A többi pontosan ilyen.",
+    body: "Amit most megnyitottál, a Start program része. Ugyanez a vezetés, ugyanez a lejátszó vár a következőknél is — a terved szerint, sorban.",
+  },
+
   /** The shelf: the entry programme's next sessions, as real cards. */
   shelf: {
     eyebrow: "A folytatás",
@@ -603,12 +617,50 @@ export const REVEAL = {
 
   /** B2 / desktop rail / sticky bar - one offer, three placements. */
   offer: {
+    /** THE MISSING HALF (offer rebuild 2026-09-14). Before this block the
+     *  decision moment carried price, guarantee and reassurance - and not one
+     *  word about WHAT IS BOUGHT. 42 people saw the offer on Sep 14 and 0
+     *  clicked: the denominator of the value equation was full, the numerator
+     *  empty.
+     *
+     *  It also answers the lead-magnet trap. The plan is free and hers
+     *  already ("a tiéd marad"), so "more workouts" is not a reason to pay -
+     *  she has not done one yet. The first line therefore sells THE SAME PLAN,
+     *  guided, not a bigger library.
+     *
+     *  Every number is from the prod content audit of 2026-09-14: 7 published
+     *  programmes, 62 published videos totalling 964 minutes (≈16 h), 16
+     *  published challenges, Lexfit Start totalSessions=35 (claimed as "30+",
+     *  deliberately under-promised). Re-check before changing a figure - an
+     *  offer may only list what the app actually ships today. */
+    getsTitle: "Amit a tagság hozzáad",
+    gets: [
+      { b: "A terved végigvezetve", d: "Minden edzés videón, Alexa vezet — nem neked kell kitalálni, mi jön ma." },
+      { b: "7 program, 62 edzés", d: "16 óra vezetett mozgás, az első naptól mind elérhető." },
+      { b: "Minden héten új", d: "16 kihívás a tárban, és hétről hétre jön az újabb." },
+      { b: "Visszamérés a 15. és 30. edzésnél", d: "Látod, mennyit fejlődtél — nem a tükörből tippeled." },
+    ],
     proofGuar: "10 edzés garancia",
     /** Split so the count can carry visual weight (R9) — an honest scale
      *  number set like small print was proof wasted. */
     proofCount: "1 200+",
     proofTail: " ember mozog velünk otthon",
-    cta: (intro: string) => `Kezdem — az első hét ${intro}`,
+    /** The cohort's name at the decision point. An offer with a name is a
+     *  thing you join; an unnamed one is just a charge. */
+    name: "Szeptemberi Újrakezdés",
+    /** "Csináljuk végig" over "Kezdem": for someone on her fifth restart the
+     *  fear is never the starting, it is the stopping - the verb answers the
+     *  objection the whole page is built on. */
+    cta: (intro: string) => `Csináljuk végig — az első hét ${intro}`,
+    /** NO DEADLINE HERE - deliberately. The offer rebuild almost shipped a
+     *  "szeptember 30-ig él" line (owner-approved in the brief) until the
+     *  selftest's migration guard caught it: offer v3 §2/§10 bans deadlines
+     *  and counters outright ("Never"), and D10 - a mail that was nothing but
+     *  a deadline - was deleted for it. The ban is also the honest reading of
+     *  the price: `week_intro` is the permanent entry tier in
+     *  lib/pricing/config, not a September promotion, so a date would be a
+     *  claim the pricing cannot keep. Reinstating one means changing the
+     *  price first, then the guard, then this comment. */
     renew: (weekStd: string) =>
       `Utána ${weekStd} / hét — a megújítás dátumát a fizetés előtt megmutatjuk. Bármikor lemondható.`,
     /** The dated version, once the client knows today (SSR-safe: the page is

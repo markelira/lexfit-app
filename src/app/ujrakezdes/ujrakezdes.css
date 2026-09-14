@@ -2933,3 +2933,103 @@
 .lxu .lp-members .fex-name { color: var(--ink-3); }
 .lxu .lp-members .fex-card:focus-visible .fex-frame { outline-color: var(--accent-2); }
 .lxu .lp-members .lp-xs { margin-top: var(--sp-3); text-align: center; }
+
+/* ── Offer rebuild 2026-09-14 · the decision moment ───────────────────────────
+   The block used to be price + reassurance with no deliverable. These are the
+   surfaces the missing half needs: the cohort name, the "what you get" list,
+   the guarantee as a framed promise rather than small print, and the real
+   September deadline. Scoped to .lxu so nothing leaks to the app. */
+
+/* The cohort's name: quiet, uppercase, the label you join under. */
+.lxu .u2-offername {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.lxu .u2-getstitle {
+  margin: 0 0 var(--sp-2);
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+}
+/* The deliverable list. A leading hairline rule per row rather than bullets:
+   this is a spec, not a sales list, and it should read like one. */
+.lxu .u2-gets {
+  list-style: none;
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+.lxu .u2-gets li {
+  display: grid;
+  gap: 2px;
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--accent-soft, rgba(73, 108, 94, .18));
+}
+.lxu .u2-gets li b {
+  font-size: 14.5px;
+  font-weight: 640;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.lxu .u2-gets li span {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+/* The guarantee, given a surface. Hairline + a soft tint so it reads as a
+   promise that is part of the offer, not a disclaimer under it. */
+.lxu .u2-guarbox {
+  margin: var(--sp-3) 0 var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--accent-soft, rgba(73, 108, 94, .22));
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 45%, transparent);
+}
+.lxu .u2-guarbox > b {
+  font-size: 13.5px;
+  font-weight: 680;
+  color: var(--ink);
+}
+.lxu .u2-guarbox > span {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2, var(--ink-3));
+}
+.lxu .u2-guarbox > span b { font-weight: 650; color: var(--ink); }
+
+/* The real deadline. Deliberately the quietest line in the block: urgency
+   that shouts reads as a trick, and this one only has to be true. */
+.lxu .u2-deadline {
+  margin: var(--sp-2) 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+/* B-W · the return-from-the-workout block. Same ground as the page, lifted by
+   a hairline card so it reads as a moment rather than a banner. */
+.lxu .u2-finish {
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-4);
+  border: 1px solid var(--line, rgba(0, 0, 0, .08));
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 35%, transparent);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px -12px rgba(0, 0, 0, .12);
+}
+.lxu .u2-finish h2 { margin: 0 0 var(--sp-2); }
+.lxu .u2-finish .u2-body { margin: 0 0 var(--sp-4); }
+.lxu .u2-finish .u2-cta { width: 100%; }
+
+@media (max-width: 700px) {
+  .lxu .u2-gets li b { font-size: 14px; }
+  .lxu .u2-gets li span { font-size: 12.5px; }
+  .lxu .u2-guarbox { padding: var(--sp-3); }
+}

@@ -522,7 +522,10 @@ function PlayerScreen({ code }: { code: string }) {
   const toggleFs = () => (fsActive ? exitFs() : enterFs());
   // Guests exit to their persisted plan, members to the app (spatial
   // consistency: you leave the way you came in).
-  const exit = () => router.push(guestLt ? `/ujrakezdes/terv/${guestLt}` : "/app");
+  // `?w=1` tells the reveal she is coming back FROM the free workout, so it
+  // can greet her with the continuity block instead of the cold plan page -
+  // the warmest moment on the whole funnel used to end in silence.
+  const exit = () => router.push(guestLt ? `/ujrakezdes/terv/${guestLt}?w=1` : "/app");
 
   // Keep the fullscreen icon (maximize ⇄ minimize) in sync with the browser
   // state - including the iPhone NATIVE video fullscreen, which reports via

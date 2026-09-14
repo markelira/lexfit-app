@@ -344,8 +344,35 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
 
   // One CTA, one price: every CTA is the same sentence built on the
   // interpolated intro amount - no second verb, no second offer.
-  assert.equal(C.REVEAL.offer.cta("X"), "Kezdem — az első hét X");
+  //
+  // Pinned by SHAPE rather than by wording. The verb is a marketing decision
+  // (it became „Csináljuk végig" in the 2026-09-14 offer rebuild, answering
+  // the restart objection instead of naming the purchase); what must not
+  // drift is that the amount is interpolated and the sentence stays one
+  // clause, because the same string renders on the fold, the rail, the sticky
+  // bar and the post-workout block.
+  const ctaSentence = C.REVEAL.offer.cta("X");
+  assert.ok(ctaSentence.includes("X"), "a CTA nem interpolálja az intro árat");
+  assert.ok(!/[.!?]\s+\S/.test(ctaSentence), "a CTA két mondatra esett szét");
   assert.ok(C.REVEAL.sticky.go.length > 0);
+
+  // The offer rebuild's deliverable list (2026-09-14). Before it, the decision
+  // moment carried price and reassurance and never said what is bought - 42
+  // offer_views produced 0 clicks on Sep 14. The guard keeps that half alive:
+  // a list that silently empties would restore the exact failure.
+  assert.ok(C.REVEAL.offer.gets.length >= 3, "az ajánlat elvesztette a 'mit kapok' listát");
+  for (const g of C.REVEAL.offer.gets) {
+    assert.ok(g.b.length > 0 && g.d.length > 0, "üres gets-elem");
+    // NO AMOUNTS: every forint on this page is interpolated from PRICES.
+    assert.ok(!/\bFt\b|\d\s?990|\d\s?900/.test(`${g.b} ${g.d}`), `forint a gets-listában: ${g.b}`);
+  }
+  assert.ok(C.REVEAL.offer.name.length > 0, "az ajánlatnak nincs neve");
+  // The post-workout block may greet the RETURN, never claim a completion -
+  // the guest player reports none, so „megcsináltad" would be a guess.
+  const finishText = `${C.REVEAL.finish.eyebrow} ${C.REVEAL.finish.hd} ${C.REVEAL.finish.body}`.toLowerCase();
+  for (const claim of ["megcsináltad", "teljesítetted", "befejezted", "gratulál"]) {
+    assert.ok(!finishText.includes(claim), `a finish blokk befejezést állít: "${claim}"`);
+  }
 
   // B6: the entry list must carry every named programme the shared band
   // claims - keyword-checked so the reveal can never promise more or less

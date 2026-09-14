@@ -245,6 +245,19 @@ export function trackUjrakezdesWatchOpen(code: string): void {
   push("lx_ujrakezdes_watch_open", { code });
 }
 
+/** She came back from the free workout and got the continuity block (`?w=1`).
+ *  The denominator for the funnel's warmest segment: watch_open → finish_view
+ *  → finish_cta is the shortest known path to a first payment. */
+export function trackUjrakezdesFinishView(): void {
+  push("lx_ujrakezdes_finish_view");
+}
+
+/** The CTA inside that block. Counted separately from the in-flow offer so
+ *  the post-workout moment's own contribution is visible. */
+export function trackUjrakezdesFinishCta(): void {
+  push("lx_ujrakezdes_finish_cta");
+}
+
 /** A locked workout card was tapped (peek → sent to the offer). */
 export function trackUjrakezdesCardPeek(code: string): void {
   push("lx_ujrakezdes_card_peek", { code });
