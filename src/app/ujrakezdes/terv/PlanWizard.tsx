@@ -980,24 +980,44 @@ export default function PlanWizard({
                   real first session, signed at 192px. Degrades to the number
                   chip whenever media has not loaded (or cannot). */}
               <ul className="u2-inc u2-stack">
-                {C.REVEAL.entry.items.map((it) => {
-                  const slug = "slug" in it ? it.slug : null;
-                  const poster = slug
-                    ? media?.programs?.find((p) => p.slug === slug)?.poster
-                    : undefined;
-                  return (
-                    <li key={it.b}>
-                      {poster ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img className="u2-inc-shot" src={poster} alt="" loading="lazy" decoding="async" />
-                      ) : (
-                        <span className="k">{it.k}</span>
-                      )}
-                      <span><b>{it.b}</b> - {it.d}</span>
-                    </li>
-                  );
-                })}
+                {C.REVEAL.entry.items.map((it) => (
+                  <li key={it.b}>
+                    <span className="u2-inc-ic" aria-hidden="true">
+                      <LxIcon d={lxPaths[it.icon as keyof typeof lxPaths]} size={17} sw={1.6} />
+                    </span>
+                    <span><b>{it.b}</b> - {it.d}</span>
+                  </li>
+                ))}
               </ul>
+              {/* „Mire van edzésed" - what the library COVERS, next to what the
+                  programmes ARE. The objection this answers is „lesz-e benne
+                  olyan, ami nekem jó", and a spread of categories answers it
+                  faster than any promise. Counts are over the same 130
+                  sessions the offer claims. */}
+              <div className="u2-cats">
+                <p className="u2-label">{C.REVEAL.entry.catsTitle}</p>
+                <ul className="u2-catchips">
+                  {C.REVEAL.entry.cats.map((c) => (
+                    <li key={c.l}><b>{c.n}</b> {c.l}</li>
+                  ))}
+                </ul>
+
+                <p className="u2-label">{C.REVEAL.entry.typesTitle}</p>
+                <ul className="u2-catchips u2-catchips-alt">
+                  {C.REVEAL.entry.types.map((c) => (
+                    <li key={c.l}><b>{c.n}</b> {c.l}</li>
+                  ))}
+                </ul>
+
+                <p className="u2-label">{C.REVEAL.entry.durTitle}</p>
+                <ul className="u2-catchips u2-catchips-alt">
+                  {C.REVEAL.entry.durs.map((c) => (
+                    <li key={c.l}><b>{c.n}</b> {c.l}</li>
+                  ))}
+                </ul>
+                <p className="u2-xs">{C.REVEAL.entry.catsFoot}</p>
+              </div>
+
               {/* R5 · the stack lands on one number. */}
               <p className="u2-sum">{C.REVEAL.entry.sum(intro)}</p>
 

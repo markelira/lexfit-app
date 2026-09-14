@@ -3142,20 +3142,60 @@
   .lxu .u2-devrow .lab { font-size: 8.5px; }
 }
 
-/* The programme poster in the entry list. Same 30px column the number chip
-   occupied, so the list rhythm is unchanged whether media loaded or not -
-   the image degrades to the chip, never to a gap. */
-.lxu .u2-inc-shot {
+/* The programme icon in the entry list. Mux posters were tried here first and
+   were wrong: every programme's 60-second frame is the same pink living room,
+   so seven near-identical smudges at 34px carried no information and cost
+   ~280KB. An icon says what the programme IS. */
+.lxu .u2-inc-ic {
   flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  object-fit: cover;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
   margin-top: 1px;
-  background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 60%, transparent);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+  border-radius: 9px;
+  color: var(--accent-2);
+  background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 70%, transparent);
 }
-.lxu .u2-inc li:has(.u2-inc-shot) { align-items: flex-start; }
+.lxu .u2-inc li:has(.u2-inc-ic) { align-items: flex-start; }
+
+/* „Mire van edzésed" - the library's coverage as counted chips. The number
+   carries the weight; the label rides along. */
+.lxu .u2-cats { margin-top: var(--sp-5); }
+.lxu .u2-cats .u2-label { margin-top: var(--sp-4); }
+.lxu .u2-cats .u2-label:first-child { margin-top: 0; }
+.lxu .u2-catchips {
+  list-style: none;
+  margin: 0 0 var(--sp-2);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.lxu .u2-catchips li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--line, rgba(0, 0, 0, .08));
+  background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 30%, transparent);
+  font-size: 12.5px;
+  color: var(--ink-2, var(--ink-3));
+}
+.lxu .u2-catchips li b {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 13px;
+  font-weight: 680;
+  color: var(--ink);
+}
+/* The secondary rows are lighter - they qualify the library, they do not
+   measure it. */
+.lxu .u2-catchips-alt li {
+  background: transparent;
+  color: var(--ink-3);
+}
+.lxu .u2-catchips-alt li b { color: var(--accent-2); }
 
 /* ── „Az első hónapod" - the plan extended to four weeks ─────────────────────
    The month as one picture (4 rows × 7 days, her own week repeated) plus four

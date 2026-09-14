@@ -375,6 +375,16 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   const libTotal = C.REVEAL.offer.libSlices.reduce((a, s) => a + s.n, 0);
   const claimed = Number(C.REVEAL.offer.gets.find((g) => /\d/.test(g.b))?.b.match(/\d+/)?.[0] ?? 0);
   assert.equal(libTotal, claimed, `a rács ${libTotal} cellát rajzol, a lista ${claimed} edzést állít`);
+
+  // „Mire van edzésed": the category counts are a partition of the SAME 130
+  // sessions - every session has exactly one category - so they must total the
+  // claimed number. Duration buckets partition it too. (The `types` row is
+  // deliberately exempt: a workout can be quiet AND evening, so those counts
+  // overlap and must NOT add up.)
+  const catTotal = C.REVEAL.entry.cats.reduce((a, c) => a + c.n, 0);
+  assert.equal(catTotal, claimed, `a kategóriák ${catTotal}-re jönnek ki, az ajánlat ${claimed} edzést állít`);
+  const durTotal = C.REVEAL.entry.durs.reduce((a, c) => a + c.n, 0);
+  assert.equal(durTotal, claimed, `a hossz-sávok ${durTotal}-re jönnek ki, az ajánlat ${claimed} edzést állít`);
   // The post-workout block may greet the RETURN, never claim a completion -
   // the guest player reports none, so „megcsináltad" would be a guess.
   const finishText = `${C.REVEAL.finish.eyebrow} ${C.REVEAL.finish.hd} ${C.REVEAL.finish.body}`.toLowerCase();

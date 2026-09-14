@@ -21,11 +21,6 @@ import * as C from "../copy";
 export function MonthStory({ plan }: { plan: WeekPlan }) {
   const n = plan.trainingCount;
   const total = n * 4;
-  // The week her 10th session lands in - the guarantee's own threshold, and
-  // the only honest way to tie the month to the promise. 2/week puts it in
-  // week 5, which still fits the guarantee's five-week window.
-  const guarWeek = Math.ceil(10 / n);
-
   return (
     <section className="u2-blk u2-month">
       <p className="u2-eyebrow">{C.REVEAL.month.eyebrow}</p>
@@ -53,12 +48,10 @@ export function MonthStory({ plan }: { plan: WeekPlan }) {
       </div>
 
       <ol className="u2-mbeats">
-        {C.REVEAL.month.weeks.map((b, i) => (
+        {C.REVEAL.month.weeks.map((b) => (
           <li key={b.t}>
             <b>{b.t}</b>
             <span>{b.d(n, plan.firstWorkoutMinutes)}</span>
-            {/* The guarantee lands on the week it actually lands on. */}
-            {i === 3 && <em className="u2-mguar">{C.REVEAL.month.guar(guarWeek)}</em>}
           </li>
         ))}
       </ol>

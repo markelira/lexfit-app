@@ -556,8 +556,6 @@ export const REVEAL = {
           `A ${n * 4}. edzésed felé tartasz. Innentől nem eldöntöd, hogy megcsináld: egyszerűen jön a soros nap.`,
       },
     ],
-    /** The guarantee lands on the week her 10th session actually falls in. */
-    guar: (w: number) => `A ${w}. hétre megvan a 10. edzésed - pont eddig szól a garancia.`,
     foot: (total: number) =>
       `Összesen ${total} edzés az első hónapban. Az elsőt ma ingyen megnézed, a többi a tagsággal jön.`,
   },
@@ -792,21 +790,60 @@ export const REVEAL = {
       // deliberate under-count reads as an error the moment someone totals it.
       // NOTE: the landing FAQ and offer-copy still say „30 edzés" - safe as an
       // under-promise, worth aligning once.
-      { slug: "foundation", k: "35", b: "Teljes edzés program", d: "35 vezetett edzés, max 30 perc, eszköz nélkül. A te tempódban, heti 2, 3 vagy 4 nap." },
-      { slug: "elsolepes", k: "07", b: "7 napos kezdő program", d: "napi 8-10 perc, csendes, ízületkímélő. Hogy hétből hetet teljesíts." },
-      { slug: "napindito", k: "03", b: "Reggeli rutinok", d: "három napindító, 5-8 perc, pizsamában is." },
-      { slug: "napzaro", k: "03", b: "Esti rutinok", d: "három rutin, 6-8 perc, lassú tartások, átvezetnek az alvásba." },
-      { slug: "5naposhasmelytorzschallange", k: "05", b: "Has & Mély Törzs", d: "öt nap, 10-15 perc. Stabil törzs és jobb tartás, nem kockás has." },
-      { slug: "5naposlabfenekchallange", k: "05", b: "Láb & Fenék", d: "öt nap, 10-15 perc. Guggolás, csípőemelés, kitörés, lassan." },
-      { slug: "tartasjavito", k: "04", b: "Tartásjavító", d: "négy hét, heti egy új edzés. A monitor előtti görnyedés két oka ellen." },
+      { slug: "foundation", icon: "layers", k: "35", b: "Teljes edzés program", d: "35 vezetett edzés, max 30 perc, eszköz nélkül. A te tempódban, heti 2, 3 vagy 4 nap." },
+      { slug: "elsolepes", icon: "calendarCheck", k: "07", b: "7 napos kezdő program", d: "napi 8-10 perc, csendes, ízületkímélő. Hogy hétből hetet teljesíts." },
+      { slug: "napindito", icon: "flame", k: "03", b: "Reggeli rutinok", d: "három napindító, 5-8 perc, pizsamában is." },
+      { slug: "napzaro", icon: "moon", k: "03", b: "Esti rutinok", d: "három rutin, 6-8 perc, lassú tartások, átvezetnek az alvásba." },
+      { slug: "5naposhasmelytorzschallange", icon: "shield", k: "05", b: "Has & Mély Törzs", d: "öt nap, 10-15 perc. Stabil törzs és jobb tartás, nem kockás has." },
+      { slug: "5naposlabfenekchallange", icon: "dumbbell", k: "05", b: "Láb & Fenék", d: "öt nap, 10-15 perc. Guggolás, csípőemelés, kitörés, lassan." },
+      { slug: "tartasjavito", icon: "userRound", k: "04", b: "Tartásjavító", d: "négy hét, heti egy új edzés. A monitor előtti görnyedés két oka ellen." },
       // 68 playable challenge days across 16 published challenges
       // (challengeVideos pool, audit 2026-09-14). The old line promised „minden
       // héten 5 új videó" - a cadence that stopped on Aug 17, and a number
       // (5/week) the archive never matched. The shelf is real; the rhythm
       // promise comes back when a new challenge ships.
-      { k: "68", b: "Heti kihívás archívum", d: "16 hét kihívás, napi 10-15 perc." },
-      { k: "✓", b: "Mérföldkövek és visszamérés", d: "1 · 5 · 10 · 15 · 30 · szünet 1-3 hónapra" },
+      { icon: "trophy", k: "68", b: "Heti kihívás archívum", d: "16 hét kihívás, napi 10-15 perc." },
+      { icon: "chartColumn", k: "✓", b: "Mérföldkövek és visszamérés", d: "1 · 5 · 10 · 15 · 30 · szünet 1-3 hónapra" },
     ],
+    /** „Mire van edzésed" (owner request 2026-09-14): the entry list said what
+     *  the PROGRAMMES are; this says what the library COVERS. For someone whose
+     *  objection is „lesz-e benne olyan, ami nekem jó", a spread of categories
+     *  answers it faster than any promise.
+     *
+     *  Every number is a count over the 130 sessions actually in use (62
+     *  programme sessions + 68 challenge days, audit 2026-09-14), with the
+     *  programmes' `theme` and the challenges' `bodyPart` folded into one
+     *  taxonomy - so the categories add up to exactly the 130 the offer claims.
+     *  The lone „Tánc-kardió" video sits inside Teljes test rather than
+     *  standing as a category of one. */
+    catsTitle: "Mire van edzésed",
+    cats: [
+      { n: 31, l: "Has & törzs" },
+      { n: 29, l: "Mobilitás, nyújtás" },
+      { n: 25, l: "Alsótest" },
+      { n: 19, l: "Tartás" },
+      { n: 14, l: "Teljes test" },
+      { n: 12, l: "Felsőtest" },
+    ],
+    /** Not exclusive labels - a workout can be quiet AND evening - so these
+     *  deliberately do NOT total 130. They answer „milyen napra való". */
+    typesTitle: "Milyen napra",
+    types: [
+      { n: 31, l: "Csendes, ugrálás nélkül" },
+      { n: 12, l: "Lazító" },
+      { n: 8, l: "Intenzív" },
+      { n: 7, l: "Esti" },
+      { n: 6, l: "Fal vagy szék mellett" },
+      { n: 3, l: "Reggeli" },
+    ],
+    durTitle: "Ha ennyi időd van",
+    durs: [
+      { n: 92, l: "10 perc vagy kevesebb" },
+      { n: 26, l: "11-20 perc" },
+      { n: 12, l: "21-30 perc" },
+    ],
+    catsFoot: "A terved ezekből válogat - neked nem kell keresgélned.",
+
     /** R5 · the stack lands on one number. */
     sum: (intro: string) => `Mindez az első héten: ${intro}.`,
     rhythmTitle: "A ritmust később is átállíthatod",
