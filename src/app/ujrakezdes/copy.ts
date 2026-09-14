@@ -634,8 +634,24 @@ export const REVEAL = {
      *  deliberately under-promised). Re-check before changing a figure - an
      *  offer may only list what the app actually ships today. */
     getsTitle: "Amit a tagság hozzáad",
+    /** Captions for the library grid (the 130 cells). The numbers come from
+     *  the same audit as `gets` - see the note above. */
+    libTotal: "vezetett edzés",
+    libFirst: "az elsőt ma ingyen megnézed",
+    /** The grid's groups, in the order the library is built. Must total the
+     *  number `gets` claims, or the picture contradicts the sentence. */
+    libSlices: [
+      { n: 35, label: "Start", accent: true },
+      { n: 7, label: "Kezdő" },
+      { n: 3, label: "Reggel" },
+      { n: 3, label: "Este" },
+      { n: 5, label: "Has" },
+      { n: 5, label: "Láb" },
+      { n: 4, label: "Tartás" },
+      { n: 68, label: "Kihívás" },
+    ],
     gets: [
-      { b: "A terved végigvezetve", d: "Minden edzés videón, Alexa vezet - nem neked kell kitalálni, mi jön ma." },
+      { icon: "play", b: "A terved végigvezetve", d: "Minden edzés videón, Alexa vezet - nem neked kell kitalálni, mi jön ma." },
       // The count includes the challenges (owner-corrected 2026-09-14). Their
       // videos live in `challengeVideos`, a POOL SEPARATE from `videos` - the
       // first audit only looked in `videos`, found the SZM* codes unresolved
@@ -643,12 +659,12 @@ export const REVEAL = {
       // videos, all published with Mux playback, and all 68 challenge days
       // resolve. 62 programme sessions (964 min) + 68 challenge days (680 min)
       // = 130 sessions / 1 644 min ≈ 27 h.
-      { b: "130 edzés", d: "7 program és 16 hét kihívás - az első naptól mind elérhető." },
+      { icon: "layoutGrid", b: "130 edzés", d: "7 program és 16 hét kihívás - az első naptól mind elérhető." },
       // Deliberately NOT "minden héten új": the challenges ran weekly from
       // April to Aug 17 and none has shipped since. The shelf is real, the
       // cadence promise is not - restore it when a new challenge lands.
-      { b: "Telefonon, laptopon, TV-n", d: "A böngészőben fut, nem kell letölteni semmit - az edzést a TV-re is kiküldheted." },
-      { b: "Visszamérés a 15. és 30. edzésnél", d: "Látod, mennyit fejlődtél - nem a tükörből tippeled." },
+      { icon: "cast", devices: true, b: "Telefonon, laptopon, TV-n", d: "A böngészőben fut, nem kell letölteni semmit - az edzést a TV-re is kiküldheted." },
+      { icon: "chartColumn", b: "Visszamérés a 15. és 30. edzésnél", d: "Látod, mennyit fejlődtél - nem a tükörből tippeled." },
     ],
     proofGuar: "10 edzés garancia",
     /** Split so the count can carry visual weight (R9) — an honest scale

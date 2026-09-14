@@ -21,6 +21,9 @@ import { GARANCIA, GUARANTEE_LIVE } from "@/components/landing/offer-copy";
 import { PRICES } from "@/lib/pricing/config";
 import { annualSavingsPct, formatHuf, perDayHuf, perMonthHuf } from "@/lib/pricing/display";
 import PlanTray, { trayChips } from "./PlanTray";
+import { DeviceRow, LibraryGrid } from "./OfferGraphics";
+import { LxIcon } from "@/components/LxIcon";
+import { lxPaths } from "@/lib/icons";
 import MailPreview from "./MailPreview";
 import HabitCurve from "./HabitCurve";
 import StartDayPick, { type StartPick } from "./StartDayPick";
@@ -1503,9 +1506,19 @@ function RevealOffer({ intro, weekStd, href, onGo }: {
       <p className="u2-getstitle">{C.REVEAL.offer.getsTitle}</p>
       <ul className="u2-gets">
         {C.REVEAL.offer.gets.map((g) => (
-          <li key={g.b}><b>{g.b}</b><span>{g.d}</span></li>
+          <li key={g.b}>
+            <span className="u2-gets-ic" aria-hidden="true">
+              <LxIcon d={lxPaths[g.icon as keyof typeof lxPaths]} size={15} sw={1.7} />
+            </span>
+            <b>{g.b}</b>
+            <span className="u2-gets-d">{g.d}</span>
+            {"devices" in g && g.devices && <DeviceRow />}
+          </li>
         ))}
       </ul>
+
+      {/* The library, shown rather than counted. */}
+      <LibraryGrid slices={C.REVEAL.offer.libSlices} />
 
       <p className="u2-proof">
         <b>{C.REVEAL.offer.proofCount}</b>{C.REVEAL.offer.proofTail}

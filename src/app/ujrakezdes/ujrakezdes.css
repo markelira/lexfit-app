@@ -3044,3 +3044,109 @@
   color: var(--ink-2, var(--ink-3));
 }
 .lxu .u2-guarbox-1 b { font-weight: 680; color: var(--ink); }
+
+/* ── Offer graphics (2026-09-14) ──────────────────────────────────────────────
+   The decision moment was 1 795px of prose with zero visual elements while the
+   believing-blocks carried 55 images. These two graphics put the argument back
+   into pictures. Pure CSS/SVG: nothing downloads, nothing shifts layout. */
+
+/* The gets list gains an icon column - four identically-weighted paragraphs
+   gave the eye nothing to jump between. */
+.lxu .u2-gets li {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 2px var(--sp-2);
+  align-items: start;
+  padding-left: 0;
+  border-left: 0;
+}
+.lxu .u2-gets-ic {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  color: var(--accent-2);
+  background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 70%, transparent);
+}
+.lxu .u2-gets li b { grid-column: 2; }
+.lxu .u2-gets-d { grid-column: 2; }
+
+/* THE LIBRARY GRID. 130 cells, eight groups: the quantity becomes visible and
+   the structure comes free. The single filled cell is the free first workout -
+   the visitor is already inside the picture. */
+.lxu .u2-lib {
+  margin: var(--sp-4) 0 var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--line, rgba(0, 0, 0, .07));
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 22%, transparent);
+}
+.lxu .u2-lib-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3) var(--sp-4);
+  align-items: flex-start;
+}
+.lxu .u2-lib-g { display: grid; gap: 5px; }
+.lxu .u2-lib-cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 7px);
+  gap: 3px;
+  max-width: 88px;
+}
+/* The Start group is the widest because it is the entry programme - its cells
+   get the room to read as the backbone of the library. */
+.lxu .u2-lib-g.on .u2-lib-cells { max-width: 130px; }
+.lxu .u2-lib-cells i {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--accent-2) 26%, transparent);
+}
+.lxu .u2-lib-cells i.first {
+  background: var(--accent-2);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent-2) 22%, transparent);
+}
+.lxu .u2-lib-lbl {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.lxu .u2-lib-cap {
+  margin-top: var(--sp-3);
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+.lxu .u2-lib-cap b { font-size: 15px; font-weight: 680; color: var(--ink); }
+.lxu .u2-lib-cap i { font-style: normal; }
+
+/* The device row - the home page's castrow vocabulary, at reveal scale. */
+.lxu .u2-devrow {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  color: var(--ink-3);
+}
+.lxu .u2-devrow .dev { display: flex; align-items: center; gap: 5px; }
+.lxu .u2-devrow .lab {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+.lxu .u2-devrow .sep {
+  width: 3px; height: 3px; border-radius: 99px;
+  background: currentColor; opacity: .45; margin-left: var(--sp-2);
+}
+.lxu .u2-devrow .cast { margin-left: auto; color: var(--accent-2); display: flex; }
+
+@media (max-width: 700px) {
+  .lxu .u2-lib-cells { max-width: 76px; }
+  .lxu .u2-lib-g.on .u2-lib-cells { max-width: 110px; }
+  .lxu .u2-devrow .lab { font-size: 8.5px; }
+}

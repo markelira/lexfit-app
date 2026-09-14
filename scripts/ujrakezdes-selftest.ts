@@ -368,6 +368,13 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
     assert.ok(!/\bFt\b|\d\s?990|\d\s?900/.test(`${g.b} ${g.d}`), `forint a gets-listában: ${g.b}`);
   }
   assert.ok(C.REVEAL.offer.name.length > 0, "az ajánlatnak nincs neve");
+
+  // The library grid DRAWS the number the list claims. If the two ever drift,
+  // the picture contradicts the sentence on the same screen - the loudest
+  // possible trust crack, and the whole reason the graphic exists.
+  const libTotal = C.REVEAL.offer.libSlices.reduce((a, s) => a + s.n, 0);
+  const claimed = Number(C.REVEAL.offer.gets.find((g) => /\d/.test(g.b))?.b.match(/\d+/)?.[0] ?? 0);
+  assert.equal(libTotal, claimed, `a rács ${libTotal} cellát rajzol, a lista ${claimed} edzést állít`);
   // The post-workout block may greet the RETURN, never claim a completion -
   // the guest player reports none, so „megcsináltad" would be a guess.
   const finishText = `${C.REVEAL.finish.eyebrow} ${C.REVEAL.finish.hd} ${C.REVEAL.finish.body}`.toLowerCase();
