@@ -92,10 +92,16 @@
 
 .mz-stage {
   display: grid;
-  align-content: center;
+  /* `safe` is the whole point: centring is what we want while the beat fits,
+     but when it does not, a plain `center` overflows in BOTH directions and
+     the top of the slide disappears under the header - which is exactly how
+     beat 3 broke. `safe` falls back to start-alignment instead of cropping. */
+  align-content: safe center;
   justify-items: start;
-  padding: 0 22px;
+  padding: 8px 22px;
   min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .mz-beat { width: 100%; max-width: 460px; margin: 0 auto; }
 .mz-beat-wide { max-width: 560px; }
@@ -197,7 +203,16 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,.4), 0 30px 60px -28px rgba(0,0,0,.8);
 }
-.mz-shot img { display: block; width: 100%; height: auto; }
+/* Whatever arrives - a 16:9 Mux frame or a tall screenshot - is shown in one
+   fixed shape. A poster that dictates its own height can push the beat past
+   the viewport, and on a phone that means the headline leaves the screen. */
+.mz-shot img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: 50% 42%;
+}
 .mz-play {
   position: absolute;
   inset: 0;

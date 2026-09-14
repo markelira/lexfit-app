@@ -31,7 +31,11 @@ const DEMO: CinemaPlan = {
     title: "Láb alapokról",
     theme: "Alsótest",
     mins: 26,
-    poster: "/player-demo-poster.jpg",
+    // NOT player-demo-poster.jpg: that is a screenshot OF THE PLAYER UI, so
+    // beat 3 showed a picture of an interface instead of a workout. A real
+    // training frame is the only honest stand-in until a token supplies the
+    // member's own Mux poster.
+    poster: "/cast-tv.jpg",
   },
 };
 
