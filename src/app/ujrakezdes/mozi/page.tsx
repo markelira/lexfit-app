@@ -42,6 +42,13 @@ const DEMO: CinemaPlan = {
 export default function MoziPage() {
   const [plan, setPlan] = useState<CinemaPlan>(DEMO);
   const [done, setDone] = useState(false);
+  const [start, setStart] = useState(0);
+  const [round, setRound] = useState(0);   // remount key for "Újra megnézem"
+
+  useEffect(() => {
+    const b = Number(new URLSearchParams(window.location.search).get("beat"));
+    if (b >= 1 && b <= 4) setStart(b - 1);
+  }, []);
 
   // Real media when a plan token is given - the posters make or break beat 3,
   // and a demo image flatters the design in a way the live page cannot.
@@ -70,7 +77,7 @@ export default function MoziPage() {
             type="button"
             className="u2-cta"
             style={{ justifySelf: "center" }}
-            onClick={() => { setDone(false); }}
+            onClick={() => { setRound((r) => r + 1); setDone(false); }}
           >
             Újra megnézem
           </button>
@@ -79,5 +86,5 @@ export default function MoziPage() {
     );
   }
 
-  return <CinemaReveal plan={plan} onDone={() => setDone(true)} />;
+  return <CinemaReveal key={round} plan={plan} start={start} onDone={() => setDone(true)} />;
 }

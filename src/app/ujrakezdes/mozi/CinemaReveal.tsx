@@ -63,8 +63,15 @@ export interface CinemaPlan {
  *  feels held: beat 2 carries the most to absorb, beat 4 the least. */
 const DWELL = [4600, 5600, 5000, 4200];
 
-export function CinemaReveal({ plan, onDone }: { plan: CinemaPlan; onDone: () => void }) {
-  const [i, setI] = useState(0);
+export function CinemaReveal({ plan, onDone, start = 0 }: {
+  plan: CinemaPlan;
+  onDone: () => void;
+  /** Jump straight to a beat (?beat=1..4). A review tool: four beats that
+   *  auto-advance are hard to look at one at a time, and "watch the whole
+   *  thing again to see slide 3" is how design feedback dies. */
+  start?: number;
+}) {
+  const [i, setI] = useState(start);
   const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
 
