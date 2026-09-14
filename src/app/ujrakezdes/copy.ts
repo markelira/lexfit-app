@@ -552,13 +552,47 @@ export const REVEAL = {
   cinema: {
     eyebrow: "Szeptemberi Újrakezdés",
     hd: "Kezdjük el ma.",
-    /** Callbacks, in the order the beats ran: the week, the library, the
-     *  proof it keeps going. Short enough to read in one pass. */
+    /** Fallback lines (the demo route, and any answer set that yields nothing
+     *  personal). Callbacks to the beats just watched, not fresh claims. */
     lines: [
       "A heted végigvezetve - minden edzés videón, Alexával",
       "130 edzés · 7 program · 16 hét kihívás",
       "Visszamérés a 15. és 30. edzésnél",
     ],
+    /** Always present, personalised or not: the size of what she is buying. */
+    libLine: "130 edzés · 7 program · 16 hét kihívás",
+    /**
+     * PERSONALISED ANSWERS (owner request 2026-09-14).
+     *
+     * Each line is a SOLUTION to something she told us, never a playback of
+     * it. "Térdkímélő" repeated back is a label; "minden térdelős gyakorlatnak
+     * van álló párja" is an answer - and at the moment of deciding, the
+     * question in her head is not "did they hear me" but "will this work for
+     * MY knee / MY evening / MY two days".
+     *
+     * Priority order below is deliberate: the physical objection outranks
+     * everything (it is the one that makes people close the page), then the
+     * time of day, then the starting level. The anchor answer is NOT used -
+     * „a kihagyott hét nem nulláz" is beat 2's whole point, and repeating it
+     * here would spend a personalised slot on something already said.
+     *
+     * Every claim is one the product keeps: the care variants exist in the
+     * library (`types` carries „Csendes" and „Falra fogva"), the short
+     * morning routines are the 3 napindító sessions, and the weekly cadence
+     * is what buildWeekPlan already drew.
+     */
+    answers: {
+      knee: "A térded: minden térdelős gyakorlatnak van állva végezhető párja.",
+      back: "A derekad: a gerincterhelés mindenhol opcionális, a sorrend erre épül.",
+      quiet: "Csendben: ugrálás nélküli változat, alvó gyerek mellett is megy.",
+      evening: "Este is működik: nincs rituálé, csak elindítod és követed.",
+      morning: "Reggelre: 5-8 perces napindítók is vannak, pizsamában is.",
+      levelNone: "Nulláról: az első hét szándékosan a legkönnyebb.",
+      levelRare: "Ritkán mozogsz most - a felépítés ehhez van igazítva.",
+      days2: "Heti 2 nap is elég - a terv ehhez készült, nem a heti öthöz.",
+      flex: "Rugalmasan: ha csúszik egy nap, a sorozatod nem sérül.",
+      small: "Kis helyen: 2×2 méter és egy matrac elég.",
+    },
     priceTail: "az első heted",
     trust: ["1 200+ tag", "Stripe-fizetés", "e-számla", "14 napos elállás"],
     more: "Előbb megnézem a részleteket",
@@ -665,6 +699,31 @@ export const REVEAL = {
     eyebrow: "Az első edzésed",
     hd: "A többi pontosan ilyen.",
     body: "Amit most megnyitottál, a Start program része. Ugyanez a vezetés, ugyanez a lejátszó vár a következőknél is - a terved szerint, sorban.",
+  },
+
+  /** Two personalised lines for the cinema's offer, chosen by prevalence and
+   *  by how much each objection costs us. Returns [] when the answers carry
+   *  nothing specific - the generic lines then stand, rather than a made-up
+   *  "personal" one. */
+  pickCinemaAnswers: (a: {
+    care?: readonly string[]; daypart?: string; level?: string; days?: string; place?: string;
+  }): string[] => {
+    const A = REVEAL.cinema.answers;
+    const out: string[] = [];
+    // 1 · the physical objection - the one that closes pages
+    if (a.care?.includes("knee")) out.push(A.knee);
+    else if (a.care?.includes("back")) out.push(A.back);
+    else if (a.care?.includes("quiet")) out.push(A.quiet);
+    // 2 · when the day actually has room
+    if (a.daypart === "evening") out.push(A.evening);
+    else if (a.daypart === "morning") out.push(A.morning);
+    // 3 · fallbacks, in descending order of how often they are true
+    if (out.length < 2 && (a.level === "none")) out.push(A.levelNone);
+    if (out.length < 2 && (a.level === "rare")) out.push(A.levelRare);
+    if (out.length < 2 && a.days === "2") out.push(A.days2);
+    if (out.length < 2 && a.days === "flex") out.push(A.flex);
+    if (out.length < 2 && a.place === "small") out.push(A.small);
+    return out.slice(0, 2);
   },
 
   /** The shelf: the entry programme's next sessions, as real cards. */

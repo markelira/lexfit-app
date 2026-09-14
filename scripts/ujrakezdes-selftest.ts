@@ -399,6 +399,26 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   // silently restore the price-tag-only screen that produced 0 clicks.
   assert.ok(C.REVEAL.cinema.lines.length >= 3, "a mozi ajánlatából eltűnt az érték-lista");
   assert.ok(C.REVEAL.cinema.trust.length >= 3, "a mozi ajánlatából eltűnt a bizalmi sor");
+  assert.ok(C.REVEAL.cinema.libLine.includes(String(claimed)), "a mozi könyvtár-sora nem a valós számot mondja");
+
+  // The personalised offer lines. Two rules, both load-bearing: a knee answer
+  // must produce the knee line (a generic one at the decision point wastes the
+  // most valuable slot on the screen), and an answer set with nothing specific
+  // must produce NOTHING - a fabricated "personal" line is worse than none.
+  const pick = C.REVEAL.pickCinemaAnswers;
+  const knee = pick({ care: ["knee"], daypart: "evening", level: "none", days: "3", place: "living_room" });
+  assert.ok(knee[0]?.includes("térd"), `a térd-válasz nem a térd-sort adja: ${knee[0]}`);
+  assert.ok(knee.length === 2 && knee[1]?.includes("Este"), "a második személyes sor a napszakra válaszol");
+  assert.equal(
+    pick({ care: ["none"], daypart: "varies", level: "regular", days: "3", place: "living_room" }).length,
+    0,
+    "semmitmondó válaszokból nem gyártunk kitalált »személyes« sort",
+  );
+  // Never more than two: the offer screen must stay one glance.
+  assert.ok(
+    pick({ care: ["knee", "back", "quiet"], daypart: "evening", level: "none", days: "2", place: "small" }).length <= 2,
+    "a személyes sorok száma kettőnél nem lehet több",
+  );
   // The post-workout block may greet the RETURN, never claim a completion -
   // the guest player reports none, so „megcsináltad" would be a guess.
   const finishText = `${C.REVEAL.finish.eyebrow} ${C.REVEAL.finish.hd} ${C.REVEAL.finish.body}`.toLowerCase();

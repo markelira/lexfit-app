@@ -78,6 +78,9 @@ export interface CinemaOffer {
   /** The annual plan's per-day figure, shown NEXT TO the weekly price and
    *  never instead of it. */
   perDay?: string;
+  /** Up to two lines answering what she told the quiz. Empty falls back to
+   *  the generic three - a fabricated "personal" line is worse than none. */
+  fit?: string[];
 }
 
 export function CinemaReveal({ plan, offer, onDone, start = 0 }: {
@@ -359,10 +362,11 @@ function BeatOffer({ offer }: { offer: CinemaOffer }) {
       <p className="mz-eyebrow mz-in" style={{ ["--d" as string]: "0ms" }}>{C.REVEAL.cinema.eyebrow}</p>
       <h1 className="mz-h mz-h-sm mz-in" style={{ ["--d" as string]: "80ms" }}>{C.REVEAL.cinema.hd}</h1>
 
-      {/* Value BEFORE price. Each line is a callback to a beat just watched,
-          so none of it is a new claim to evaluate - it is a receipt. */}
+      {/* Value BEFORE price, and personal where it can be. Each line either
+          answers something she told the quiz or calls back to a beat she just
+          watched - nothing here is a fresh claim to evaluate. */}
       <ul className="mz-got">
-        {C.REVEAL.cinema.lines.map((l, n) => (
+        {(offer.fit?.length ? [...offer.fit, C.REVEAL.cinema.libLine] : C.REVEAL.cinema.lines).map((l, n) => (
           <li key={l} className="mz-in" style={{ ["--d" as string]: `${200 + n * 90}ms` }}>
             <LxIcon d={lxPaths.check} size={14} sw={2.6} />
             <span>{l}</span>

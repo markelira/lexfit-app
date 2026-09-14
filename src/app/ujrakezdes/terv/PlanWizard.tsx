@@ -813,6 +813,9 @@ export default function PlanWizard({
               ? C.REVEAL.offer.timeline(intro, weekStd, nextChargeLabel("week_intro", cinemaToday))
               : undefined,
             perDay: formatHuf(perDayHuf()),
+            // Her own answers, turned into solutions. Picked by prevalence and
+            // by which objection costs the most - see copy.pickCinemaAnswers.
+            fit: C.REVEAL.pickCinemaAnswers(a),
           }}
           onDone={() => { setCinema(false); trackUjrakezdesCinemaDone(); }}
         />
