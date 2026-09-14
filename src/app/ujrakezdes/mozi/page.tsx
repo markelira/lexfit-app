@@ -86,5 +86,8 @@ export default function MoziPage() {
     );
   }
 
-  return <CinemaReveal key={round} plan={plan} start={start} onDone={() => setDone(true)} />;
+  // `start` is read after mount (a render-time read would mismatch hydration),
+  // so it has to be part of the key - otherwise the component is already
+  // mounted at beat 0 by the time the value arrives and ?beat= does nothing.
+  return <CinemaReveal key={`${round}-${start}`} plan={plan} start={start} onDone={() => setDone(true)} />;
 }
