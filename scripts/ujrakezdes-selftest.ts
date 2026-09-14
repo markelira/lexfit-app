@@ -349,8 +349,9 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   // (it became „Csináljuk végig" in the 2026-09-14 offer rebuild, answering
   // the restart objection instead of naming the purchase); what must not
   // drift is that the amount is interpolated and the sentence stays one
-  // clause, because the same string renders on the fold, the rail, the sticky
-  // bar and the post-workout block.
+  // clause, because the same string renders on the fold, the rail and the
+  // post-workout block. (The sticky bar keeps its own short label in
+  // REVEAL.sticky.go - a bar that tall stops being a bar.)
   const ctaSentence = C.REVEAL.offer.cta("X");
   assert.ok(ctaSentence.includes("X"), "a CTA nem interpolálja az intro árat");
   assert.ok(!/[.!?]\s+\S/.test(ctaSentence), "a CTA két mondatra esett szét");
