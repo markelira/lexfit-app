@@ -310,3 +310,65 @@
   .mz-h { margin-bottom: 32px; }
   .mz-stage { padding: 0 24px; }
 }
+
+/* ── Beat 5 · the offer ──────────────────────────────────────────────────────
+   The only beat that does not move on by itself, and the only one with a
+   button. Everything is sized so the price, the button and the guarantee are
+   in one glance - a decision screen you have to scroll is not a decision
+   screen. */
+.mz-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 4px;
+}
+.mz-price b {
+  font-size: clamp(38px, 12vw, 54px);
+  font-weight: 700;
+  letter-spacing: -.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.mz-price span { font-size: 15px; color: var(--mz-ink-2); }
+.mz-after { margin: 10px 0 0; font-size: 13.5px; color: var(--mz-ink-3); }
+
+.mz-cta {
+  display: block;
+  margin-top: 24px;
+  padding: 17px 22px;
+  border-radius: 15px;
+  background: var(--mz-accent);
+  color: #08120e;
+  font-size: 16.5px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 10px 30px -12px color-mix(in oklab, var(--mz-accent) 70%, transparent);
+  transition: transform .12s cubic-bezier(.22,.61,.36,1);
+}
+.mz-cta:active { transform: scale(.975); }
+
+.mz-guar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 14px 2px 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--mz-ink-3);
+}
+.mz-guar svg { flex: none; margin-top: 1px; color: var(--mz-accent); }
+
+/* The way past the offer is a text link, not a second button: one thing to do,
+   plus an escape - never a choice between two buttons. */
+.mz-more {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--mz-ink-3);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 8px;
+  cursor: pointer;
+}

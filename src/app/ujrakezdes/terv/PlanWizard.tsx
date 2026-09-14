@@ -23,6 +23,7 @@ import { annualSavingsPct, formatHuf, perDayHuf, perMonthHuf } from "@/lib/prici
 import PlanTray, { trayChips } from "./PlanTray";
 import { DeviceRow, LibraryGrid } from "./OfferGraphics";
 import { MonthStory } from "./MonthStory";
+import { CinemaReveal } from "../mozi/CinemaReveal";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import MailPreview from "./MailPreview";
@@ -47,7 +48,9 @@ import { buildWeekPlan } from "@/lib/ujrakezdes/plan";
 import { validateEmail } from "@/lib/quiz/validate";
 import { STEP_IDS, type Answers, type Care, type StepId } from "@/lib/ujrakezdes/types";
 import {
-  marketingContext, newEventId, trackUjrakezdesFinishCta, trackUjrakezdesFinishView,
+  marketingContext, newEventId,
+  trackUjrakezdesCinemaCta, trackUjrakezdesCinemaDone, trackUjrakezdesCinemaStart,
+  trackUjrakezdesFinishCta, trackUjrakezdesFinishView, trackUjrakezdesHeroCta,
   trackUjrakezdesGateView, trackUjrakezdesLead,
   trackUjrakezdesLoaderDone, trackUjrakezdesOfferClick, trackUjrakezdesOfferView, trackUjrakezdesQuizStart,
   trackUjrakezdesRevealView, trackUjrakezdesStartDay, trackUjrakezdesStep,
@@ -229,6 +232,11 @@ export default function PlanWizard({
   /** R4 · the chosen start day. Session-remembered; personalises the
    *  first-workout block and the curve's footing, writes nothing upstream. */
   const [startPick, setStartPick] = useState<StartPick>("today");
+  /** The cinematic opener. Shown once per session and only after a fresh quiz
+   *  run - someone returning through an e-mail link already knows what her
+   *  plan is, and a four-beat intro on every visit turns from a reveal into a
+   *  toll booth. `initial` marks the persisted-plan route (token URL). */
+  const [cinema, setCinema] = useState(false);
   /** True when the player sent her back here after the free workout (`?w=1`).
    *  Resolved post-mount - the route is prerendered - and the URL is cleaned
    *  afterwards so a refresh or a shared link does not replay the greeting. */
@@ -365,6 +373,17 @@ export default function PlanWizard({
   }, [screen, advance]);
 
   useEffect(() => { if (screen === "gate") trackUjrakezdesGateView(); }, [screen]);
+  useEffect(() => {
+    if (screen !== "reveal" || initial) return;
+    try {
+      if (sessionStorage.getItem("lx-mozi") === "1") return;
+      sessionStorage.setItem("lx-mozi", "1");
+    } catch { /* private mode: play it, once is better than never */ }
+    setCinema(true);
+    trackUjrakezdesCinemaStart();
+    // `initial` is a mount-time prop; the rule cannot change mid-session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen]);
   // Back from the free workout (`?w=1`). The flag is lifted into state and the
   // parameter stripped in the same pass: the greeting belongs to this return,
   // not to every later visit to the same token URL.
@@ -743,10 +762,12 @@ export default function PlanWizard({
      *  point in the funnel where escaping costs nothing: no auth state, no
      *  localStorage the next page cannot live without (?lt= carries the
      *  answers). */
-    const goCheckout = (where: "offer" | "sticky" | "finish") => (e: React.MouseEvent) => {
+    const goCheckout = (where: "offer" | "sticky" | "finish" | "cinema" | "hero") => (e: React.MouseEvent) => {
       if (isComplete(a)) writeQuizHandoff(a);
       if (where === "sticky") trackUjrakezdesStickyClick();
       else if (where === "finish") trackUjrakezdesFinishCta();
+      else if (where === "cinema") trackUjrakezdesCinemaCta();
+      else if (where === "hero") trackUjrakezdesHeroCta();
       else trackUjrakezdesOfferClick();
       const ext = externalBrowserHref(ctaHref);
       if (ext) {
@@ -756,6 +777,35 @@ export default function PlanWizard({
     };
 
     return (
+      <>
+      {/* The cinematic opener sits OVER the page rather than replacing it: the
+          reveal is already rendered underneath, so dismissing it is instant and
+          the browser has had the whole sequence to load what is below. Beat 5
+          is the offer, and its CTA is the same href and handler as every other
+          CTA here - one destination, one tracked click. */}
+      {cinema && media?.first && (
+        <CinemaReveal
+          plan={{
+            days: plan.days.map((d) => ({ short: d.short, training: d.training })),
+            trainingCount: plan.trainingCount,
+            minutes: plan.firstWorkoutMinutes,
+            firstWorkout: {
+              title: media.first.title,
+              theme: media.first.theme,
+              mins: media.first.mins,
+              poster: media.first.poster,
+            },
+          }}
+          offer={{
+            intro,
+            weekStd,
+            href: ctaHref,
+            onGo: goCheckout("cinema"),
+            guarantee: GUARANTEE_LIVE ? GARANCIA.shortLead + GARANCIA.shortBody : undefined,
+          }}
+          onDone={() => { setCinema(false); trackUjrakezdesCinemaDone(); }}
+        />
+      )}
       <main className="lxu u2" ref={stageRef} tabIndex={-1}>
         {/* ── B0 · the quiz's bar, parked at 88% ──────────────────────────── */}
         <div className="u2-top">
@@ -839,6 +889,22 @@ export default function PlanWizard({
                     survive. The claim is about equipment, not cost. */}
                 <div><dt>0</dt><dd>{C.REVEAL.b1.stats.equip}</dd></div>
               </dl>
+
+              {/* The hero's buy row. After the cinema has made the case and
+                  named the price, the plan card is no longer only "here is your
+                  week" - it is the answer to the offer she just watched, so the
+                  one-tap path lives inside the hero instead of a screen below
+                  it. Same href and handler as every other CTA; counted
+                  separately so the cinema's effect on it is visible. */}
+              <div className="u2-herobuy">
+                <div className="u2-herobuy-p">
+                  <b>{C.REVEAL.b1.buyLead(intro)}</b>
+                  <span>{C.REVEAL.b1.buySub(weekStd)}</span>
+                </div>
+                <a className="u2-cta u2-cta-sm" href={ctaHref} onClick={goCheckout("hero")}>
+                  {C.REVEAL.b1.buyCta}
+                </a>
+              </div>
 
               {C.ENERGY_LIVE && energy && (
                 <p className="u2-calc u2-m1" style={{ ["--i" as string]: 14 }}>
@@ -1149,6 +1215,7 @@ export default function PlanWizard({
         </div>
 
       </main>
+      </>
     );
   }
 

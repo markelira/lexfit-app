@@ -89,5 +89,21 @@ export default function MoziPage() {
   // `start` is read after mount (a render-time read would mismatch hydration),
   // so it has to be part of the key - otherwise the component is already
   // mounted at beat 0 by the time the value arrives and ?beat= does nothing.
-  return <CinemaReveal key={`${round}-${start}`} plan={plan} start={start} onDone={() => setDone(true)} />;
+  return (
+    <CinemaReveal
+      key={`${round}-${start}`}
+      plan={plan}
+      start={start}
+      // Demo offer: the prototype must show beat 5 in full, but its CTA leads
+      // nowhere - a test page that can start a real checkout is a trap.
+      offer={{
+        intro: "490 Ft",
+        weekStd: "1 990 Ft",
+        href: "#",
+        onGo: (e) => e.preventDefault(),
+        guarantee: "10 edzés garancia - ha az első 10 edzés után (max 5 hét) úgy érzed, nem a tiéd, visszakapod, amit befizettél.",
+      }}
+      onDone={() => setDone(true)}
+    />
+  );
 }

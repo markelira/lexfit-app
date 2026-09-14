@@ -61,10 +61,22 @@ export interface CinemaPlan {
 
 /** Per-beat dwell. Long enough to read the one line, short enough that nobody
  *  feels held: beat 2 carries the most to absorb, beat 4 the least. */
-const DWELL = [4600, 5600, 5000, 4200];
+/* Beat 5 is 0: the offer never auto-advances. Every beat before it is paced
+   by us; the one that asks for money is paced by her. */
+const DWELL = [4600, 5600, 5000, 4200, 0];
 
-export function CinemaReveal({ plan, onDone, start = 0 }: {
+export interface CinemaOffer {
+  intro: string;
+  weekStd: string;
+  href: string;
+  onGo: (e: React.MouseEvent) => void;
+  guarantee?: string;
+}
+
+export function CinemaReveal({ plan, offer, onDone, start = 0 }: {
   plan: CinemaPlan;
+  /** Beat 5. The price exists ONLY here - everything before it is the case. */
+  offer: CinemaOffer;
   onDone: () => void;
   /** Jump straight to a beat (?beat=1..4). A review tool: four beats that
    *  auto-advance are hard to look at one at a time, and "watch the whole
@@ -84,7 +96,7 @@ export function CinemaReveal({ plan, onDone, start = 0 }: {
   }, []);
 
   const next = useCallback(() => {
-    setI((v) => (v >= 3 ? (onDone(), v) : v + 1));
+    setI((v) => (v >= 4 ? (onDone(), v) : v + 1));
   }, [onDone]);
   const prev = useCallback(() => setI((v) => Math.max(0, v - 1)), []);
 
@@ -101,6 +113,7 @@ export function CinemaReveal({ plan, onDone, start = 0 }: {
   useEffect(() => {
     if (reduced) return;            // no auto-advance without motion consent
     if (paused) return;
+    if (DWELL[i] === 0) return;     // the offer waits for her, not a timer
     startedAt.current = performance.now();
     const t = setTimeout(next, left.current);
     return () => {
@@ -120,6 +133,12 @@ export function CinemaReveal({ plan, onDone, start = 0 }: {
     down.current = null;
     setPaused(false);
     if (!d) return;
+    // On the offer beat a stray tap must not dismiss the decision - only the
+    // buttons act. Swiping back still works.
+    if (i === 4 && e.clientX - d.x > -40) {
+      if (e.clientX - d.x > 40) prev();
+      return;
+    }
     const dx = e.clientX - d.x;
     if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); return; }
     // A tap: right two-thirds advances, left third goes back - the story
@@ -145,7 +164,9 @@ export function CinemaReveal({ plan, onDone, start = 0 }: {
     <BeatMonth key="b" plan={plan} />,
     <BeatFirst key="c" plan={plan} />,
     <BeatProof key="d" />,
+    <BeatOffer key="e" offer={offer} />,
   ];
+  const onOffer = i === 4;
 
   return (
     <div
@@ -157,7 +178,7 @@ export function CinemaReveal({ plan, onDone, start = 0 }: {
       {/* Progress: four segments, filled behind, live on the current one. It is
           the goal gradient made visible - and it promises the end is near. */}
       <div className="mz-bars" aria-hidden="true">
-        {[0, 1, 2, 3].map((n) => (
+        {[0, 1, 2, 3, 4].map((n) => (
           <span key={n} className="mz-bar">
             <i
               // `key` on the live segment restarts its animation on each beat.
@@ -178,10 +199,16 @@ export function CinemaReveal({ plan, onDone, start = 0 }: {
 
       <main className="mz-stage" key={i}>{beats[i]}</main>
 
-      <footer className="mz-foot" aria-hidden="true">
-        <span className="mz-hint">
-          {i < 3 ? "Koppints a folytatáshoz" : "Koppints, és jöhet a terved"}
-        </span>
+      <footer className="mz-foot">
+        {onOffer ? (
+          <button type="button" className="mz-more" onClick={(e) => { e.stopPropagation(); onDone(); }}>
+            Előbb megnézem a részleteket
+          </button>
+        ) : (
+          <span className="mz-hint" aria-hidden="true">
+            {i < 3 ? "Koppints a folytatáshoz" : "Koppints, és jöhet az ajánlat"}
+          </span>
+        )}
       </footer>
     </div>
   );
@@ -306,6 +333,48 @@ function BeatProof() {
       <p className="mz-fine mz-in" style={{ ["--d" as string]: "760ms" }}>
         A fotók valódi tagoké, az ő engedélyükkel.
       </p>
+    </section>
+  );
+}
+
+/* ── Beat 5 · the offer ────────────────────────────────────────────────────
+   Look: one price. Feel: this is small and reversible. Think: I can start
+   tonight.
+   Everything before this beat was the case; this is the ask, and it is the
+   only screen in the sequence that does not move on by itself. The guarantee
+   sits under the button because the last thing read before a decision should
+   be the way out of it (regret aversion), and the secondary action is a plain
+   text link - a second button would make this a choice between two things
+   instead of one thing and an escape. */
+function BeatOffer({ offer }: { offer: CinemaOffer }) {
+  return (
+    <section className="mz-beat">
+      <p className="mz-eyebrow mz-in" style={{ ["--d" as string]: "0ms" }}>Szeptemberi Újrakezdés</p>
+      <h1 className="mz-h mz-in" style={{ ["--d" as string]: "90ms" }}>Kezdjük ma este.</h1>
+
+      <div className="mz-price mz-rise" style={{ ["--d" as string]: "240ms" }}>
+        <b>{offer.intro}</b>
+        <span>az első heted</span>
+      </div>
+      <p className="mz-after mz-in" style={{ ["--d" as string]: "380ms" }}>
+        utána {offer.weekStd} / hét · bármikor lemondható
+      </p>
+
+      <a
+        className="mz-cta mz-rise"
+        style={{ ["--d" as string]: "480ms" }}
+        href={offer.href}
+        onClick={offer.onGo}
+      >
+        Csináljuk végig
+      </a>
+
+      {offer.guarantee && (
+        <p className="mz-guar mz-in" style={{ ["--d" as string]: "620ms" }}>
+          <LxIcon d={lxPaths.shield} size={14} sw={1.8} />
+          {offer.guarantee}
+        </p>
+      )}
     </section>
   );
 }

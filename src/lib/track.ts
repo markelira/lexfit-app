@@ -258,6 +258,16 @@ export function trackUjrakezdesFinishCta(): void {
   push("lx_ujrakezdes_finish_cta");
 }
 
+/** The cinematic opener started / was dismissed (or ran to its end). Together
+ *  they measure whether the sequence is watched or escaped - the single number
+ *  that decides if it ships. */
+export function trackUjrakezdesCinemaStart(): void { push("lx_ujrakezdes_cinema_start"); }
+export function trackUjrakezdesCinemaDone(): void { push("lx_ujrakezdes_cinema_done"); }
+/** The CTA on the cinema's final beat. */
+export function trackUjrakezdesCinemaCta(): void { push("lx_ujrakezdes_cinema_cta"); }
+/** The hero's buy row on the reveal - the one-tap path after the cinema. */
+export function trackUjrakezdesHeroCta(): void { push("lx_ujrakezdes_hero_cta"); }
+
 /** A locked workout card was tapped (peek → sent to the offer). */
 export function trackUjrakezdesCardPeek(code: string): void {
   push("lx_ujrakezdes_card_peek", { code });

@@ -513,6 +513,14 @@ export const REVEAL = {
     milestones: (guar: boolean) =>
       ["1. edzés", "5.", guar ? "10. - garancia" : "10.", "15. félidő", "30. visszamérés"],
     guardIdx: 2,
+    /** The hero's buy row (owner decision 2026-09-14). After the cinema has
+     *  made the case and shown the price, the plan card's job changes: it is
+     *  no longer only "here is your week", it is the answer to the offer she
+     *  just saw - so the price and a one-tap path sit inside the hero itself
+     *  rather than a screen below it. */
+    buyLead: (intro: string) => `${intro} az első heted`,
+    buySub: (weekStd: string) => `utána ${weekStd} / hét · bármikor lemondható`,
+    buyCta: "Kezdem",
     stats: { days: "nap / hét", mins: "perc / edzés", equip: "eszköz" },
     calc: (kcal: string, steps: string) =>
       `Ha a kalkulátort is kitöltötted: ${kcal} kcal napi cél · ${steps} lépés - becslés a megadott adataid alapján.`,
