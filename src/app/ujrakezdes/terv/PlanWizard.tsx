@@ -787,18 +787,27 @@ export default function PlanWizard({
           the browser has had the whole sequence to load what is below. Beat 5
           is the offer, and its CTA is the same href and handler as every other
           CTA here - one destination, one tracked click. */}
-      {cinema && media?.first && (
+      {cinema && (
         <CinemaReveal
           plan={{
             days: plan.days.map((d) => ({ short: d.short, training: d.training })),
             trainingCount: plan.trainingCount,
             minutes: plan.firstWorkoutMinutes,
-            firstWorkout: {
-              title: media.first.title,
-              theme: media.first.theme,
-              mins: media.first.mins,
-              poster: media.first.poster,
-            },
+            // Beat 3 is ~10s into the sequence, which is far longer than the
+            // media fetch takes - so the cinema opens IMMEDIATELY and the
+            // poster arrives before it is needed. Gating the whole overlay on
+            // media meant the reveal flashed underneath for a few hundred
+            // milliseconds and the cinema then dropped on top of it.
+            firstWorkout: media?.first
+              ? {
+                  title: media.first.title,
+                  theme: media.first.theme,
+                  mins: media.first.mins,
+                  poster: media.first.poster,
+                }
+              : firstW
+                ? { title: firstW.theme, theme: firstW.theme, mins: firstW.mins, poster: "" }
+                : { title: "Az első edzésed", theme: "Teljes test", mins: plan.firstWorkoutMinutes, poster: "" },
           }}
           offer={{
             intro,

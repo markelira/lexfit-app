@@ -200,11 +200,12 @@ export function CinemaReveal({ plan, offer, onDone, start = 0 }: {
         ))}
       </div>
 
+      {/* No skip button in the corner (owner decision 2026-09-14). The way out
+          is the footer link on the offer beat, plus the sequence itself: every
+          beat advances on a tap and the whole thing runs under half a minute.
+          A corner escape on beat 1 invites leaving before anything was said. */}
       <header className="mz-top">
         <span className="mz-mark">LEXFIT</span>
-        <button type="button" className="mz-skip" onClick={(e) => { e.stopPropagation(); onDone(); }}>
-          Kihagyom
-        </button>
       </header>
 
       <main className="mz-stage" key={i}>{beats[i]}</main>
@@ -306,8 +307,12 @@ function BeatFirst({ plan }: { plan: CinemaPlan }) {
       <h1 className="mz-h mz-in" style={{ ["--d" as string]: "90ms" }}>Ma este megvan az első.</h1>
 
       <figure className="mz-shot mz-rise" style={{ ["--d" as string]: "240ms" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={w.poster} alt="" />
+        {/* The poster may still be in flight for the first second or two - the
+            frame holds its shape either way, so nothing jumps when it lands. */}
+        {w.poster
+          // eslint-disable-next-line @next/next/no-img-element
+          ? <img src={w.poster} alt="" />
+          : <div className="mz-shot-wait" aria-hidden="true" />}
         <span className="mz-play" aria-hidden="true"><LxIcon d={lxPaths.play} size={26} sw={1.6} /></span>
         <figcaption>
           <b>{w.title}</b>
