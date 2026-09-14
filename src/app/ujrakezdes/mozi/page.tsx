@@ -47,7 +47,7 @@ export default function MoziPage() {
 
   useEffect(() => {
     const b = Number(new URLSearchParams(window.location.search).get("beat"));
-    if (b >= 1 && b <= 4) setStart(b - 1);
+    if (b >= 1 && b <= 5) setStart(b - 1);
   }, []);
 
   // Real media when a plan token is given - the posters make or break beat 3,

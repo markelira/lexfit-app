@@ -78,7 +78,7 @@ export function CinemaReveal({ plan, offer, onDone, start = 0 }: {
   /** Beat 5. The price exists ONLY here - everything before it is the case. */
   offer: CinemaOffer;
   onDone: () => void;
-  /** Jump straight to a beat (?beat=1..4). A review tool: four beats that
+  /** Jump straight to a beat (?beat=1..5). A review tool: four beats that
    *  auto-advance are hard to look at one at a time, and "watch the whole
    *  thing again to see slide 3" is how design feedback dies. */
   start?: number;
