@@ -235,7 +235,7 @@ export default function PlanWizard({
   /** The reveal's media (v2): the first workout's full playback + the next
    *  sessions' poster/preview cards, fetched by plan token. Null until (and
    *  unless) it loads - every media surface degrades to the token-free UI. */
-  const [media, setMedia] = useState<{ first: FirstMedia | null; cards: MediaCard[] } | null>(null);
+  const [media, setMedia] = useState<{ first: FirstMedia | null; cards: MediaCard[]; programs?: { slug: string; poster: string }[] } | null>(null);
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [hp, setHp] = useState("");
@@ -961,13 +961,31 @@ export default function PlanWizard({
               </ul>
 
               <p className="u2-label">{C.REVEAL.entry.listTitle}</p>
+              {/* Each programme shows its own first frame (graphics audit
+                  2026-09-14). This list was the page's most wordless stretch -
+                  1 215px of numbers and prose with no image at all - and it is
+                  the block that has to carry "this is what you get". The
+                  programmes have no cover of their own, so the poster is the
+                  real first session, signed at 192px. Degrades to the number
+                  chip whenever media has not loaded (or cannot). */}
               <ul className="u2-inc u2-stack">
-                {C.REVEAL.entry.items.map((it) => (
-                  <li key={it.b}>
-                    <span className="k">{it.k}</span>
-                    <span><b>{it.b}</b> - {it.d}</span>
-                  </li>
-                ))}
+                {C.REVEAL.entry.items.map((it) => {
+                  const slug = "slug" in it ? it.slug : null;
+                  const poster = slug
+                    ? media?.programs?.find((p) => p.slug === slug)?.poster
+                    : undefined;
+                  return (
+                    <li key={it.b}>
+                      {poster ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img className="u2-inc-shot" src={poster} alt="" loading="lazy" decoding="async" />
+                      ) : (
+                        <span className="k">{it.k}</span>
+                      )}
+                      <span><b>{it.b}</b> - {it.d}</span>
+                    </li>
+                  );
+                })}
               </ul>
               {/* R5 · the stack lands on one number. */}
               <p className="u2-sum">{C.REVEAL.entry.sum(intro)}</p>

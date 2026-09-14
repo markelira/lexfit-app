@@ -97,6 +97,23 @@ export async function signPlaybackTokens(playbackId: string) {
  * so the poster frame and the preview clip are taken from 60s in, where the
  * actual training is on screen.
  */
+/** A thumbnail-only token at an arbitrary width.
+ *
+ *  Mux IGNORES url query params once a token is present - the frame and the
+ *  size have to live in the token's own claims - so a small image needs its
+ *  own signature rather than a smaller `?width=`. Used by the programme strip,
+ *  where seven 960px posters would be ~280KB for images rendered at 48px. */
+export async function signThumbToken(playbackId: string, width: number, time = 60) {
+  const t = await mux.jwt.signPlaybackId(playbackId, {
+    keyId: process.env.MUX_SIGNING_KEY_ID,
+    keySecret: process.env.MUX_SIGNING_PRIVATE_KEY,
+    expiration: "6h" as const,
+    type: "thumbnail",
+    params: { time: String(time), width: String(width) },
+  });
+  return t as unknown as string;
+}
+
 export async function signPreviewTokens(playbackId: string) {
   const base = {
     keyId: process.env.MUX_SIGNING_KEY_ID,

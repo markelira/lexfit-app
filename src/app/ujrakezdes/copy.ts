@@ -748,13 +748,13 @@ export const REVEAL = {
       // deliberate under-count reads as an error the moment someone totals it.
       // NOTE: the landing FAQ and offer-copy still say „30 edzés" - safe as an
       // under-promise, worth aligning once.
-      { k: "35", b: "Teljes edzés program", d: "35 vezetett edzés, max 30 perc, eszköz nélkül. A te tempódban, heti 2, 3 vagy 4 nap." },
-      { k: "07", b: "7 napos kezdő program", d: "napi 8-10 perc, csendes, ízületkímélő. Hogy hétből hetet teljesíts." },
-      { k: "03", b: "Reggeli rutinok", d: "három napindító, 5-8 perc, pizsamában is." },
-      { k: "03", b: "Esti rutinok", d: "három rutin, 6-8 perc, lassú tartások, átvezetnek az alvásba." },
-      { k: "05", b: "Has & Mély Törzs", d: "öt nap, 10-15 perc. Stabil törzs és jobb tartás, nem kockás has." },
-      { k: "05", b: "Láb & Fenék", d: "öt nap, 10-15 perc. Guggolás, csípőemelés, kitörés, lassan." },
-      { k: "04", b: "Tartásjavító", d: "négy hét, heti egy új edzés. A monitor előtti görnyedés két oka ellen." },
+      { slug: "foundation", k: "35", b: "Teljes edzés program", d: "35 vezetett edzés, max 30 perc, eszköz nélkül. A te tempódban, heti 2, 3 vagy 4 nap." },
+      { slug: "elsolepes", k: "07", b: "7 napos kezdő program", d: "napi 8-10 perc, csendes, ízületkímélő. Hogy hétből hetet teljesíts." },
+      { slug: "napindito", k: "03", b: "Reggeli rutinok", d: "három napindító, 5-8 perc, pizsamában is." },
+      { slug: "napzaro", k: "03", b: "Esti rutinok", d: "három rutin, 6-8 perc, lassú tartások, átvezetnek az alvásba." },
+      { slug: "5naposhasmelytorzschallange", k: "05", b: "Has & Mély Törzs", d: "öt nap, 10-15 perc. Stabil törzs és jobb tartás, nem kockás has." },
+      { slug: "5naposlabfenekchallange", k: "05", b: "Láb & Fenék", d: "öt nap, 10-15 perc. Guggolás, csípőemelés, kitörés, lassan." },
+      { slug: "tartasjavito", k: "04", b: "Tartásjavító", d: "négy hét, heti egy új edzés. A monitor előtti görnyedés két oka ellen." },
       // 68 playable challenge days across 16 published challenges
       // (challengeVideos pool, audit 2026-09-14). The old line promised „minden
       // héten 5 új videó" - a cadence that stopped on Aug 17, and a number

@@ -2,7 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 import { allowRequest, HOUR_MS } from "@/lib/rate-limit";
-import { signPreviewTokens } from "@/lib/mux";
+import { signPreviewTokens, signThumbToken } from "@/lib/mux";
 import { loadLandingCatalog } from "@/lib/landing-catalog.server";
 import { LM_VARIANT, type LmLeadDoc } from "@/lib/ujrakezdes/lead";
 
@@ -98,10 +98,31 @@ export async function GET(req: Request) {
     });
   }
 
+  // The programme strip (graphics audit 2026-09-14). The entry block lists
+  // seven programmes as numbers and prose across 1 215px with no image at
+  // all - the page's most wordless stretch, and the one that has to carry
+  // "this is what you get". One real poster per programme, taken from its
+  // first session, at 192px: the programmes have no cover field of their own,
+  // but every video has a Mux playback id, so the library can show itself.
+  const progPosters: unknown[] = [];
+  for (const p of catalog.programs) {
+    const firstOfProg = catalog.workouts.find((w) => w.program === p.slug);
+    if (!firstOfProg) continue;
+    const d = await adminDb.collection("videos").doc(firstOfProg.code).get();
+    const v = d.data();
+    if (!v?.muxPlaybackId) continue;
+    if (v.status !== undefined && v.status !== "published") continue;
+    const t = await signThumbToken(v.muxPlaybackId as string, 192);
+    progPosters.push({
+      slug: p.slug,
+      poster: `https://image.mux.com/${v.muxPlaybackId}/thumbnail.webp?token=${t}`,
+    });
+  }
+
   // Tokens live 6h; let the CDN hold the response briefly so a reveal that
   // re-fetches (refresh, back-forward) doesn't re-sign every time.
   return NextResponse.json(
-    { first, cards },
+    { first, cards, programs: progPosters },
     { headers: { "Cache-Control": "private, max-age=600" } },
   );
 }
