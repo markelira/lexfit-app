@@ -518,6 +518,50 @@ export const REVEAL = {
       `Ha a kalkulátort is kitöltötted: ${kcal} kcal napi cél · ${steps} lépés - becslés a megadott adataid alapján.`,
   },
 
+  /** „Az első hónapod" - the plan extended from one week to four.
+   *
+   *  The free plan is ONE week, and one week is something she can do without
+   *  us; the month is where the product lives. Four beats, one line each -
+   *  detailed enough to be hers, short enough to read standing up.
+   *
+   *  GUARDRAIL, stricter here than anywhere: every line is about rhythm, never
+   *  the body. A month is exactly the horizon where fitness copy starts
+   *  promising centimetres, and the one promise this page can keep is that the
+   *  week survives a bad week. */
+  month: {
+    eyebrow: "Az első hónapod",
+    hd: "Négy hét, a te ritmusoddal",
+    weeks: [
+      {
+        t: "1. hét",
+        d: (n: number, mins: number) =>
+          `${n} edzés, egyenként ${mins} perc. A cél nem a teljesítmény - az, hogy meglegyen mind a ${n}.`,
+      },
+      {
+        t: "2. hét",
+        // Not „elfogyni a lendület": the selftest's banned-vocabulary guard
+        // catches the `fogy` stem, and it is right to - the exception would
+        // cost more than the phrasing. This version is sharper anyway.
+        d: () =>
+          "A lendület már nincs meg, a rutin még nincs. A terved ezért nem lesz nehezebb: ugyanaz a ritmus, ugyanaz a hossz.",
+      },
+      {
+        t: "3. hét",
+        d: () =>
+          "Ez az a hét, amikor általában közbejön valami. Ha kihagysz, ott folytatod - a sorozatod nem nullázódik.",
+      },
+      {
+        t: "4. hét",
+        d: (n: number) =>
+          `A ${n * 4}. edzésed felé tartasz. Innentől nem eldöntöd, hogy megcsináld: egyszerűen jön a soros nap.`,
+      },
+    ],
+    /** The guarantee lands on the week her 10th session actually falls in. */
+    guar: (w: number) => `A ${w}. hétre megvan a 10. edzésed - pont eddig szól a garancia.`,
+    foot: (total: number) =>
+      `Összesen ${total} edzés az első hónapban. Az elsőt ma ingyen megnézed, a többi a tagsággal jön.`,
+  },
+
   /** R3 · the habit-strength curve. Y-axis has no units and NEVER a body
    *  number; the dip annotation is the page's one deliberate extravagance. */
   curve: {

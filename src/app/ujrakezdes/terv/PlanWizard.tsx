@@ -22,6 +22,7 @@ import { PRICES } from "@/lib/pricing/config";
 import { annualSavingsPct, formatHuf, perDayHuf, perMonthHuf } from "@/lib/pricing/display";
 import PlanTray, { trayChips } from "./PlanTray";
 import { DeviceRow, LibraryGrid } from "./OfferGraphics";
+import { MonthStory } from "./MonthStory";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import MailPreview from "./MailPreview";
@@ -842,6 +843,13 @@ export default function PlanWizard({
                 </p>
               )}
             </section>
+
+            {/* ── „Az első hónapod" - the plan, extended from one week to
+                four. Sits directly after the plan card because it IS the plan
+                card's continuation: the free week is what she came for, the
+                month is what the membership is. Before the offer, so the
+                value is on the table when the price arrives. ─────────────── */}
+            <MonthStory plan={plan} />
 
             {/* ── R4 · when do you start. MOVED ABOVE THE OFFER (mobile audit
                 2026-09-14): picking „ma este" is an implementation intention -

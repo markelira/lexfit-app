@@ -3156,3 +3156,80 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
 }
 .lxu .u2-inc li:has(.u2-inc-shot) { align-items: flex-start; }
+
+/* ── „Az első hónapod" - the plan extended to four weeks ─────────────────────
+   The month as one picture (4 rows × 7 days, her own week repeated) plus four
+   one-line beats. The first training cell is solid: that is today's session,
+   so the calendar starts where she already stands. */
+.lxu .u2-month h2 { margin-bottom: var(--sp-4); }
+.lxu .u2-mgrid {
+  display: grid;
+  gap: 5px;
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3);
+  border: 1px solid var(--line, rgba(0, 0, 0, .07));
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 20%, transparent);
+}
+.lxu .u2-mrow {
+  display: grid;
+  grid-template-columns: 16px repeat(7, 1fr);
+  gap: 5px;
+  align-items: center;
+}
+.lxu .u2-mw {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 9.5px;
+  color: var(--ink-3);
+  text-align: right;
+}
+.lxu .u2-mrow i {
+  height: 13px;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--ink-3) 11%, transparent);
+}
+.lxu .u2-mrow i.on { background: color-mix(in oklab, var(--accent-2) 34%, transparent); }
+.lxu .u2-mrow i.first {
+  background: var(--accent-2);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent-2) 20%, transparent);
+}
+
+.lxu .u2-mbeats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+.lxu .u2-mbeats li {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: var(--sp-2);
+  align-items: baseline;
+}
+.lxu .u2-mbeats li b {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.lxu .u2-mbeats li > span {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-2, var(--ink-3));
+}
+.lxu .u2-mguar {
+  grid-column: 2;
+  margin-top: 4px;
+  font-style: normal;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--accent-2);
+}
+.lxu .u2-mfoot { margin-top: var(--sp-4); }
+
+@media (max-width: 700px) {
+  .lxu .u2-mbeats li { grid-template-columns: 40px 1fr; }
+  .lxu .u2-mbeats li > span { font-size: 13px; }
+}
