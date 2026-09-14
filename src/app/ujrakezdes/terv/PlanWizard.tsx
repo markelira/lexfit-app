@@ -545,7 +545,10 @@ export default function PlanWizard({
     let live = true;
     fetch(`/api/ujrakezdes-lead/media?lt=${leadToken}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((b: { first: FirstMedia | null; cards: MediaCard[] } | null) => {
+      // `programs` belongs in the annotation: it survived only because a TS
+      // type cannot delete a JSON field, and the next reader would reasonably
+      // conclude the poster strip has no data behind it.
+      .then((b: { first: FirstMedia | null; cards: MediaCard[]; programs?: { slug: string; poster: string }[] } | null) => {
         if (live && b) setMedia(b);
       })
       .catch(() => { /* fallbacks render */ });
