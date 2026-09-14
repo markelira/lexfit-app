@@ -81,28 +81,25 @@ export function CinemaReveal({ plan, onDone }: { plan: CinemaPlan; onDone: () =>
   }, [onDone]);
   const prev = useCallback(() => setI((v) => Math.max(0, v - 1)), []);
 
-  // Wall-clock progress so a pause resumes where it stopped rather than
-  // restarting the beat - the difference between "held" and "interrupted".
-  const [prog, setProg] = useState(0);
+  // The beat timer is a setTimeout, and the progress bar is a CSS animation -
+  // NOT a requestAnimationFrame that setStates every frame. The first version
+  // did exactly that and it broke the whole effect: re-rendering at 60fps
+  // rewrote each element's `--d` delay every 16ms, so every entrance animation
+  // restarted before it could begin and the slides sat at opacity 0. Paused
+  // state is handled where it belongs - `animation-play-state` for the bar,
+  // a remaining-time calculation for the timer.
   const startedAt = useRef(0);
-  const elapsed = useRef(0);
+  const left = useRef(0);
+  useEffect(() => { left.current = DWELL[i]; }, [i]);
   useEffect(() => {
-    elapsed.current = 0;
-    setProg(0);
-  }, [i]);
-  useEffect(() => {
-    if (reduced || paused) return;
-    startedAt.current = performance.now() - elapsed.current;
-    let raf = 0;
-    const tick = (t: number) => {
-      elapsed.current = t - startedAt.current;
-      const p = Math.min(1, elapsed.current / DWELL[i]);
-      setProg(p);
-      if (p >= 1) { next(); return; }
-      raf = requestAnimationFrame(tick);
+    if (reduced) return;            // no auto-advance without motion consent
+    if (paused) return;
+    startedAt.current = performance.now();
+    const t = setTimeout(next, left.current);
+    return () => {
+      clearTimeout(t);
+      left.current = Math.max(0, left.current - (performance.now() - startedAt.current));
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
   }, [i, paused, reduced, next]);
 
   // Swipe, with the same 10px hysteresis the rest of the funnel uses.
@@ -145,7 +142,7 @@ export function CinemaReveal({ plan, onDone }: { plan: CinemaPlan; onDone: () =>
 
   return (
     <div
-      className={`mz${reduced ? " mz-still" : ""}`}
+      className={`mz${reduced ? " mz-still" : ""}${paused ? " mz-paused" : ""}`}
       onPointerDown={onDown}
       onPointerUp={onUp}
       onPointerCancel={() => { down.current = null; setPaused(false); }}
@@ -155,7 +152,12 @@ export function CinemaReveal({ plan, onDone }: { plan: CinemaPlan; onDone: () =>
       <div className="mz-bars" aria-hidden="true">
         {[0, 1, 2, 3].map((n) => (
           <span key={n} className="mz-bar">
-            <i style={{ transform: `scaleX(${n < i ? 1 : n === i ? (reduced ? 1 : prog) : 0})` }} />
+            <i
+              // `key` on the live segment restarts its animation on each beat.
+              key={n === i ? `live-${i}` : `static-${n}`}
+              className={n < i ? "done" : n === i ? "live" : ""}
+              style={n === i ? { ["--dwell" as string]: `${DWELL[i]}ms` } : undefined}
+            />
           </span>
         ))}
       </div>
