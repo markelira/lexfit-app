@@ -51,6 +51,25 @@ export default function UjrakezdesD3({
         </PanelText>
       </Panel>
 
+      {/* The month, picked up from the reveal's second beat. The timing is the
+          point: this mail lands on day 3, when she is standing inside week one
+          and week two - the flat one - is what happens next. Naming it before
+          it arrives is what turns "elfogyott a lendület" from a personal
+          failure into a scheduled, survivable part of the plan. */}
+      <Text style={styles.body}>
+        Így néz ki innen a hónapod:
+      </Text>
+      <Text style={styles.body}>
+        <strong>2. hét:</strong> a lendület már nincs meg, a rutin még nincs. A
+        terved ezért nem lesz nehezebb - ugyanaz a ritmus, ugyanaz a hossz.
+        <br />
+        <strong>3. hét:</strong> ez az a hét, amikor általában közbejön valami.
+        Ha kihagysz, ott folytatod.
+        <br />
+        <strong>4. hét:</strong> innentől nem eldöntöd, hogy megcsináld -
+        egyszerűen jön a soros nap.
+      </Text>
+
       <Text style={styles.body}>
         Én tíz évig versenyszerűen tornáztam, aztán évekig semmit. Nem az edzés
         hiányzott, hanem egy rendszer, ami kibírja az életet. Ezt építettem meg.
