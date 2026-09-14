@@ -470,10 +470,10 @@ async function maybeCheckoutAbandoned(event: Stripe.Event): Promise<void> {
     const spec = PRICES[role] ?? PRICES.week_intro;
     const introLine =
       role === "week_intro"
-        ? `Az első heted ${formatHuf(PRICES.week_intro.amountHuf)}, utána ${formatHuf(PRICES.week_std.amountHuf)} hetente — bármikor lemondható.`
+        ? `Az első heted ${formatHuf(PRICES.week_intro.amountHuf)}, utána ${formatHuf(PRICES.week_std.amountHuf)} hetente - bármikor lemondható.`
         : role === "annual_std"
-          ? `${formatHuf(spec.amountHuf)} egy évre — bármikor lemondható.`
-          : `${formatHuf(spec.amountHuf)} havonta — bármikor lemondható.`;
+          ? `${formatHuf(spec.amountHuf)} egy évre - bármikor lemondható.`
+          : `${formatHuf(spec.amountHuf)} havonta - bármikor lemondható.`;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
     const ctaHref = `${appUrl}/register?q=plan&plan=${role}${lt ? `&lt=${lt}` : ""}`;
 

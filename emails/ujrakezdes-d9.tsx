@@ -55,7 +55,7 @@ export default function UjrakezdesD9({
       <Text style={styles.body}>Szia,</Text>
       <Text style={styles.body}>
         ez az utolsó levelem ebből a sorozatból. Arról szól, mi vár rád az első
-        tíz edzésen — mert nem egészen az, amire a legtöbben számítanak.
+        tíz edzésen - mert nem egészen az, amire a legtöbben számítanak.
       </Text>
 
       <Text style={styles.body}>
@@ -67,7 +67,7 @@ export default function UjrakezdesD9({
       <Text style={styles.body}>
         <strong>Valahol az ötödik táján jön az első kihagyott nap.</strong> Ez
         benne van a tervben. A pihenőnap nem töri meg a sorozatot, a kihagyott
-        hét pedig nem nulláz — ott folytatod, ahol abbahagytad.
+        hét pedig nem nulláz - ott folytatod, ahol abbahagytad.
       </Text>
 
       <Text style={styles.body}>
@@ -80,8 +80,8 @@ export default function UjrakezdesD9({
           <PanelText>
             Ez a tíz edzés egyben a garancia útvonala is:{" "}
             <strong>
-              csináld végig őket öt héten belül — a könnyített változat is
-              számít —, és ha utána úgy érzed, ez nem a tiéd, visszautaljuk az
+              csináld végig őket öt héten belül - a könnyített változat is
+              számít -, és ha utána úgy érzed, ez nem a tiéd, visszautaljuk az
               addig befizetett tagsági díjad.
             </strong>{" "}
             Nem fogadás. Egy útvonal, aminek a végén te döntesz.

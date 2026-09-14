@@ -245,7 +245,7 @@ export const ALEXA = {
    *  disclaimer („nem ígérek csodát") disappeared into the biography, and it is
    *  the half that answers the hype objection (offer_v2 §2 #10). */
   story:
-    "Tíz évig versenyszerűen tornáztam, aztán évekig semmit. Nulláról, egy matracon kezdtem újra — ebből lett a LEXFIT.",
+    "Tíz évig versenyszerűen tornáztam, aztán évekig semmit. Nulláról, egy matracon kezdtem újra - ebből lett a LEXFIT.",
   promise:
     "Nem vagyok orvos és nem ígérek csodát. Egy rendszert ígérek, ami kibírja az életet.",
   name: "Alexa",
@@ -272,7 +272,7 @@ export interface Choice<T extends string> {
 export const Q_ANCHOR = {
   hd: "Mi hozott ide?",
   options: [
-    { value: "restart", label: "Újra rendszeresen mozognék", sub: "Volt már, hogy ment — most maradjon is meg.", icon: lxPaths.rotateCcw },
+    { value: "restart", label: "Újra rendszeresen mozognék", sub: "Volt már, hogy ment - most maradjon is meg.", icon: lxPaths.rotateCcw },
     { value: "careful", label: "Óvatosan mozognék", sub: "A hátam, az ízületeim miatt figyelnem kell.", icon: lxPaths.shield },
     { value: "no_energy", label: "A nap végén nincs energiám", sub: "Elkezdeni a nehéz, nem maga a mozgás.", icon: lxPaths.moon },
     { value: "stronger", label: "Erősödnék, formálódnék", sub: "Van alapom, csak kell hozzá egy rend.", icon: lxPaths.dumbbell },
@@ -283,7 +283,7 @@ export const Q_ANCHOR = {
 export const Q_LEVEL = {
   hd: "Mennyire mozogsz mostanában?",
   options: [
-    { value: "none", label: "Szinte semennyit", sub: "Nulláról indulunk — ez teljesen rendben van.", icon: lxPaths.house },
+    { value: "none", label: "Szinte semennyit", sub: "Nulláról indulunk - ez teljesen rendben van.", icon: lxPaths.house },
     { value: "rare", label: "Néha, rendszertelenül", sub: "Van mozgás, csak nincs mögötte rendszer.", icon: lxPaths.clock },
     { value: "weekly", label: "Hetente egyszer-kétszer", sub: "Megvan az alap, erre lehet építeni.", icon: lxPaths.calendarCheck },
     { value: "regular", label: "Rendszeresen", sub: "Csak egy keret hiányzik, ami összefogja.", icon: lxPaths.gauge },
@@ -293,16 +293,16 @@ export const Q_LEVEL = {
 export const Q_DAYS = {
   hd: "Hány nap férne bele egy hetedbe?",
   options: [
-    { value: "2", label: "2 nap", sub: "Kevés, de tartható — ez többet ér, mint a semmi." },
+    { value: "2", label: "2 nap", sub: "Kevés, de tartható - ez többet ér, mint a semmi." },
     { value: "3", label: "3 nap", sub: "A legtöbb embernek ez a jó egyensúly." },
     { value: "4", label: "4 nap", sub: "Sűrűbb ritmus, még mindig három pihenőnappal." },
-    { value: "flex", label: "Ahogy jön", sub: "Legyen rugalmas — hárommal számolunk.", icon: lxPaths.sliders },
+    { value: "flex", label: "Ahogy jön", sub: "Legyen rugalmas - hárommal számolunk.", icon: lxPaths.sliders },
   ] as Choice<Days>[],
 };
 
 export const Q_FOCUS = {
   hd: "Hol szeretnél erősödni?",
-  micro: "Erre teszünk külön hangsúlyt — később bármikor módosítható.",
+  micro: "Erre teszünk külön hangsúlyt - később bármikor módosítható.",
   options: [
     { value: "fenek", label: "Fenék, comb", sub: "Stabil, erős alsótest.", icon: lxPaths.flame },
     { value: "core", label: "Has, törzs", sub: "Erős törzs, biztos tartás.", icon: lxPaths.gauge },
@@ -332,7 +332,7 @@ export const Q_CARE = {
   options: [
     { value: "knee", label: "Térd", sub: "Ugrálás nélkül, becsapódásmentes párokkal.", icon: lxPaths.shield },
     { value: "back", label: "Derék, hát", sub: "Kíméletes felépítés, biztonságos gyakorlatokkal.", icon: lxPaths.userRound },
-    { value: "quiet", label: "Csendben kell edzenem", sub: "Alvó gyerek, szomszédok — van csendes változat.", icon: lxPaths.volumeX },
+    { value: "quiet", label: "Csendben kell edzenem", sub: "Alvó gyerek, szomszédok - van csendes változat.", icon: lxPaths.volumeX },
     { value: "none", label: "Semmi különös", sub: "Jöhet bármi, bírom.", icon: lxPaths.check },
   ] as Choice<Care>[],
   cta: "Tovább",
@@ -341,9 +341,9 @@ export const Q_CARE = {
 export const Q_PLACE = {
   hd: "Hol fogsz mozogni?",
   options: [
-    { value: "living_room", label: "Nappaliban, matracon", sub: "A leggyakoribb — pont erre épül minden edzés.", icon: lxPaths.house },
+    { value: "living_room", label: "Nappaliban, matracon", sub: "A leggyakoribb - pont erre épül minden edzés.", icon: lxPaths.house },
     { value: "small", label: "Kisebb helyen", sub: "Két négyzetméter is elég hozzá.", icon: lxPaths.layers },
-    { value: "varied", label: "Változó helyeken", sub: "Nincs fix hely — ahol épp vagy.", icon: lxPaths.layoutGrid },
+    { value: "varied", label: "Változó helyeken", sub: "Nincs fix hely - ahol épp vagy.", icon: lxPaths.layoutGrid },
   ] as Choice<Place>[],
 };
 
@@ -353,7 +353,7 @@ export const Q_DAYPART = {
     { value: "morning", label: "Reggel, munka előtt", sub: "Amíg még nem jött közbe semmi.", icon: lxPaths.gauge },
     { value: "midday", label: "Napközben", sub: "Ebédszünet, vagy két dolog között.", icon: lxPaths.clock },
     { value: "evening", label: "Este, a nap végén", sub: "Levezetésnek, a nap után.", icon: lxPaths.moon },
-    { value: "varies", label: "Mindig máskor", sub: "Nem tervezhető — a terv ehhez igazodik.", icon: lxPaths.sliders },
+    { value: "varies", label: "Mindig máskor", sub: "Nem tervezhető - a terv ehhez igazodik.", icon: lxPaths.sliders },
   ] as Choice<Daypart>[],
 };
 
@@ -430,7 +430,7 @@ export const GATE = {
   privacy: "Adatkezelési tájékoztató",
   emailError: "Kérlek, ellenőrizd az e-mail címed.",
   networkError:
-    "Nem sikerült elküldeni — ellenőrizd a netkapcsolatod, és próbáld újra.",
+    "Nem sikerült elküldeni - ellenőrizd a netkapcsolatod, és próbáld újra.",
 } as const;
 
 /** The consent text version recorded with every submission (spec §3). Bump this
@@ -493,7 +493,7 @@ export const REVEAL = {
    *  Nunes & Drèze 2006): payment is the last 12%, not a new decision. */
   progress: {
     done: "Kész a kvíz", left: "1 lépés", pct: 88,
-    caption: "A terved 88%-ban kész — már csak az indulást válaszd.",
+    caption: "A terved 88%-ban kész - már csak az indulást válaszd.",
   },
 
   /** B1 · the plan card. */
@@ -511,11 +511,11 @@ export const REVEAL = {
      *  referencing a promise the page never explains was the reveal's one
      *  internal inconsistency (council audit, 2026-09-13). */
     milestones: (guar: boolean) =>
-      ["1. edzés", "5.", guar ? "10. — garancia" : "10.", "15. félidő", "30. visszamérés"],
+      ["1. edzés", "5.", guar ? "10. - garancia" : "10.", "15. félidő", "30. visszamérés"],
     guardIdx: 2,
     stats: { days: "nap / hét", mins: "perc / edzés", equip: "eszköz" },
     calc: (kcal: string, steps: string) =>
-      `Ha a kalkulátort is kitöltötted: ${kcal} kcal napi cél · ${steps} lépés — becslés a megadott adataid alapján.`,
+      `Ha a kalkulátort is kitöltötted: ${kcal} kcal napi cél · ${steps} lépés - becslés a megadott adataid alapján.`,
   },
 
   /** R3 · the habit-strength curve. Y-axis has no units and NEVER a body
@@ -526,10 +526,10 @@ export const REVEAL = {
     yLabel: "szokáserő",
     xStart: "1. hét",
     xEnd: (weeks: number) => `${weeks}. hét`,
-    dip: "kihagyott hét — nem nulláz",
+    dip: "kihagyott hét - nem nulláz",
     /** The two rules become the curve's caption (they ARE what it draws). */
     caption:
-      "A pihenőnap nem töri meg a sorozatot. A kihagyott hét pedig nem nulláz — ott folytatod, ahol abbahagytad. Ezért van a görbén egy völgy: benne van a tervben.",
+      "A pihenőnap nem töri meg a sorozatot. A kihagyott hét pedig nem nulláz - ott folytatod, ahol abbahagytad. Ezért van a görbén egy völgy: benne van a tervben.",
     aria: (weeks: number) =>
       `Szokáserő-görbe ${weeks} héten át: emelkedik, a közepén egy kihagyott hét miatt visszaesik, majd magasabban folytatódik. Mérföldkövek az 1., 5., 10., 15. és 30. edzésnél.`,
   },
@@ -550,7 +550,7 @@ export const REVEAL = {
    *  itself, at the moment of peak investment). */
   first: {
     eyebrow: "Az első edzésed",
-    free: "Nézd meg most — ingyen",
+    free: "Nézd meg most - ingyen",
     sub: "ugyanaz a lejátszó, mint a tagságban",
     hd: "Az első pipa ma este megvan.",
   },
@@ -576,7 +576,7 @@ export const REVEAL = {
   finish: {
     eyebrow: "Az első edzésed",
     hd: "A többi pontosan ilyen.",
-    body: "Amit most megnyitottál, a Start program része. Ugyanez a vezetés, ugyanez a lejátszó vár a következőknél is — a terved szerint, sorban.",
+    body: "Amit most megnyitottál, a Start program része. Ugyanez a vezetés, ugyanez a lejátszó vár a következőknél is - a terved szerint, sorban.",
   },
 
   /** The shelf: the entry programme's next sessions, as real cards. */
@@ -585,7 +585,7 @@ export const REVEAL = {
     hd: "Ez vár rád a Start programban",
     aria: "A Start program következő edzései",
     lock: "a tagsággal",
-    note: "Minden kártya a valódi edzés — érintsd meg, és belenézhetsz.",
+    note: "Minden kártya a valódi edzés - érintsd meg, és belenézhetsz.",
   },
 
   /**
@@ -602,13 +602,13 @@ export const REVEAL = {
     /** Personalized certainty lines, from HER answers. Max 4 render. */
     fitTitle: "A tervedhez igazítva",
     fit: {
-      levelLow: "Kezdőknek tervezve — nulláról is elindulsz",
+      levelLow: "Kezdőknek tervezve - nulláról is elindulsz",
       levelMid: "A szintedhez igazítva, fokozatos felépítéssel",
       knee: "Minden gyakorlatnak van térdkímélő párja",
       back: "Derékbarát felépítés, biztonságos sorrend",
-      quiet: "Csendes változat — alvó gyerek mellett is megy",
-      home: "Otthon, eszköz nélkül — elég 2×2 méter",
-      days: (n: number) => `Heti ${n} nap, pihenőnapokkal — később átállítható`,
+      quiet: "Csendes változat - alvó gyerek mellett is megy",
+      home: "Otthon, eszköz nélkül - elég 2×2 méter",
+      days: (n: number) => `Heti ${n} nap, pihenőnapokkal - később átállítható`,
       flex: "Rugalmas heti ritmus, pihenőnapokkal",
     },
     allIn: "Egy tagság, minden benne: a 30 edzéses Start, az összes program, heti 5 új kihívás.",
@@ -635,10 +635,20 @@ export const REVEAL = {
      *  offer may only list what the app actually ships today. */
     getsTitle: "Amit a tagság hozzáad",
     gets: [
-      { b: "A terved végigvezetve", d: "Minden edzés videón, Alexa vezet — nem neked kell kitalálni, mi jön ma." },
-      { b: "7 program, 62 edzés", d: "16 óra vezetett mozgás, az első naptól mind elérhető." },
-      { b: "Minden héten új", d: "16 kihívás a tárban, és hétről hétre jön az újabb." },
-      { b: "Visszamérés a 15. és 30. edzésnél", d: "Látod, mennyit fejlődtél — nem a tükörből tippeled." },
+      { b: "A terved végigvezetve", d: "Minden edzés videón, Alexa vezet - nem neked kell kitalálni, mi jön ma." },
+      // The count includes the challenges (owner-corrected 2026-09-14). Their
+      // videos live in `challengeVideos`, a POOL SEPARATE from `videos` - the
+      // first audit only looked in `videos`, found the SZM* codes unresolved
+      // and wrongly concluded they did not exist. Re-audited: 69 challenge
+      // videos, all published with Mux playback, and all 68 challenge days
+      // resolve. 62 programme sessions (964 min) + 68 challenge days (680 min)
+      // = 130 sessions / 1 644 min ≈ 27 h.
+      { b: "130 edzés", d: "7 program és 16 hét kihívás - az első naptól mind elérhető." },
+      // Deliberately NOT "minden héten új": the challenges ran weekly from
+      // April to Aug 17 and none has shipped since. The shelf is real, the
+      // cadence promise is not - restore it when a new challenge lands.
+      { b: "Telefonon, laptopon, TV-n", d: "A böngészőben fut, nem kell letölteni semmit - az edzést a TV-re is kiküldheted." },
+      { b: "Visszamérés a 15. és 30. edzésnél", d: "Látod, mennyit fejlődtél - nem a tükörből tippeled." },
     ],
     proofGuar: "10 edzés garancia",
     /** Split so the count can carry visual weight (R9) — an honest scale
@@ -651,7 +661,7 @@ export const REVEAL = {
     /** "Csináljuk végig" over "Kezdem": for someone on her fifth restart the
      *  fear is never the starting, it is the stopping - the verb answers the
      *  objection the whole page is built on. */
-    cta: (intro: string) => `Csináljuk végig — az első hét ${intro}`,
+    cta: (intro: string) => `Csináljuk végig - az első hét ${intro}`,
     /** NO DEADLINE HERE - deliberately. The offer rebuild almost shipped a
      *  "szeptember 30-ig él" line (owner-approved in the brief) until the
      *  selftest's migration guard caught it: offer v3 §2/§10 bans deadlines
@@ -662,7 +672,7 @@ export const REVEAL = {
      *  claim the pricing cannot keep. Reinstating one means changing the
      *  price first, then the guard, then this comment. */
     renew: (weekStd: string) =>
-      `Utána ${weekStd} / hét — a megújítás dátumát a fizetés előtt megmutatjuk. Bármikor lemondható.`,
+      `Utána ${weekStd} / hét - a megújítás dátumát a fizetés előtt megmutatjuk. Bármikor lemondható.`,
     /** The dated version, once the client knows today (SSR-safe: the page is
      *  prerendered, so the date resolves after mount; until then `renew`
      *  stands in). Naming the exact date and amount is the anti-bait move —
@@ -683,17 +693,17 @@ export const REVEAL = {
       `${intro} az első hét · utána ${weekStd} / hét · évesre váltva ${perDay} / nap`,
     /** Sprint P1-2 · the guarantee touching the button, not only its own
      *  section. Renders only while GUARANTEE_LIVE. */
-    guarLine: "10 edzés garancia — ha nem vált be, visszakapod.",
+    guarLine: "10 edzés garancia - ha nem vált be, visszakapod.",
   },
 
   /** B3 · the mechanism. The failure is written onto the system, never the
    *  person - that is the whole psychological argument of the page. */
   b3: {
     eyebrow: "Ismerős?",
-    body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra — aztán a jövő hétből hónap lett. Nem az akaraterővel van baj: azzal, hogy minden kihagyás után nulláról kell kezdeni.",
+    body: "Hétfőn még megvolt a lendület. Csütörtökön közbejött valami. A jövő héten majd újra - aztán a jövő hétből hónap lett. Nem az akaraterővel van baj: azzal, hogy minden kihagyás után nulláról kell kezdeni.",
     rules: [
       "A pihenőnap nem töri meg a sorozatot.",
-      "A kihagyott hét nem nulláz — ott folytatod, ahol abbahagytad.",
+      "A kihagyott hét nem nulláz - ott folytatod, ahol abbahagytad.",
     ],
   },
 
@@ -703,7 +713,7 @@ export const REVEAL = {
     eyebrow: (day: string) => `Az első edzésed · ${day}`,
     hd: "Az első pipa ma este megvan.",
     sub: (mins: number) =>
-      `${mins} perc, eszköz nélkül. Az első mérföldkő nem 30 edzés — öt.`,
+      `${mins} perc, eszköz nélkül. Az első mérföldkő nem 30 edzés - öt.`,
   },
 
   /** B6 · the entry. The one price the page asks about. */
@@ -711,7 +721,7 @@ export const REVEAL = {
     eyebrow: "Ez a heted. Ha rendszert szeretnél belőle:",
     hd: (intro: string) => `Az első hét ${intro}.`,
     lead: (weekStd: string) =>
-      `Teljes hozzáférés az első naptól — nem próbaverzió. Utána ${weekStd} / hét, vagy válts havira és évesre.`,
+      `Teljes hozzáférés az első naptól - nem próbaverzió. Utána ${weekStd} / hét, vagy válts havira és évesre.`,
     listTitle: "Egy tagság, minden benne",
     items: [
       { k: "30", b: "Teljes edzés program", d: "30 vezetett edzés, max 30 perc, eszköz nélkül. A te tempódban, heti 2, 3 vagy 4 nap." },
@@ -732,9 +742,9 @@ export const REVEAL = {
     same: "Mindhárom tagságban ugyanaz van: minden program, minden edzés, minden új heti tartalom. Csak a ritmus más.",
     honestyLead: "Ha tudod, hogy maradsz, a havi olcsóbb.",
     honesty: (weeklyMonthly: string, month: string) =>
-      ` A heti ritmus havi szinten ${weeklyMonthly} — a havi tagság ${month}.`,
+      ` A heti ritmus havi szinten ${weeklyMonthly} - a havi tagság ${month}.`,
     later: "A ritmust a fizetés után, egy kattintással állítod át. Most csak az első hét kérdés.",
-    youtube: "A videó ingyen is megvan. A sorrend, a terv és a vezetés — az a tagság.",
+    youtube: "A videó ingyen is megvan. A sorrend, a terv és a vezetés - az a tagság.",
   },
 
   /** B7 · the guarantee band. Body and statutory line come from the shared
@@ -746,7 +756,7 @@ export const REVEAL = {
    *  way around. The cohort line is true by construction — the offer is named
    *  Szeptemberi Újrakezdés; REVISIT THE WORDING IN OCTOBER. */
   alexaEyebrow: "Ki az az Alexa?",
-  alexaSigned: "„Ezt személyesen vállalom.” — Alexa",
+  alexaSigned: "„Ezt személyesen vállalom.” - Alexa",
   alexaCohort: "A szeptemberi újrakezdők most kezdik az első hetüket.",
 
   /** B9 · the anti-avatar. */
@@ -761,23 +771,23 @@ export const REVEAL = {
    *  from `faqBilling` with real interpolated amounts. */
   faq: [
     { q: "Mikor és mennyit vonnak le?", a: "", guar: false, billing: true },
-    { q: "Szüneteltethetem?", a: "Igen, 1–3 hónapra, egy kattintással — a haladásod megmarad.", guar: false, billing: false },
+    { q: "Szüneteltethetem?", a: "Igen, 1–3 hónapra, egy kattintással - a haladásod megmarad.", guar: false, billing: false },
     { q: "Hogyan működik a 10 edzés garancia?", a: "Egy e-mail a hi@lexfit.hu-ra, és visszautaljuk a befizetett díjaidat.", guar: true, billing: false },
-    { q: "Mi van, ha kihagyok egy hetet?", a: "Ott folytatod, ahol abbahagytad — nálunk nincs „lemaradás”.", guar: false, billing: false },
+    { q: "Mi van, ha kihagyok egy hetet?", a: "Ott folytatod, ahol abbahagytad - nálunk nincs „lemaradás”.", guar: false, billing: false },
     { q: "Meddig tart a Start program?", a: "30 edzés, a te tempódban. Nem az idő számít, hanem hogy a 30 meglegyen.", guar: false, billing: false },
     { q: "Kell hozzá eszköz?", a: "Nem. Elég egy matrac és 2×2 méter.", guar: false, billing: false },
   ],
   faqBilling: (intro: string, weekStd: string) =>
-    `Ma ${intro}-ot vonunk le. Hét nap múlva vált át ${weekStd} / hétre — a pontos dátumot a fizetés előtt is kiírjuk, és a megújulás előtt e-mailben szólunk. Bármikor lemondható.`,
+    `Ma ${intro}-ot vonunk le. Hét nap múlva vált át ${weekStd} / hétre - a pontos dátumot a fizetés előtt is kiírjuk, és a megújulás előtt e-mailben szólunk. Bármikor lemondható.`,
   faqTitle: "GYIK",
 
   /** B11 · the close. */
   close: {
     quote: "„Nem az a kérdés, bírod-e egyben. Az, hogy mi történik, amikor jön egy rossz hét.”",
-    by: "— Alexa",
+    by: "- Alexa",
     sub: "Nem kell ma biztosnak lenned: az első 10 edzésre garancia van.",
     subNoGuar: "Bármikor lemondhatod, egy kattintással.",
-    later: "Most nem? A terved így is a tiéd — e-mailben is elküldtük, hogy TV-n vagy laptopon is megnyithasd.",
+    later: "Most nem? A terved így is a tiéd - e-mailben is elküldtük, hogy TV-n vagy laptopon is megnyithasd.",
     trust: "Stripe · e-számla · 14 napos elállás · bármikor lemondható egy kattintással",
   },
 
@@ -798,7 +808,7 @@ export const GUARANTEE_BLOCK = {
 } as const;
 
 export const CARE_NOTE: Record<Exclude<Care, "none">, string> = {
-  knee: "Ugrálás nélküli változat — minden gyakorlatnak van becsapódásmentes párja.",
+  knee: "Ugrálás nélküli változat - minden gyakorlatnak van becsapódásmentes párja.",
   back: "Kíméletes felépítés, a deréknak biztonságos gyakorlatsorral.",
   quiet: "Csendes változat: ugrás és dobbantás nélkül, alvó gyerek mellett is megy.",
 };
@@ -807,11 +817,11 @@ export const CARE_NOTE: Record<Exclude<Care, "none">, string> = {
  *  already written to them, and a postscript restating it would be filler. */
 export const SEGMENT_PS: Partial<Record<Anchor, string>> = {
   careful:
-    "Ui. Ha az ízületeid miatt vagy óvatos: minden edzésnek van csendes, fal mellett végezhető változata — és az is teljes értékű.",
+    "Ui. Ha az ízületeid miatt vagy óvatos: minden edzésnek van csendes, fal mellett végezhető változata - és az is teljes értékű.",
   no_energy:
     "Ui. Ha estére semmi nem marad: a Napzáró rutinok 6–8 percesek. Az is mozgás.",
   stronger:
-    "Ui. A terv fokozatosan nehezedik — a 30 edzés alatt észre fogod venni, csak nem az első héten.",
+    "Ui. A terv fokozatosan nehezedik - a 30 edzés alatt észre fogod venni, csak nem az első héten.",
   browsing:
     "Ui. Nyugodtan nézelődj. A terved addig is megvár.",
 };
@@ -843,20 +853,20 @@ export const ENERGY = {
   /** The invitation on the reveal. Opt-in: nothing is asked before this. */
   teaserHeading: "Kiszámoljuk a napi kalóriacélod?",
   teaserBody:
-    "Ha szeretnéd, a testadataidból kiszámoljuk a napi kalória- és fehérjecélod, és a napi lépéscélod. Nem kötelező — a heti terved enélkül is a tiéd.",
+    "Ha szeretnéd, a testadataidból kiszámoljuk a napi kalória- és fehérjecélod, és a napi lépéscélod. Nem kötelező - a heti terved enélkül is a tiéd.",
   teaserCta: "Kiszámolom",
 
   /** The screen has to answer "why am I being asked this?" before it asks.
    *  "Alapadatok" named the fields; it never named the outcome. */
   formHeading: "Kiszámoljuk a kalóriacélod",
-  formSub: "Ebből jön ki a napi kalória- és fehérjecélod, és a napi lépéscélod — a heti terved mellé.",
+  formSub: "Ebből jön ki a napi kalória- és fehérjecélod, és a napi lépéscélod - a heti terved mellé.",
   formMicro: "Csak a számoláshoz kell. Bármikor kérheted a törlésüket.",
   /** Shown when every field is filled but the Art. 9 consent is not ticked.
    *  The consent cannot be required - that is the whole point - but walking on
    *  in silence and then showing no numbers at the end is a dead end nobody can
    *  diagnose. So the screen says what will happen, and still lets them pass. */
   consentMissing:
-    "A számoláshoz a hozzájárulásod is kell. Enélkül is továbbmehetsz — a heti terved ugyanúgy elkészül, csak a napi célok maradnak ki.",
+    "A számoláshoz a hozzájárulásod is kell. Enélkül is továbbmehetsz - a heti terved ugyanúgy elkészül, csak a napi célok maradnak ki.",
 
   sexLabel: "Nem",
   sexOptions: [
@@ -905,7 +915,7 @@ export const ENERGY = {
     tomeg: "Izomépítés",
   } as Record<"fogyas" | "tonus" | "tomeg", string>,
   tempoLead: {
-    fogyas: "Mindhárom biztonságos — a különbség a sebesség és a fenntarthatóság egyensúlya.",
+    fogyas: "Mindhárom biztonságos - a különbség a sebesség és a fenntarthatóság egyensúlya.",
     tonus: "Itt az erősítés és a fehérje a fontos; a kalória csak finomhangolás.",
     tomeg: "A többlet mérete dönti el, mennyi izom és mennyi zsír épül mellé.",
   } as Record<"fogyas" | "tonus" | "tomeg", string>,
@@ -917,13 +927,13 @@ export const ENERGY = {
       intenziv: "Biztonságos tartományon belül, de nagyobb fegyelmet kér.",
     },
     tonus: {
-      laza: "Fenntartó kalória — a legtisztább átalakulás, türelmesen.",
+      laza: "Fenntartó kalória - a legtisztább átalakulás, türelmesen.",
       kozepes: "Enyhe deficit. A legtöbb embernek ez a jó kiindulás.",
       intenziv: "Erősebb zsírvesztési fókusz, az izom megőrzése mellett.",
     },
     tomeg: {
       laza: "Lassú, minőségi izomépítés, minimális zsírral.",
-      kozepes: "Az ajánlott alap — észrevehető fejlődés, kordában tartva.",
+      kozepes: "Az ajánlott alap - észrevehető fejlődés, kordában tartva.",
       intenziv: "Gyorsabb építés, valamivel több zsírral együtt.",
     },
   } as Record<string, Record<string, string>>,
@@ -943,7 +953,7 @@ export const ENERGY = {
   skip: "Kihagyom",
   submit: "Mutasd az eredményem",
   submitBusy: "Számoljuk…",
-  error: "Ellenőrizd az adatokat — a mezőknek valós értéket kell tartalmazniuk.",
+  error: "Ellenőrizd az adatokat - a mezőknek valós értéket kell tartalmazniuk.",
 
   // ── Results ──
   kcalLabel: "napi kalória",
@@ -957,15 +967,15 @@ export const ENERGY = {
    *  already answered it, and two numbers for one question is worse than one. */
   workoutHeading: "Mivel kezdd",
   workoutLead: (days: number) =>
-    `A heti ${days} edzésnapodra ezt ajánljuk — a tagságban mind a kettő benne van.`,
+    `A heti ${days} edzésnapodra ezt ajánljuk - a tagságban mind a kettő benne van.`,
 
   /** Shown when the deficit would have gone under the safety floor. */
   flooredNote:
-    "A célod ennél alacsonyabb értéket adna, de nem megyünk lejjebb — ennyi kalória alatt már szakember felügyelete kell hozzá.",
+    "A célod ennél alacsonyabb értéket adna, de nem megyünk lejjebb - ennyi kalória alatt már szakember felügyelete kell hozzá.",
 
   /** The one honesty line. Not a disclaimer to hide: it is the register. */
   disclaimer:
-    "Ezek becsült értékek, tájékoztató jelleggel — nem minősülnek orvosi vagy dietetikai tanácsnak. Ha bármilyen krónikus betegséged van, vagy kezelés alatt állsz, beszéld meg az orvosoddal.",
+    "Ezek becsült értékek, tájékoztató jelleggel - nem minősülnek orvosi vagy dietetikai tanácsnak. Ha bármilyen krónikus betegséged van, vagy kezelés alatt állsz, beszéld meg az orvosoddal.",
 
   recalcCta: "Újraszámolom",
 } as const;
@@ -983,7 +993,7 @@ export const ENERGY = {
 export const CALC_INVITE = {
   hd: "Kérsz mellé napi kalóriacélt is?",
   sub: "Három kérdés, és a heti terved mellé megkapod a napi kalória- és fehérjecélod, meg a napi lépéscélod.",
-  helper: "A hét kérdés megvan, a terved kész. Ez ráadás — nélküle is a tiéd.",
+  helper: "A hét kérdés megvan, a terved kész. Ez ráadás - nélküle is a tiéd.",
   yes: "Kérem, három kérdés",
   no: "Köszönöm, elég a terv",
 } as const;

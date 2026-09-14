@@ -274,7 +274,7 @@ export default function Landing({ variant = "base" }: { variant?: C.LpVariant })
         </div>
       </section>
 
-      {/* ── S6 · „Akik már csinálják" — UNLOCKED 2026-09-14: the consented
+      {/* ── S6 · „Akik már csinálják" - UNLOCKED 2026-09-14: the consented
           member photos shipped on the reveal B5; the same belt renders here.
           Tapping a card is a quiz start - on this page every road leads to
           the same door. ───────────────────────────────────────────────────── */}

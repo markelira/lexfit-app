@@ -37,7 +37,7 @@ export function OfferBox({
           <br />
           {GUARANTEE_LIVE ? (
             <>
-              Csináld végig az első 10 edzést — ha nem vált be,{" "}
+              Csináld végig az első 10 edzést - ha nem vált be,{" "}
               <strong>visszakapod a pénzed.</strong>
             </>
           ) : (
@@ -46,12 +46,12 @@ export function OfferBox({
         </PanelText>
       </Panel>
 
-      <Cta href={ctaHref}>Kezdem — az első hét {intro}</Cta>
+      <Cta href={ctaHref}>Kezdem - az első hét {intro}</Cta>
 
       <Text style={styles.small}>
-        Utána {weekStd} / hét — a pontos dátumot a fizetés előtt kiírjuk, és a
+        Utána {weekStd} / hét - a pontos dátumot a fizetés előtt kiírjuk, és a
         megújulás előtt e-mailben szólunk. Ha tudod, hogy maradsz: havi {month},
-        vagy {annual} egy évre — a fizetés után egy kattintással váltasz.
+        vagy {annual} egy évre - a fizetés után egy kattintással váltasz.
       </Text>
     </>
   );

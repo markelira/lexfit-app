@@ -23,7 +23,7 @@ import { GUARANTEE_LIVE } from "@/components/landing/offer-copy";
 export type ResumeStage = "2h" | "24h";
 
 export const subjectFor = (stage: ResumeStage) =>
-  stage === "2h" ? "Ott maradt félbe — segítsek?" : "Egy lépésre álltál meg";
+  stage === "2h" ? "Ott maradt félbe - segítsek?" : "Egy lépésre álltál meg";
 export const subject = subjectFor("24h");
 
 const preview = "A terved és a választott csomagod is megvan még.";
@@ -42,19 +42,19 @@ export default function CheckoutResume({
 }) {
   if (stage === "2h") {
     return (
-      <EmailLayout preview="A fizetés félbemaradt — a fiókod és a terved megvan.">
+      <EmailLayout preview="A fizetés félbemaradt - a fiókod és a terved megvan.">
         <Text style={styles.eyebrow}>LEXFIT</Text>
         <Text style={styles.h1}>{subjectFor("2h")}</Text>
         <Text style={styles.body}>Szia,</Text>
         <Text style={styles.body}>
-          elindítottad a csatlakozást ({roleName}), de a fizetés félbemaradt —
+          elindítottad a csatlakozást ({roleName}), de a fizetés félbemaradt -
           a Facebook beépített böngészője sokszor elakad a kártyánál; ez a
           levél már a saját böngésződben nyílik. A fiókod és a terved megvan,
           egy kattintással ott folytatod. {introLine}
         </Text>
         {GUARANTEE_LIVE && (
           <Text style={styles.body}>
-            És áll a garancia: csináld végig az első 10 edzést — ha nem vált
+            És áll a garancia: csináld végig az első 10 edzést - ha nem vált
             be, <strong>visszakapod a pénzed.</strong>
           </Text>
         )}
@@ -71,7 +71,7 @@ export default function CheckoutResume({
       <Text style={styles.body}>Szia,</Text>
       <Text style={styles.body}>
         elindítottad a csatlakozást ({roleName}), de a fizetés végül nem ment
-        át. Semmi gond — a fiókod és a terved is megvan, ott folytathatod, ahol
+        át. Semmi gond - a fiókod és a terved is megvan, ott folytathatod, ahol
         abbahagytad.
       </Text>
 
@@ -87,7 +87,7 @@ export default function CheckoutResume({
 
       {GUARANTEE_LIVE && (
         <Text style={styles.body}>
-          És áll a garancia: csináld végig az első 10 edzést — ha nem vált be,{" "}
+          És áll a garancia: csináld végig az első 10 edzést - ha nem vált be,{" "}
           <strong>visszakapod a pénzed.</strong>
         </Text>
       )}
@@ -95,7 +95,7 @@ export default function CheckoutResume({
       <Cta href={ctaHref}>Folytatom a fizetést</Cta>
 
       <Text style={styles.body}>
-        Ha közben meggondoltad magad, az is rendben van — a heti terved akkor
+        Ha közben meggondoltad magad, az is rendben van - a heti terved akkor
         is a tiéd marad.
       </Text>
 

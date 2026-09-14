@@ -204,7 +204,7 @@ export function StepStage({
     let axis: "none" | "x" | "y" = "none";
     let dragging = false;
     let lastP = 0; // last painted progress, so a release continues from what is on screen
-    let base = 0; // progress the drag starts from — non-zero when a spring was grabbed
+    let base = 0; // progress the drag starts from - non-zero when a spring was grabbed
     const track = new VelocityTracker();
 
     const width = () => host.offsetWidth || window.innerWidth || 390;

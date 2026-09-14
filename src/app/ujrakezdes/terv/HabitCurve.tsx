@@ -57,7 +57,7 @@ export default function HabitCurve({ trainingCount }: { trainingCount: number })
             style={{ strokeDasharray: dash, strokeDashoffset: on ? 0 : dash }}
           />
 
-          {/* milestone markers — the same chain as the plan card's */}
+          {/* milestone markers - the same chain as the plan card's */}
           {m.milestones.map((mi, i) => (
             <g
               key={mi.n}
@@ -71,7 +71,7 @@ export default function HabitCurve({ trainingCount }: { trainingCount: number })
             </g>
           ))}
 
-          {/* the dip annotation — the page's one deliberate extravagance */}
+          {/* the dip annotation - the page's one deliberate extravagance */}
           <g className="u2-cv-dip" style={{ transitionDelay: "1.5s" }}>
             <line
               x1={px(m.dip.x)} y1={py(m.dip.y) + 6}
@@ -82,7 +82,7 @@ export default function HabitCurve({ trainingCount }: { trainingCount: number })
             </text>
           </g>
 
-          {/* axes labels — the y-label sits top-left, clear of the curve's
+          {/* axes labels - the y-label sits top-left, clear of the curve's
               endpoint and the 30 marker (it clipped on the right edge). */}
           <text className="u2-cv-ax" x={px(0)} y={H - 8}>{C.REVEAL.curve.xStart}</text>
           <text className="u2-cv-ax" x={px(1)} y={H - 8} textAnchor="end">

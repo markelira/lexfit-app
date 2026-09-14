@@ -67,7 +67,7 @@ export default function PlanMail({
             <li key={d.key} className={d.training ? "on" : ""}>
               <span className="d">{d.short}</span>
               <span className="m">
-                {d.training ? (d.minutes ? `${d.minutes}′` : "•") : "—"}
+                {d.training ? (d.minutes ? `${d.minutes}′` : "•") : "-"}
               </span>
             </li>
           ))}

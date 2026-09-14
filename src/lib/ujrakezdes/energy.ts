@@ -290,7 +290,7 @@ export interface WorkoutPick {
  *  exists: every value here is a real, published programme. */
 const BY_FOCUS: Record<Focus, WorkoutPick> = {
   fenek: { program: PROGRAM.LAB, why: "Célzottan fenék és comb, öt napon át." },
-  core: { program: PROGRAM.HAS, why: "Has és mély törzs — a tartás alapja." },
+  core: { program: PROGRAM.HAS, why: "Has és mély törzs - a tartás alapja." },
   felso: { program: PROGRAM.START, why: "Felsőtest-napokkal, a teljes programon belül." },
   tartas: { program: PROGRAM.TARTAS, why: "Négy hét a hátra és a tartásra." },
   teljes: { program: PROGRAM.START, why: "Mindenből egyensúlyban, sorrendben." },
@@ -314,7 +314,7 @@ export function recommendPrograms(
   const opener: WorkoutPick =
     level === "none"
       ? { program: PROGRAM.KEZDO, why: "Hét rövid nap, hogy meglegyen a lendület." }
-      : { program: PROGRAM.START, why: "A gerincprogram — 30 vezetett edzés, a te tempódban." };
+      : { program: PROGRAM.START, why: "A gerincprogram - 30 vezetett edzés, a te tempódban." };
 
   const byFocus = focus ? BY_FOCUS[focus] : null;
   const second: WorkoutPick =
@@ -323,7 +323,7 @@ export function recommendPrograms(
       : goal === "fogyas"
       ? { program: PROGRAM.LAB, why: "Nagy izomcsoportok, több energia egy edzés alatt." }
       : goal === "tonus"
-        ? { program: PROGRAM.HAS, why: "Törzserő — ez tartja meg a formát a többi edzésben." }
+        ? { program: PROGRAM.HAS, why: "Törzserő - ez tartja meg a formát a többi edzésben." }
         : { program: PROGRAM.TARTAS, why: "Stabil váll és csípő, hogy bírja a terhelést." };
 
   // Never recommend the same thing twice: a beginner's opener is the 7-day

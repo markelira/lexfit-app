@@ -24,7 +24,7 @@ export interface Choice<T extends string> {
 export const INTRO = {
   eyebrow: "INGYENES · KB. 1 PERC",
   headline: "Készítsd el a személyes otthoni edzésterved 60 másodperc alatt",
-  sub: "10–20 perc naponta, eszköz nélkül is. Válaszolj pár kérdésre, és megkapod a napi kalória-célod, a rád szabott LexFit programot és a napi lépéscélod — ingyen.",
+  sub: "10–20 perc naponta, eszköz nélkül is. Válaszolj pár kérdésre, és megkapod a napi kalória-célod, a rád szabott LexFit programot és a napi lépéscélod - ingyen.",
   cta: "Kezdjük",
   micro: "Kb. 1 perc · Nem kell regisztrálni a kitöltéshez",
 };
@@ -42,7 +42,7 @@ export const Q_GOAL = {
 
 export const Q_SEX = {
   hd: "Mi a biológiai nemed?",
-  micro: "A kalória-számításhoz kell — a férfi és női szervezet energiaigénye eltér.",
+  micro: "A kalória-számításhoz kell - a férfi és női szervezet energiaigénye eltér.",
   options: [
     { value: "male", label: "Férfi" },
     { value: "female", label: "Nő" },
@@ -73,7 +73,7 @@ export const Q_STEPS = {
   hd: "Mit gondolsz, mennyit sétálsz egy átlagos napon?",
   micro: "Tipp: a telefonod egészségalkalmazása megmondja. Ha nem tudod, tippelj nyugodtan.",
   options: [
-    { value: "lt4k", label: "Keveset — pár rövid séta (kb. 4 000 alatt)" },
+    { value: "lt4k", label: "Keveset - pár rövid séta (kb. 4 000 alatt)" },
     { value: "4_7k", label: "Közepeset (kb. 4–7 ezer lépés)" },
     { value: "7_10k", label: "Elég sokat (kb. 7–10 ezer lépés)" },
     { value: "10k_plus", label: "Nagyon sokat (10 ezer felett)" },
@@ -82,7 +82,7 @@ export const Q_STEPS = {
 
 export const Q_TRAINING = {
   hd: "És edzeni szoktál mostanában?",
-  micro: "Nincs rossz válasz — a programod pontosan innen indul majd.",
+  micro: "Nincs rossz válasz - a programod pontosan innen indul majd.",
   options: [
     { value: "none", label: "Nem, most kezdeném (újra)" },
     { value: "sometimes", label: "Néha igen, de nem rendszeresen" },
@@ -97,13 +97,13 @@ export const Q_TRAINING = {
 export const INTERSTITIAL = {
   A: {
     hd: "Tudtad?",
-    body: "A magyar lakosság 41%-a naponta legalább hét órát tölt üléssel vagy fekvéssel — az alvásidőn túl.",
-    tail: "A jó hír: már napi néhány perc célzott mozgás is számít — és a terved pontosan ilyen lesz.",
+    body: "A magyar lakosság 41%-a naponta legalább hét órát tölt üléssel vagy fekvéssel - az alvásidőn túl.",
+    tail: "A jó hír: már napi néhány perc célzott mozgás is számít - és a terved pontosan ilyen lesz.",
     source: "Forrás: KSH, Testmozgás 2019",
   },
   B: {
     hd: "Tudtad?",
-    body: "Csak minden 6. magyar felnőtt mozog annyit, amennyit a WHO ajánl. Akik igen, azok 81,5%-a érzi jónak az egészségét — a teljes lakosságnál ez 60%.",
+    body: "Csak minden 6. magyar felnőtt mozog annyit, amennyit a WHO ajánl. Akik igen, azok 81,5%-a érzi jónak az egészségét - a teljes lakosságnál ez 60%.",
     tail: "A különbség nem a tehetség. A rendszeresség.",
     source: "Forrás: KSH, Testmozgás 2019",
   },
@@ -124,7 +124,7 @@ export const Q_TARGET = {
   hd: "Mi a cél-testsúlyod?",
   label: "Cél-testsúly (kg)",
   error: "Kérlek, kg-ban add meg (pl. 68).",
-  ambitious: "Ez nagyon ambiciózus cél — a terved biztonságos, fenntartható ütemre készül.",
+  ambitious: "Ez nagyon ambiciózus cél - a terved biztonságos, fenntartható ütemre készül.",
   cta: "Tovább",
 };
 
@@ -143,7 +143,7 @@ export const Q_LIFESTAGE = {
 
 export const Q_SESSION = {
   hd: "Reálisan mennyi időd van egy edzésre?",
-  micro: "A jó terv nem az, ami sok időt kér — hanem amit tényleg megcsinálsz.",
+  micro: "A jó terv nem az, ami sok időt kér - hanem amit tényleg megcsinálsz.",
   options: [
     { value: "10_15", label: "10–15 perc" },
     { value: "20_30", label: "20–30 perc" },
@@ -175,19 +175,19 @@ export const LOADER = {
 
 export const CAPTURE = {
   hd: "Kész a személyes terved! 🎉",
-  sub: "Add meg a keresztneved és az e-mail címed — azonnal mutatjuk a kalória-célod, a LexFit programod és a napi lépéscélod, és e-mailben is elküldjük, hogy meglegyen.",
+  sub: "Add meg a keresztneved és az e-mail címed - azonnal mutatjuk a kalória-célod, a LexFit programod és a napi lépéscélod, és e-mailben is elküldjük, hogy meglegyen.",
   namePlaceholder: "Keresztneved",
   emailPlaceholder: "E-mail címed",
   nameError: "Kérlek, a keresztneved add meg (pl. Anna).",
   emailError: "Kérlek, ellenőrizd az e-mail címed.",
   consentHealth:
-    "Hozzájárulok, hogy a megadott adataimat — a keresztnevem, az e-mail címem és a kvízben adott válaszaim, köztük az egészséggel összefüggő adatok (testadatok, mozgási szokások) — a LexFit a személyes eredményem elkészítéséhez és elküldéséhez kezelje.",
+    "Hozzájárulok, hogy a megadott adataimat - a keresztnevem, az e-mail címem és a kvízben adott válaszaim, köztük az egészséggel összefüggő adatok (testadatok, mozgási szokások) - a LexFit a személyes eredményem elkészítéséhez és elküldéséhez kezelje.",
   consentHealthLink: "Adatkezelési tájékoztató",
   consentMarketing: "Kérem a LexFit e-mailes tippjeit és ajánlatait. Bármikor leiratkozhatok.",
   cta: "Kérem a tervem",
   ctaBusy: "Küldés…",
   micro: "Az adataidat bizalmasan kezeljük, harmadik félnek nem adjuk át.",
-  networkError: "Hoppá, nem sikerült elküldeni — ellenőrizd a netkapcsolatod, és próbáld újra.",
+  networkError: "Hoppá, nem sikerült elküldeni - ellenőrizd a netkapcsolatod, és próbáld újra.",
 };
 
 export const RESULT = {
@@ -197,7 +197,7 @@ export const RESULT = {
   kcalHd: "A kalóriáid",
   maintenanceLabel: "Szinten tartó kalóriád",
   goalLabel: "A célodhoz ajánlott",
-  kcalFine: "Becslés a megadott adataid alapján — iránymutatásnak tökéletes, nem kell grammra követni.",
+  kcalFine: "Becslés a megadott adataid alapján - iránymutatásnak tökéletes, nem kell grammra követni.",
 
   // Exactly one of these renders, decided by CalorieResult.note + goal.
   paceLine: (kg: number) =>
@@ -205,21 +205,21 @@ export const RESULT = {
   checkpointLine: (kg: number) =>
     `Az első kontrollpont: 4 hét múlva kb. −${kg.toString().replace(".", ",")} kg.`,
   maintainLine:
-    "A megadott célod alapján nem fogyásra, hanem szinten tartásra állítottuk a kalóriád — a hangsúly nálad a formálódáson lesz.",
+    "A megadott célod alapján nem fogyásra, hanem szinten tartásra állítottuk a kalóriád - a hangsúly nálad a formálódáson lesz.",
   floorLine:
-    "A célodhoz nem kell ennél kevesebbet enned — a hangsúly nálad a mozgáson lesz.",
+    "A célodhoz nem kell ennél kevesebbet enned - a hangsúly nálad a mozgáson lesz.",
   goalLine: {
-    tone: "Enyhe deficit — a feszesedéshez pont ennyi kell.",
-    strength: "Enyhe többlet — ebből épül az izom.",
-    posture_energy: "Nem kell kevesebbet enned — a hangsúly nálad a mozgáson lesz.",
-    restart: "Nem kell kevesebbet enned — a hangsúly nálad a mozgáson lesz.",
+    tone: "Enyhe deficit - a feszesedéshez pont ennyi kell.",
+    strength: "Enyhe többlet - ebből épül az izom.",
+    posture_energy: "Nem kell kevesebbet enned - a hangsúly nálad a mozgáson lesz.",
+    restart: "Nem kell kevesebbet enned - a hangsúly nálad a mozgáson lesz.",
   } as Partial<Record<Goal, string>>,
 
   mirrorHd: "Hol állsz?",
   mirror: {
-    none: "A magyar felnőttek 59%-a szabadidejében egyáltalán nem sportol. Azzal, hogy idáig eljutottál, már többet tettél, mint a többség — és a terved pontosan nulláról indul.",
-    sometimes: "Csak minden 6. magyar teljesíti a WHO mozgásajánlását. Te már félúton vagy — a terved abban segít, hogy a rendszeresség is meglegyen.",
-    regular: "A rendszeresen mozgók a magyar felnőttek kisebbségében vannak — te köztük vagy. A terved abban segít, hogy a következő szintre lépj.",
+    none: "A magyar felnőttek 59%-a szabadidejében egyáltalán nem sportol. Azzal, hogy idáig eljutottál, már többet tettél, mint a többség - és a terved pontosan nulláról indul.",
+    sometimes: "Csak minden 6. magyar teljesíti a WHO mozgásajánlását. Te már félúton vagy - a terved abban segít, hogy a rendszeresség is meglegyen.",
+    regular: "A rendszeresen mozgók a magyar felnőttek kisebbségében vannak - te köztük vagy. A terved abban segít, hogy a következő szintre lépj.",
   } as Record<TrainingNow, string>,
   mirrorSource: "Forrás: KSH, Testmozgás 2019",
 
@@ -227,37 +227,37 @@ export const RESULT = {
   obstacleLine: {
     no_time: "…és minden edzés belefér a keretedbe.",
     no_motivation: "…változatos, rövid blokkokkal, hogy ne unj rá.",
-    dont_know_how: "…lépésről lépésre, videós vezetéssel — sosem kell kitalálnod, mi jön.",
+    dont_know_how: "…lépésről lépésre, videós vezetéssel - sosem kell kitalálnod, mi jön.",
     gave_up: "…fokozatos terheléssel, hogy ezúttal ne égj ki az elején.",
     bad_experience: "…otthon, a saját tempódban. Senki nem néz, senki nem értékel.",
   } as Record<Obstacle, string>,
   copyMode: {
     gentle_postpartum: "Kíméletes, a szülés utáni testre figyelő tempóban indul.",
-    menopause: "Az erős izomzat 45 felett a legjobb befektetés — a program erre külön figyel.",
+    menopause: "Az erős izomzat 45 felett a legjobb befektetés - a program erre külön figyel.",
     strength: "Erő-hangsúllyal: a fejlődés az ismétlésekben és a terhelésben lesz mérhető.",
     desk: "Az ülőmunka két fő következményére épül: a feszes mellkasra és a gyenge felső hátra.",
     none: "",
   } as Record<string, string>,
   jointFriendly: "Ízületkímélő felépítés, alacsony becsapódással.",
-  shortenNote: "Az edzések rövidíthetők — az első hetekben a rövidebb verzió is teljes értékű.",
-  nextStep: (name: string) => `És ha megvan? Utána rád vár: ${name} — a fejlődésed következő lépcsője.`,
+  shortenNote: "Az edzések rövidíthetők - az első hetekben a rövidebb verzió is teljes értékű.",
+  nextStep: (name: string) => `És ha megvan? Utána rád vár: ${name} - a fejlődésed következő lépcsője.`,
   bonus: (name: string) => `🎁 Hozzá ajándékba: ${name}`,
 
   stepsHd: "Napi lépéscélod",
   stepsNow: (n: number) => `Most kb. ${n.toLocaleString("hu-HU")} lépésnél jársz.`,
   stepCopy: {
     already_walker: (t: number) =>
-      `A lépéseid már most rendben vannak (${t.toLocaleString("hu-HU")}) — tartsd, a többit bízd a programodra. 👏`,
+      `A lépéseid már most rendben vannak (${t.toLocaleString("hu-HU")}) - tartsd, a többit bízd a programodra. 👏`,
     two_stage: (t: number, first: number) =>
-      `Végcélod: ${t.toLocaleString("hu-HU")}. De ne egyszerre — az első két hétben célozd meg a ${first.toLocaleString("hu-HU")}-t (ez kb. egy 20 perces séta pluszban), onnan emelünk.`,
+      `Végcélod: ${t.toLocaleString("hu-HU")}. De ne egyszerre - az első két hétben célozd meg a ${first.toLocaleString("hu-HU")}-t (ez kb. egy 20 perces séta pluszban), onnan emelünk.`,
     plus_1000: (t: number) =>
-      `Ne egyszerre — az első héten csak +1 000 lépést tegyél hozzá (kb. egy 10 perces séta), utána emelj ${t.toLocaleString("hu-HU")}-ig.`,
-    easy: () => "Ez kb. egy plusz rövid séta naponta — simán benne van.",
+      `Ne egyszerre - az első héten csak +1 000 lépést tegyél hozzá (kb. egy 10 perces séta), utána emelj ${t.toLocaleString("hu-HU")}-ig.`,
+    easy: () => "Ez kb. egy plusz rövid séta naponta - simán benne van.",
   },
 
-  closer: "A tervedet megcsináltuk. A többihez ott leszünk minden edzésnél — neked már csak el kell kezdened. 💪",
+  closer: "A tervedet megcsináltuk. A többihez ott leszünk minden edzésnél - neked már csak el kell kezdened. 💪",
   // There is no free trial. This is the real entry offer.
-  cta: "Kezdem a programom — az első hét 490 Ft",
+  cta: "Kezdem a programom - az első hét 490 Ft",
   secondary: "Előbb körbenéznék",
   disclaimer:
     "A kvíz eredménye tájékoztató jellegű, nem minősül orvosi tanácsnak. Ha krónikus betegséged van, edzés előtt konzultálj orvosoddal.",

@@ -66,7 +66,7 @@ export function PricingBand({ surface = "landing" }: { surface?: PricingSurface 
       featured: true,
       amt: monthHuf,
       cur: "/ hónap",
-      lead: <><b>{monthHuf} / hónap</b> — {month.tagline}.</>,
+      lead: <><b>{monthHuf} / hónap</b> - {month.tagline}.</>,
       body: (
         <p className="pc-body">
           {monthBullets.map((b, i) => (
@@ -83,7 +83,7 @@ export function PricingBand({ surface = "landing" }: { surface?: PricingSurface 
       featured: false,
       amt: annualHuf,
       cur: "/ év",
-      lead: <><b>{annualHuf} / év</b> — így {annualPerMonth} / hónap (–{annualSavingsPct()}%).</>,
+      lead: <><b>{annualHuf} / év</b> - így {annualPerMonth} / hónap (–{annualSavingsPct()}%).</>,
       body: <p className="pc-body">{annual.body}</p>,
       cta: annual.cta,
     },

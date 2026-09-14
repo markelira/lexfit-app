@@ -1042,7 +1042,7 @@ function PlanStep({
         <PaywallOffer headRef={headRef} />
         {/* P3/P15 - the first workout already exists, and starting today or on
             Monday is equally fine. Removes the "when do I begin" stall. */}
-        <p className="pw-ready">Az első edzésed készen áll — ma vagy hétfőn kezded, mindegy.</p>
+        <p className="pw-ready">Az első edzésed készen áll - ma vagy hétfőn kezded, mindegy.</p>
         <div className="pw-plans" role="radiogroup" aria-label="Csomag" ref={groupRef}>
           {PAYWALL_PLANS.map((p, i) => (
             <PlanRow

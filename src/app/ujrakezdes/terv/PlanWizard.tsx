@@ -842,7 +842,7 @@ export default function PlanWizard({
               <RevealOffer intro={intro} weekStd={weekStd} href={ctaHref} onGo={goCheckout("offer")} />
             </section>
 
-            {/* ── R3 · the habit-strength curve — the mechanism, drawn ────── */}
+            {/* ── R3 · the habit-strength curve - the mechanism, drawn ────── */}
             <HabitCurve trainingCount={plan.trainingCount} />
 
             {/* ── R4 · when do you start ──────────────────────────────────── */}
@@ -885,14 +885,14 @@ export default function PlanWizard({
             </section>
 
             {/* ── B3 · the mechanism's opening mirror. The two rules moved
-                under the curve — they are what it draws; restating them here
+                under the curve - they are what it draws; restating them here
                 made the same argument twice. ─────────────────────────────── */}
             <section className="u2-blk" ref={mechRef}>
               <p className="u2-eyebrow">{C.REVEAL.b3.eyebrow}</p>
               <p className="u2-body">{C.REVEAL.b3.body}</p>
             </section>
 
-            {/* ── B8 · Alexa — moved ABOVE the offer (R8): the story earns
+            {/* ── B8 · Alexa - moved ABOVE the offer (R8): the story earns
                 the price. Cohort line is the tribe's door. ───────────────── */}
             <section className="u2-blk u2-alexa" ref={alexaRef}>
               <Image src="/alexa-av.jpg" alt="Alexa" width={96} height={96} className="u2-face u2-face-lg" />
@@ -906,7 +906,7 @@ export default function PlanWizard({
             </section>
 
             {/* ── The shelf: the Start programme's next sessions as real
-                cards (v2) — the product proving itself just before the
+                cards (v2) - the product proving itself just before the
                 offer. Locked taps land on the offer, honestly. ───────────── */}
             {media && media.cards.length > 0 && (
               <WorkoutCardsRow
@@ -915,7 +915,7 @@ export default function PlanWizard({
               />
             )}
 
-            {/* ── B5 · „Akik már csinálják" — UNLOCKED 2026-09-13: consented
+            {/* ── B5 · „Akik már csinálják" - UNLOCKED 2026-09-13: consented
                 member photos exist now (owner-supplied). Same finish-card
                 marquee as the landing and the post-workout screen, adapted to
                 the reveal's white ground; the honesty line ships with it, or
@@ -954,7 +954,7 @@ export default function PlanWizard({
                 {C.REVEAL.entry.items.map((it) => (
                   <li key={it.b}>
                     <span className="k">{it.k}</span>
-                    <span><b>{it.b}</b> — {it.d}</span>
+                    <span><b>{it.b}</b> - {it.d}</span>
                   </li>
                 ))}
               </ul>
@@ -1010,7 +1010,7 @@ export default function PlanWizard({
           </aside>
         </div>
 
-        {/* ── B7 · the guarantee band — the page's one ground change ──────── */}
+        {/* ── B7 · the guarantee band - the page's one ground change ──────── */}
         {GUARANTEE_LIVE && (
           <section className="u2-band u2-dark" id="garancia">
             <div className="u2-col">
@@ -1034,7 +1034,7 @@ export default function PlanWizard({
           </div>
         </section>
 
-        {/* ── B10 · FAQ — billing questions first (R10): the money
+        {/* ── B10 · FAQ - billing questions first (R10): the money
             objections live within one scroll of the offer. ───────────────── */}
         <section className="u2-band u2-tight" ref={faqRef}>
           <div className="u2-col">

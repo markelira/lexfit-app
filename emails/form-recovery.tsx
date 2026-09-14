@@ -15,9 +15,9 @@ import { EmailLayout } from "./components/EmailLayout";
 import { Cta, Sign } from "./components/Bits";
 import { styles } from "./tokens";
 
-export const subject = "A heti terved — egy lépés van hátra";
+export const subject = "A heti terved - egy lépés van hátra";
 
-const preview = "7 rövid kérdés, és kész a terved — pihenőnapokkal.";
+const preview = "7 rövid kérdés, és kész a terved - pihenőnapokkal.";
 
 export default function FormRecovery({ ctaHref }: { ctaHref: string }) {
   return (
@@ -28,14 +28,14 @@ export default function FormRecovery({ ctaHref }: { ctaHref: string }) {
       <Text style={styles.body}>Szia,</Text>
       <Text style={styles.body}>
         a Facebookon kérted a heti edzéstervedet. Ahhoz, hogy tényleg a tiéd
-        legyen, 7 rövid kérdésre kell válaszolnod — abból áll össze a terv,
+        legyen, 7 rövid kérdésre kell válaszolnod - abból áll össze a terv,
         pihenőnapokkal, a te szintedhez igazítva. Két percnél nem tart tovább.
       </Text>
 
       <Cta href={ctaHref}>Kérem a tervem</Cta>
 
       <Text style={styles.body}>
-        Ha mégsem aktuális, ne foglalkozz vele — több levelet nem küldünk
+        Ha mégsem aktuális, ne foglalkozz vele - több levelet nem küldünk
         ebben az ügyben.
       </Text>
 

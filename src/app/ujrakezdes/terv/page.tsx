@@ -6,9 +6,9 @@ import PlanWizard from "./PlanWizard";
 // anonymous, paid traffic only, and outside the funnel's four routes.
 
 export const metadata: Metadata = {
-  title: "A heti terved — 7 kérdés | LEXFIT",
+  title: "A heti terved - 7 kérdés | LEXFIT",
   description:
-    "Hét kérdés, nagyjából egy perc, és kész a heti edzésterved — pihenőnapokkal, otthonra, eszköz nélkül.",
+    "Hét kérdés, nagyjából egy perc, és kész a heti edzésterved - pihenőnapokkal, otthonra, eszköz nélkül.",
   robots: { index: false, follow: true },
 };
 

@@ -13,7 +13,7 @@ import QuizWizard from "./QuizWizard";
 export const metadata: Metadata = {
   title: "Készítsd el a személyes edzésterved | LEXFIT",
   description:
-    "Válaszolj pár kérdésre, és megkapod a napi kalória-célod, a rád szabott LexFit programot és a napi lépéscélod — ingyen, kb. 1 perc alatt.",
+    "Válaszolj pár kérdésre, és megkapod a napi kalória-célod, a rád szabott LexFit programot és a napi lépéscélod - ingyen, kb. 1 perc alatt.",
   // Paid traffic only: this page should not compete with the landing page in
   // search, and a half-funnel entry point is a poor organic result.
   robots: { index: false, follow: true },

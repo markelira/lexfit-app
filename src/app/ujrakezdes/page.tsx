@@ -11,7 +11,7 @@ import { lpVariantFor } from "./copy";
 export const metadata: Metadata = {
   title: "7 kérdés, és kész a heti edzésterved | LEXFIT",
   description:
-    "7 kérdés, és kész a heti edzésterved. Otthonra, eszköz nélkül, pihenőnapokkal — Alexával. Azoknak, akik már többször újrakezdték.",
+    "7 kérdés, és kész a heti edzésterved. Otthonra, eszköz nélkül, pihenőnapokkal - Alexával. Azoknak, akik már többször újrakezdték.",
   // Paid traffic only. A half-funnel entry point is a poor organic result and
   // must not compete with the landing page in search - same call as /terv.
   robots: { index: false, follow: true },

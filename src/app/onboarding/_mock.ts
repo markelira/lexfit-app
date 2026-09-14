@@ -54,7 +54,7 @@ export const MOCK = {
   focus: {
     heading: "Hol szeretnél erősödni?",
     sub: "Egyet válassz - erre teszek majd külön hangsúlyt. Később módosítható.",
-    helper: "Minden gyakorlatnak van könnyített változata — az is teljes értékű.",
+    helper: "Minden gyakorlatnak van könnyített változata - az is teljes értékű.",
     options: [
       { v: "fenek", icon: lxPaths.flame, label: "Fenék, comb", sub: "Stabil, erős alsótest." },
       { v: "core", icon: lxPaths.gauge, label: "Has, törzs", sub: "Erős törzs, biztos tartás." },
@@ -90,7 +90,7 @@ export const MOCK = {
     ],
     recommended: 3,
     /** The non-numeric fourth option (§2.2 P25). */
-    flexLabel: "Ahogy jön — legyen rugalmas",
+    flexLabel: "Ahogy jön - legyen rugalmas",
     flexNote: "Három napot tervezek be, de nem kötöm napokhoz. Bármikor átállíthatod.",
     weekHeading: "Így néz majd ki a heted",
     weekdaysLabel: "Mely napokon?",
@@ -131,7 +131,7 @@ export const MOCK = {
   obstacle: {
     heading: "Mi állított meg eddig?",
     sub: "Hogy tudjam, mire figyeljek - és mikor bátorítsalak. Nincs rossz válasz.",
-    helper: "Minden gyakorlatnak van könnyített változata — az is teljes értékű.",
+    helper: "Minden gyakorlatnak van könnyített változata - az is teljes értékű.",
     options: [
       { v: "ido", icon: lxPaths.clock, label: "Nem volt rá időm", sub: "Sose jött ki a naptárból." },
       { v: "motiv", icon: lxPaths.rotateCcw, label: "Elfogyott a lendület", sub: "Elkezdtem, de abbamaradt." },

@@ -67,7 +67,7 @@ export function curveModel(trainingCount: number): CurveModel {
     return base - valley + lift;
   };
 
-  const STEPS = weeks * 4; // quarter-week resolution — smooth at any size
+  const STEPS = weeks * 4; // quarter-week resolution - smooth at any size
   const points = Array.from({ length: STEPS + 1 }, (_, i) => {
     const t = (i / STEPS) * weeks;
     return { x: t / weeks, y: Math.max(0, Math.min(1, y(t))) };

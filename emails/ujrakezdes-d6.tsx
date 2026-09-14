@@ -34,8 +34,8 @@ export const subject = GUARANTEE_LIVE
   : "30 edzés, a te tempódban";
 
 const preview = GUARANTEE_LIVE
-  ? "A 10 edzés garancia — öt héten belül."
-  : "Egy tagság, minden benne — és bármikor lemondható.";
+  ? "A 10 edzés garancia - öt héten belül."
+  : "Egy tagság, minden benne - és bármikor lemondható.";
 
 export default function UjrakezdesD6({
   unsubHref,
@@ -65,7 +65,7 @@ export default function UjrakezdesD6({
       <Text style={styles.body}>Szia,</Text>
       <Text style={styles.body}>
         a heti terv egy hét. Ha rendszert szeretnél belőle, arra való a
-        tagság — és az ajánlat belefér három mondatba:
+        tagság - és az ajánlat belefér három mondatba:
       </Text>
 
       {/* The offer in one breath (audit P4): price, scope, guarantee - then
@@ -78,7 +78,7 @@ export default function UjrakezdesD6({
           <PanelText>
             A garancia pontosan így szól:{" "}
             <strong>
-              csináld végig az első 10 edzést öt héten belül — a könnyített
+              csináld végig az első 10 edzést öt héten belül - a könnyített
               változat is számít. Ha utána úgy érzed, ez nem a tiéd, egy
               e-mail elég, és visszautaljuk az addig befizetett tagsági díjad.
             </strong>{" "}

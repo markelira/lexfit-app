@@ -39,14 +39,14 @@ export default function UjrakezdesD3({
       <Text style={styles.body}>Szia,</Text>
       <Text style={styles.body}>
         a legtöbb újrakezdés nem az első napokban esik szét, hanem amikor jön
-        egy rossz hét. Túlóra, betegség, vendégek — és a sorozat nulláról indul.
+        egy rossz hét. Túlóra, betegség, vendégek - és a sorozat nulláról indul.
         Onnan pedig ritkán indul újra.
       </Text>
 
       <Panel>
         <PanelText>
           Ezért van a LEXFIT-ben két szabály. A pihenőnap nem töri meg a
-          sorozatot. A kihagyott hét pedig nem nulláz — ott folytatod, ahol
+          sorozatot. A kihagyott hét pedig nem nulláz - ott folytatod, ahol
           abbahagytad.
         </PanelText>
       </Panel>
@@ -67,7 +67,7 @@ export default function UjrakezdesD3({
       {ps && <Text style={styles.small}>{ps}</Text>}
       {watchHref && (
         <Text style={styles.small}>
-          Ui. Az első edzésedet <strong>ingyen megnézheted</strong> — 20–30
+          Ui. Az első edzésedet <strong>ingyen megnézheted</strong> - 20–30
           perc, akár ma este:{" "}
           <Link href={watchHref} style={{ color: color.accentInk }}>
             Megnézem az első edzést

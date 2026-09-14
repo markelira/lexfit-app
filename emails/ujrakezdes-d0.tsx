@@ -44,14 +44,14 @@ export default function UjrakezdesD0({
 
       <Text style={styles.body}>
         Három dolog van benne: a heti beosztásod pihenőnapokkal, az első edzés
-        (20–30 perc, eszköz nélkül — elég egy matrac és 2×2 méter), és a
+        (20–30 perc, eszköz nélkül - elég egy matrac és 2×2 méter), és a
         folytatás.
       </Text>
 
       {workouts.length > 0 && (
         <>
           <Text style={styles.body}>
-            <strong>Ez vár rád a tagságban.</strong> A LEXFIT Start első edzései —
+            <strong>Ez vár rád a tagságban.</strong> A LEXFIT Start első edzései -
             ugyanezek a kártyák, mint az appban:
           </Text>
           <WorkoutCardList
@@ -66,10 +66,10 @@ export default function UjrakezdesD0({
       {watchHref && (
         <>
           <Text style={styles.body}>
-            <strong>Az első edzésed ingyen megnézheted</strong> — ugyanabban a
+            <strong>Az első edzésed ingyen megnézheted</strong> - ugyanabban a
             lejátszóban, mint a tagságban. Fiók és fizetés nélkül.
           </Text>
-          <Cta href={watchHref}>Megnézem az első edzést — ingyen</Cta>
+          <Cta href={watchHref}>Megnézem az első edzést - ingyen</Cta>
         </>
       )}
 
@@ -83,7 +83,7 @@ export default function UjrakezdesD0({
       {consented && (
         <Text style={styles.body}>
           A következő napokban három rövid levelet küldök arról, hogyan
-          szokott szétesni az első hét — és mit lehet ellene tenni.
+          szokott szétesni az első hét - és mit lehet ellene tenni.
         </Text>
       )}
 
