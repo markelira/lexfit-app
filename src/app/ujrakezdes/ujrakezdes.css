@@ -3033,3 +3033,14 @@
   .lxu .u2-gets li span { font-size: 12.5px; }
   .lxu .u2-guarbox { padding: var(--sp-3); }
 }
+
+/* The guarantee at the decision point is ONE framed line (mobile audit
+   2026-09-14): the full text has its own band (B7), and spelling it out here
+   made it the page's third telling. */
+.lxu .u2-guarbox-1 {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2, var(--ink-3));
+}
+.lxu .u2-guarbox-1 b { font-weight: 680; color: var(--ink); }

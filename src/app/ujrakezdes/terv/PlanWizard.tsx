@@ -827,7 +827,10 @@ export default function PlanWizard({
                 <div><dt><Count to={plan.trainingCount} /></dt><dd>{C.REVEAL.b1.stats.days}</dd></div>
                 <div><dt><Count to={plan.firstWorkoutMinutes} /></dt><dd>{C.REVEAL.b1.stats.mins}</dd></div>
                 {/* "0 eszköz" read as an empty state; "0 Ft eszköz" is a benefit. */}
-                <div><dt>0 Ft</dt><dd>{C.REVEAL.b1.stats.equip}</dd></div>
+                {/* „0" and not „0 Ft": this stat sits ~60px above the price,
+                    and a forint here invites the comparison the offer has to
+                    survive. The claim is about equipment, not cost. */}
+                <div><dt>0</dt><dd>{C.REVEAL.b1.stats.equip}</dd></div>
               </dl>
 
               {C.ENERGY_LIVE && energy && (
@@ -837,6 +840,14 @@ export default function PlanWizard({
               )}
             </section>
 
+            {/* ── R4 · when do you start. MOVED ABOVE THE OFFER (mobile audit
+                2026-09-14): picking „ma este" is an implementation intention -
+                a micro-commitment to a time - and commitment/consistency only
+                works on what comes AFTER it. Sitting a screen below the price
+                it was a nice touch; sitting above it, it is the first yes.
+                It writes nothing upstream, so the move costs nothing. ─────── */}
+            <StartDayPick pick={startPick} onPick={pickStart} mins={plan.firstWorkoutMinutes} />
+
             {/* ── B2 · the offer at the fold (mobile; desktop = the rail) ──── */}
             <section className="u2-offer u2-mobile u2-m1" style={{ ["--i" as string]: 15 }} ref={b2Ref}>
               <RevealOffer intro={intro} weekStd={weekStd} href={ctaHref} onGo={goCheckout("offer")} />
@@ -844,9 +855,6 @@ export default function PlanWizard({
 
             {/* ── R3 · the habit-strength curve - the mechanism, drawn ────── */}
             <HabitCurve trainingCount={plan.trainingCount} />
-
-            {/* ── R4 · when do you start ──────────────────────────────────── */}
-            <StartDayPick pick={startPick} onPick={pickStart} mins={plan.firstWorkoutMinutes} />
 
             {/* ── The first workout, watchable free (v2). The card is the
                 real video; playing opens the REAL /player page in guest mode
@@ -1488,11 +1496,10 @@ function RevealOffer({ intro, weekStd, href, onGo }: {
 }) {
   return (
     <>
-      <p className="u2-offername">{C.REVEAL.offer.name}</p>
-
-      {/* The deliverable. The first line deliberately sells the SAME plan she
-          already has for free, guided - not a bigger library she has no
-          appetite for yet. */}
+      {/* The cohort's name is NOT repeated here: the plan card carries it
+          („A terved · Szeptemberi Újrakezdés") ~600px above, and the same
+          label twice on one screen dilutes rather than reinforces. The
+          deliverable title is the block's own opening line. */}
       <p className="u2-getstitle">{C.REVEAL.offer.getsTitle}</p>
       <ul className="u2-gets">
         {C.REVEAL.offer.gets.map((g) => (
@@ -1510,13 +1517,14 @@ function RevealOffer({ intro, weekStd, href, onGo }: {
       <a className="u2-cta" href={href} onClick={onGo}>
         {C.REVEAL.offer.cta(intro)}
       </a>
-      {/* The risk reversal, given its own weight: this is the sentence that
-          makes a 490 Ft decision reversible, and it was set as small print. */}
+      {/* The risk reversal at the button: one line, framed. The FULL guarantee
+          text has its own band further down (B7), so spelling it out here made
+          it the page's third telling - the decision point needs the promise,
+          not the paragraph. */}
       {GUARANTEE_LIVE && (
-        <div className="u2-guarbox">
-          <b>{GARANCIA.heading}</b>
-          <span>{GARANCIA.bodyLead}<b>{GARANCIA.bodyStrong}</b>{GARANCIA.bodyTail}</span>
-        </div>
+        <p className="u2-guarbox u2-guarbox-1">
+          <b>{GARANCIA.shortLead}</b>{GARANCIA.shortBody}
+        </p>
       )}
       <RenewLine intro={intro} weekStd={weekStd} />
       <p className="u2-calm">{C.REVEAL.offer.calm}</p>

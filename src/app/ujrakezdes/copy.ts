@@ -724,14 +724,25 @@ export const REVEAL = {
       `Teljes hozzáférés az első naptól - nem próbaverzió. Utána ${weekStd} / hét, vagy válts havira és évesre.`,
     listTitle: "Egy tagság, minden benne",
     items: [
-      { k: "30", b: "Teljes edzés program", d: "30 vezetett edzés, max 30 perc, eszköz nélkül. A te tempódban, heti 2, 3 vagy 4 nap." },
+      // 35, not 30: programs/foundation ships totalSessions=35 and its
+      // `sessions` subcollection holds 35 playable videos (audit 2026-09-14).
+      // The list has to add up to the 130 the offer block claims, and a
+      // deliberate under-count reads as an error the moment someone totals it.
+      // NOTE: the landing FAQ and offer-copy still say „30 edzés" - safe as an
+      // under-promise, worth aligning once.
+      { k: "35", b: "Teljes edzés program", d: "35 vezetett edzés, max 30 perc, eszköz nélkül. A te tempódban, heti 2, 3 vagy 4 nap." },
       { k: "07", b: "7 napos kezdő program", d: "napi 8-10 perc, csendes, ízületkímélő. Hogy hétből hetet teljesíts." },
       { k: "03", b: "Reggeli rutinok", d: "három napindító, 5-8 perc, pizsamában is." },
       { k: "03", b: "Esti rutinok", d: "három rutin, 6-8 perc, lassú tartások, átvezetnek az alvásba." },
       { k: "05", b: "Has & Mély Törzs", d: "öt nap, 10-15 perc. Stabil törzs és jobb tartás, nem kockás has." },
       { k: "05", b: "Láb & Fenék", d: "öt nap, 10-15 perc. Guggolás, csípőemelés, kitörés, lassan." },
       { k: "04", b: "Tartásjavító", d: "négy hét, heti egy új edzés. A monitor előtti görnyedés két oka ellen." },
-      { k: "16+", b: "Heti kihívás archívum", d: "minden héten 5 új videó." },
+      // 68 playable challenge days across 16 published challenges
+      // (challengeVideos pool, audit 2026-09-14). The old line promised „minden
+      // héten 5 új videó" - a cadence that stopped on Aug 17, and a number
+      // (5/week) the archive never matched. The shelf is real; the rhythm
+      // promise comes back when a new challenge ships.
+      { k: "68", b: "Heti kihívás archívum", d: "16 hét kihívás, napi 10-15 perc." },
       { k: "✓", b: "Mérföldkövek és visszamérés", d: "1 · 5 · 10 · 15 · 30 · szünet 1-3 hónapra" },
     ],
     /** R5 · the stack lands on one number. */
