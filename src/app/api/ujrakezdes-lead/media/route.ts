@@ -104,20 +104,29 @@ export async function GET(req: Request) {
   // "this is what you get". One real poster per programme, taken from its
   // first session, at 192px: the programmes have no cover field of their own,
   // but every video has a Mux playback id, so the library can show itself.
-  const progPosters: unknown[] = [];
-  for (const p of catalog.programs) {
-    const firstOfProg = catalog.workouts.find((w) => w.program === p.slug);
-    if (!firstOfProg) continue;
-    const d = await adminDb.collection("videos").doc(firstOfProg.code).get();
-    const v = d.data();
-    if (!v?.muxPlaybackId) continue;
-    if (v.status !== undefined && v.status !== "published") continue;
-    const t = await signThumbToken(v.muxPlaybackId as string, 192);
-    progPosters.push({
-      slug: p.slug,
-      poster: `https://image.mux.com/${v.muxPlaybackId}/thumbnail.webp?token=${t}`,
-    });
-  }
+  // NOT via catalog.workouts: that array is `entryVideos.map(toWorkout)`, i.e.
+  // the entry programme ONLY, so matching against it returned one poster and
+  // silently dropped the other six. Each programme's own `sessions`
+  // subcollection is the honest source.
+  const progPosters = (
+    await Promise.all(
+      catalog.programs.map(async (p) => {
+        const sess = await adminDb
+          .collection("programs").doc(p.slug).collection("sessions")
+          .orderBy("order").limit(1).get();
+        const code = sess.docs[0]?.data()?.videoCode as string | undefined;
+        if (!code) return null;
+        const v = (await adminDb.collection("videos").doc(code).get()).data();
+        if (!v?.muxPlaybackId) return null;
+        if (v.status !== undefined && v.status !== "published") return null;
+        const t = await signThumbToken(v.muxPlaybackId as string, 192);
+        return {
+          slug: p.slug,
+          poster: `https://image.mux.com/${v.muxPlaybackId}/thumbnail.webp?token=${t}`,
+        };
+      }),
+    )
+  ).filter(Boolean);
 
   // Tokens live 6h; let the CDN hold the response briefly so a reveal that
   // re-fetches (refresh, back-forward) doesn't re-sign every time.
