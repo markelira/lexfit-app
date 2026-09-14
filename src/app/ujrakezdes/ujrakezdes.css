@@ -3073,52 +3073,43 @@
 .lxu .u2-gets li b { grid-column: 2; }
 .lxu .u2-gets-d { grid-column: 2; }
 
-/* THE LIBRARY GRID. 130 cells, eight groups: the quantity becomes visible and
-   the structure comes free. The single filled cell is the free first workout -
-   the visitor is already inside the picture. */
+/* THE LIBRARY GRID. 130 cells in one continuous flow: the quantity becomes
+   visible, and that mass is the whole point. Structure rides along in two
+   tones (programmes vs the challenge archive) plus a hairline gap at each
+   programme seam - eight boxed groups looked orderly in the abstract and tore
+   into ragged columns at 376px. The single filled cell is the free first
+   workout, so the visitor is inside the picture rather than outside it. */
 .lxu .u2-lib {
   margin: var(--sp-4) 0 var(--sp-3);
-  padding: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
   border: 1px solid var(--line, rgba(0, 0, 0, .07));
   border-radius: 14px;
   background: color-mix(in oklab, var(--accent-soft, #e8f0ec) 22%, transparent);
 }
-.lxu .u2-lib-groups {
+.lxu .u2-lib-flow {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-3) var(--sp-4);
-  align-items: flex-start;
-}
-.lxu .u2-lib-g { display: grid; gap: 5px; }
-.lxu .u2-lib-cells {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 7px);
   gap: 3px;
-  max-width: 88px;
 }
-/* The Start group is the widest because it is the entry programme - its cells
-   get the room to read as the backbone of the library. */
-.lxu .u2-lib-g.on .u2-lib-cells { max-width: 130px; }
-.lxu .u2-lib-cells i {
+.lxu .u2-lib-flow i {
   width: 7px;
   height: 7px;
   border-radius: 2px;
-  background: color-mix(in oklab, var(--accent-2) 26%, transparent);
+  background: color-mix(in oklab, var(--accent-2) 30%, transparent);
 }
-.lxu .u2-lib-cells i.first {
+/* The challenge archive, one step back - it is the bonus shelf, not the spine. */
+.lxu .u2-lib-flow i.dim { background: color-mix(in oklab, var(--accent-2) 15%, transparent); }
+/* A programme boundary: a little air, so the eye can find the seams without
+   a legend for every group. */
+.lxu .u2-lib-flow i.seam { margin-right: 7px; }
+.lxu .u2-lib-flow i.first {
   background: var(--accent-2);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent-2) 22%, transparent);
-}
-.lxu .u2-lib-lbl {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 9.5px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  box-shadow: 0 0 0 2.5px color-mix(in oklab, var(--accent-2) 20%, transparent);
 }
 .lxu .u2-lib-cap {
   margin-top: var(--sp-3);
   font-size: 12.5px;
+  line-height: 1.5;
   color: var(--ink-3);
 }
 .lxu .u2-lib-cap b { font-size: 15px; font-weight: 680; color: var(--ink); }
@@ -3146,7 +3137,7 @@
 .lxu .u2-devrow .cast { margin-left: auto; color: var(--accent-2); display: flex; }
 
 @media (max-width: 700px) {
-  .lxu .u2-lib-cells { max-width: 76px; }
-  .lxu .u2-lib-g.on .u2-lib-cells { max-width: 110px; }
+  .lxu .u2-lib-flow i { width: 6px; height: 6px; }
+  .lxu .u2-lib-flow i.seam { margin-right: 6px; }
   .lxu .u2-devrow .lab { font-size: 8.5px; }
 }

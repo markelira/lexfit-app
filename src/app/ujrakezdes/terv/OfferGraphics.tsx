@@ -17,7 +17,7 @@ import * as C from "../copy";
 // visual vocabulary instead of inventing a second one.
 
 /** One programme's share of the library, as cells. */
-interface Slice { n: number; label: string; accent?: boolean }
+interface Slice { n: number; label: string; accent?: boolean; dim?: boolean }
 
 /**
  * THE LIBRARY AT A GLANCE.
@@ -31,26 +31,30 @@ interface Slice { n: number; label: string; accent?: boolean }
  */
 export function LibraryGrid({ slices }: { slices: readonly Slice[] }) {
   const total = slices.reduce((a, s) => a + s.n, 0);
+  // ONE continuous flow of cells, not eight boxed groups. Boxed groups looked
+  // orderly in the abstract and fell apart at 376px: the flex-wrap tore them
+  // into ragged columns and the labels detached from their cells. A single
+  // flow keeps the thing the graphic exists for - the MASS of 130 - and
+  // carries the structure in two tones plus a hairline gap at each seam.
+  const cells: { idx: number; dim: boolean; seam: boolean }[] = [];
   let seen = 0;
+  for (const s of slices) {
+    for (let i = 0; i < s.n; i++) {
+      cells.push({ idx: seen + i, dim: !!s.dim, seam: i === s.n - 1 });
+    }
+    seen += s.n;
+  }
   return (
     <figure className="u2-lib" aria-hidden="true">
-      <div className="u2-lib-groups">
-        {slices.map((s) => {
-          const start = seen;
-          seen += s.n;
-          return (
-            <div key={s.label} className={`u2-lib-g${s.accent ? " on" : ""}`}>
-              <div className="u2-lib-cells">
-                {Array.from({ length: s.n }, (_, i) => (
-                  // The single filled cell is the free first workout - the
-                  // only honest way to show "you are already inside this".
-                  <i key={i} className={start + i === 0 ? "first" : ""} />
-                ))}
-              </div>
-              <span className="u2-lib-lbl">{s.label}</span>
-            </div>
-          );
-        })}
+      <div className="u2-lib-flow">
+        {cells.map((c) => (
+          <i
+            key={c.idx}
+            // The one filled cell is the free first workout: she is already
+            // inside the picture, not looking at it from outside.
+            className={`${c.idx === 0 ? "first" : ""}${c.dim ? " dim" : ""}${c.seam ? " seam" : ""}`}
+          />
+        ))}
       </div>
       <figcaption className="u2-lib-cap">
         <b>{total}</b> {C.REVEAL.offer.libTotal} · <i>{C.REVEAL.offer.libFirst}</i>

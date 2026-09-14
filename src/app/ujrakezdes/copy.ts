@@ -648,7 +648,9 @@ export const REVEAL = {
       { n: 5, label: "Has" },
       { n: 5, label: "Láb" },
       { n: 4, label: "Tartás" },
-      { n: 68, label: "Kihívás" },
+      // `dim` = the challenge archive: a second tone separates the programmes
+      // (62) from the challenges (68) without needing eight legends.
+      { n: 68, label: "Kihívás", dim: true },
     ],
     gets: [
       { icon: "play", b: "A terved végigvezetve", d: "Minden edzés videón, Alexa vezet - nem neked kell kitalálni, mi jön ma." },
