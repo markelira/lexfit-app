@@ -385,6 +385,20 @@ const ok = (label: string) => { n++; console.log(`  ✓ ${label}`); };
   assert.equal(catTotal, claimed, `a kategóriák ${catTotal}-re jönnek ki, az ajánlat ${claimed} edzést állít`);
   const durTotal = C.REVEAL.entry.durs.reduce((a, c) => a + c.n, 0);
   assert.equal(durTotal, claimed, `a hossz-sávok ${durTotal}-re jönnek ki, az ajánlat ${claimed} edzést állít`);
+
+  // The cinema's closing beat and the page must quote the SAME library. A
+  // sequence that promises 130 and a page that promises something else is
+  // worse than either number on its own - and the cinema is watched first, so
+  // its number is the one she carries into the decision.
+  const cinemaNums: string[] = C.REVEAL.cinema.lines.join(" ").match(/\d+/g) ?? [];
+  assert.ok(
+    cinemaNums.includes(String(claimed)),
+    `a mozi ajánlata nem a ${claimed} edzést idézi (talált: ${cinemaNums.join(",")})`,
+  );
+  // Value before price is the whole point of the rebuild; an empty list would
+  // silently restore the price-tag-only screen that produced 0 clicks.
+  assert.ok(C.REVEAL.cinema.lines.length >= 3, "a mozi ajánlatából eltűnt az érték-lista");
+  assert.ok(C.REVEAL.cinema.trust.length >= 3, "a mozi ajánlatából eltűnt a bizalmi sor");
   // The post-workout block may greet the RETURN, never claim a completion -
   // the guest player reports none, so „megcsináltad" would be a guess.
   const finishText = `${C.REVEAL.finish.eyebrow} ${C.REVEAL.finish.hd} ${C.REVEAL.finish.body}`.toLowerCase();

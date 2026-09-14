@@ -526,6 +526,44 @@ export const REVEAL = {
       `Ha a kalkulátort is kitöltötted: ${kcal} kcal napi cél · ${steps} lépés - becslés a megadott adataid alapján.`,
   },
 
+  /** The cinema's closing beat - the OFFER.
+   *
+   *  Built from what today's data actually says, not from instinct:
+   *
+   *  · 42 people reached the reveal's offer on Sep 14 and 0 clicked, back when
+   *    that block was price + reassurance with no deliverable. The identical
+   *    mistake was about to ship here: beat 5 opened as a price tag. So the
+   *    value comes first, in three lines - each one a callback to a beat they
+   *    have just watched, not a fresh claim to evaluate.
+   *  · The dated renewal line is the single highest-value sentence on the
+   *    screen. The lead-conversion diagnosis was blunt about it: the fear was
+   *    never the 490, it is the invisible 1 990. Naming the date and the amount
+   *    before the button is the anti-bait move.
+   *  · The annual per-day figure sits beside the weekly one (mental
+   *    accounting), never instead of it - pinning 109 Ft/nap to the weekly
+   *    plan would be the kind of misdirection the GVH fines.
+   *  · Trust row last: Stripe, invoice, statutory withdrawal, and the 1 200+
+   *    who are already here. For a 35-54 audience paying by card on a phone,
+   *    "is this safe" is the final unasked question.
+   *
+   *  Numbers mirror REVEAL.offer exactly - the selftest enforces it, because a
+   *  cinema that promises 130 and a page that promises something else is worse
+   *  than either number alone. */
+  cinema: {
+    eyebrow: "Szeptemberi Újrakezdés",
+    hd: "Kezdjük el ma.",
+    /** Callbacks, in the order the beats ran: the week, the library, the
+     *  proof it keeps going. Short enough to read in one pass. */
+    lines: [
+      "A heted végigvezetve - minden edzés videón, Alexával",
+      "130 edzés · 7 program · 16 hét kihívás",
+      "Visszamérés a 15. és 30. edzésnél",
+    ],
+    priceTail: "az első heted",
+    trust: ["1 200+ tag", "Stripe-fizetés", "e-számla", "14 napos elállás"],
+    more: "Előbb megnézem a részleteket",
+  },
+
   /** „Az első hónapod" - the plan extended from one week to four.
    *
    *  The free plan is ONE week, and one week is something she can do without

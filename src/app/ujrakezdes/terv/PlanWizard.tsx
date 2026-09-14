@@ -237,6 +237,10 @@ export default function PlanWizard({
    *  plan is, and a four-beat intro on every visit turns from a reveal into a
    *  toll booth. `initial` marks the persisted-plan route (token URL). */
   const [cinema, setCinema] = useState(false);
+  /** Today's clock for the cinema's dated renewal line. Post-mount: a
+   *  render-time date on a prerendered route freezes at build. */
+  const [cinemaToday, setCinemaToday] = useState<number | null>(null);
+  useEffect(() => setCinemaToday(Date.now()), []);
   /** True when the player sent her back here after the free workout (`?w=1`).
    *  Resolved post-mount - the route is prerendered - and the URL is cleaned
    *  afterwards so a refresh or a shared link does not replay the greeting. */
@@ -802,6 +806,13 @@ export default function PlanWizard({
             href: ctaHref,
             onGo: goCheckout("cinema"),
             guarantee: GUARANTEE_LIVE ? GARANCIA.shortLead + GARANCIA.shortBody : undefined,
+            // The dated second charge - the diagnosis' "the fear is never the
+            // 490, it is the invisible 1 990". Date resolved on the client
+            // because this route is prerendered.
+            timeline: cinemaToday
+              ? C.REVEAL.offer.timeline(intro, weekStd, nextChargeLabel("week_intro", cinemaToday))
+              : undefined,
+            perDay: formatHuf(perDayHuf()),
           }}
           onDone={() => { setCinema(false); trackUjrakezdesCinemaDone(); }}
         />

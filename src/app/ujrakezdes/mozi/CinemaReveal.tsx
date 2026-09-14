@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { FinishExamples } from "@/components/finish/FinishExamples";
+import * as C from "../copy";
 import "./mozi.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,6 +72,12 @@ export interface CinemaOffer {
   href: string;
   onGo: (e: React.MouseEvent) => void;
   guarantee?: string;
+  /** "Ma: 490 Ft → szeptember 21-től 1 990 Ft / hét." Resolved by the caller,
+   *  because the date needs today's clock and this route is prerendered. */
+  timeline?: string;
+  /** The annual plan's per-day figure, shown NEXT TO the weekly price and
+   *  never instead of it. */
+  perDay?: string;
 }
 
 export function CinemaReveal({ plan, offer, onDone, start = 0 }: {
@@ -202,7 +209,7 @@ export function CinemaReveal({ plan, offer, onDone, start = 0 }: {
       <footer className="mz-foot">
         {onOffer ? (
           <button type="button" className="mz-more" onClick={(e) => { e.stopPropagation(); onDone(); }}>
-            Előbb megnézem a részleteket
+            {C.REVEAL.cinema.more}
           </button>
         ) : (
           <span className="mz-hint" aria-hidden="true">
@@ -349,20 +356,34 @@ function BeatProof() {
 function BeatOffer({ offer }: { offer: CinemaOffer }) {
   return (
     <section className="mz-beat">
-      <p className="mz-eyebrow mz-in" style={{ ["--d" as string]: "0ms" }}>Szeptemberi Újrakezdés</p>
-      <h1 className="mz-h mz-in" style={{ ["--d" as string]: "90ms" }}>Kezdjük ma este.</h1>
+      <p className="mz-eyebrow mz-in" style={{ ["--d" as string]: "0ms" }}>{C.REVEAL.cinema.eyebrow}</p>
+      <h1 className="mz-h mz-h-sm mz-in" style={{ ["--d" as string]: "80ms" }}>{C.REVEAL.cinema.hd}</h1>
 
-      <div className="mz-price mz-rise" style={{ ["--d" as string]: "240ms" }}>
+      {/* Value BEFORE price. Each line is a callback to a beat just watched,
+          so none of it is a new claim to evaluate - it is a receipt. */}
+      <ul className="mz-got">
+        {C.REVEAL.cinema.lines.map((l, n) => (
+          <li key={l} className="mz-in" style={{ ["--d" as string]: `${200 + n * 90}ms` }}>
+            <LxIcon d={lxPaths.check} size={14} sw={2.6} />
+            <span>{l}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mz-price mz-rise" style={{ ["--d" as string]: "520ms" }}>
         <b>{offer.intro}</b>
-        <span>az első heted</span>
+        <span>{C.REVEAL.cinema.priceTail}</span>
       </div>
-      <p className="mz-after mz-in" style={{ ["--d" as string]: "380ms" }}>
-        utána {offer.weekStd} / hét · bármikor lemondható
+      {/* The sentence that decides it: the date and the amount of the SECOND
+          charge, before the button rather than after it. */}
+      <p className="mz-after mz-in" style={{ ["--d" as string]: "620ms" }}>
+        {offer.timeline ?? `utána ${offer.weekStd} / hét · bármikor lemondható`}
+        {offer.perDay && <> · évesre váltva {offer.perDay} / nap</>}
       </p>
 
       <a
         className="mz-cta mz-rise"
-        style={{ ["--d" as string]: "480ms" }}
+        style={{ ["--d" as string]: "700ms" }}
         href={offer.href}
         onClick={offer.onGo}
       >
@@ -370,11 +391,15 @@ function BeatOffer({ offer }: { offer: CinemaOffer }) {
       </a>
 
       {offer.guarantee && (
-        <p className="mz-guar mz-in" style={{ ["--d" as string]: "620ms" }}>
+        <p className="mz-guar mz-in" style={{ ["--d" as string]: "800ms" }}>
           <LxIcon d={lxPaths.shield} size={14} sw={1.8} />
           {offer.guarantee}
         </p>
       )}
+
+      <ul className="mz-trust mz-in" style={{ ["--d" as string]: "880ms" }}>
+        {C.REVEAL.cinema.trust.map((t) => <li key={t}>{t}</li>)}
+      </ul>
     </section>
   );
 }

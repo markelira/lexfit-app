@@ -102,6 +102,8 @@ export default function MoziPage() {
         href: "#",
         onGo: (e) => e.preventDefault(),
         guarantee: "10 edzés garancia - ha az első 10 edzés után (max 5 hét) úgy érzed, nem a tiéd, visszakapod, amit befizettél.",
+        timeline: "Ma: 490 Ft → szeptember 21-től 1 990 Ft / hét. Bármikor lemondható.",
+        perDay: "109 Ft",
       }}
       onDone={() => setDone(true)}
     />
