@@ -86,11 +86,12 @@ export function onboardingDraftFromQuiz(a: Answers): DraftAnswers {
 
 /** Write the handoff draft. Called from the reveal's CTAs, synchronously,
  *  before navigation - localStorage writes complete before the page unloads. */
-export function writeQuizHandoff(a: Answers): void {
+export function writeQuizHandoff(a: Answers, email?: string): void {
   writeDraft({
     v: 1,
     idx: PLAN_STEP_IDX,
     answers: onboardingDraftFromQuiz(a),
     startedAt: Date.now(),
+    ...(email ? { email } : {}),
   });
 }

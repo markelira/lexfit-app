@@ -32,6 +32,17 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
   const [busy, setBusy] = useState(false);
   const [attachError, setAttachError] = useState(false);
 
+  // Prefill the address she typed at the quiz gate. Post-mount, not a lazy
+  // initial state: /register is prerendered, and a render-time read would
+  // hydrate-mismatch. Asking again on the last screen before payment is where
+  // this funnel stopped converting (325 leads, 0 registrations, Sep 14-17) -
+  // she gave it minutes ago and the CTA even carried her token.
+  const [prefilled, setPrefilled] = useState(false);
+  useEffect(() => {
+    const d = readDraft();
+    if (d?.email) { setEmail(d.email); setPrefilled(true); }
+  }, []);
+
   const isReg = mode === "register";
   const pendingRef = useRef<{ firstName: string; marketing: boolean } | null>(null);
 
@@ -200,7 +211,13 @@ export function RegisterForm({ onAuthed }: { onAuthed: () => void }) {
         )}
 
         <div className={`field${errs.email ? " bad" : ""}`}>
-          <label htmlFor="rf-email">E-mail cím</label>
+          <label htmlFor="rf-email">
+            E-mail cím
+            {/* Say it out loud when it is already filled: a pre-filled field
+                without explanation reads as a bug or a leak, the same line
+                said plainly reads as "we remembered". */}
+            {prefilled && isReg && <span className="rf-known"> · a kvízből</span>}
+          </label>
           <div className="inp">
             <input
               id="rf-email"

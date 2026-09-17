@@ -767,7 +767,14 @@ export default function PlanWizard({
      *  localStorage the next page cannot live without (?lt= carries the
      *  answers). */
     const goCheckout = (where: "offer" | "sticky" | "finish" | "cinema" | "hero") => (e: React.MouseEvent) => {
-      if (isComplete(a)) writeQuizHandoff(a);
+      // Her address goes with the answers: she typed it at the gate minutes
+      // ago, and re-asking for it on the last screen before payment is where
+      // this funnel has been losing everyone (325 leads, 0 registrations,
+      // Sep 14-17).
+      // (On the token route - an e-mail return visit - `email` is empty, so
+      // that path still asks. Fixing it needs the address server-side; the
+      // fresh-quiz path is where the traffic is.)
+      if (isComplete(a)) writeQuizHandoff(a, email || undefined);
       if (where === "sticky") trackUjrakezdesStickyClick();
       else if (where === "finish") trackUjrakezdesFinishCta();
       else if (where === "cinema") trackUjrakezdesCinemaCta();

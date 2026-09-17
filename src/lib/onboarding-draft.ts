@@ -23,6 +23,17 @@ export interface Draft {
   idx: number; // current step index, so a reload resumes in place
   answers: DraftAnswers;
   startedAt: number; // ms epoch, stamped by the caller
+  /** The e-mail she already typed at the quiz gate.
+   *
+   *  Carried so the account step can prefill it instead of asking again. She
+   *  gave this address ten minutes earlier, the reveal's CTA even carries her
+   *  lead token in the URL - re-asking at the last screen before payment reads
+   *  as "start over", and on 2026-09-14..17 not a single person got past that
+   *  screen (325 leads, 0 registrations).
+   *
+   *  It is HER OWN address, kept in her own browser, and only to save her
+   *  typing it twice - nothing is sent anywhere it was not already sent. */
+  email?: string;
 }
 
 function isDraft(d: unknown): d is Draft {

@@ -216,3 +216,12 @@
 }
 .authx .attach-retry p { max-width: 340px; font-size: 15px; color: var(--ink-2); line-height: 1.5; }
 .authx .attach-retry .submit { max-width: 240px; }
+
+/* „· a kvízből" next to a prefilled e-mail label. A field that fills itself
+   without explanation reads as a bug or a leak; the same fact said plainly
+   reads as "we remembered", which is the point of prefilling it at all. */
+.authx .field label .rf-known,
+.lx .field label .rf-known {
+  font-weight: 400;
+  opacity: .62;
+}

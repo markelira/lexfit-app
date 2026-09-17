@@ -132,7 +132,14 @@ function initialAnswers(): FunnelAnswers {
 
 function stepFromUrl(): StepId {
   if (typeof window === "undefined") return "welcome";
-  const q = new URLSearchParams(window.location.search).get("q");
+  const search = window.location.search;
+  const q = new URLSearchParams(search).get("q");
+  // A reveal CTA arrives as ?q=plan&plan=week_intro - the offer screen already
+  // named the price and she tapped it. Showing the picker again asks her to
+  // decide something she just decided, one screen after the decision. Skip to
+  // the account step; the plan is still displayed AND changeable at the pay
+  // step, which is where it legally has to be shown anyway.
+  if (q === "plan" && planFromSearch(search)) return "account";
   return (q && STEP_OF_Q[q]) || "welcome";
 }
 
