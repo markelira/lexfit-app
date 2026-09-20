@@ -349,6 +349,9 @@
   margin: var(--sp-6, 24px) 0 var(--sp-5, 20px);
   display: grid;
   gap: var(--sp-6, 24px);
+  /* `.lx` paints the app's own ground; inside a landing band it has to stay
+     transparent or the shelf shows up as a differently-coloured stripe. */
+  background: transparent;
 }
 
 .lxs .lxs-cathead {

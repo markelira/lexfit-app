@@ -15,6 +15,9 @@ import { WorkoutCard, type WorkoutCardVideo } from "@/components/WorkoutCard";
  * while the row holds eight is the kind of small lie that costs more than the
  * sentence was worth.
  *
+ * The wrapper carries `.lx` because that is the scope workout-card.css is
+ * written against; see the comment at the return.
+ *
  * Every card is a CTA. Tapping one cannot play anything - nothing has been
  * bought yet - so instead of a locked dead end it opens the checkout, which is
  * what someone who just tapped a workout is asking for.
@@ -36,8 +39,13 @@ export function ProgramShelf({
     groups.set(k, [...(groups.get(k) ?? []), w]);
   }
 
+  // `.lx` is not decoration: every rule in workout-card.css (and cards.css,
+  // and course-cards.css) is scoped under it. Without it the cards render
+  // unstyled - the trainer avatar alone blows up to full width. It is applied
+  // HERE rather than on the page root so the app's base layer cannot reach the
+  // landing's own bands, which live under `.lxu`.
   return (
-    <div className="lxs-shelf">
+    <div className="lx lxs-shelf">
       {[...groups].map(([theme, list]) => (
         <section key={theme} className="lxs-cat" aria-label={theme}>
           <div className="lxs-cathead">
