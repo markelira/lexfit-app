@@ -196,3 +196,61 @@
 @media (prefers-reduced-motion: reduce) {
   .lx .wc-play { transition: none; }
 }
+
+/* ── Locked cards (P1) ────────────────────────────────────────────────────
+   A programme buyer owns one playlist. The rest has to LOOK unavailable
+   before the tap, not after it - a card that reads as open and then bounces
+   the viewer off the player is a small betrayal at the moment they were most
+   willing.
+
+   It dims rather than disables. The card stays tappable because a tap can
+   explain and offer, while a dead card answers nothing; the veil is a material
+   laid over the art, so the workout is still legible underneath - they should
+   want it. Desaturating carries most of the message: the cover art is the one
+   thing on these cards that has colour, so draining it reads as "not yours"
+   before any icon is noticed. */
+
+.lx .wc-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: oklch(0.96 0.004 168 / 0.5);
+  backdrop-filter: saturate(0.32) brightness(1.04);
+}
+
+/* The play affordance becomes the lock. Same position, same size - the eye
+   already knows where to look, so only its meaning changes. It is a lighter
+   material than the veil beneath it, which is what makes it read as the
+   interactive thing on a surface that is otherwise held back. */
+.lx .wc-play.lk {
+  background: oklch(1 0 0 / 0.82);
+  color: var(--ink, #18201d);
+  border: 1px solid oklch(1 0 0 / 0.6);   /* bright edge: light on the material */
+  backdrop-filter: blur(10px) saturate(150%);
+}
+
+/* The title stays fully legible - the veil is over the art, not the words.
+   Dimming the text too would make the card feel broken rather than gated. */
+.lx .wc.locked .wc-name { opacity: 1; }
+.lx .wc.locked .wc-sub { opacity: 0.72; }
+
+/* Press feedback still lands on pointer-DOWN. A locked card that does not
+   respond reads as broken; it responds, and then explains. */
+.lx .wc.locked .wc-cover:active ~ .wc-thumb,
+.lx .wc.locked:active .wc-thumb { transform: scale(0.988); }
+
+@media (prefers-reduced-transparency: reduce) {
+  /* Never stack translucency when the viewer has asked for less of it:
+     the veil goes solid-ish and the blur goes away entirely. */
+  .lx .wc-veil { background: oklch(0.94 0.004 168 / 0.72); backdrop-filter: saturate(0.3); }
+  .lx .wc-play.lk { background: #fff; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  .lx .wc-play.lk { background: #fff; border-color: var(--ink, #18201d); }
+  .lx .wc-veil { background: oklch(0.96 0.004 168 / 0.62); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lx .wc.locked:active .wc-thumb { transform: none; }
+}

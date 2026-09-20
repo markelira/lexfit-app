@@ -11,6 +11,8 @@ import { Button } from "@/components/Button";
 import { BottomSheet } from "@/components/BottomSheet";
 import { MobileWorkoutSheet, type SheetVideo } from "@/components/MobileWorkoutSheet";
 import { useIsMobile } from "@/lib/useIsMobile";
+import { useProgramAccess } from "@/lib/useProgramAccess";
+import { UpsellModal } from "@/components/UpsellModal";
 import { Rail } from "@/components/Rail";
 import { cardGrad, catOf } from "@/lib/categories";
 import { getMyList, setSaved } from "@/lib/mylist";
@@ -85,6 +87,8 @@ export default function LibraryPage() {
   const [q, setQ] = useState("");
   const [resumeMap, setResumeMap] = useState<Record<string, number>>({});
   const isMobile = useIsMobile();
+  const { locked, ownedLabel } = useProgramAccess();
+  const [upsell, setUpsell] = useState(false);
   const [filterSheet, setFilterSheet] = useState(false);
   const [draft, setDraft] = useState<ActiveFilters>(emptyFilters);
   const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
@@ -219,6 +223,8 @@ export default function LibraryPage() {
 
   // Mobile: card/row tap opens the detail sheet; desktop plays directly (§M4).
   const openOrPlay = (code: string) => {
+    // Explain before the player has to refuse (P1).
+    if (locked(code)) { setUpsell(true); return; }
     const v = data?.videos.find((x) => x.code === code);
     if (isMobile && v) setSheetVideo(v as SheetVideo);
     else router.push(`/player/${code}?autostart=1`);
@@ -259,6 +265,7 @@ export default function LibraryPage() {
       resume={resumeOf(v)}
       saved={myList.has(v.code)}
       onToggleSave={toggleSave}
+      locked={locked(v.code)}
       onPlay={openOrPlay}
     />
   );
@@ -519,6 +526,12 @@ export default function LibraryPage() {
         </BottomSheet>
       )}
 
+
+      <UpsellModal
+        open={upsell}
+        ownedLabel={ownedLabel}
+        onClose={() => setUpsell(false)}
+      />
       <MobileWorkoutSheet
         v={sheetVideo}
         programHue={sheetVideo ? memberOf(sheetVideo.code)?.hue ?? null : null}

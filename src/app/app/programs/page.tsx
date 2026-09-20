@@ -12,6 +12,8 @@ import { Button } from "@/components/Button";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { MobileWorkoutSheet, type SheetVideo } from "@/components/MobileWorkoutSheet";
 import { useIsMobile } from "@/lib/useIsMobile";
+import { useProgramAccess } from "@/lib/useProgramAccess";
+import { UpsellModal } from "@/components/UpsellModal";
 import { ProgramBanner, bannerChips, bannerEyebrow, CATEGORY_WORD } from "@/components/ProgramBanner";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
@@ -29,6 +31,8 @@ export default function ProgramsPage() {
   const { user } = useAuth();
   const router = useRouter();
   const isMobile = useIsMobile();
+  const { locked, ownedLabel } = useProgramAccess();
+  const [upsell, setUpsell] = useState(false);
   const [pindex, setPindex] = useState<ProgramIndex | null>(null);
   const [libVideos, setLibVideos] = useState<LibVideo[]>([]);
   const [progress, setProgress] = useState<ProgressState | null>(null);
@@ -71,6 +75,7 @@ export default function ProgramsPage() {
 
   const play = (code: string) => router.push(`/player/${code}?autostart=1`);
   const openOrPlay = (code: string) => {
+    if (locked(code)) { setUpsell(true); return; }
     const v = libByCode.get(code);
     if (isMobile && v) setSheetVideo(v as SheetVideo);
     else play(code);
@@ -95,6 +100,7 @@ export default function ProgramsPage() {
             resumeFrac={resumeFrac}
             myList={myList}
             onToggleSave={toggleSave}
+            locked={locked}
             onPlayCard={openOrPlay}
             onPlay={play}
             onOpen={() => router.push(`/app/program/${p.slug}`)}
@@ -102,6 +108,12 @@ export default function ProgramsPage() {
         ))}
       </div>
 
+
+      <UpsellModal
+        open={upsell}
+        ownedLabel={ownedLabel}
+        onClose={() => setUpsell(false)}
+      />
       <MobileWorkoutSheet
         v={sheetVideo}
         programHue={
@@ -119,7 +131,7 @@ export default function ProgramsPage() {
 }
 
 function ProgramBand({
-  p, videos, completedCodes, completedMap, resumeFrac, myList, onToggleSave, onPlayCard, onPlay, onOpen,
+  p, videos, completedCodes, completedMap, resumeFrac, myList, locked, onToggleSave, onPlayCard, onPlay, onOpen,
 }: {
   p: ProgramEntry;
   videos: LibVideo[];
@@ -127,6 +139,8 @@ function ProgramBand({
   completedMap: Record<string, { at: string; atTime?: string }>;
   resumeFrac: (v: LibVideo) => number | undefined;
   myList: Set<string>;
+  /** P1 - whether this viewer may open a given video. */
+  locked: (code: string) => boolean;
   onToggleSave: (code: string) => void;
   onPlayCard: (code: string) => void;
   onPlay: (code: string) => void;
@@ -183,6 +197,7 @@ function ProgramBand({
                 resume={resumeFrac(v)}
                 completedAt={completedMap[v.code] ? completedMap[v.code].at : null}
                 completedTime={completedMap[v.code]?.atTime ?? null}
+                locked={locked(v.code)}
                 saved={myList.has(v.code)}
                 onPlay={onPlayCard}
                 onToggleSave={onToggleSave}

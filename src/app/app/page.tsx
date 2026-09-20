@@ -12,6 +12,8 @@ import { NcardModal } from "@/components/NcardModal";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { MobileWorkoutSheet, type SheetVideo } from "@/components/MobileWorkoutSheet";
 import { useIsMobile } from "@/lib/useIsMobile";
+import { useProgramAccess } from "@/lib/useProgramAccess";
+import { UpsellModal } from "@/components/UpsellModal";
 import { Button } from "@/components/Button";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
@@ -46,6 +48,9 @@ export default function KezdolapPage() {
   const [sheetVideo, setSheetVideo] = useState<SheetVideo | null>(null);
   const [pindex, setPindex] = useState<ProgramIndex | null>(null);
   const isMobile = useIsMobile();
+  // P1 - which videos this viewer may actually open, and what they own.
+  const { locked, ownedLabel } = useProgramAccess();
+  const [upsell, setUpsell] = useState(false);
 
   const reload = useCallback(async () => {
     if (!user) return;
@@ -137,6 +142,9 @@ export default function KezdolapPage() {
 
   // On mobile, tapping a card opens the detail sheet (§M4); desktop plays directly.
   const openOrPlay = (code: string) => {
+    // Explain before the player has to refuse. A tap on a locked card is a
+    // question ("why not this one?"), and the upsell answers it in place.
+    if (locked(code)) { setUpsell(true); return; }
     if (isMobile && videoByCode[code]) setSheetVideo(videoByCode[code] as SheetVideo);
     else play(code);
   };
@@ -178,6 +186,7 @@ export default function KezdolapPage() {
         resume={resumeFrac(v)}
         completedAt={comp ? comp.at : null}
         completedTime={comp?.atTime ?? null}
+        locked={locked(v.code)}
         saved={myList.has(v.code)}
         onPlay={openOrPlay}
         onToggleSave={toggleSave}
@@ -280,6 +289,12 @@ export default function KezdolapPage() {
           onClose={() => setCineOpen(false)}
         />
       )}
+
+      <UpsellModal
+        open={upsell}
+        ownedLabel={ownedLabel}
+        onClose={() => setUpsell(false)}
+      />
       <MobileWorkoutSheet
         v={sheetVideo}
         programHue={sheetVideo ? memberOf(sheetVideo.code)?.hue ?? null : null}

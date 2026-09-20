@@ -44,6 +44,7 @@ export function WorkoutCard({
   programTotal = null,
   programBadge = null,
   programHue = null,
+  locked = false,
   resume,
   completedAt = null,
   completedTime = null,
@@ -65,6 +66,12 @@ export function WorkoutCard({
   resume?: number; // 0–1 fraction, if in progress
   completedAt?: string | null; // YYYY-MM-DD, if completed
   completedTime?: string | null; // local HH:MM, if recorded
+  /**
+   * The viewer cannot open this one (P1). The card stays tappable on purpose -
+   * a disabled card answers nothing, while a tap can explain and offer. What
+   * changes is that it LOOKS unavailable before the tap rather than after it.
+   */
+  locked?: boolean;
   saved: boolean;
   onPlay: (code: string) => void;
   onToggleSave: (code: string) => void;
@@ -90,12 +97,13 @@ export function WorkoutCard({
   }
 
   return (
-    <div className="wc">
+    <div className={`wc${locked ? " locked" : ""}`}>
       <div className="wc-thumb">
         <Cover className="wc-cover-art" theme={v.theme} code={v.code} grad={programHue != null ? programGrad(programHue) : undefined} />
-        {isToday && <span className="wc-ribbon">MAI EDZÉSED</span>}
-        <span className="wc-play" aria-hidden="true">
-          <LxIcon d={lxPaths.play} size={16} fill />
+        {isToday && !locked && <span className="wc-ribbon">MAI EDZÉSED</span>}
+        {locked && <span className="wc-veil" aria-hidden="true" />}
+        <span className={`wc-play${locked ? " lk" : ""}`} aria-hidden="true">
+          <LxIcon d={locked ? lxPaths.lock : lxPaths.play} size={16} sw={2} fill={!locked} />
         </span>
         <span className="wc-dur">{v.mins} PERC</span>
         {showBar && (
@@ -105,7 +113,11 @@ export function WorkoutCard({
         )}
       </div>
 
-      <button className="wc-cover" onClick={() => onPlay(v.code)} aria-label={`${v.title} lejátszása`} />
+      <button
+        className="wc-cover"
+        onClick={() => onPlay(v.code)}
+        aria-label={locked ? `${v.title} - tagsághoz tartozik` : `${v.title} lejátszása`}
+      />
 
       <div className="wc-body">
         {ringPct != null ? (
@@ -140,7 +152,7 @@ export function WorkoutCard({
             <div className="wc-sub">{benefitOf(v)}</div>
           )}
         </div>
-        <button
+        {!locked && <button
           className={`wc-save${saved ? " on" : ""}`}
           aria-pressed={saved}
           aria-label={saved ? "Eltávolítás a Listámról" : "Mentés a Listámra"}
@@ -152,7 +164,7 @@ export function WorkoutCard({
           <span className="dot">
             {saved ? <LxIcon d={lxPaths.check} size={13} sw={2.6} /> : <LxIcon d={lxPaths.plus} size={14} sw={2.4} />}
           </span>
-        </button>
+        </button>}
       </div>
     </div>
   );
