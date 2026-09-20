@@ -1,8 +1,9 @@
 /* The membership upsell, scoped `.lxup`.
 
-   Shown at the moment a programme owner reaches for content their purchase
-   does not cover. It replaces a full-page redirect to /subscribe, which threw
-   them off the screen they were using with no explanation of what happened. */
+   Shown the moment someone reaches for content their purchase does not cover.
+   It has to create wanting, not announce a boundary - so the goods come first,
+   as a fanned stack of the real programmes, and the refusal is one quiet line
+   near the bottom. */
 
 .lxup {
   position: fixed;
@@ -11,67 +12,121 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: oklch(0.2 0.02 168 / 0.55);
-  backdrop-filter: blur(3px);
-  animation: lxup-dim 200ms ease-out;
+  /* A modal task: dim AND push back, so the app recedes rather than staying
+     available behind the decision. */
+  background: oklch(0.18 0.02 168 / 0.58);
+  backdrop-filter: blur(4px);
+  animation: lxup-dim 220ms ease-out;
 }
 @keyframes lxup-dim { from { opacity: 0; } to { opacity: 1; } }
 
 .lxup-sheet {
   position: relative;
-  width: min(430px, 100%);
+  width: min(440px, 100%);
+  max-height: 94dvh;
+  overflow: hidden auto;   /* one axis: setting only overflow-y makes the
+                              browser compute overflow-x as auto */
   background: var(--surface, #fff);
   color: var(--ink, #18201d);
   font-family: var(--font);
-  border-radius: 22px 22px 0 0;
-  padding: 26px 22px calc(20px + env(safe-area-inset-bottom));
-  text-align: center;
-  box-shadow: 0 -12px 60px -20px oklch(0.2 0.02 168 / 0.6);
-  /* Enters along the axis it leaves on. Critically damped - nothing here
-     carried momentum, so overshoot would read as decoration. */
-  animation: lxup-rise 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  border-radius: 26px 26px 0 0;
+  box-shadow: 0 -16px 70px -22px oklch(0.18 0.02 168 / 0.66);
+  /* Materialize: blur and scale together, so the surface reads as arriving
+     rather than as an opacity fade. Critically damped - nothing the reader did
+     carried momentum into it. */
+  animation: lxup-arrive 380ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-@keyframes lxup-rise {
-  from { transform: translateY(24px); opacity: 0; }
-  to   { transform: none; opacity: 1; }
+@keyframes lxup-arrive {
+  from { opacity: 0; transform: translateY(26px) scale(0.985); filter: blur(7px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
 }
 
 .lxup-x {
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 34px;
-  height: 34px;
+  z-index: 3;
+  width: 32px;
+  height: 32px;
   border: 0;
   border-radius: 999px;
-  background: var(--surface-2, #eef4f1);
-  color: var(--ink-2, #4a5a52);
+  background: oklch(0.18 0.02 168 / 0.42);
+  color: #fff;
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: transform 110ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  backdrop-filter: blur(10px);
+  transition: transform 110ms cubic-bezier(0.22, 0.61, 0.36, 1), background 160ms;
 }
-.lxup-x:active { transform: scale(0.92); }
+.lxup-x:active { transform: scale(0.9); }
 .lxup-x:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
-.lxup-ic {
-  display: inline-grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 999px;
-  background: var(--accent-soft, #e3efe9);
-  color: var(--accent-2, #3f6354);
-  margin-bottom: 14px;
+/* ── The goods ────────────────────────────────────────────────────────────
+   A fanned stack of real programmes, each on its own brand hue. The fan is
+   what makes it read as "more where this came from" - a neat grid would read
+   as an inventory. */
+
+.lxup-fan {
+  position: relative;
+  height: 168px;
+  padding: 26px 22px 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  /* The stack fades into the sheet instead of ending on a hard edge. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
 }
 
-/* What they already own, stated before anything is asked of them. */
+.lxup-tile {
+  width: 104px;
+  height: 132px;
+  flex: none;
+  border-radius: 14px;
+  padding: 11px 10px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  box-shadow: 0 10px 26px -14px oklch(0.18 0.02 168 / 0.8);
+  /* Each tile leans a little further out and sits a little lower, so the group
+     reads as a hand of cards rather than a row of boxes. */
+  margin-inline: -16px;
+  transform: rotate(calc((var(--i) - 1.5) * 5deg)) translateY(calc(var(--i) * -2px));
+  animation: lxup-deal 520ms cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+  animation-delay: calc(var(--i) * 55ms + 120ms);
+}
+@keyframes lxup-deal {
+  from { opacity: 0; transform: translateY(18px) scale(0.94) rotate(0deg); }
+}
+.lxup-tile .mk { opacity: 0.9; margin-bottom: 4px; }
+.lxup-tile .nm {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.008em;
+  text-wrap: balance;
+}
+.lxup-tile .ct {
+  font-family: var(--mono, monospace);
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  opacity: 0.78;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Body ───────────────────────────────────────────────────────────────── */
+
+.lxup-body { padding: 4px 22px calc(20px + env(safe-area-inset-bottom)); text-align: center; }
+
+/* The reassurance, on its own line and calm - it is not a header ornament. */
 .lxup-owned {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   margin: 0 0 12px;
-  padding: 7px 13px;
+  padding: 6px 12px;
   border-radius: 999px;
   background: var(--ok-soft, #e8f5ee);
   color: var(--ink, #18201d);
@@ -83,39 +138,52 @@
 
 .lxup-sheet h2 {
   margin: 0 0 8px;
-  font-size: clamp(19px, 5vw, 22px);
-  line-height: 1.2;
-  letter-spacing: -0.016em;
-  font-weight: 750;
+  font-size: clamp(23px, 6vw, 28px);
+  line-height: 1.12;
+  /* Negative tracking as display type grows - letters read too far apart
+     otherwise. The body below stays near 0. */
+  letter-spacing: -0.026em;
+  font-weight: 800;
   text-wrap: balance;
 }
 .lxup-sub {
   margin: 0 auto 18px;
-  max-width: 34ch;
+  max-width: 32ch;
   font-size: 14.5px;
   line-height: 1.55;
   color: var(--ink-2, #4a5a52);
 }
 
+/* Left-aligned inside a centred block: a list is read, not admired, and
+   centred list items give the eye no shared edge to run down. */
 .lxup-gets {
   list-style: none;
-  margin: 0 0 20px;
+  margin: 0 0 18px;
   padding: 0;
   display: grid;
-  gap: 9px;
+  gap: 10px;
   text-align: left;
-  justify-content: center;
 }
 .lxup-gets li {
   display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
-  gap: 9px;
-  align-items: start;
-  font-size: 14px;
-  line-height: 1.45;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  font-size: 14.5px;
+  line-height: 1.4;
 }
-.lxup-gets svg { margin-top: 2px; color: var(--accent-2, #3f6354); }
+.lxup-gets .ic {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--accent-soft, #e3efe9);
+  color: var(--accent-2, #3f6354);
+  display: grid;
+  place-items: center;
+}
 
+/* The price rides ON the button. Under it in grey it read as a footnote to the
+   decision; beside the verb it is part of it. */
 .lxup-cta {
   width: 100%;
   border: 0;
@@ -123,25 +191,38 @@
   background: var(--accent-2, #3f6354);
   color: #fff;
   font: inherit;
-  font-size: 16px;
-  font-weight: 700;
-  padding: 15px 20px;
+  padding: 13px 18px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   transition: transform 110ms cubic-bezier(0.22, 0.61, 0.36, 1), background 160ms;
 }
-.lxup-cta:active { transform: scale(0.975); }
+.lxup-cta .tx { font-size: 16px; font-weight: 700; }
+.lxup-cta .pr {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: oklch(1 0 0 / 0.17);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.lxup-cta:active { transform: scale(0.975); background: #36554a; }
 .lxup-cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
-.lxup-from {
-  margin: 10px 0 0;
+.lxup-note {
+  margin: 11px 0 0;
   font-size: 12.5px;
+  line-height: 1.5;
   color: var(--ink-3, #6d7f77);
 }
 
-/* Dismiss is free and obvious. A modal that fights to stay is one people learn
-   to close without reading. */
+/* Free and obvious. A modal that fights to stay is one people learn to close
+   without reading. */
 .lxup-later {
-  margin-top: 12px;
+  margin-top: 6px;
   border: 0;
   background: none;
   font: inherit;
@@ -149,18 +230,25 @@
   color: var(--ink-2, #4a5a52);
   text-decoration: underline;
   cursor: pointer;
-  padding: 8px;
+  padding: 9px;
 }
 
 @media (min-width: 620px) {
   .lxup { align-items: center; padding: 24px; }
-  .lxup-sheet { border-radius: 22px; padding-bottom: 24px; }
+  .lxup-sheet { border-radius: 26px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lxup, .lxup-sheet { animation: none; }
+  .lxup, .lxup-sheet, .lxup-tile { animation: none; }
+  .lxup-x, .lxup-cta { transition: none; }
   .lxup-x:active, .lxup-cta:active { transform: none; }
+  /* The fan still fans - it is layout, not motion - it just arrives at once. */
 }
 @media (prefers-reduced-transparency: reduce) {
-  .lxup { backdrop-filter: none; background: oklch(0.2 0.02 168 / 0.72); }
+  .lxup { backdrop-filter: none; background: oklch(0.18 0.02 168 / 0.76); }
+  .lxup-x { backdrop-filter: none; background: oklch(0.18 0.02 168 / 0.8); }
+}
+@media (prefers-contrast: more) {
+  .lxup-cta .pr { background: oklch(1 0 0 / 0.3); }
+  .lxup-gets .ic { outline: 1px solid var(--accent-2); }
 }

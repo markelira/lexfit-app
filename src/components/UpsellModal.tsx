@@ -1,32 +1,39 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LxIcon } from "@/components/LxIcon";
+import { ProgramMark } from "@/components/ProgramMark";
 import { lxPaths } from "@/lib/icons";
 import { formatHuf } from "@/lib/pricing/display";
 import { PRICES } from "@/lib/pricing/config";
+import { programGrad, programVisual } from "@/lib/programs";
+import { loadProgramIndex } from "@/lib/program-index";
 import { trackUpsellView, trackUpsellClick } from "@/lib/track";
 import "./UpsellModal.css";
 
+interface Tile { slug: string; title: string; hue: number; count: number }
+
 /**
- * The upsell a programme owner meets when they reach for content their
+ * The membership upsell, shown the moment someone reaches for content their
  * purchase does not cover (P1).
  *
- * Before this, that moment was a full-page redirect to /subscribe: they tapped
- * a workout and the app threw them onto a pricing page with no explanation of
- * what had just happened. The modal keeps them where they were and answers the
- * only question they are actually asking - why not this one?
+ * The first version led with the refusal - "ez a videó a tagsághoz tartozik" -
+ * and then listed features. That is a tollbooth: it names what you cannot have
+ * and asks you to pay for the absence. It also showed nothing. A person
+ * deciding whether to widen their access is deciding about CONTENT, and the
+ * only way to make that decision is to see some.
  *
- * Three rules it follows deliberately:
+ * So it leads with the count of what is waiting, shows those programmes as a
+ * fanned stack built from their own brand hues and marks, and states the price
+ * beside the button rather than under it in grey. The refusal, which is a fact
+ * and not an argument, is demoted to one quiet line.
  *
- *  - **It opens what they already own first.** Someone who paid is not a
- *    stranger to convert; leading with "you own X" before "this needs Y" is the
- *    difference between an offer and a tollbooth.
- *  - **One ask.** A membership. No plan grid, no second-guessing - the pricing
- *    page is one tap away for anyone who wants to compare.
- *  - **Dismiss is free and obvious.** A modal that fights to stay is a modal
- *    people learn to close without reading.
+ * What did NOT change, because it was already right:
+ *  - what they own is said BEFORE anything is asked of them;
+ *  - one ask, no plan grid - the pricing page is a tap away for comparers;
+ *  - dismissing is free and obvious, because a modal that fights to stay is
+ *    one people learn to close without reading.
  */
 export function UpsellModal({
   open,
@@ -39,8 +46,34 @@ export function UpsellModal({
   onClose: () => void;
 }) {
   const router = useRouter();
-  const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [tiles, setTiles] = useState<Tile[]>([]);
+  const [total, setTotal] = useState<number | null>(null);
+
+  // The programmes on the other side of the ask, loaded only when the ask is
+  // actually made. Their own hues and marks, so the stack is the real catalogue
+  // rather than a picture of one.
+  useEffect(() => {
+    if (!open) return;
+    let active = true;
+    loadProgramIndex()
+      .then((idx) => {
+        if (!active) return;
+        const mine = ownedLabel?.trim().toLowerCase();
+        const others = idx.programs.filter((p) => (p.title ?? "").trim().toLowerCase() !== mine);
+        setTotal(others.length);
+        setTiles(
+          others.slice(0, 4).map((p) => ({
+            slug: p.slug,
+            title: p.hu || p.title,
+            hue: p.hue,
+            count: p.codes.length,
+          })),
+        );
+      })
+      .catch(() => { /* the ask still stands without the picture */ });
+    return () => { active = false; };
+  }, [open, ownedLabel]);
 
   useEffect(() => {
     if (!open) return;
@@ -63,6 +96,9 @@ export function UpsellModal({
     router.push("/subscribe");
   };
 
+  const n = total ?? 0;
+  const hd = n > 0 ? `Még ${n} program vár` : "Nyisd ki az egészet";
+
   return (
     <div className="lxup" role="presentation" onClick={onClose}>
       <div
@@ -70,50 +106,78 @@ export function UpsellModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="lxup-hd"
-        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
       >
         <button ref={closeRef} type="button" className="lxup-x" onClick={onClose} aria-label="Bezárás">
-          <LxIcon d={lxPaths.close} size={18} sw={2.2} />
+          <LxIcon d={lxPaths.close} size={17} sw={2.2} />
         </button>
 
-        <span className="lxup-ic"><LxIcon d={lxPaths.lock} size={24} sw={1.7} /></span>
-
-        {/* What they own comes first. They paid; the app should say so before
-            it asks for anything. */}
-        {ownedLabel && (
-          <p className="lxup-owned">
-            <LxIcon d={lxPaths.check} size={14} sw={2.6} />
-            A(z) <strong>{ownedLabel}</strong> a tiéd - az marad.
-          </p>
+        {/* The goods, fanned. Built from each programme's own hue and mark, so
+            this IS the catalogue rather than an illustration of it. */}
+        {tiles.length > 0 && (
+          <div className="lxup-fan" aria-hidden="true">
+            {tiles.map((t, i) => {
+              const pv = programVisual(t.slug, t.title);
+              return (
+                <div
+                  key={t.slug}
+                  className="lxup-tile"
+                  style={{ background: programGrad(t.hue), ["--i" as string]: i }}
+                >
+                  <span className="mk"><ProgramMark shape={pv.icon} size={13} /></span>
+                  <span className="nm">{t.title}</span>
+                  <span className="ct">{t.count} edzés</span>
+                </div>
+              );
+            })}
+          </div>
         )}
 
-        <h2 id="lxup-hd">Ez a videó a tagsághoz tartozik</h2>
-        <p className="lxup-sub">
-          {ownedLabel
-            ? "A megvásárolt programod minden edzése megy. Ez a videó egy másik programhoz tartozik - azokat a tagság nyitja meg. (A heti kihívások egyébként neked is ingyen mennek.)"
-            : "A teljes videótárhoz tagság kell. A heti kihívások ingyen mennek."}
-        </p>
+        <div className="lxup-body">
+          {/* Said before anything is asked. They paid; the app should lead with
+              that, not with what is missing. */}
+          {ownedLabel && (
+            <p className="lxup-owned">
+              <LxIcon d={lxPaths.check} size={13} sw={2.8} />
+              A(z) <strong>{ownedLabel}</strong> a tiéd - az marad.
+            </p>
+          )}
 
-        <ul className="lxup-gets">
-          {[
-            "Mind a 7 program, nem csak egy",
-            "A teljes videótár, új edzésekkel folyamatosan",
-            "Bármikor lemondható",
-          ].map((t) => (
-            <li key={t}><LxIcon d={lxPaths.check} size={14} sw={2.6} />{t}</li>
-          ))}
-        </ul>
+          <h2 id="lxup-hd">{hd}</h2>
+          <p className="lxup-sub">
+            {ownedLabel
+              ? "A tagság a teljes videótárat nyitja: minden programot, minden új edzést. Amit megvettél, az ettől függetlenül a tiéd marad."
+              : "A tagság a teljes videótárat nyitja: minden programot, minden új edzést."}
+          </p>
 
-        <button type="button" className="lxup-cta" onClick={go}>
-          Megnézem a tagságot
-        </button>
-        <p className="lxup-from">
-          {formatHuf(PRICES.week_intro.amountHuf)}-tól · bármikor lemondható
-        </p>
-        <button type="button" className="lxup-later" onClick={onClose}>
-          {ownedLabel ? "Vissza a programomhoz" : "Most nem"}
-        </button>
+          <ul className="lxup-gets">
+            {[
+              ["layers", "Minden program, nem csak egy"],
+              ["plus", "Új edzések folyamatosan"],
+              ["shield", "Bármikor lemondható, kötöttség nélkül"],
+            ].map(([ic, t]) => (
+              <li key={t}>
+                <span className="ic"><LxIcon d={lxPaths[ic]} size={15} sw={1.9} /></span>
+                {t}
+              </li>
+            ))}
+          </ul>
+
+          <button type="button" className="lxup-cta" onClick={go}>
+            <span className="tx">Megnézem a tagságot</span>
+            <span className="pr">{formatHuf(PRICES.week_intro.amountHuf)}-tól</span>
+          </button>
+
+          {/* The refusal is a fact, not an argument - so it sits here, quietly,
+              instead of being the headline. */}
+          <p className="lxup-note">
+            Ez az edzés is ebben van. A heti kihívások közben ingyen mennek.
+          </p>
+
+          <button type="button" className="lxup-later" onClick={onClose}>
+            {ownedLabel ? "Vissza a programomhoz" : "Most nem"}
+          </button>
+        </div>
       </div>
     </div>
   );
