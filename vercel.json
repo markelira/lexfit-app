@@ -22,7 +22,11 @@
     },
     {
       "path": "/api/cron/campaign-brief?mode=watch",
-      "schedule": "4 4,16 * * *"
+      "schedule": "4 4 * * *"
+    },
+    {
+      "path": "/api/cron/campaign-brief?mode=watch",
+      "schedule": "4 16 * * *"
     },
     {
       "path": "/api/cron/campaign-brief?mode=brief",
