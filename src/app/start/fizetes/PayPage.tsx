@@ -67,6 +67,8 @@ export function PayPage({ sessionCount }: { sessionCount: number }) {
     return () => { active = false; };
   }, [webview]);
 
+  const [secret, setSecret] = useState<string | null>(null);
+
   const createSession = useCallback(async (embedded: boolean) => {
     const res = await fetch("/api/stripe/program-checkout", {
       method: "POST",
@@ -79,16 +81,45 @@ export function PayPage({ sessionCount }: { sessionCount: number }) {
         marketing: marketingContext(),
       }),
     });
-    const body = (await res.json()) as { clientSecret?: string; url?: string; error?: string };
+    // A failed route may answer with something that is not JSON at all, so
+    // parsing has to be allowed to fail without taking the message with it.
+    const body = (await res.json().catch(() => ({}))) as {
+      clientSecret?: string; url?: string; error?: string;
+    };
     if (!res.ok) throw new Error(body.error ?? "checkout_failed");
     return body;
   }, []);
 
-  const fetchClientSecret = useCallback(async () => {
-    const b = await createSession(true);
-    if (!b.clientSecret) throw new Error("no_client_secret");
-    return b.clientSecret;
-  }, [createSession]);
+  /**
+   * The session is created HERE, before the provider mounts - not inside
+   * `fetchClientSecret`.
+   *
+   * Handing the provider a fetch that can fail means its failure is its own:
+   * it swallowed a 500, timed out waiting for a client secret, and left a
+   * spinner that never resolved while the console filled with an
+   * IntegrationError nobody on the page could see. Creating it first puts the
+   * error where it can be shown to the person waiting.
+   */
+  useEffect(() => {
+    if (!consented || webview !== false || secret || err) return;
+    let active = true;
+    createSession(true)
+      .then((b) => {
+        if (!active) return;
+        if (!b.clientSecret) throw new Error("no_client_secret");
+        setSecret(b.clientSecret);
+      })
+      .catch((e: Error) => {
+        if (!active) return;
+        setErr(e.message === "price_missing" ? START.pay.unavailable : START.pay.failed);
+      });
+    return () => { active = false; };
+  }, [consented, webview, secret, err, createSession]);
+
+  const fetchClientSecret = useCallback(
+    async () => secret ?? Promise.reject(new Error("no_client_secret")),
+    [secret],
+  );
 
   /** Meta's in-app browser has failed embedded Stripe before, and most of this
    *  page's traffic lives there. It gets the hosted page - a redirect, but one
@@ -185,7 +216,7 @@ export function PayPage({ sessionCount }: { sessionCount: number }) {
               <p className="lxs-err">{err}</p>
             ) : !consented ? (
               <p className="lxs-await">{START.pay.await}</p>
-            ) : stripe ? (
+            ) : stripe && secret ? (
               <div className="lxs-embed">
                 <EmbeddedCheckoutProvider stripe={stripe} options={{ fetchClientSecret }}>
                   <EmbeddedCheckout />

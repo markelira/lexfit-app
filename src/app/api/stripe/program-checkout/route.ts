@@ -5,7 +5,7 @@ import { verifyRequest } from "@/lib/auth-server";
 import { allowRequest, HOUR_MS } from "@/lib/rate-limit";
 import { getStripe } from "@/lib/stripe";
 import { priceIdForRole } from "@/lib/pricing/checkout-server";
-import { PRICES, PROGRAM_PURCHASE_ROLES, isProgramRole } from "@/lib/pricing/config";
+import { PRICES, PROGRAM_PURCHASE_ROLES, isProgramRole, type ProgramRole } from "@/lib/pricing/config";
 import { logEvent } from "@/lib/pricing/events";
 
 export const runtime = "nodejs";
@@ -57,6 +57,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
+  try {
+    return await createSession(req, role, body, ip);
+  } catch (e) {
+    // NEVER a bodyless 500. Next's default error page is not JSON, so the
+    // browser reported "Unexpected end of JSON input" and Stripe's provider
+    // timed out waiting for a client secret - the buyer saw a spinner that
+    // never resolved. The commonest cause is a price that exists in test mode
+    // and not in live, which is a deploy step, not a bug the buyer can fix.
+    const msg = e instanceof Error ? e.message : "unknown";
+    console.error("[program-checkout]", msg);
+    return NextResponse.json(
+      { error: /No Stripe price/.test(msg) ? "price_missing" : "checkout_failed" },
+      { status: 500 },
+    );
+  }
+}
+
+async function createSession(
+  req: Request,
+  role: ProgramRole,
+  body: {
+    email?: string;
+    embedded?: boolean;
+    where?: string;
+    marketing?: { consent?: string; fbp?: string; fbc?: string; ttp?: string; ttclid?: string };
+  },
+  ip: string,
+) {
   const programSlug = PROGRAM_PURCHASE_ROLES[role];
   const email = typeof body.email === "string" && body.email.includes("@")
     ? body.email.trim().slice(0, 254)
