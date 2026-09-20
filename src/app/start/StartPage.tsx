@@ -54,7 +54,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
   const Cta = ({ where, small }: { where: string; small?: boolean }) => (
     <button
       type="button"
-      className={`lp-cta${small ? " lp-cta-s" : ""}`}
+      className={`lp-cta${small ? " lp-cta-sm" : ""}`}
       onClick={() => go(where)}
     >
       {START.hero.cta}

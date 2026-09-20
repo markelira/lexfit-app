@@ -1,0 +1,151 @@
+/* The receipt screen, scoped `.lxk`.
+
+   SELF-CONTAINED on purpose. It used to borrow the landing's stylesheet, and
+   when the landing was rebuilt on a different layer every class this page
+   names disappeared with it - a paying customer's confirmation rendered as
+   unstyled text. A page this far downstream must not depend on the styling of
+   a page that is still being iterated, so everything it needs is here. */
+
+.lxk {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #f1f6f4;
+  color: #18201d;
+  font-family: var(--font, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+.lxk-card {
+  width: min(460px, 100%);
+  background: #fff;
+  border: 1px solid #dde8e3;
+  border-radius: 22px;
+  padding: 34px 26px 28px;
+  text-align: center;
+  box-shadow: 0 1px 2px rgb(24 32 29 / 0.04), 0 18px 50px -24px rgb(24 32 29 / 0.24);
+  animation: lxk-in 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes lxk-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.99); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* The confirmation mark. It arrives a beat after the card, so the card reads
+   as the surface and the mark as the news - critically damped, because nothing
+   the reader did carried momentum into it. */
+.lxk-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: #e3efe9;
+  color: #3f6354;
+  margin-bottom: 18px;
+  animation: lxk-pop 460ms cubic-bezier(0.22, 0.61, 0.36, 1) 120ms backwards;
+}
+.lxk-mark.ok { background: #e4f3ea; color: #2f7d55; }
+@keyframes lxk-pop {
+  from { opacity: 0; transform: scale(0.82); }
+  to   { opacity: 1; transform: none; }
+}
+
+.lxk-eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3f6354;
+}
+
+.lxk h1 {
+  margin: 0 0 10px;
+  font-size: clamp(24px, 6vw, 30px);
+  line-height: 1.12;
+  /* Negative tracking as display type grows - letters read too far apart
+     otherwise. The body copy below stays at 0. */
+  letter-spacing: -0.022em;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.lxk-sub {
+  margin: 0 auto 20px;
+  max-width: 34ch;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: #55685f;
+}
+
+.lxk-cta {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  background: #3f6354;
+  color: #fff;
+  font: inherit;
+  font-size: 16.5px;
+  font-weight: 700;
+  padding: 16px 20px;
+  cursor: pointer;
+  /* Feedback on pointer-DOWN, never on release. */
+  transition: transform 110ms cubic-bezier(0.22, 0.61, 0.36, 1), background 160ms;
+}
+.lxk-cta:active { transform: scale(0.975); background: #36554a; }
+.lxk-cta:focus-visible { outline: 3px solid #7a9b8d; outline-offset: 3px; }
+
+/* The handoff. Visible, because a screen that moves on its own without saying
+   so reads as a glitch - and it stops on any sign of intent, because it is a
+   convenience rather than a rail. */
+.lxk-handoff {
+  margin: 12px 0 0;
+  display: grid;
+  gap: 7px;
+  justify-items: center;
+  font-size: 12.5px;
+  color: #6d7f77;
+}
+.lxk-handoff .bar {
+  width: 120px;
+  height: 2px;
+  border-radius: 999px;
+  background: #dde8e3;
+  overflow: hidden;
+}
+.lxk-handoff .bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #7a9b8d;
+  transform-origin: left;
+  animation: lxk-fill 5s linear forwards;
+}
+@keyframes lxk-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.lxk-handoff.quiet { opacity: 0.75; }
+
+.lxk-note {
+  margin-top: 22px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #f4f8f6;
+  border: 1px solid #e4ece8;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #44584f;
+  text-align: left;
+}
+.lxk-note strong { display: block; margin-bottom: 4px; color: #18201d; }
+.lxk-note a { color: #3f6354; }
+.lxk-note strong + * { margin-top: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lxk-card, .lxk-mark { animation: none; }
+  .lxk-cta { transition: none; }
+  .lxk-cta:active { transform: none; }
+  /* The bar still shows the wait, it just does not animate into it. */
+  .lxk-handoff .bar i { animation: none; transform: scaleX(1); opacity: 0.5; }
+}
