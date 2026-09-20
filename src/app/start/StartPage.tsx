@@ -10,6 +10,8 @@ import { lxPaths } from "@/lib/icons";
 import { inMetaWebview } from "@/lib/webview";
 import { marketingContext, trackProgramCheckout, trackProgramView } from "@/lib/track";
 import { formatHuf } from "@/lib/pricing/display";
+import type { WorkoutCardVideo } from "@/components/WorkoutCard";
+import { ProgramShelf } from "./ProgramShelf";
 import { START } from "./copy";
 import "../ujrakezdes/ujrakezdes.css"; // the shared look: .lxu / .lp-* bands
 import "./start.css";                  // only what the pay panel adds
@@ -44,7 +46,8 @@ function getStripe(): Promise<Stripe | null> | null {
  * no redirect, no account, no password. The only thing between the visitor and
  * the money is the consent tick the law requires.
  */
-export function StartPage({ sessionCount }: { sessionCount: number }) {
+export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
+  const sessionCount = workouts.length;
   const [consented, setConsented] = useState(false);
   const [webview, setWebview] = useState(false);
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -176,6 +179,16 @@ export function StartPage({ sessionCount }: { sessionCount: number }) {
     return () => { io1.disconnect(); io2.disconnect(); window.removeEventListener("scroll", onScroll); };
   }, [paying]);
 
+  /** The ask, repeated. A long page with two CTAs makes the reader carry their
+   *  decision back up to the hero; one after every argument lets them act the
+   *  moment they are convinced. */
+  const CtaBlock = ({ where, line }: { where: string; line?: string }) => (
+    <div className="lxs-ctablk">
+      <Cta where={where} />
+      <p className="lp-xs">{line ?? START.hero.ctaSub(START.price)}</p>
+    </div>
+  );
+
   const consentRow = (
     <label className="lxs-consent" ref={consentRef}>
       <input
@@ -267,18 +280,20 @@ export function StartPage({ sessionCount }: { sessionCount: number }) {
                 instead of parking a legal paragraph on the decision itself.
                 The provider is only mounted once ticked, so no checkout
                 session is created before the consent is recorded. */}
-            {consentRow}
-            {!stripe ? (
+            <div className="lxs-paybox">
+              {consentRow}
+              {!stripe ? (
               <p className="lxs-err">{START.pay.unavailable}</p>
-            ) : consented ? (
-              <div className="lxs-embed">
-                <EmbeddedCheckoutProvider stripe={stripe} options={{ fetchClientSecret }}>
-                  <EmbeddedCheckout />
-                </EmbeddedCheckoutProvider>
-              </div>
-            ) : (
-              <p className="lxs-await">{START.pay.await}</p>
-            )}
+              ) : consented ? (
+                <div className="lxs-embed">
+                  <EmbeddedCheckoutProvider stripe={stripe} options={{ fetchClientSecret }}>
+                    <EmbeddedCheckout />
+                  </EmbeddedCheckoutProvider>
+                </div>
+              ) : (
+                <p className="lxs-await">{START.pay.await}</p>
+              )}
+            </div>
             <div className="lxs-paytrust">
               {START.pay.trust.map((t) => <span key={t}>{t}</span>)}
             </div>
@@ -300,6 +315,7 @@ export function StartPage({ sessionCount }: { sessionCount: number }) {
               </li>
             ))}
           </ul>
+          <CtaBlock where="after-gets" />
         </div>
       </section>
 
@@ -340,6 +356,15 @@ export function StartPage({ sessionCount }: { sessionCount: number }) {
             ))}
           </dl>
         </div>
+
+        {/* Every session, in the app's own cards. Full-bleed: the rows scroll
+            past the text column the way the app's shelves do. */}
+        <ProgramShelf workouts={workouts} onTap={() => void go("shelf")} />
+
+        <div className="lp-col">
+          <p className="lp-xs lxs-shelfnote">{START.inside.shelfNote}</p>
+          <CtaBlock where="after-shelf" />
+        </div>
       </section>
 
       {/* ── S6 · who it is and is not for ───────────────────────────────── */}
@@ -361,6 +386,7 @@ export function StartPage({ sessionCount }: { sessionCount: number }) {
               </div>
             ))}
           </div>
+          <CtaBlock where="after-fit" />
         </div>
       </section>
 
@@ -391,6 +417,7 @@ export function StartPage({ sessionCount }: { sessionCount: number }) {
           <p className="lp-eyebrow">{START.guarantee.eyebrow}</p>
           <h2>{START.guarantee.k(START.guaranteeDays)}</h2>
           <p className="lp-body">{START.guarantee.d(START.guaranteeDays)}</p>
+          <CtaBlock where="after-guarantee" />
         </div>
       </section>
 

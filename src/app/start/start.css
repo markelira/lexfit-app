@@ -303,3 +303,128 @@
   color: #55685f;
   text-align: center;
 }
+
+/* ── Dark bands ───────────────────────────────────────────────────────────
+   `.lp-dark` recolours ONLY h2, .lp-eyebrow and .lp-body. Anything else put
+   inside it inherits the page's dark ink and lands #18201d on #18201d -
+   invisible. Everything this page adds to a dark band is coloured here,
+   explicitly, rather than hoping inheritance is kind. */
+
+.lxs .lp-dark .lxs-steps strong,
+.lxs .lp-dark .lxs-gets strong { color: var(--d-ink, #f5f8f6); }
+
+.lxs .lp-dark .lxs-steps p,
+.lxs .lp-dark .lxs-gets p {
+  color: oklch(0.965 0.008 168 / 0.82);
+  opacity: 1;               /* the light band uses opacity; here it would double up */
+}
+
+.lxs .lp-dark .lxs-ic {
+  background: oklch(0.965 0.008 168 / 0.12);
+  color: var(--d-ink, #f5f8f6);
+}
+.lxs .lp-dark .lxs-ctablk .lp-xs { color: oklch(0.965 0.008 168 / 0.72); }
+
+/* ── Repeated CTA block ─────────────────────────────────────────────────── */
+
+.lxs .lxs-ctablk {
+  margin-top: var(--sp-6, 24px);
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.lxs .lxs-ctablk .lp-xs { margin: 0; }
+@media (max-width: 719px) {
+  .lxs .lxs-ctablk { justify-items: stretch; }
+  .lxs .lxs-ctablk .lp-cta { width: 100%; }
+  .lxs .lxs-ctablk .lp-xs { text-align: center; }
+}
+
+/* ── The programme, session by session ────────────────────────────────────
+   Full-bleed rows that scroll past the text column, the way the app's own
+   shelves do. The cards are the app's WorkoutCard, so workout-card.css does
+   the card and everything here is only the frame around it. */
+
+.lxs .lxs-shelf {
+  margin: var(--sp-6, 24px) 0 var(--sp-5, 20px);
+  display: grid;
+  gap: var(--sp-6, 24px);
+}
+
+.lxs .lxs-cathead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  /* Matches the text column's gutter so the headings line up with the copy
+     above, even though the row below bleeds past it. */
+  padding: 0 max(20px, calc((100vw - var(--u-max, 560px)) / 2));
+  margin-bottom: 10px;
+}
+.lxs .lxs-cathead h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+}
+.lxs .lxs-cathead span {
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3, #6d7f77);
+  font-variant-numeric: tabular-nums;
+}
+
+.lxs .lxs-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;   /* one axis only: setting just overflow-x makes the
+                           browser compute overflow-y as auto */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px max(20px, calc((100vw - var(--u-max, 560px)) / 2)) 10px;
+  scrollbar-width: none;
+}
+.lxs .lxs-row::-webkit-scrollbar { display: none; }
+
+.lxs .lxs-cell {
+  flex: 0 0 auto;
+  width: 248px;
+  scroll-snap-align: start;
+}
+/* Nothing is bought yet, so there is no list to save to. The card's own play
+   affordance stays - tapping it opens the checkout, which is what someone who
+   just tapped a workout is asking for. */
+.lxs .lxs-cell .wc-save { display: none; }
+
+.lxs .lxs-shelfnote { margin-top: 0; }
+
+/* ── Pay box ──────────────────────────────────────────────────────────────
+   The consent is part of the payment, not a separate hurdle in front of it:
+   one bordered surface holds the tick and the card form, so the tick reads as
+   the first line of the form rather than a gate outside it. */
+
+.lxs .lxs-paybox {
+  border: 1px solid var(--u-line, #dde8e3);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+}
+.lxs .lxs-paybox .lxs-consent {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--u-line, #dde8e3);
+  border-radius: 0;
+  background: #f4f8f6;
+  padding: 16px;
+  font-size: 13px;
+}
+.lxs .lxs-paybox .lxs-consent.lxs-ask { background: #e9f3ee; }
+.lxs .lxs-paybox .lxs-embed { padding: 14px 10px 4px; }
+.lxs .lxs-paybox .lxs-await { margin: 0; border-radius: 0; background: #fff; padding: 26px 20px; }
+.lxs .lxs-paybox .lxs-err { margin: 0; padding: 22px; text-align: center; }
+
+@media (min-width: 720px) {
+  .lxs .lxs-cell { width: 268px; }
+}

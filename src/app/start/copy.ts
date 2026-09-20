@@ -118,6 +118,7 @@ export const START = {
     hd: (n: number) => `${n} edzés, sorrendben.`,
     lead: (n: number, weeks: number) =>
       `A ${n} edzés egymásra épül: az elején a mozdulatokat tanulod, a végére már össze vannak fűzve. Heti 4-5 edzéssel ${weeks} hét - ha ritkábban edzel, egyszerűen tovább tart, és ez rendben van.`,
+    shelfNote: "Ez a teljes program - nincs elrejtve semmi. Minden edzést Alexa vezet, és mindegyik megy szőnyegen, eszköz nélkül.",
     facts: [
       { v: "~30", l: "perc egy edzés" },
       { v: "0", l: "eszköz" },
