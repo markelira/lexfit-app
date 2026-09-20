@@ -62,6 +62,9 @@ export const START = {
     ctaSub: (price: string) => `${price}, egyetlen alkalommal. Nem újul meg, nem vonunk le többet.`,
     mechanism: "Egyszer fizetsz, és örökre a tiéd.",
     mechanismSub: "Nem előfizetés. Nincs mit lemondani.",
+    /** The sticky bar is one line on a narrow phone - the long version wrapped
+     *  to three and crowded the button next to it. */
+    stickySub: "Nem előfizetés.",
     perSession: (per: string) => `${per} egy edzés - és nem havonta, hanem összesen.`,
   },
 

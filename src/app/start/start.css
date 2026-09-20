@@ -518,3 +518,38 @@
 .lxs .lxs-fin { overflow: hidden; }
 .lxs .lxs-fin .fex-marquee { margin: 22px 0 0; }
 .lxs .lxs-finnote { margin-top: 16px; }
+
+/* ── Why the shelf overflowed ─────────────────────────────────────────────
+   The shelf is a grid and every rail is a flex row, and BOTH default their
+   items to `min-width: auto`. A rail wide enough to scroll therefore stretched
+   its own track instead of scrolling inside it - so the track grew to the width
+   of six cards, the billboard centred in that track ran off the screen, and the
+   synopsis was clipped mid-word. Capping the minimums is the whole fix; it is
+   also what made the earlier desktop alignment behave unpredictably. */
+.lxs .lxs-shelf { grid-template-columns: minmax(0, 1fr); }
+.lxs .lxs-cat { min-width: 0; }
+.lxs .lxs-row { min-width: 0; }
+
+/* ── Phones ───────────────────────────────────────────────────────────────
+   The rail's job on a phone is to say "there is more" in the first glance, so
+   the card is sized to leave the next one peeking rather than to fit neatly. */
+@media (max-width: 719px) {
+  .lxs .lxs-cell { width: min(76vw, 264px); }
+
+  /* The billboard is a small hero here, not a 250px-tall stage: it has to leave
+     room for the rail underneath it inside one thumb-scroll. */
+  .lxs .lxs-banner .pgs-hero {
+    min-height: 0;
+    padding: 18px 18px 20px;
+    border-radius: 16px;
+  }
+  .lxs .lxs-banner .pgs-title { font-size: clamp(21px, 6.4vw, 28px); }
+  .lxs .lxs-banner .pgs-syn { font-size: 13.5px; -webkit-line-clamp: 3; }
+  .lxs .lxs-banner .pgs-chips { gap: 6px; }
+  .lxs .lxs-banner .pgs-chip { font-size: 9.5px; padding: 5px 9px; }
+  .lxs .lxs-banner { margin-bottom: 10px; }
+  .lxs .lxs-shelf { gap: 26px; }
+
+  /* Alexa's read is long; on a phone it needs looser leading, not tighter. */
+  .lxs .lxs-ax-story p { font-size: 15.5px; line-height: 1.66; }
+}

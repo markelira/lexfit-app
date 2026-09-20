@@ -498,7 +498,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
       <div className={`lp-sticky${stickyOn ? " on" : ""}`} aria-hidden={!stickyOn}>
         <div className="lp-sticky-p">
           <b>{START.price}, egyszer</b>
-          <span>{START.hero.mechanismSub}</span>
+          <span>{START.hero.stickySub}</span>
         </div>
         <Cta where="sticky" small />
       </div>
