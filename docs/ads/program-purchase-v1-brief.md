@@ -149,7 +149,8 @@ one breaks the rhythm and the reader has to re-read the heading to place it.
 | 5 | Így működik | **navy** | Így működik | Three steps to being inside |
 | 6 | **Mi van benne** | **tinted** | Mi van benne | Six billboards, 35 cards |
 | 7 | Kinek jó | cream, tight | Őszintén | Who it is NOT for |
-| 8 | Alexa | **navy** | Aki végigvisz | The person |
+| 8 | Alexa | **navy** | Aki végigvisz | Her story - the page's one long read |
+| 8b | Befejező kártya | cream, tight | Minden edzés után | The share card, as a feature |
 | 9 | Garancia | cream, tight | Semmit nem kockáztatsz | Risk removal |
 | 10 | GYIK | cream | Kérdések | Objections |
 | 11 | Close | accent | Kezdjük | Final ask |
@@ -174,10 +175,36 @@ billboards and their rails on different left edges. Argument bands use 640px;
 band 6 uses 960px for its copy, stats, billboards AND rails, so the whole
 product section scans down a single left edge.
 
+### Alexa
+
+Her account is the homepage's, condensed - not a fresh bio. Two versions of a
+founder's story drift, and the one on the page taking money would be the one
+that drifted. No incident is retold, only what it taught her, which is also what
+keeps it free of identifying detail. The disclaimer ("nem vagyok orvos, nem
+ígérek csodát") is kept as its own beat: inside the biography it disappears, and
+it is the half that answers the hype objection.
+
+### The finish card, and why it is framed as a feature
+
+The `FinishExamples` belt (the same component the homepage, the lead magnet and
+the reveal render) uses consented photographs with **invented sample stats** -
+minutes, streak, exercise counts. The per-card "minta" label and the
+section-level qualifier were both removed on owner instruction on 2026-08-11.
+
+On a lead page that is a smaller question than it is here. This page takes
+money, so the section is headed as the FEATURE - "a saját kártyád, ha akarod",
+this is what you can make after a workout - rather than as results. Framed that
+way the numbers are illustrative of a product capability, which is what they
+are, instead of implied member outcomes, which they are not.
+
+**Open for the owner:** if those cards should ever carry real numbers, or a
+qualifier, `src/components/finish/FinishExamples.tsx` is the one file to change
+and all four surfaces follow.
+
 ### CTA placement
 
-Nine CTAs: hero, after what-you-get, after the shelf, after who-it-is-for,
-after the guarantee, the close, the mobile sticky bar, and every one of the 35
+Ten CTAs: hero, after what-you-get, after the shelf, after who-it-is-for,
+after Alexa, after the guarantee, the close, the mobile sticky bar, and every one of the 35
 workout cards (a tap opens the checkout rather than a locked dead end). Each
 carries the price on its sub-line, so no CTA requires scrolling back up to
 remember what it costs.

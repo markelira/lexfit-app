@@ -150,10 +150,45 @@ export const START = {
     },
   },
 
+  // Alexa, told the way the homepage tells her - the SAME story, condensed.
+  // Not a fresh bio: two versions of a founder's account drift, and the one on
+  // the page taking money would be the one that drifted. No incident is
+  // retold, only what it taught her, which is also what keeps it free of
+  // identifying detail.
   alexa: {
     eyebrow: "Aki végigvisz",
-    hd: "Alexa.",
-    body: "Ő vezeti végig mind a nyolc hetet. Minden gyakorlatot megmutat, és megmondja, mire figyelj - nincs olyan mozdulat, amit magadtól kellene kitalálnod.",
+    pull: "„Amikor újrakezdtem, otthon kezdtem.”",
+    story: [
+      "Ritmikus gimnasztika, heti hat edzés, tíz éven át. Szerettem. Aztán egyszer csak nem.",
+      "Nem sérülés volt, nem is lustaság. Egyszerűen elfogyott - és ott a kilépés nem döntés. Hálátlanság.",
+      "Tíz év kellett hozzá, hogy megértsem: nem a mozgással volt bajom. Azzal, hogy soha nem az enyém volt.",
+      "Amikor újrakezdtem, otthon kezdtem. Nulláról, egy matracon. Senki nem nézte, senki nem mérte, senki nem kérte számon. És ott jöttem rá, mi hiányzott végig. Nem a fegyelem - abból volt bőven. Hanem hogy a mozgás az enyém legyen.",
+      "Ezért van ez a program. Nem azért, hogy még valaki számonkérjen egy kihagyott napot - hanem azért, hogy ne kelljen megmagyaráznod.",
+    ],
+    facts: ["10 év versenysport", "minden edzést én vezetek", "1 200+ fős közösség"],
+    // The disclaimer is a separate beat from the biography on purpose: inside
+    // one block it disappears, and it is the half that answers the hype
+    // objection.
+    promises: [
+      "Nem mondom meg, mit csinálj.",
+      "Nem ítéllek el, ha kimaradsz.",
+      "Nem játszom, hogy tökéletes vagyok.",
+    ],
+    vow: "Nem vagyok orvos és nem ígérek csodát. Egy rendszert ígérek, ami kibírja az életet.",
+    close: "Egyedül nehéz.",
+    close2: "Együtt muszáj.",
+    sign: "- Alexa",
+  },
+
+  // The finish card, shown as the FEATURE it is rather than as proof. The
+  // numbers on the sample cards are illustrative, and framing the section as
+  // "this is what you get after a workout" keeps that honest - a row of photos
+  // headed "results" would be claiming something these numbers do not support.
+  finish: {
+    eyebrow: "Minden edzés után",
+    hd: "A saját kártyád, ha akarod.",
+    body: "Ahogy befejezed az edzést, készíthetsz egy képet magadról, és ráteszed az adatait: mennyi ideig ment, hány gyakorlat volt, hányadik napod ez sorban. Megosztod, vagy megtartod magadnak - a te dolgod.",
+    note: "Így néznek ki. Koppints bármelyikre.",
   },
 
   guarantee: {

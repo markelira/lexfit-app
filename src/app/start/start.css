@@ -431,3 +431,90 @@
    and below, so the eye reads it as one region rather than losing its place in
    a continuous cream run. */
 .lxs .lxs-productband { background: oklch(0.975 0.008 168); }
+
+/* ── Alexa ────────────────────────────────────────────────────────────────
+   The page's one long read. `.lp-dark` only recolours h2, .lp-eyebrow and
+   .lp-body, so - as with the steps and the billboards - everything added here
+   states its own colour rather than inheriting the page's dark ink onto a dark
+   ground. */
+
+.lxs .lxs-ax-pull {
+  font-size: clamp(24px, 5.6vw, 36px) !important;
+  line-height: 1.12;
+  letter-spacing: -0.026em;   /* display sizes want negative tracking */
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.lxs .lxs-ax-body { margin-top: clamp(28px, 5vw, 44px); }
+
+.lxs .lxs-ax-story { display: grid; gap: 14px; }
+.lxs .lxs-ax-story p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.62;          /* the longest read on the page - looser leading */
+  color: oklch(0.965 0.008 168 / 0.84);
+}
+
+.lxs .lxs-ax-facts { margin-top: 22px; }
+
+/* Three short promises, set as a list of statements rather than prose: this is
+   the beat that answers "is this another person who will make me feel bad",
+   and it has to be readable in one glance. */
+.lxs .lxs-ax-promise {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.lxs .lxs-ax-promise li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--d-ink, #f5f8f6);
+}
+.lxs .lxs-ax-promise li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 2px;
+  background: oklch(0.73 0.03 168);
+}
+
+.lxs .lxs-ax-vow {
+  margin: 24px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid oklch(1 0 0 / 0.14);
+  font-size: 16px;
+  line-height: 1.55;
+  color: oklch(0.965 0.008 168 / 0.78);
+}
+
+.lxs .lxs-ax-close {
+  margin: 22px 0 0;
+  font-size: clamp(20px, 4.4vw, 26px);
+  line-height: 1.18;
+  letter-spacing: -0.018em;
+  font-weight: 750;
+  color: var(--d-ink, #f5f8f6);
+}
+.lxs .lxs-ax-sign {
+  margin: 10px 0 0;
+  font-family: var(--mono, monospace);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: oklch(0.73 0.03 168);
+}
+
+/* ── The finish card ──────────────────────────────────────────────────────
+   The marquee brings its own stylesheet; it only needs room to run full-bleed
+   past the text column, which is what makes it read as a moving belt rather
+   than a static strip. */
+.lxs .lxs-fin { overflow: hidden; }
+.lxs .lxs-fin .fex-marquee { margin: 22px 0 0; }
+.lxs .lxs-finnote { margin-top: 16px; }

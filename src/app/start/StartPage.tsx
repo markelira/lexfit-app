@@ -12,6 +12,7 @@ import { marketingContext, trackProgramCheckout, trackProgramView } from "@/lib/
 import { formatHuf } from "@/lib/pricing/display";
 import type { WorkoutCardVideo } from "@/components/WorkoutCard";
 import { ProgramShelf } from "./ProgramShelf";
+import { FinishExamples } from "@/components/finish/FinishExamples";
 import { START } from "./copy";
 import "../ujrakezdes/ujrakezdes.css"; // the shared look: .lxu / .lp-* bands
 import "./start.css";                  // only what the pay panel adds
@@ -394,13 +395,14 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
         </div>
       </section>
 
-      {/* ── S7 · Alexa (navy) ───────────────────────────────────────────── */}
-      <section className="lp-band lp-dark">
+      {/* ── S7 · Alexa (navy). The page's one long read. Someone deciding on a
+          9 990 Ft purchase from a brand they met ninety seconds ago is deciding
+          about a person as much as a product, so she gets the room. ───────── */}
+      <section className="lp-band lp-dark lxs-ax">
         <div className="lp-col lp-alexa">
           <div>
             <p className="lp-eyebrow">{START.alexa.eyebrow}</p>
-            <h2>{START.alexa.hd}</h2>
-            <p className="lp-body">{START.alexa.body}</p>
+            <h2 className="lxs-ax-pull">{START.alexa.pull}</h2>
           </div>
           <div className="lp-alexa-photo">
             <Image
@@ -411,6 +413,41 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
               sizes="(max-width: 1023px) 80vw, 380px"
             />
           </div>
+        </div>
+
+        <div className="lp-col lxs-ax-body">
+          <div className="lxs-ax-story">
+            {START.alexa.story.map((para) => <p key={para}>{para}</p>)}
+          </div>
+          <ul className="lp-chips lp-chips-d lxs-ax-facts">
+            {START.alexa.facts.map((f) => <li key={f}>{f}</li>)}
+          </ul>
+          {/* Kept apart from the biography: inside one block the disclaimer
+              disappears, and it is the half that answers the hype objection. */}
+          <ul className="lxs-ax-promise">
+            {START.alexa.promises.map((t) => <li key={t}>{t}</li>)}
+          </ul>
+          <p className="lxs-ax-vow">{START.alexa.vow}</p>
+          <p className="lxs-ax-close">
+            {START.alexa.close}<br />{START.alexa.close2}
+          </p>
+          <p className="lxs-ax-sign">{START.alexa.sign}</p>
+          <CtaBlock where="after-alexa" />
+        </div>
+      </section>
+
+      {/* ── S7b · the finish card. Shown as the feature it is, not as proof:
+          the numbers on the sample cards are illustrative, and a row of photos
+          headed "results" would claim something they do not support. ─────── */}
+      <section className="lp-band lp-tight lxs-fin">
+        <div className="lp-col">
+          <p className="lp-eyebrow">{START.finish.eyebrow}</p>
+          <h2>{START.finish.hd}</h2>
+          <p className="lp-body">{START.finish.body}</p>
+        </div>
+        <FinishExamples onPick={() => void go("finish")} />
+        <div className="lp-col">
+          <p className="lp-xs lxs-finnote">{START.finish.note}</p>
         </div>
       </section>
 
