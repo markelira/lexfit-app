@@ -53,6 +53,10 @@ export async function GET(req: Request) {
         sent: false,
         reason: quiet ? "no_alerts" : "not_live",
         purchases: brief.total.purchases,
+        // Booleans only, never values. `vercel env pull` returns an empty
+        // string for env vars marked sensitive, so reading the config from
+        // outside cannot tell "unset" from "write-only" - the runtime can.
+        config: brief.config,
       });
     }
 
