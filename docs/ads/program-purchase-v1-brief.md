@@ -136,7 +136,21 @@ them to ViewContent / InitiateCheckout / **Purchase**. Map `lx_program_purchase`
 before spending anything — an ad set optimising for a conversion that never arrives spends
 its whole learning budget on nothing, which is exactly what happened with Lead.
 
-## Generated set (2026-09-20, Higgsfield MCP, nano_banana_pro)
+## Generated set
+
+**The shipping set is `final-v3/` — see its README for the full spec, the build recipe and
+the list of defects that were fixed.** Twelve creatives: three copy variants across 4:5,
+1:1, 9:16 and 16:9, all 2160px or larger. The trainer in them is a real photograph, not a
+generated likeness.
+
+Two standalone creatives sit alongside it, from the first exploration:
+- `ad2-price-4x5.png` — the price anchor (`285 Ft / EGY EDZÉS ÁRA`), typographic, no people.
+  Runs as-is.
+- `ad4-ferfi-4x5.png` — native cell, male subject, not a likeness of anyone real. Runs
+  as-is, and it is the only cell speaking to the half of the audience the positioning has
+  covered since Aug 2026.
+
+### Earlier exploration (2026-09-20, Higgsfield MCP, nano_banana_pro)
 
 All Hungarian display strings passed the OCR gate on eyes-on review. Every string was
 chosen to avoid the double acute (ő/ű), the known garbling mode — which is why the badge
