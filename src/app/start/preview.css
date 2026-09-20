@@ -1,0 +1,240 @@
+/* The workout preview, scoped `.lxpv`.
+
+   A bottom sheet on phones and a centred dialog on desktop - the same object
+   either way, positioned where the thumb or the cursor already is. */
+
+.lxpv {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  /* Dim AND push back: this is a modal task, so the page behind recedes rather
+     than staying available. */
+  background: oklch(0.2 0.02 168 / 0.5);
+  backdrop-filter: blur(3px);
+  animation: lxpv-dim 220ms ease-out;
+}
+@keyframes lxpv-dim { from { opacity: 0; } to { opacity: 1; } }
+
+.lxpv-sheet {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(92dvh, 920px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #18201d;
+  font-family: var(--font);
+  border-radius: 22px 22px 0 0;
+  overflow: hidden;
+  box-shadow: 0 -12px 60px -20px oklch(0.2 0.02 168 / 0.6);
+  /* Enter along the axis it will leave on: up from the bottom, down to
+     dismiss. Critically damped - no overshoot on something that just appeared
+     without a gesture behind it. */
+  animation: lxpv-rise 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes lxpv-rise {
+  from { transform: translateY(26px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.lxpv-x {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: oklch(0.2 0.02 168 / 0.55);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: transform 110ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.lxpv-x:active { transform: scale(0.92); }
+.lxpv-x:focus-visible { outline: 3px solid #7a9b8d; outline-offset: 2px; }
+
+.lxpv-scroll {
+  overflow: hidden auto;   /* one axis: setting only overflow-y makes the
+                              browser compute overflow-x as auto */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Media ──────────────────────────────────────────────────────────────── */
+
+.lxpv-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #e6ede9;
+  overflow: hidden;
+}
+.lxpv-still,
+.lxpv-anim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* The clip is painted over the still and only revealed once it has decoded,
+   so the panel never shows an empty frame while a GIF downloads. */
+.lxpv-anim { opacity: 0; transition: opacity 420ms ease-out; }
+.lxpv-anim.on { opacity: 1; }
+.lxpv-fallback { position: absolute; inset: 0; }
+.lxpv-skel {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, #e6ede9 30%, #f2f7f4 50%, #e6ede9 70%);
+  background-size: 220% 100%;
+  animation: lxpv-shimmer 1.4s linear infinite;
+}
+@keyframes lxpv-shimmer { to { background-position: -120% 0; } }
+
+.lxpv-live,
+.lxpv-dur {
+  position: absolute;
+  z-index: 2;
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: oklch(0.2 0.02 168 / 0.62);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+.lxpv-live { top: 12px; left: 12px; }
+.lxpv-dur { bottom: 12px; right: 12px; font-variant-numeric: tabular-nums; }
+
+/* ── Body ───────────────────────────────────────────────────────────────── */
+
+.lxpv-body { padding: 20px 20px 24px; }
+
+.lxpv-eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #6d7f77;
+}
+.lxpv-title {
+  margin: 0 0 6px;
+  font-size: clamp(21px, 5.4vw, 26px);
+  line-height: 1.16;
+  letter-spacing: -0.018em;   /* negative tracking as display type grows */
+  font-weight: 750;
+  text-wrap: balance;
+}
+.lxpv-sub {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #55685f;
+}
+
+/* The exercise list - the part that answers "what will I actually be doing". */
+.lxpv-blocks { margin-top: 22px; }
+.lxpv-blockhd {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.008em;
+}
+.lxpv-blocks > ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.lxpv-bname {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e4ece8;
+  font-size: 14px;
+  font-weight: 650;
+}
+.lxpv-bname em {
+  font-style: normal;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  color: #6d7f77;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.lxpv-blocks ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 5px; }
+.lxpv-blocks ul li {
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #55685f;
+  padding-left: 14px;
+  position: relative;
+}
+.lxpv-blocks ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 6px;
+  height: 1.5px;
+  background: #b6c7c0;
+}
+
+/* ── Foot ───────────────────────────────────────────────────────────────── */
+
+.lxpv-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+  border-top: 1px solid #e4ece8;
+  background: oklch(1 0 0 / 0.94);
+  backdrop-filter: blur(14px) saturate(150%);
+}
+.lxpv-price { flex: 1; min-width: 0; display: grid; line-height: 1.25; }
+.lxpv-price strong {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+.lxpv-price span { font-size: 11.5px; color: #6d7f77; }
+
+.lxpv-cta {
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  background: #3f6354;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: transform 110ms cubic-bezier(0.22, 0.61, 0.36, 1), background 160ms;
+}
+.lxpv-cta:active { transform: scale(0.975); background: #36554a; }
+.lxpv-cta:focus-visible { outline: 3px solid #7a9b8d; outline-offset: 3px; }
+
+@media (min-width: 620px) {
+  .lxpv { align-items: center; padding: 24px; }
+  .lxpv-sheet { border-radius: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxpv, .lxpv-sheet { animation: none; }
+  .lxpv-anim { transition: none; }
+  .lxpv-skel { animation: none; }
+  .lxpv-x:active, .lxpv-cta:active { transform: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .lxpv { backdrop-filter: none; }
+  .lxpv-foot { background: #fff; backdrop-filter: none; }
+  .lxpv-x, .lxpv-live, .lxpv-dur { backdrop-filter: none; background: oklch(0.2 0.02 168 / 0.85); }
+}

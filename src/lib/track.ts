@@ -373,3 +373,9 @@ export function trackProgramPurchase(role: PriceRole, slug: string): void {
     ...(spec ? { value: spec.amountHuf, currency: "HUF" } : {}),
   });
 }
+
+/** A workout card was opened for a look. The step between seeing the programme
+ *  and asking to pay for it - without it the shelf's contribution is invisible. */
+export function trackProgramPreview(code: string): void {
+  push("lx_program_preview", { code });
+}

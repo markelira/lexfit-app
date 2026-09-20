@@ -8,10 +8,11 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { inMetaWebview } from "@/lib/webview";
-import { marketingContext, trackProgramCheckout, trackProgramView } from "@/lib/track";
+import { marketingContext, trackProgramCheckout, trackProgramPreview, trackProgramView } from "@/lib/track";
 import { formatHuf } from "@/lib/pricing/display";
 import type { WorkoutCardVideo } from "@/components/WorkoutCard";
 import { ProgramShelf } from "./ProgramShelf";
+import { PreviewModal } from "./PreviewModal";
 import { FinishExamples } from "@/components/finish/FinishExamples";
 import { START } from "./copy";
 import "../ujrakezdes/ujrakezdes.css"; // the shared look: .lxu / .lp-* bands
@@ -55,6 +56,8 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
   const [paying, setPaying] = useState(false);   // the pay panel is mounted
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  /** Which workout is open for a look, if any. */
+  const [preview, setPreview] = useState<string | null>(null);
   const payRef = useRef<HTMLDivElement>(null);
   const consentRef = useRef<HTMLLabelElement>(null);
 
@@ -363,7 +366,11 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
 
         {/* Every session, in the app's own cards. Full-bleed: the rows scroll
             past the text column the way the app's shelves do. */}
-        <ProgramShelf workouts={workouts} onTap={() => void go("shelf")} />
+        <ProgramShelf
+          workouts={workouts}
+          onPreview={(code) => { setPreview(code); trackProgramPreview(code); }}
+          onSave={() => void go("shelf-save")}
+        />
 
         <div className="lp-col lp-col-wide">
           <p className="lp-xs lxs-shelfnote">{START.inside.shelfNote}</p>
@@ -493,6 +500,13 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
           </p>
         </div>
       </section>
+
+      {/* The card preview, and the ask it closes on. */}
+      <PreviewModal
+        code={preview}
+        onClose={() => setPreview(null)}
+        onBuy={() => { setPreview(null); void go("preview"); }}
+      />
 
       {/* ── sticky bar (mobile) ─────────────────────────────────────────── */}
       <div className={`lp-sticky${stickyOn ? " on" : ""}`} aria-hidden={!stickyOn}>

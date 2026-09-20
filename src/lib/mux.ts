@@ -114,7 +114,18 @@ export async function signThumbToken(playbackId: string, width: number, time = 6
   return t as unknown as string;
 }
 
-export async function signPreviewTokens(playbackId: string) {
+/**
+ * Poster + animated clip, both signed as IMAGE types.
+ *
+ * The token covers BOTH `/animated.gif` and `/animated.webp`; prefer the webp,
+ * which came back 1.85MB against the gif's 9.84MB for the same ten seconds.
+ *
+ * `seconds` is the animation's length. Mux caps an animated clip at 10s, which
+ * is also the ceiling on how much "preview video" can be served without
+ * clipping the asset - a playback token cannot be duration-limited, so a real
+ * sixty-second preview means a separate short asset, not a longer window here.
+ */
+export async function signPreviewTokens(playbackId: string, seconds = 5, width = 480) {
   const base = {
     keyId: process.env.MUX_SIGNING_KEY_ID,
     keySecret: process.env.MUX_SIGNING_PRIVATE_KEY,
@@ -129,7 +140,7 @@ export async function signPreviewTokens(playbackId: string) {
     mux.jwt.signPlaybackId(playbackId, {
       ...base,
       type: "gif",
-      params: { start: "60", end: "65", width: "480" },
+      params: { start: "60", end: String(60 + Math.min(10, Math.max(1, seconds))), width: String(width) },
     }),
   ]);
   return { thumbnail: thumb as unknown as string, gif: gif as unknown as string };

@@ -247,6 +247,21 @@ export const START = {
   consent: (days: number) =>
     `Kérem, hogy a hozzáférés azonnal induljon. Tudomásul veszem, hogy a teljesítés megkezdése után a törvényi elállási jogom megszűnik - a ${days} napos pénzvisszafizetést a LEXFIT ettől függetlenül vállalja.`,
 
+  // The card preview. Honest about what it is: a look inside one workout,
+  // not a free sample of the product.
+  preview: {
+    live: "ELŐNÉZET",
+    sub: (mins: number, count: number) =>
+      count > 0
+        ? `${mins} perc · ${count} gyakorlat · Alexa végigvezet`
+        : `${mins} perc · Alexa végigvezet`,
+    blocksHd: "Mit csinálsz benne",
+    cta: "Megveszem a programot",
+    footNote: "egyszer · örökre a tiéd",
+    loading: "Egy pillanat…",
+    failed: "Ezt az előnézetet most nem tudtuk betölteni - a program tartalmát fent végignézheted.",
+  },
+
   pay: {
     hd: "Fizetés",
     await: "Pipáld ki a fenti sort, és megnyílik a kártyás fizetés.",

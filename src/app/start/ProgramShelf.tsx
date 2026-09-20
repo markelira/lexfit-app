@@ -23,9 +23,9 @@ import "@/app/app/programs/programs.css"; // `.lx .pgs-*` - the billboard itself
  * The wrapper carries `.lx` because that is the scope workout-card.css and
  * programs.css are both written against; see the comment at the return.
  *
- * Every card is a CTA. Tapping one cannot play anything - nothing has been
- * bought yet - so instead of a locked dead end it opens the checkout, which is
- * what someone who just tapped a workout is asking for.
+ * Tapping a card opens its preview rather than the checkout. Someone who taps
+ * a workout is asking to see THAT workout, and answering with a payment form
+ * skips the question; the preview answers it and then makes the ask.
  */
 
 /** What each category is for, in the buyer's terms rather than the trainer's. */
@@ -50,10 +50,15 @@ const keyOf = (theme: string) =>
 
 export function ProgramShelf({
   workouts,
-  onTap,
+  onPreview,
+  onSave,
 }: {
   workouts: WorkoutCardVideo[];
-  onTap: () => void;
+  /** Tapping a card opens its preview - the thing they just asked to see. */
+  onPreview: (code: string) => void;
+  /** There is no list to save to before a purchase, so the save control goes
+   *  to the checkout instead of nowhere. */
+  onSave: () => void;
 }) {
   if (!workouts.length) return null;
 
@@ -113,8 +118,8 @@ export function ProgramShelf({
                     <WorkoutCard
                       v={v}
                       saved={false}
-                      onPlay={onTap}
-                      onToggleSave={onTap}
+                      onPlay={onPreview}
+                      onToggleSave={onSave}
                     />
                   </div>
                 ))}

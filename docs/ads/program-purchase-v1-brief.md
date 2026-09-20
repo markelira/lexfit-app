@@ -201,6 +201,34 @@ are, instead of implied member outcomes, which they are not.
 qualifier, `src/components/finish/FinishExamples.tsx` is the one file to change
 and all four surfaces follow.
 
+### The card preview, and the sixty-second video that does not exist yet
+
+Tapping a workout card opens a preview sheet: the workout's poster, an
+**eight-second moving clip** from the sixty-second mark, its category, format
+and length, the full **exercise list block by block**, and a pinned CTA.
+
+A real sixty-second preview video is **not** built, and it is not a matter of
+asking for a different token. A signed Mux playback token cannot be
+duration-limited: handing one to a public page would make the whole workout
+available to anyone who read it out of a network tab, and across 35 cards that
+is most of the library. Mux caps an animated clip at ten seconds, so that is
+the ceiling on preview *footage* without clipping.
+
+**What a true 60s preview needs:** one clipped Mux asset per workout (Mux can
+create an asset from a slice of another), its playback id stored on the video
+document as `previewPlaybackId`, and the modal pointing at it. Leaking that id
+then leaks a minute, not the library. Roughly a one-time script plus a field -
+worth doing if the preview proves it moves the purchase.
+
+Weight matters here because this page is served to phones from an ad: ten
+seconds of gif at 480px measured **9.8MB**. The same clip as webp at 420px is
+**1.2MB**, and it is only fetched when a card is actually tapped.
+
+The exercise list carries more of the preview's weight than the footage does.
+It answers the question a visitor is actually asking - not "what does this look
+like" but "what will I be doing for twenty-six minutes" - and it comes from the
+same `blocks` the player uses, so it cannot drift from the workout.
+
 ### CTA placement
 
 Ten CTAs: hero, after what-you-get, after the shelf, after who-it-is-for,
