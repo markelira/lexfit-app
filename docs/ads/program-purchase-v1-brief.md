@@ -128,6 +128,60 @@ photograph with minimal type, so it reads as a post rather than an ad.
 
 CTA button: **Vásárlás**. Destination `/start`.
 
+## The landing: `/start`
+
+One page, no navigation. A nav on an ad landing is a row of exits, so the only
+links are the two legal ones in the footer.
+
+### Scan architecture
+
+Eleven bands, each with a fixed three-part rhythm so the eye learns the pattern
+once and then skims it: **eyebrow → heading → body**. Every band carries an
+eyebrow, including the three that originally had none, because a band without
+one breaks the rhythm and the reader has to re-read the heading to place it.
+
+| # | Band | Ground | Eyebrow | Job |
+|---|---|---|---|---|
+| 1 | Hero | sage | Nincs havidíj | Offer + price + CTA above the fold |
+| 2 | Pay panel | white | — | Opens in place on CTA press |
+| 3 | Amit megveszel | cream | Amit megveszel | Four things the price buys |
+| 4 | Problem mirror | cream, tight | Miért akad el | Say what they believe first |
+| 5 | Így működik | **navy** | Így működik | Three steps to being inside |
+| 6 | **Mi van benne** | **tinted** | Mi van benne | Six billboards, 35 cards |
+| 7 | Kinek jó | cream, tight | Őszintén | Who it is NOT for |
+| 8 | Alexa | **navy** | Aki végigvisz | The person |
+| 9 | Garancia | cream, tight | Semmit nem kockáztatsz | Risk removal |
+| 10 | GYIK | cream | Kérdések | Objections |
+| 11 | Close | accent | Kezdjük | Final ask |
+
+Two navy bands and one tinted band break what would otherwise be a long cream
+run. The tint on band 6 matters most: it is the page's longest stretch by far -
+six billboards and thirty-five cards - and without its own ground the reader
+loses their place in the middle of it.
+
+### Heading tree
+
+One `h1` (the hero), one `h2` per band, one `h3` per category billboard. The
+billboard component gained a `titleAs` prop for this: it renders `h2` where the
+band IS the section (/app/programs, the homepage) and `h3` where it sits inside
+a band that already owns one, so the outline stays a tree rather than a flat run.
+
+### Column system
+
+Two widths, both the page's own primitive (`.lp-col` / `.lp-col-wide`), never
+hand-rolled gutter math - two earlier attempts at percentage arithmetic put the
+billboards and their rails on different left edges. Argument bands use 640px;
+band 6 uses 960px for its copy, stats, billboards AND rails, so the whole
+product section scans down a single left edge.
+
+### CTA placement
+
+Nine CTAs: hero, after what-you-get, after the shelf, after who-it-is-for,
+after the guarantee, the close, the mobile sticky bar, and every one of the 35
+workout cards (a tap opens the checkout rather than a locked dead end). Each
+carries the price on its sub-line, so no CTA requires scrolling back up to
+remember what it costs.
+
 ## Measurement
 
 The page emits `lx_program_view` → `lx_program_checkout` → `lx_program_purchase`, all

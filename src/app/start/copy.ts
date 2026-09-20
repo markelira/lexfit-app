@@ -98,6 +98,7 @@ export const START = {
   // The problem mirror. Says what they already believe, in their words, before
   // claiming anything - the same move the lead magnet's S3 makes.
   mirror: {
+    eyebrow: "Miért akad el",
     hd: "Nem az akarat fogy el.",
     body: "A legtöbben nem azért hagyják abba, mert lusták. Hanem mert minden edzés előtt dönteni kell: mit csináljak ma, mennyit, meddig. Ez a döntés fárasztóbb, mint maga az edzés - és pár hét múlva egyszerűbb kihagyni.",
     close: "Ezt a döntést veszi le rólad a program.",
@@ -129,6 +130,7 @@ export const START = {
   // Pratfall: saying plainly who this is NOT for buys more trust than another
   // benefit bullet, and it keeps the refund rate down.
   fit: {
+    eyebrow: "Őszintén",
     hd: "Kinek jó, és kinek nem",
     yes: {
       k: "Neked való, ha",
@@ -162,6 +164,7 @@ export const START = {
   },
 
   faq: {
+    eyebrow: "Kérdések",
     hd: "Amit ilyenkor kérdezni szoktak",
     items: [
       {

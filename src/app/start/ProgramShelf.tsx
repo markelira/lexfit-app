@@ -85,7 +85,12 @@ export function ProgramShelf({
         const minLevel = Math.min(...list.map((v) => v.level ?? 1));
         return (
           <section key={theme} className="lxs-cat" aria-label={theme}>
-            <div className="lxs-banner">
+            {/* `.lp-col lp-col-wide` is the page's OWN centring primitive, used
+                here instead of a hand-rolled gutter. Two earlier attempts at
+                percentage math put the billboard and its rail on different
+                left edges; reusing the primitive cannot drift from the copy
+                because it IS what the copy uses. */}
+            <div className="lp-col lp-col-wide lxs-banner">
               <ProgramBanner
                 slug={key}
                 title={catWord(theme)}
@@ -93,6 +98,7 @@ export function ProgramShelf({
                 hue={hues[key]}
                 eyebrow={bannerEyebrow(["LEXFIT START", `${list.length} EDZÉS`])}
                 synopsis={SYNOPSIS[theme]}
+                titleAs="h3"
                 chips={[
                   levelWord(minLevel).toUpperCase(),
                   `~${avg} PERC / EDZÉS`,
@@ -100,17 +106,19 @@ export function ProgramShelf({
                 ]}
               />
             </div>
-            <div className="lxs-row" role="list">
-              {list.map((v) => (
-                <div className="lxs-cell" role="listitem" key={v.code}>
-                  <WorkoutCard
-                    v={v}
-                    saved={false}
-                    onPlay={onTap}
-                    onToggleSave={onTap}
-                  />
-                </div>
-              ))}
+            <div className="lp-col lp-col-wide">
+              <div className="lxs-row" role="list">
+                {list.map((v) => (
+                  <div className="lxs-cell" role="listitem" key={v.code}>
+                    <WorkoutCard
+                      v={v}
+                      saved={false}
+                      onPlay={onTap}
+                      onToggleSave={onTap}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         );

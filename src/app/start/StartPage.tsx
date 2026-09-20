@@ -322,6 +322,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
       {/* ── S3 · the problem mirror ─────────────────────────────────────── */}
       <section className="lp-band lp-tight">
         <div className="lp-col">
+          <p className="lp-eyebrow">{START.mirror.eyebrow}</p>
           <h2>{START.mirror.hd}</h2>
           <p className="lp-body">{START.mirror.body}</p>
           <p className="lp-body"><b>{START.mirror.close}</b></p>
@@ -344,9 +345,11 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
         </div>
       </section>
 
-      {/* ── S5 · what is inside ─────────────────────────────────────────── */}
-      <section className="lp-band">
-        <div className="lp-col">
+      {/* ── S5 · what is inside. The one WIDE band: its copy, stats,
+          billboards and rails all sit in the same 960px column, so the whole
+          section scans down a single left edge. ───────────────────────────── */}
+      <section className="lp-band lxs-productband">
+        <div className="lp-col lp-col-wide">
           <p className="lp-eyebrow">{START.inside.eyebrow}</p>
           <h2>{START.inside.hd(sessionCount)}</h2>
           <p className="lp-body">{START.inside.lead(sessionCount, START.weeks)}</p>
@@ -361,7 +364,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
             past the text column the way the app's shelves do. */}
         <ProgramShelf workouts={workouts} onTap={() => void go("shelf")} />
 
-        <div className="lp-col">
+        <div className="lp-col lp-col-wide">
           <p className="lp-xs lxs-shelfnote">{START.inside.shelfNote}</p>
           <CtaBlock where="after-shelf" />
         </div>
@@ -370,6 +373,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
       {/* ── S6 · who it is and is not for ───────────────────────────────── */}
       <section className="lp-band lp-tight">
         <div className="lp-col">
+          <p className="lp-eyebrow">{START.fit.eyebrow}</p>
           <h2>{START.fit.hd}</h2>
           <div className="lxs-fit">
             {[START.fit.yes, START.fit.no].map((col, i) => (
@@ -424,6 +428,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
       {/* ── S9 · FAQ ────────────────────────────────────────────────────── */}
       <section className="lp-band">
         <div className="lp-col">
+          <p className="lp-eyebrow">{START.faq.eyebrow}</p>
           <h2>{START.faq.hd}</h2>
           <div className="lxs-faq">
             {START.faq.items.map((f) => (

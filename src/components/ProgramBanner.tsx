@@ -44,6 +44,7 @@ export function ProgramBanner({
   eyebrow,
   synopsis,
   chips = [],
+  titleAs: Title = "h2",
   children,
 }: {
   slug: string;
@@ -55,6 +56,13 @@ export function ProgramBanner({
   eyebrow: string;
   synopsis?: string | null;
   chips?: string[];
+  /**
+   * The heading element. `h2` on surfaces where the band IS the section
+   * (/app/programs, the homepage). `h3` where the banner sits inside a section
+   * that already owns an h2 - a landing band, say - so the document outline
+   * stays a tree rather than a flat run of h2s.
+   */
+  titleAs?: "h2" | "h3";
   /** The CTA row. Differs per surface: playback in the app, the funnel on `/`. */
   children?: ReactNode;
 }) {
@@ -71,7 +79,7 @@ export function ProgramBanner({
           <span className="nm">{pv.name}</span>
         </span>
         <div className="pgs-eyebrow">{eyebrow}</div>
-        <h2 className="pgs-title">{name}</h2>
+        <Title className="pgs-title">{name}</Title>
         {synopsis && <p className="pgs-syn">{synopsis}</p>}
         {chips.length > 0 && (
           <div className="pgs-chips">

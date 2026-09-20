@@ -354,24 +354,17 @@
   background: transparent;
 }
 
-/* The gutter that lines the shelf up with the copy above it.
+/* The category billboard. Alignment comes from `.lp-col lp-col-wide` on the
+   wrapper - the page's own centring primitive - so it cannot drift from the
+   copy. Nothing here computes a gutter. */
+.lxs .lxs-banner { margin-bottom: 12px; }
 
-   NOT computed from the viewport: the shelf sits inside `.lp-band`, which has
-   already inset it by its own clamp() padding, so a viewport-based sum counts
-   that inset twice. A percentage resolves against the band's content box - the
-   exact box `.lp-col` centres its 640px in - so this stays aligned at every
-   width without knowing what the band's padding currently is.
-
-   640px is `.lp-col`'s max-width. If that ever changes, this follows it. */
-.lxs .lxs-shelf { --lxs-gut: max(0px, calc((100% - 640px) / 2)); }
-
-/* The category billboard. Padded by the shared gutter so its left edge lines
-   up with the copy above; the rail beneath starts on the same line and then
-   scrolls past the right edge, which is what marks it as scrollable. */
-.lxs .lxs-banner {
-  padding-inline: var(--lxs-gut);
-  margin-bottom: 12px;
-}
+/* `.lxu .lp-band h2` (0,2,1) outranks `.lx .pgs-title` (0,2,0), which painted
+   the billboard heading with the BAND's ink: dark on a dark billboard,
+   invisible. The heading is an h3 here now, but the billboard's own colours are
+   pinned regardless so a future band rule cannot reach inside it again. */
+.lxs .lxs-banner .pgs-title { color: #fff; }
+.lxs .lxs-banner .pgs-syn { color: oklch(1 0 0 / 0.82); }
 /* Inside a landing band the billboard is a card, not a full-bleed wall - it
    should read as a small hero, so it keeps a radius and a contained shadow. */
 .lxs .lxs-banner .pgs-hero {
@@ -387,7 +380,7 @@
                            browser compute overflow-y as auto */
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding: 2px var(--lxs-gut) 10px;
+  padding: 2px 0 10px;
   scrollbar-width: none;
 }
 .lxs .lxs-row::-webkit-scrollbar { display: none; }
@@ -432,3 +425,9 @@
 @media (min-width: 720px) {
   .lxs .lxs-cell { width: 268px; }
 }
+
+/* The product band is the page's longest stretch by far - six billboards and
+   thirty-five cards. A faint ground separates it from the argument bands above
+   and below, so the eye reads it as one region rather than losing its place in
+   a continuous cream run. */
+.lxs .lxs-productband { background: oklch(0.975 0.008 168); }
