@@ -2,7 +2,8 @@ import "server-only";
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { sendEmail } from "@/lib/email";
-import { collectBrief, renderBrief, CAMPAIGN } from "@/lib/campaign-brief";
+import { adminDb } from "@/lib/firebase-admin";
+import { buildBrief, renderBrief, CAMPAIGN, type EventDoc } from "@/lib/campaign-brief";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,7 +39,16 @@ export async function GET(req: Request) {
   const now = Date.now();
 
   try {
-    const brief = await collectBrief(now);
+    // One `at >=` read, filtered in memory - the shape the other crons use,
+    // and it avoids a composite index on (name, at).
+    const snap = await adminDb.collection("events").where("at", ">=", CAMPAIGN.startMs).get();
+    const rows = snap.docs.map((d) => d.data() as EventDoc);
+    const brief = buildBrief(rows, now, {
+      pixel: !!process.env.META_PIXEL_ID,
+      capiToken: !!process.env.META_CAPI_TOKEN,
+      gtm: !!process.env.NEXT_PUBLIC_GTM_ID,
+      sendgrid: !!process.env.SENDGRID_API_KEY,
+    });
 
     // Nothing to say, and this mode is allowed to say nothing.
     const quiet = mode === "watch" && brief.alerts.length === 0;

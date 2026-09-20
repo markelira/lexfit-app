@@ -1,5 +1,3 @@
-import "server-only";
-import { adminDb } from "@/lib/firebase-admin";
 import { PRICES } from "@/lib/pricing/config";
 import { formatHuf } from "@/lib/pricing/display";
 
@@ -14,6 +12,11 @@ import { formatHuf } from "@/lib/pricing/display";
  * learning. A brief that prescribed a change each evening would therefore be
  * acting on one-conversion samples AND resetting the algorithm nightly. It
  * would make results worse, not better, while looking diligent.
+ *
+ * This module is deliberately PURE - it takes rows and returns a report. The
+ * Firestore read lives in the route, so the whole analysis (and every rule
+ * below) can be exercised by scripts/campaign-brief-selftest.ts rather than
+ * first running for real at 20:00 on launch day.
  *
  * So the two jobs are split by the sample size each one honestly needs:
  *
@@ -100,24 +103,29 @@ function dayKey(ms: number): string {
   return p; // en-CA gives "09-21"
 }
 
-interface EventDoc {
+export interface EventDoc {
   name: string;
   at: number;
   props?: Record<string, unknown>;
 }
 
-export async function collectBrief(nowMs: number): Promise<Brief> {
+/** The env flags the report cares about. Passed in rather than read here, so
+ *  the rules stay testable and the module stays free of `process.env`. */
+export interface BriefConfig {
+  pixel: boolean;
+  capiToken: boolean;
+  gtm: boolean;
+  sendgrid: boolean;
+}
+
+export function buildBrief(rows: EventDoc[], nowMs: number, config: BriefConfig): Brief {
   const live = nowMs >= CAMPAIGN.startMs && nowMs <= CAMPAIGN.endMs;
   const totalDays = Math.ceil((CAMPAIGN.endMs - CAMPAIGN.startMs) / (24 * H));
   const dayIndex =
     nowMs < CAMPAIGN.startMs ? 0 : nowMs > CAMPAIGN.endMs ? -1 : Math.floor((nowMs - CAMPAIGN.startMs) / (24 * H)) + 1;
 
-  // One `at >=` read, filtered in memory - the same shape the other crons use,
-  // and it avoids needing a composite index on (name, at).
-  const snap = await adminDb.collection("events").where("at", ">=", CAMPAIGN.startMs).get();
-  const evs: EventDoc[] = snap.docs
-    .map((d) => d.data() as EventDoc)
-    .filter((e) => e && typeof e.at === "number" && e.at <= nowMs)
+  const evs: EventDoc[] = rows
+    .filter((e) => e && typeof e.at === "number" && e.at >= CAMPAIGN.startMs && e.at <= nowMs)
     // Chronological, so the row a de-duplicated purchase lands in is the
     // earliest of its twins rather than whichever Firestore returned first.
     .sort((a, b) => a.at - b.at);
@@ -174,13 +182,6 @@ export async function collectBrief(nowMs: number): Promise<Brief> {
     }),
     { day: "összesen", starts: 0, purchases: 0, revenueHuf: 0, accounts: 0 },
   );
-
-  const config = {
-    pixel: !!process.env.META_PIXEL_ID,
-    capiToken: !!process.env.META_CAPI_TOKEN,
-    gtm: !!process.env.NEXT_PUBLIC_GTM_ID,
-    sendgrid: !!process.env.SENDGRID_API_KEY,
-  };
 
   const gateOpen = dayIndex >= GATE_MIN_DAYS || total.purchases >= GATE_MIN_PURCHASES;
 
