@@ -13,6 +13,7 @@ import {
   ownedPrograms,
   type SubscriptionDoc,
 } from "../src/lib/pricing/types";
+import { START } from "../src/app/start/copy";
 import {
   PRICES,
   PROGRAM_PRODUCTS,
@@ -398,7 +399,41 @@ function programGrants() {
     );
   }
   assert.equal(programRoleForSlug("napindito"), null, "a programme not for sale has no role");
-  console.log("✓ programme purchases (scope, survival, catalog wiring)");
+
+  // The /start page's claims, guarded the way the lead magnet's are.
+  const allCopy = JSON.stringify(START);
+  assert.equal(START.price, formatHuf(PRICES.program_foundation.amountHuf), "price is derived");
+  assert.equal(START.slug, PROGRAM_PURCHASE_ROLES[START.role], "page sells what it grants");
+  // The 8-week framing is allowed but must come from ONE constant, and the
+  // page must not promise it without saying what it costs in cadence - the ad
+  // leads with "8 hetes program", so the landing has to hold the same claim up.
+  const weekMentions = allCopy.match(/(\d+)\s*het/gi) ?? [];
+  assert.ok(weekMentions.length > 0, "/start states the programme length");
+  for (const m of weekMentions) {
+    assert.equal(
+      Number(m.match(/\d+/)![0]),
+      START.weeks,
+      `every week figure on /start must be START.weeks, found ${m}`,
+    );
+  }
+  assert.ok(
+    /heti 4-5 edz/i.test(allCopy),
+    "/start must state the cadence the 8 weeks assumes, not just the 8 weeks",
+  );
+  // No deadline or countdown - offer v3 §2/§10, and the GVH's AboutYou decision.
+  assert.equal(
+    // Deliberately NOT a bare /lejár/: the page says "Nincs lejárat", which is
+    // the opposite claim and must not trip a guard aimed at countdowns.
+    /(csak ma|utolsó esély|visszaszámlál|határid|hamarosan lejár|\bmost\b.{0,14}kedvezm)/i.test(
+      allCopy,
+    ),
+    false,
+    "no manufactured urgency on /start",
+  );
+  // The whole offer rests on one promise; the page must actually make it.
+  assert.ok(/örökre/i.test(allCopy), "/start states the forever promise");
+  assert.ok(/nem előfizetés/i.test(allCopy), "/start names the objection it answers");
+  console.log("✓ programme purchases (scope, survival, catalog wiring, /start claims)");
 }
 
 accessMatrix();

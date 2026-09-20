@@ -29,6 +29,15 @@ export const START = {
   price: formatHuf(PRICES[ROLE].amountHuf),
   guaranteeDays: WITHDRAWAL_DAYS,
 
+  // The programme's length in weeks. LEXFIT has positioned Lexfit Start as a
+  // guided 8-week programme since the start, and the ad leads with it - the
+  // landing page has to say the same thing or the click lands on a different
+  // product. It stays a SINGLE constant here, paired with the honest cadence
+  // (35 sessions over 8 weeks = 4-5 a week) and with the FAQ answer that says
+  // outright what happens when someone trains less often: it takes longer, and
+  // that is fine. The promise is the programme, not the calendar.
+  weeks: 8,
+
   meta: {
     title: "Lexfit Start - 8 hetes otthoni edzésprogram, egyszeri fizetéssel",
     description:
@@ -40,7 +49,7 @@ export const START = {
     // The whole offer in three beats. Clarity over cleverness: a cold visitor
     // from a Meta feed has about five seconds, and every one of the three
     // facts here is one they would otherwise have to hunt for.
-    h1: "Egy teljes edzésprogram. Egyszer fizetsz. Örökre a tiéd.",
+    h1: "8 hetes edzésprogram. Egyszer fizetsz. Örökre a tiéd.",
     sub: "Otthonra, eszköz nélkül, Alexával. Megmondja, mikor mit csinálj - neked csak el kell indítanod.",
     cta: "Megveszem a programot",
     // Sits directly under the button, where price anxiety peaks.
@@ -53,7 +62,7 @@ export const START = {
   gets: [
     {
       icon: "dumbbell",
-      k: "A teljes program",
+      k: "A teljes 8 hét",
       d: "Videós edzések sorrendbe rakva - az elsőtől az utolsóig. Nem kell kitalálnod, mi jön.",
     },
     {
@@ -127,7 +136,7 @@ export const START = {
       },
       {
         q: "Mennyi időt vesz el?",
-        a: "Edzésenként nagyjából fél órát, és te döntöd el, mely napokon. Nincs előírt menetrend.",
+        a: "Edzésenként nagyjából fél órát, és te döntöd el, mely napokon. A 8 hét heti 4-5 edzéssel jön ki - ha ritkábban edzel, egyszerűen tovább tart, és ez rendben van. A program a tiéd, nem szalad el.",
       },
       {
         q: "Mi van, ha most kezdem?",
