@@ -2,6 +2,7 @@
 
 import "./auth.css";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SIGN_IN_EMAIL_KEY, SIGN_IN_LINK_MINUTES } from "@/lib/auth-link-config";
 import { useRouter } from "next/navigation";
 import {
   browserLocalPersistence,
@@ -41,6 +42,20 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
   const [stay, setStay] = useState(true); // login: default checked (GDPR-safe, user choice)
   const [marketing, setMarketing] = useState(false); // register: default UNCHECKED (GDPR opt-in)
   const [busy, setBusy] = useState(false);
+  /**
+   * Login asks for an ADDRESS first, and mails a link (P1).
+   *
+   * Since /start, accounts exist that never chose a password: the buyer paid,
+   * the receipt built the account, and they were signed in on the spot. A
+   * login screen demanding a password locked exactly those people out of
+   * something they had already bought - and it is also the better default for
+   * everyone else, because nobody has to remember anything.
+   *
+   * The password path is still here, one tap away, for the accounts that have
+   * one. Register is untouched: creating an account still sets a password.
+   */
+  const [linkMode, setLinkMode] = useState(true);
+  const [linkSent, setLinkSent] = useState(false);
 
   const [attachError, setAttachError] = useState(false);
 
@@ -190,6 +205,37 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
     }
   }
 
+  /** Mail a sign-in link. Answers the same way whether or not the account
+   *  exists - a different answer here would be an account-enumeration oracle. */
+  async function handleSendLink() {
+    setFormErr(null);
+    setNotice(null);
+    const mail = email.trim().toLowerCase();
+    if (!EMAIL_RE.test(mail)) {
+      setErrs((e) => ({ ...e, email: "Adj meg egy érvényes e-mail címet." }));
+      emailRef.current?.focus();
+      return;
+    }
+    setBusy(true);
+    // Stored BEFORE the request: Firebase needs the address back to complete
+    // the sign-in, and the link deliberately does not carry it - anyone who
+    // received a forwarded copy could otherwise take the session.
+    try { localStorage.setItem(SIGN_IN_EMAIL_KEY, mail); } catch {}
+    try {
+      const res = await fetch("/api/auth/login-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: mail }),
+      });
+      if (!res.ok) throw new Error("failed");
+      setLinkSent(true);
+    } catch {
+      setFormErr("Most nem sikerült elküldeni. Próbáld újra egy perc múlva.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleForgot() {
     setFormErr(null);
     setNotice(null);
@@ -285,11 +331,40 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
             </div>
 
             <section className="pane" key={mode}>
+              {!isReg && linkSent ? (
+                <>
+                  <h1 className="ax-h1">Elküldtük a belépőd</h1>
+                  <p className="lede">
+                    Nézd meg a <strong>{email.trim().toLowerCase()}</strong> postafiókot.
+                    Egy koppintás a linkre, és bent vagy - jelszó nem kell.
+                  </p>
+                  <p className="hint" style={{ marginTop: 4 }}>
+                    A link {SIGN_IN_LINK_MINUTES} percig él, és csak egyszer használható.
+                    Ha pár percen belül nem látod, nézd meg a levélszemét mappát is.
+                  </p>
+                  <button
+                    type="button"
+                    className="submit"
+                    style={{ marginTop: 18 }}
+                    onClick={() => { setLinkSent(false); setEmail(""); }}
+                  >
+                    <span className="tx">Másik címet adok meg</span>
+                  </button>
+                  <div className="topline" style={{ justifyContent: "center", marginTop: 16 }}>
+                    <button type="button" className="lnk" onClick={() => { setLinkSent(false); setLinkMode(false); }}>
+                      Inkább jelszóval lépek be
+                    </button>
+                  </div>
+                </>
+              ) : (
+              <>
               <h1 className="ax-h1">{isReg ? "Kezdjük el." : "Üdv újra itt."}</h1>
               <p className="lede">
                 {isReg
                   ? "Hozz létre egy fiókot - a csomagot a következő lépésben választod ki."
-                  : "Lépj be, és folytasd ott, ahol abbahagytad."}
+                  : linkMode
+                    ? "Add meg az e-mail címed, és küldünk egy belépő linket. Jelszó nem kell."
+                    : "Lépj be, és folytasd ott, ahol abbahagytad."}
               </p>
 
               <div className="oauth">
@@ -308,7 +383,14 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
 
               <div className="div">vagy</div>
 
-              <form onSubmit={handleEmailSubmit} noValidate>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!isReg && linkMode) { void handleSendLink(); return; }
+                  void handleEmailSubmit(e);
+                }}
+                noValidate
+              >
                 {isReg && (
                   <div className={`field${errs.name ? " bad" : ""}`}>
                     <label htmlFor="ax-name">Keresztneved</label>
@@ -355,6 +437,7 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                   )}
                 </div>
 
+                {(isReg || !linkMode) && (
                 <div className={`field${errs.password ? " bad" : ""}`}>
                   <div className="lab-row">
                     <label htmlFor="ax-pw">Jelszó</label>
@@ -398,6 +481,7 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                     </div>
                   )}
                 </div>
+                )}
 
                 {isReg ? (
                   <label className="check">
@@ -410,7 +494,7 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                       Kérek heti emlékeztetőt és új edzés-értesítőt. Bármikor leiratkozhatsz.
                     </span>
                   </label>
-                ) : (
+                ) : linkMode ? null : (
                   <label className="check">
                     <input
                       type="checkbox"
@@ -423,7 +507,9 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
 
                 <button className={`submit${busy ? " loading" : ""}`} type="submit" disabled={busy}>
                   <span className="sp" aria-hidden="true" />
-                  <span className="tx">{isReg ? "Fiók létrehozása" : "Belépés"}</span>
+                  <span className="tx">
+                    {isReg ? "Fiók létrehozása" : linkMode ? "Küldjetek belépő linket" : "Belépés"}
+                  </span>
                 </button>
               </form>
 
@@ -438,6 +524,20 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                 </p>
               )}
 
+              {/* The other way in, for the accounts that have a password. Offered,
+                  not defaulted: most accounts now never set one. */}
+              {!isReg && (
+                <p className="legal" style={{ textAlign: "center" }}>
+                  <button
+                    type="button"
+                    className="lnk"
+                    onClick={() => { setLinkMode((v) => !v); setFormErr(null); setNotice(null); }}
+                  >
+                    {linkMode ? "Inkább jelszóval lépek be" : "Inkább küldjetek belépő linket"}
+                  </button>
+                </p>
+              )}
+
               {isReg ? (
                 <p className="legal">
                   A folytatással elfogadod az <a href="/aszf">ÁSZF</a>-et és az{" "}
@@ -449,6 +549,8 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                 {isReg ? <ShieldIcon /> : <LockIcon />}
                 {isReg ? "14 napos elállási jog" : "Titkosított kapcsolat"}
               </div>
+              </>
+              )}
             </section>
           </div>
         </main>

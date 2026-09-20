@@ -44,6 +44,13 @@ export async function POST(req: Request) {
   // answer below fires either way, so a limited call is indistinguishable.
   if (await allowRequest("loginlink", email, 5, HOUR_MS)) {
     try {
+      // Only an EXISTING account gets a link. Firebase would otherwise create
+      // one on consumption, so a mistyped address would deliver a working link
+      // into a blank account - and the person would open it looking for the
+      // programme they had paid for and find nothing. Silence here reads as
+      // "check the address", which is the true answer. The response below is
+      // identical either way, so this is still not an enumeration oracle.
+      await getAuth(adminApp).getUserByEmail(email);
       const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu";
       const link = await getAuth(adminApp).generateSignInWithEmailLink(email, {
         url: `${base}${next}`,
