@@ -9,6 +9,7 @@ import { collection, doc, getDoc, getDocs, query, where } from "firebase/firesto
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 import { Protected } from "@/components/Protected";
+import { UpsellModal } from "@/components/UpsellModal";
 import { PlayerSkeleton } from "@/components/Skeletons";
 import { Check } from "@/components/OnbAside";
 import { getPlaybackTokens, type PlaybackResponse } from "@/lib/playback";
@@ -78,6 +79,10 @@ function PlayerScreen({ code }: { code: string }) {
   const startedRef = useRef(false);
   const [pb, setPb] = useState<PlaybackResponse | null>(null);
   const [pbError, setPbError] = useState<string | null>(null);
+  /** Open when the gate refused this video (P1). */
+  const [upsell, setUpsell] = useState(false);
+  /** What the viewer already owns, named - so the upsell can lead with it. */
+  const [ownedLabel, setOwnedLabel] = useState<string | null>(null);
   const [cur, setCur] = useState(0);
   const [dur, setDur] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -300,6 +305,28 @@ function PlayerScreen({ code }: { code: string }) {
     return { e: name, t: `${secToClock(Math.round(t))} · ${b.name.toUpperCase()}` };
   };
 
+  // Only runs when the upsell opens: a viewer who can play never pays for it.
+  useEffect(() => {
+    if (!upsell || !user || ownedLabel != null) return;
+    let active = true;
+    (async () => {
+      try {
+        const [{ getSubscription, purchasedPrograms }, { loadProgramIndex }] = await Promise.all([
+          import("@/lib/billing"),
+          import("@/lib/program-index"),
+        ]);
+        const owned = purchasedPrograms(await getSubscription(user.uid));
+        if (!owned.length) { if (active) setOwnedLabel(""); return; }
+        const idx = await loadProgramIndex();
+        const names = owned.map((s) => idx.bySlug[s]?.title).filter(Boolean) as string[];
+        if (active) setOwnedLabel(names[0] ?? "");
+      } catch {
+        if (active) setOwnedLabel("");  // no name is better than a wrong one
+      }
+    })();
+    return () => { active = false; };
+  }, [upsell, user, ownedLabel]);
+
   async function start() {
     setPbError(null);
     try {
@@ -321,9 +348,13 @@ function PlayerScreen({ code }: { code: string }) {
       setPb(data);
       setStage("playing");
     } catch (e) {
-      // No active subscription → send to the paywall.
+      // 403 means the gate refused THIS video - either no access at all, or a
+      // programme purchase that does not cover it. Throwing the viewer onto
+      // /subscribe answered a question they had not asked; the upsell opens
+      // here instead, over the workout they just reached for, and says what
+      // they already own before it asks for anything.
       if (e instanceof Error && e.message === "forbidden") {
-        router.push("/subscribe");
+        setUpsell(true);
         return;
       }
       setPbError(e instanceof Error ? e.message : "A videó nem elérhető.");
@@ -777,6 +808,12 @@ function PlayerScreen({ code }: { code: string }) {
       <div className="szm-pl-stagebg" style={{ background: grad(video.theme) }} aria-hidden="true" />
 
       {/* TOP BAR - exit always visible (L-RULE 06) */}
+      <UpsellModal
+        open={upsell}
+        ownedLabel={ownedLabel || null}
+        onClose={() => { setUpsell(false); router.back(); }}
+      />
+
       <header className="pf-top">
         <button className="pf-ex" onClick={exit}><LxIcon d={lxPaths.chevronLeft} size={16} /> Kilépés</button>
         <div className="pf-ttl"><span className="nm">{video.title}</span><span className="c">{video.code} · FOUNDATION · {video.theme.toUpperCase()}</span></div>

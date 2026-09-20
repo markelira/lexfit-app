@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import { adminDb } from "@/lib/firebase-admin";
 import { getStripe, uidForCustomer } from "@/lib/stripe";
 import { COLLECTIONS, milestoneDocId, webhookEventDocId } from "@/lib/pricing/keys";
-import { ROLE_BY_LOOKUP_KEY, PROGRAM_PURCHASE_ROLES, isProgramRole } from "@/lib/pricing/config";
+import { ROLE_BY_LOOKUP_KEY, PROGRAM_PRODUCTS, PROGRAM_PURCHASE_ROLES, isProgramRole } from "@/lib/pricing/config";
 import {
   ensureWeeklySchedule,
   ensureEarnedAnnualSchedule,
@@ -170,6 +170,16 @@ async function maybeIssueInvoice(event: Stripe.Event): Promise<void> {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     if (session.mode !== "payment" || !session.amount_total) return; // subs → invoice.paid
+    // A programme purchase is NOT full access, and the invoice is the legal
+    // record of what was sold. The Stripe product was split for exactly this
+    // reason (config.ts PROGRAM_PRODUCTS); the invoice line had been left
+    // behind saying "Lexfit teljes hozzáférés" over a 9 990 Ft one-programme
+    // sale.
+    const pRole = session.metadata?.role;
+    const desc =
+      session.metadata?.kind === "program" && pRole && isProgramRole(pRole)
+        ? PROGRAM_PRODUCTS[pRole].name
+        : DESC;
     const pi =
       typeof session.payment_intent === "string"
         ? session.payment_intent
@@ -182,7 +192,7 @@ async function maybeIssueInvoice(event: Stripe.Event): Promise<void> {
         address: mapAddress(d?.address),
       },
       amountHuf: Math.round(session.amount_total / 100),
-      description: DESC,
+      description: desc,
       fulfillmentDate: budapestDay(new Date()),
     });
   }

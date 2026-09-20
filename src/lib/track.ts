@@ -379,3 +379,15 @@ export function trackProgramPurchase(role: PriceRole, slug: string): void {
 export function trackProgramPreview(code: string): void {
   push("lx_program_preview", { code });
 }
+
+// ── Membership upsell ───────────────────────────────────────────────────────
+// Fired when a programme owner reaches for content their purchase does not
+// cover. `surface` separates the two audiences the same modal serves: someone
+// who bought a programme, and someone with no access at all.
+
+export function trackUpsellView(surface: "program_owner" | "no_access"): void {
+  push("lx_upsell_view", { surface });
+}
+export function trackUpsellClick(surface: "program_owner" | "no_access"): void {
+  push("lx_upsell_click", { surface });
+}

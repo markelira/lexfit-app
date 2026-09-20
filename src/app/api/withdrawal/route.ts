@@ -1,5 +1,6 @@
 import "server-only";
 import { NextResponse } from "next/server";
+import { FieldValue } from "firebase-admin/firestore";
 import type Stripe from "stripe";
 import { verifyRequest } from "@/lib/auth-server";
 import { getStripe } from "@/lib/stripe";
@@ -26,6 +27,70 @@ function invoiceRefundTarget(inv: Stripe.Invoice): Stripe.RefundCreateParams | n
 }
 
 /**
+ * Withdrawal for a programme purchase (P1).
+ *
+ * Refunds every grant still inside its window, in full, and deletes the grant
+ * keys it refunded. Each grant carries its OWN payment intent, so this never
+ * touches the document-level `lastPaymentIntent` - which a later purchase may
+ * have overwritten.
+ */
+async function withdrawProgram(
+  uid: string,
+  email: string | null,
+  ref: FirebaseFirestore.DocumentReference,
+  sub: SubscriptionDoc,
+  entries: [string, NonNullable<SubscriptionDoc["programs"]>[string]][],
+) {
+  const now = Date.now();
+  const inWindow = entries.filter(([, g]) => now - g.grantedAt <= WITHDRAWAL_DAYS * DAY_MS);
+  if (!inWindow.length) {
+    return NextResponse.json({ error: "withdrawal_window_expired" }, { status: 403 });
+  }
+
+  const stripe = getStripe();
+  let refundedMinor = 0;
+  const removed: string[] = [];
+  try {
+    for (const [slug, g] of inWindow) {
+      if (g.paymentIntent && (g.amountPaid ?? 0) > 0) {
+        await stripe.refunds.create({ payment_intent: g.paymentIntent });
+        refundedMinor += g.amountPaid ?? 0;
+      }
+      removed.push(slug);
+    }
+  } catch (e) {
+    return NextResponse.json(
+      { error: `stripe_error: ${e instanceof Error ? e.message : ""}` },
+      { status: 502 },
+    );
+  }
+
+  const patch: Record<string, unknown> = { updatedAt: now };
+  for (const slug of removed) patch[`programs.${slug}`] = FieldValue.delete();
+  await ref.update(patch);
+
+  await logEvent("withdrawal_requested", {
+    uid,
+    props: { kind: "program", programs: removed, refundedMinor },
+  });
+  await notifyAdmin("withdrawal", {
+    uid,
+    email,
+    plan: `program:${removed.join(",")}`,
+    refundHuf: refundedMinor / 100,
+  });
+  if (email) {
+    try {
+      await sendWithdrawalConfirm(email, Math.round(refundedMinor / 100));
+    } catch (e) {
+      console.error("[withdrawal] confirmation email failed:", e);
+    }
+  }
+
+  return NextResponse.json({ ok: true, refundedMinor, programs: removed });
+}
+
+/**
  * F1.3 - right of withdrawal (J2). Refunds the UNUSED portion of each actually
  * paid invoice (so the weekly 490→1990 two-price first period is correct), then
  * closes access immediately, emits `withdrawal_requested` (F6 guardrail) and
@@ -38,6 +103,18 @@ export async function POST(req: Request) {
   const ref = subscriptionRef(token.uid);
   const snap = await ref.get();
   const sub = snap.data() as SubscriptionDoc | undefined;
+
+  // P1 - a programme purchase has no `startedAt`, no period and no
+  // subscription, so it fell straight through this guard and answered 404 to a
+  // buyer the /start page had promised an unconditional refund to. It gets its
+  // own path: a single payment, refunded in FULL (there is no unused portion of
+  // a thing you own outright), and the grant removed - a refunded programme
+  // that stays playable is the same bug as a refunded subscription that does.
+  const grantEntries = Object.entries(sub?.programs ?? {});
+  if (sub && grantEntries.length > 0 && sub.startedAt == null) {
+    return withdrawProgram(token.uid, token.email ?? null, ref, sub, grantEntries);
+  }
+
   if (!sub || sub.startedAt == null) {
     return NextResponse.json({ error: "no_subscription" }, { status: 404 });
   }

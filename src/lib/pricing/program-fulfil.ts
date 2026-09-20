@@ -23,6 +23,11 @@ import { buildProgramGrantData, subscriptionRef } from "@/lib/pricing/subscripti
  * account, one grant and one email.
  */
 
+/** How long after checkout the thank-you page may still sign someone in. Long
+ *  enough for a slow webhook and a reloaded tab, short enough that a session id
+ *  found later is worth nothing. */
+const SIGNIN_TOKEN_WINDOW_MS = 60 * 60_000;
+
 const customerIdOf = (
   c: string | Stripe.Customer | Stripe.DeletedCustomer | null,
 ): string => (typeof c === "string" ? c : (c?.id ?? ""));
@@ -214,11 +219,20 @@ export async function fulfilProgramSession(sessionId: string): Promise<{
   // leave the browser - puts an inbox between the payment and the first
   // workout, at the exact moment their intent peaks. The email still goes out;
   // it is the way back in later, not the way in now.
+  // The token is bounded in time, not just by the secrecy of the session id.
+  // That id lives in the return URL - so in browser history, in anything that
+  // records page URLs, in a pasted link - and minting a full sign-in credential
+  // from it months later would be an account takeover with a very long tail.
+  // Inside the window it is the convenience it was meant to be; outside it, the
+  // emailed sign-in link is the way back in.
   let customToken: string | undefined;
-  try {
-    customToken = await getAuth(adminApp).createCustomToken(uid, { src: "program_purchase" });
-  } catch (e) {
-    console.error("[program-fulfil] could not mint a sign-in token:", e);
+  const age = Date.now() - (session.created ?? 0) * 1000;
+  if (age <= SIGNIN_TOKEN_WINDOW_MS) {
+    try {
+      customToken = await getAuth(adminApp).createCustomToken(uid, { src: "program_purchase" });
+    } catch (e) {
+      console.error("[program-fulfil] could not mint a sign-in token:", e);
+    }
   }
   return { ok: true, email, programSlug: slug, customToken };
 }
