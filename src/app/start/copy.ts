@@ -267,8 +267,15 @@ export const START = {
     backToPage: "Vissza",
     orderHd: "Amit megveszel",
     orderTitle: "Lexfit Start - a teljes program",
-    totalLabel: "Fizetendő",
+    // "A program ára", not "Fizetendő". A promotion code moves the total, and
+    // Stripe's own panel states what is actually due - two boxes on one screen
+    // disagreeing about the number is worse than either alone. Ours names the
+    // product's price; Stripe's names the charge.
+    totalLabel: "A program ára",
     onceNote: "Egyetlen alkalommal. Nem előfizetés, nem újul meg, nincs mit lemondani.",
+    /** Only shown where someone is already in the payment step - never on the
+     *  landing, where it would send people hunting for a code they never had. */
+    promoNote: "Kuponkódod a fizetésnél tudod beváltani.",
     webviewNote: "A fizetés a Stripe biztonságos oldalán zárul, onnan visszahozunk.",
     await: "Pipáld ki a fenti sort, és megnyílik a kártyás fizetés.",
     back: "Mégsem",

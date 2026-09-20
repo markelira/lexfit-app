@@ -190,6 +190,7 @@ export function PayPage({ sessionCount }: { sessionCount: number }) {
             <strong>{START.price}</strong>
           </div>
           <p className="lxf-once">{START.pay.onceNote}</p>
+          <p className="lxf-promo">{START.pay.promoNote}</p>
         </section>
 
         <section className="lxf-pay" aria-label={START.pay.hd}>

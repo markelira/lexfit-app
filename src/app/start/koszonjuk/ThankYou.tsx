@@ -40,6 +40,7 @@ export function ThankYou({ sessionId }: { sessionId: string | null }) {
         const b = (await res.json()) as {
           ok?: boolean;
           email?: string | null;
+          amountHuf?: number;
           customToken?: string;
         };
         if (!active) return;
@@ -51,7 +52,7 @@ export function ThankYou({ sessionId }: { sessionId: string | null }) {
           setState({ phase: "slow", email: b.email });
           return;
         }
-        trackProgramPurchase(START.role, START.slug);
+        trackProgramPurchase(START.role, START.slug, b.amountHuf);
         if (!b.customToken) {
           setState({ phase: "mailed", email: b.email });
           return;

@@ -177,6 +177,10 @@ export async function fulfilProgramSession(sessionId: string): Promise<{
   ok: boolean;
   email?: string | null;
   programSlug?: string;
+  /** What was ACTUALLY charged, in forints. A promotion code can move it below
+   *  the list price, and the ad platforms must be told the real number - a
+   *  value-based bid trained on a price nobody paid optimises for nothing. */
+  amountHuf?: number;
   /**
    * A one-shot Firebase custom token for the buyer, so the thank-you page can
    * sign them in without asking for anything (P1).
@@ -234,5 +238,11 @@ export async function fulfilProgramSession(sessionId: string): Promise<{
       console.error("[program-fulfil] could not mint a sign-in token:", e);
     }
   }
-  return { ok: true, email, programSlug: slug, customToken };
+  return {
+    ok: true,
+    email,
+    programSlug: slug,
+    amountHuf: Math.round((session.amount_total ?? 0) / 100),
+    customToken,
+  };
 }

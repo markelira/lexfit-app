@@ -135,6 +135,14 @@ async function createSession(
     customer_creation: "always",
     ...(email ? { customer_email: email } : {}),
     line_items: [{ price, quantity: 1 }],
+    // Stripe's own promotion-code field. Deliberately NOT a second box on our
+    // page: a prominent "van kuponod?" plants the idea and sends people off to
+    // hunt for a code they did not have, and discount-seekers churn harder
+    // than full-price buyers. Stripe renders a quiet "Add promotion code" link,
+    // which is discoverable for someone holding one and invisible to everyone
+    // else. Codes are created in the Stripe dashboard; nothing here needs to
+    // know about them.
+    allow_promotion_codes: true,
     ...(embedded
       ? {
           ui_mode: "embedded_page" as const,

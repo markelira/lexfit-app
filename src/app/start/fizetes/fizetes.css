@@ -133,3 +133,15 @@
 @media (prefers-reduced-motion: reduce) {
   .lxf-back { transition: none; }
 }
+
+/* Where a promotion code is redeemed. Stated quietly, and only here - on the
+   landing it would send people hunting for a code they never had, and
+   discount-seekers churn harder than full-price buyers. */
+.lxf-promo {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--u-line, #dde8e3);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #6d7f77;
+}

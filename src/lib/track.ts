@@ -365,12 +365,17 @@ export function trackProgramCheckout(role: PriceRole, where: string): void {
 }
 
 /** Payment confirmed by Stripe. THE optimisation event. (Meta: Purchase) */
-export function trackProgramPurchase(role: PriceRole, slug: string): void {
+export function trackProgramPurchase(role: PriceRole, slug: string, amountHuf?: number): void {
+  // The amount CHARGED, when the server knows it. A promotion code can move the
+  // total below the list price, and reporting the list price would train a
+  // value-based bid on money nobody paid. The catalogue price is only the
+  // fallback for when the confirm call could not say.
   const spec = role in PRICES ? PRICES[role] : undefined;
+  const value = amountHuf ?? spec?.amountHuf;
   push("lx_program_purchase", {
     role,
     program: slug,
-    ...(spec ? { value: spec.amountHuf, currency: "HUF" } : {}),
+    ...(value != null ? { value, currency: "HUF" } : {}),
   });
 }
 
