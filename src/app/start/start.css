@@ -354,13 +354,22 @@
   background: transparent;
 }
 
+/* The gutter that lines the shelf up with the copy above it.
+
+   NOT computed from the viewport: the shelf sits inside `.lp-band`, which has
+   already inset it by its own clamp() padding, so a viewport-based sum counts
+   that inset twice. A percentage resolves against the band's content box - the
+   exact box `.lp-col` centres its 640px in - so this stays aligned at every
+   width without knowing what the band's padding currently is.
+
+   640px is `.lp-col`'s max-width. If that ever changes, this follows it. */
+.lxs .lxs-shelf { --lxs-gut: max(0px, calc((100% - 640px) / 2)); }
+
 .lxs .lxs-cathead {
   display: flex;
   align-items: baseline;
   gap: 10px;
-  /* Matches the text column's gutter so the headings line up with the copy
-     above, even though the row below bleeds past it. */
-  padding: 0 max(20px, calc((100vw - var(--u-max, 560px)) / 2));
+  padding-inline: var(--lxs-gut);
   margin-bottom: 10px;
 }
 .lxs .lxs-cathead h3 {
@@ -386,7 +395,7 @@
                            browser compute overflow-y as auto */
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding: 2px max(20px, calc((100vw - var(--u-max, 560px)) / 2)) 10px;
+  padding: 2px var(--lxs-gut) 10px;
   scrollbar-width: none;
 }
 .lxs .lxs-row::-webkit-scrollbar { display: none; }
