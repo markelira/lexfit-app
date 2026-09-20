@@ -208,10 +208,21 @@ export default function KezdolapPage() {
   const rowWeek = joined ? playlist.slice(currentIndex, currentIndex + daysPerWeek) : [];
 
   // 3 · Listám
+  // Saved items are the exception: they put them there, so they keep seeing
+  // them - locked, with the lock visible, rather than quietly disappearing.
   const rowList = [...myList].map((c) => videoByCode[c]).filter(Boolean) as AnyVideo[];
 
   // 4 · Ha csak 15 perced van
-  const rowShort = libVideos.filter((v) => v.mins <= 15 && v.kind === "workout");
+  //
+  // Recommending what someone cannot open is not discovery, it is a shop
+  // window with the shutters down: a programme buyer would meet a row of
+  // padlocks on their own home screen, every visit. The upsell has its own
+  // moment - a deliberate reach for something else - and does not need the
+  // home page repeating it. Members are unaffected: nothing is locked for
+  // them, so nothing is filtered.
+  const rowShort = libVideos.filter(
+    (v) => v.mins <= 15 && v.kind === "workout" && !locked(v.code),
+  );
 
   // 5 · Szavazz Magadra · kihívások - in-progress first (C-RULE 06: challenges
   // live in the rows, never the hero), then the rest newest-first for discovery.

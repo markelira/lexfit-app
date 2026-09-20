@@ -294,7 +294,13 @@ body:has(.lx-shell) {
 .lx .lxam-sheet .lxam-item { min-height: 48px; }
 
 /* ══════════════════ BODY + SIDEBAR ══════════════════ */
-.lx .lx-body { flex: 1; display: flex; align-items: flex-start; min-height: 0; }
+/* NO `min-height: 0` here. It removes the flex item's automatic content-based
+   minimum, so this row never grew past the viewport remainder even when its
+   content was far taller - and a `position: sticky` sidebar inside a container
+   that is exactly one viewport tall has nowhere to travel, so it scrolled away
+   with the page. Letting the row grow to its content is what gives the sidebar
+   its runway. */
+.lx .lx-body { flex: 1; display: flex; align-items: flex-start; }
 
 .lx .lx-sidebar {
   width: 244px;

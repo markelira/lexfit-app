@@ -6,6 +6,7 @@
  * Run:  node --import tsx scripts/pricing-selftest.ts
  */
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   hasAccessFromData,
   hasAnyAccessFromData,
@@ -399,6 +400,20 @@ function programGrants() {
     );
   }
   assert.equal(programRoleForSlug("napindito"), null, "a programme not for sale has no role");
+
+  // The challenge archive is free to every signed-in account (owner decision,
+  // 2026-09-20). It is the part of the product designed to be shared, so it
+  // opens before anything is bought - and the gate must not quietly re-close it.
+  const gate = readFileSync("src/lib/program-gate.ts", "utf8");
+  assert.ok(
+    /if \(kind === "challenge"\) return true;/.test(gate),
+    "challenge videos must be free for every signed-in account",
+  );
+  assert.equal(
+    /if \(kind === "challenge"\) return false;/.test(gate),
+    false,
+    "the old members-only challenge rule must not come back",
+  );
 
   // The /start page's claims, guarded the way the lead magnet's are.
   const allCopy = JSON.stringify(START);

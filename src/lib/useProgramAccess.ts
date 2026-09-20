@@ -17,6 +17,12 @@ import { loadProgramIndex } from "@/lib/program-index";
  * opens everything; a grant opens the videos in that programme's playlist; a
  * video in no playlist is membership-only. This is the UI's copy of the rule -
  * the server's remains the one that decides.
+ *
+ * Challenge videos are free (see the gate) and are deliberately NOT special-
+ * cased here: they live in `challengeVideos`, which the library never reads,
+ * and they render through ChallengeCard, which has no lock. A code from that
+ * collection cannot reach this function, so guarding against it would be an
+ * extra fetch defending a path that does not exist.
  */
 export interface ProgramAccess {
   /** Null until resolved. Callers must not render a lock before it lands. */

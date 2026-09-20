@@ -91,14 +91,14 @@ export function UpsellModal({
         <h2 id="lxup-hd">Ez a videó a tagsághoz tartozik</h2>
         <p className="lxup-sub">
           {ownedLabel
-            ? "A megvásárolt programod minden edzése megy. Ez a videó egy másik programhoz tartozik - azokat és a heti kihívásokat a tagság nyitja meg."
-            : "A teljes videótárhoz és a heti kihívásokhoz tagság kell."}
+            ? "A megvásárolt programod minden edzése megy. Ez a videó egy másik programhoz tartozik - azokat a tagság nyitja meg. (A heti kihívások egyébként neked is ingyen mennek.)"
+            : "A teljes videótárhoz tagság kell. A heti kihívások ingyen mennek."}
         </p>
 
         <ul className="lxup-gets">
           {[
             "Mind a 7 program, nem csak egy",
-            "Heti kihívások, új tartalom folyamatosan",
+            "A teljes videótár, új edzésekkel folyamatosan",
             "Bármikor lemondható",
           ].map((t) => (
             <li key={t}><LxIcon d={lxPaths.check} size={14} sw={2.6} />{t}</li>

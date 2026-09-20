@@ -55,19 +55,24 @@ export async function programsOfVideo(code: string): Promise<string[]> {
 /**
  * The gate the Mux token route calls.
  *
- * `challenge` videos live outside every programme playlist, so a programme
- * purchase never reaches them - only a membership does. That is not an
- * oversight: the challenge archive is what the membership upsell is FOR.
+ * `challenge` videos are FREE to every signed-in account (owner decision,
+ * 2026-09-20). Szavazz Magadra is the thing people are invited to and talk
+ * about; putting it behind the same wall as the library made the one part of
+ * the product designed to be shared the part nobody could share. It is a
+ * doorway, not a vault - so it opens before anything has been bought.
  */
 export async function canPlayVideo(
   uid: string,
   code: string,
   kind: "video" | "challenge",
 ): Promise<boolean> {
+  // Free, and checked BEFORE the subscription is even read - there is nothing
+  // about the account that could change the answer.
+  if (kind === "challenge") return true;
+
   const sub = (await subscriptionRef(uid).get()).data() as SubscriptionDoc | undefined;
   const now = Date.now();
   if (hasAccessFromData(sub, now)) return true;
-  if (kind === "challenge") return false;
   const owned = sub?.programs;
   if (!owned || Object.keys(owned).length === 0) return false;
   const slugs = await programsOfVideo(code);
