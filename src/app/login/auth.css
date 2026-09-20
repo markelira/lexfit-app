@@ -225,3 +225,18 @@
   font-weight: 400;
   opacity: .62;
 }
+
+/* The other way in. A secondary path states itself quietly - it is offered,
+   not urged - but it still needs a real target to hit and a visible focus
+   state, which a bare <button> in a paragraph of fine print had neither of. */
+.authx .altway { display: flex; justify-content: center; gap: 4px; margin-top: 14px; }
+.authx .altway.two { flex-wrap: wrap; gap: 2px 14px; margin-top: 22px; }
+.authx .altway button {
+  appearance: none; background: none; border: 0; border-radius: 8px;
+  padding: 9px 10px; font-family: inherit; font-size: 13px; font-weight: 500;
+  color: var(--ink-3); cursor: pointer; transition: color 120ms ease, transform 100ms ease-out;
+}
+.authx .altway button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.authx .altway button:active { transform: scale(0.97); }
+.authx .altway button:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .authx .altway button { transition: color 120ms ease; } .authx .altway button:active { transform: none; } }

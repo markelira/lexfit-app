@@ -342,16 +342,11 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                     A link {SIGN_IN_LINK_MINUTES} percig él, és csak egyszer használható.
                     Ha pár percen belül nem látod, nézd meg a levélszemét mappát is.
                   </p>
-                  <button
-                    type="button"
-                    className="submit"
-                    style={{ marginTop: 18 }}
-                    onClick={() => { setLinkSent(false); setEmail(""); }}
-                  >
-                    <span className="tx">Másik címet adok meg</span>
-                  </button>
-                  <div className="topline" style={{ justifyContent: "center", marginTop: 16 }}>
-                    <button type="button" className="lnk" onClick={() => { setLinkSent(false); setLinkMode(false); }}>
+                  <div className="altway two">
+                    <button type="button" onClick={() => { setLinkSent(false); setEmail(""); }}>
+                      Másik címet adok meg
+                    </button>
+                    <button type="button" onClick={() => { setLinkSent(false); setLinkMode(false); }}>
                       Inkább jelszóval lépek be
                     </button>
                   </div>
@@ -527,15 +522,14 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
               {/* The other way in, for the accounts that have a password. Offered,
                   not defaulted: most accounts now never set one. */}
               {!isReg && (
-                <p className="legal" style={{ textAlign: "center" }}>
+                <div className="altway">
                   <button
                     type="button"
-                    className="lnk"
                     onClick={() => { setLinkMode((v) => !v); setFormErr(null); setNotice(null); }}
                   >
                     {linkMode ? "Inkább jelszóval lépek be" : "Inkább küldjetek belépő linket"}
                   </button>
-                </p>
+                </div>
               )}
 
               {isReg ? (
