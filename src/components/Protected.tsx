@@ -82,33 +82,45 @@ export function Protected({
       return;
     }
     let active = true;
-    hasOnboarded(user.uid).then(async (done) => {
+    (async () => {
+      const exempt =
+        typeof window !== "undefined" &&
+        (new URLSearchParams(window.location.search).has("session_id") ||
+          window.location.pathname.startsWith("/app/membership"));
+
+      // Read ONCE and decide twice from it: whether to enforce the paid gate,
+      // and whether an unanswered onboarding should send someone out of the
+      // app at all. It is read even when `requirePaid` is false, so a future
+      // onboarded-but-not-paid-gated page cannot silently lose the bounce
+      // below by leaving `paid` at its optimistic default.
+      let paid = true; // fail-open on read errors - the server re-validates anyway
+      if (!exempt) {
+        try {
+          // The door, not the rooms (P1): owning one programme is enough to
+          // enter; the Mux token route still decides each individual video.
+          paid = hasAnyAccess(await getSubscription(user.uid));
+        } catch {}
+        if (!active) return;
+        if (requirePaid && !paid) {
+          router.replace("/subscribe");
+          return;
+        }
+      }
+
+      const done = await hasOnboarded(user.uid).catch(() => true);
       if (!active) return;
-      if (!done) {
+      if (!done && !paid) {
+        // Only someone who has NOT paid belongs in /onboarding: for them it is
+        // the acquisition funnel. Sending a paying member there would hand
+        // them a flow that ends by asking for an account and a card they have
+        // already given - and the lead base is full of accounts that started
+        // that funnel and stopped. Their setup happens inside the app instead
+        // (components/onboarding/OnboardingSheet).
         router.replace("/onboarding");
         return;
       }
-      if (requirePaid) {
-        const exempt =
-          typeof window !== "undefined" &&
-          (new URLSearchParams(window.location.search).has("session_id") ||
-            window.location.pathname.startsWith("/app/membership"));
-        if (!exempt) {
-          let paid = true; // fail-open on read errors - the server re-validates anyway
-          try {
-            // The door, not the rooms (P1): owning one programme is enough to
-            // enter; the Mux token route still decides each individual video.
-            paid = hasAnyAccess(await getSubscription(user.uid));
-          } catch {}
-          if (!active) return;
-          if (!paid) {
-            router.replace("/subscribe");
-            return;
-          }
-        }
-      }
       setChecking(false);
-    });
+    })();
     return () => {
       active = false;
     };

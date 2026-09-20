@@ -391,3 +391,15 @@ export function trackUpsellView(surface: "program_owner" | "no_access"): void {
 export function trackUpsellClick(surface: "program_owner" | "no_access"): void {
   push("lx_upsell_click", { surface });
 }
+
+// ── In-app setup (P1) ───────────────────────────────────────────────────────
+// The onboarding questions, answered inside the app by someone who has already
+// paid. Separate from `lx_onboarding_start`, which is the acquisition funnel -
+// mixing them would make the funnel look like it converts people it never met.
+
+export function trackSetupStep(stepId: string): void {
+  push("lx_setup_step", { step_id: stepId });
+}
+export function trackSetupDone(): void {
+  push("lx_setup_done");
+}

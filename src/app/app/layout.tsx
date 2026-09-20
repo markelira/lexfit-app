@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/Protected";
+import { OnboardingSheet } from "@/components/onboarding/OnboardingSheet";
 import { AppShellSkeleton } from "@/components/Skeletons";
 import { useAuth } from "@/lib/auth-context";
 import { AppTopBar } from "@/components/AppTopBar";
@@ -113,6 +114,12 @@ function Shell({ children }: { children: React.ReactNode }) {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <Protected requirePaid fallback={<AppShellSkeleton />}>
+      {/* Setup, for a paying member who never answered the questions - most
+          often an account that started the acquisition funnel and stopped
+          before the end. It runs HERE rather than sending them back out to
+          /onboarding, whose last steps ask for an account and a card they have
+          already given. Dismissible; it asks again next visit. */}
+      <OnboardingSheet />
       <Shell>{children}</Shell>
     </Protected>
   );

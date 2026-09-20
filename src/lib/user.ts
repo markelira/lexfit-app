@@ -89,6 +89,17 @@ export async function saveOnboarding(uid: string, answers: OnboardingAnswers): P
 }
 
 /** Read onboarding answers back (for the profile/Haladásom screens). */
+/** Mark the profile as genuinely answered (P1) - clears the `defaulted` flag a
+ *  programme purchase writes, which is what keeps the in-app setup sheet from
+ *  offering itself again. */
+export async function setOnboardingAnswered(uid: string): Promise<void> {
+  await setDoc(
+    doc(db, "users", uid, "onboarding", "profile"),
+    { defaulted: false, answeredAt: Date.now() },
+    { merge: true },
+  );
+}
+
 export async function getOnboarding(uid: string): Promise<Record<string, unknown> | null> {
   const snap = await getDoc(doc(db, "users", uid, "onboarding", "profile"));
   return snap.exists() ? snap.data() : null;
