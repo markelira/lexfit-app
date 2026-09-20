@@ -38,6 +38,8 @@ export const CAMPAIGN = {
   endMs: Date.parse("2026-10-01T19:00:00+02:00"),
   budgetHuf: 100_000,
   role: "program_foundation" as const,
+  adAccountId: "1641490997344715",
+  campaignId: "23859997747910799",
 } as const;
 
 /** Purchases needed for the ad spend to pay for itself. Derived, never typed. */
@@ -76,6 +78,16 @@ export interface DayRow {
   accounts: number;
 }
 
+/** The cost side, as `meta-insights` returns it. Structural, not imported, so
+ *  this module stays free of the network edge and remains testable. */
+export interface CostSide {
+  ok: boolean;
+  reason?: string;
+  totalSpendHuf: number;
+  totalPurchases: number;
+  days: { date: string; spendHuf: number; impressions: number; clicks: number; ctr: number; cpmHuf: number; frequency: number; purchases: number }[];
+}
+
 export interface Brief {
   nowMs: number;
   /** 1-based day of the campaign; 0 before it starts, -1 once it has ended. */
@@ -89,6 +101,7 @@ export interface Brief {
   breakEven: number;
   config: { pixel: boolean; capiToken: boolean; gtm: boolean; sendgrid: boolean };
   gate: { open: boolean; reason: string };
+  cost: CostSide | null;
   alerts: Alert[];
 }
 
@@ -118,7 +131,12 @@ export interface BriefConfig {
   sendgrid: boolean;
 }
 
-export function buildBrief(rows: EventDoc[], nowMs: number, config: BriefConfig): Brief {
+export function buildBrief(
+  rows: EventDoc[],
+  nowMs: number,
+  config: BriefConfig,
+  cost: CostSide | null = null,
+): Brief {
   const live = nowMs >= CAMPAIGN.startMs && nowMs <= CAMPAIGN.endMs;
   const totalDays = Math.ceil((CAMPAIGN.endMs - CAMPAIGN.startMs) / (24 * H));
   const dayIndex =
@@ -202,7 +220,8 @@ export function buildBrief(rows: EventDoc[], nowMs: number, config: BriefConfig)
         ? `${dayIndex}. nap / ${total.purchases} vásárlás - a minta elbírja a döntést.`
         : `${dayIndex}. nap / ${total.purchases} vásárlás - a kapu ${GATE_MIN_DAYS}. napnál vagy ${GATE_MIN_PURCHASES} vásárlásnál nyílik.`,
     },
-    alerts: findAlerts({ live, last12h, total, config }),
+    cost,
+    alerts: findAlerts({ live, last12h, total, config, cost, todayKey }),
   };
 }
 
@@ -211,6 +230,8 @@ function findAlerts(b: {
   last12h: { starts: number; purchases: number };
   total: DayRow;
   config: Brief["config"];
+  cost: CostSide | null;
+  todayKey: string;
 }): Alert[] {
   const out: Alert[] = [];
 
@@ -249,6 +270,38 @@ function findAlerts(b: {
       why: "Vagy nem szállít a hirdetés (elutasítás, korlátozás, kimerült keret), vagy eljutnak a landingre és senki nem kattint tovább.",
       do: "Ads Manager: szállítási státusz és a mai költés. Ha költ, a landing a gyanús.",
     });
+  }
+
+  // Scheduled to run, but Meta is not spending. On launch day the usual cause
+  // is the most boring one: the draft was never published.
+  if (b.cost?.ok) {
+    const today = b.cost.days.find((d) => d.date.slice(5) === b.todayKey);
+    if (!today || today.spendHuf === 0) {
+      out.push({
+        severity: "high",
+        key: "no_spend",
+        what: "Az ütemezés szerint fut, de a Meta ma 0 Ft-ot költött.",
+        why: "Nem szállít. A leggyakoribb ok, hogy a vázlat nincs publikálva; utána jön a szünetel, az elutasított hirdetés és a kimerült keret.",
+        do: "Ads Manager: a kampány státusza Active-e, és van-e elutasítás a hirdetésen.",
+      });
+    }
+  }
+
+  // Our ledger and Meta's attribution should not drift far apart. When they do
+  // the numbers are still real - the REPORTING is broken, which is worse,
+  // because the bid optimises on the half Meta can see.
+  if (b.cost?.ok && b.total.purchases >= 5) {
+    const mine = b.total.purchases;
+    const theirs = b.cost.totalPurchases;
+    if (Math.abs(theirs - mine) / mine > 0.5) {
+      out.push({
+        severity: "medium",
+        key: "attribution_drift",
+        what: `Mi ${mine} vásárlást mértünk, a Meta ${theirs}-t tulajdonít a kampánynak.`,
+        why: "A Meta arra licitál, amit lát. Ha tartósan kevesebbet lát, alulértékeli a kampányt - a süti-elutasítás és a CAPI consent-kapuja a két szokásos ok.",
+        do: "Events Manager → Purchase esemény → a szerver- és böngésző-oldali beérkezés aránya.",
+      });
+    }
   }
 
   // A purchase that produced no account is a delivery failure the buyer feels.
@@ -307,6 +360,28 @@ export function renderBrief(b: Brief): { subject: string; text: string } {
     "",
   );
 
+  if (b.cost?.ok && b.cost.days.length) {
+    L.push("── KÖLTSÉGOLDAL (Meta) ──", "");
+    L.push("nap         költés  megjel.  katt.    CTR     CPM   frekv.");
+    for (const d of b.cost.days) {
+      L.push(
+        `${d.date.slice(5)}  ${formatHuf(Math.round(d.spendHuf)).padStart(10)}  ${String(d.impressions).padStart(7)}  ${String(d.clicks).padStart(5)}  ${d.ctr.toFixed(2)}%  ${formatHuf(Math.round(d.cpmHuf)).padStart(7)}  ${d.frequency.toFixed(2)}`,
+      );
+    }
+    const cpa = b.total.purchases > 0 ? b.cost.totalSpendHuf / b.total.purchases : null;
+    L.push(
+      "",
+      `Összes költés: ${formatHuf(Math.round(b.cost.totalSpendHuf))} / ${formatHuf(CAMPAIGN.budgetHuf)} (${((100 * b.cost.totalSpendHuf) / CAMPAIGN.budgetHuf).toFixed(0)}%)`,
+      // Two independent counts of the same thing. Printed side by side rather
+      // than reconciled, because the gap is information - not an error to hide.
+      `Vásárlás: ${b.total.purchases} (a mi mérésünk) vs ${b.cost.totalPurchases} (a Meta tulajdonítása)`,
+      cpa !== null
+        ? `Vásárlási költség a mi mérésünk szerint: ${formatHuf(Math.round(cpa))} (a termék ${formatHuf(PRICES[CAMPAIGN.role].amountHuf)})`
+        : "Vásárlási költség: még nincs vásárlás, amire osztani lehetne.",
+      "",
+    );
+  }
+
   L.push("── DÖNTÉSI KAPU ──", "");
   L.push(b.gate.reason);
   L.push(
@@ -317,11 +392,25 @@ export function renderBrief(b: Brief): { subject: string; text: string } {
   );
 
   L.push("── AMIT EZ A BRIEF NEM LÁT ──", "");
-  L.push(
-    "Költés, CPM, CTR, frekvencia, kreatívonkénti bontás: ezek a Meta oldalán vannak,",
-    "és csak egy ads_read jogú System User tokennel lennének olvashatók. E nélkül a brief",
-    "az eredményoldalt méri (vásárlás, checkout, fiók), a költségoldalt nem.",
-  );
+  if (b.cost?.ok) {
+    L.push(
+      "A kreatívonkénti és elhelyezésenkénti bontás - a kampány szintjén olvasunk.",
+      "A süti-elutasítók vásárlásai egyik oldalon sem jelennek meg hiánytalanul.",
+    );
+  } else {
+    const why =
+      b.cost?.reason === "token_invalid"
+        ? "a token érvénytelen vagy visszavonták"
+        : b.cost?.reason === "token_lacks_ads_read"
+          ? "a tokennek nincs ads_read joga erre a fiókra"
+          : b.cost?.reason === "unreachable"
+            ? "a Meta API most nem válaszolt"
+            : "nincs beállítva ads_read token (META_ADS_TOKEN)";
+    L.push(
+      `Költés, CPM, CTR, frekvencia: ${why}, ezért a költségoldal hiányzik.`,
+      "A brief addig az eredményoldalt méri (vásárlás, checkout, fiók).",
+    );
+  }
 
   const alarm = b.alerts.some((a) => a.severity === "critical")
     ? "[KRITIKUS] "

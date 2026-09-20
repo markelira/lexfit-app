@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/nextjs";
 import { sendEmail } from "@/lib/email";
 import { adminDb } from "@/lib/firebase-admin";
 import { buildBrief, renderBrief, CAMPAIGN, type EventDoc } from "@/lib/campaign-brief";
+import { fetchInsights } from "@/lib/meta-insights";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,14 +42,30 @@ export async function GET(req: Request) {
   try {
     // One `at >=` read, filtered in memory - the shape the other crons use,
     // and it avoids a composite index on (name, at).
-    const snap = await adminDb.collection("events").where("at", ">=", CAMPAIGN.startMs).get();
+    // Both sides in parallel: our own ledger and Meta's. The cost read is
+    // optional and never throws, so a missing token costs the report a section
+    // rather than costing the owner the evening mail.
+    const [snap, cost] = await Promise.all([
+      adminDb.collection("events").where("at", ">=", CAMPAIGN.startMs).get(),
+      fetchInsights({
+        adAccountId: CAMPAIGN.adAccountId,
+        campaignId: CAMPAIGN.campaignId,
+        sinceMs: CAMPAIGN.startMs,
+        untilMs: Math.min(now, CAMPAIGN.endMs),
+      }),
+    ]);
     const rows = snap.docs.map((d) => d.data() as EventDoc);
-    const brief = buildBrief(rows, now, {
-      pixel: !!process.env.META_PIXEL_ID,
-      capiToken: !!process.env.META_CAPI_TOKEN,
-      gtm: !!process.env.NEXT_PUBLIC_GTM_ID,
-      sendgrid: !!process.env.SENDGRID_API_KEY,
-    });
+    const brief = buildBrief(
+      rows,
+      now,
+      {
+        pixel: !!process.env.META_PIXEL_ID,
+        capiToken: !!process.env.META_CAPI_TOKEN,
+        gtm: !!process.env.NEXT_PUBLIC_GTM_ID,
+        sendgrid: !!process.env.SENDGRID_API_KEY,
+      },
+      cost,
+    );
 
     // Nothing to say, and this mode is allowed to say nothing.
     const quiet = mode === "watch" && brief.alerts.length === 0;
@@ -67,6 +84,10 @@ export async function GET(req: Request) {
         // string for env vars marked sensitive, so reading the config from
         // outside cannot tell "unset" from "write-only" - the runtime can.
         config: brief.config,
+        // Whether the ads token works, and why not when it does not. The value
+        // is never read back - only the verdict, so the token can be added and
+        // verified without anyone but Meta and Vercel ever seeing it.
+        ads: { ok: cost.ok, reason: cost.reason ?? null, days: cost.days.length, spendHuf: cost.totalSpendHuf },
       });
     }
 
@@ -93,6 +114,7 @@ export async function GET(req: Request) {
       campaign: CAMPAIGN.name,
       day: brief.dayIndex,
       purchases: brief.total.purchases,
+      ads: { ok: cost.ok, reason: cost.reason ?? null, spendHuf: cost.totalSpendHuf },
       alerts: brief.alerts.map((a) => a.key),
     });
   } catch (e) {

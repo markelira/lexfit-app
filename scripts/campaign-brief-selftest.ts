@@ -7,7 +7,7 @@
  * to get wrong in front of the owner: doubled revenue, a decision gate that
  * quietly opens early, and an alert that fails to shout.
  */
-import { renderBrief, BREAK_EVEN, CAMPAIGN, type Brief, type Alert } from "../src/lib/campaign-brief";
+import { renderBrief, buildBrief, BREAK_EVEN, CAMPAIGN, type Brief, type Alert, type CostSide, type EventDoc } from "../src/lib/campaign-brief";
 
 let failures = 0;
 function check(name: string, cond: boolean, detail?: string) {
@@ -32,6 +32,7 @@ function brief(over: Partial<Brief> = {}): Brief {
     breakEven: BREAK_EVEN,
     config: { pixel: true, capiToken: true, gtm: true, sendgrid: true },
     gate: { open: false, reason: "3. nap / 4 vásárlás - a kapu 5. napnál vagy 20 vásárlásnál nyílik." },
+    cost: null,
     alerts: [],
   };
   return { ...base, ...over };
@@ -114,8 +115,68 @@ check("zárás okt 1. 19:00 CEST", CAMPAIGN.endMs === Date.parse("2026-10-01T19:
   check("lezárás után is olvasható", /lezárult/.test(post.text));
 }
 
+// 10. Cost side present → the blind-spot section must shrink, and the two
+//     independent purchase counts must both be printed rather than reconciled.
+{
+  const cost: CostSide = {
+    ok: true,
+    totalSpendHuf: 28_400,
+    totalPurchases: 3,
+    days: [
+      { date: "2026-09-21", spendHuf: 9800, impressions: 7100, clicks: 121, ctr: 1.7, cpmHuf: 1380, frequency: 1.12, purchases: 2 },
+      { date: "2026-09-22", spendHuf: 9600, impressions: 6900, clicks: 104, ctr: 1.51, cpmHuf: 1391, frequency: 1.28, purchases: 1 },
+      { date: "2026-09-23", spendHuf: 9000, impressions: 6400, clicks: 98, ctr: 1.53, cpmHuf: 1406, frequency: 1.4, purchases: 0 },
+    ],
+  };
+  const { text } = renderBrief(brief({ cost }));
+  check("költségoldal megjelenik", /KÖLTSÉGOLDAL/.test(text));
+  check("mindkét mérés kiírva", /4 \(a mi mérésünk\) vs 3 \(a Meta/.test(text));
+  // formatHuf separates groups with a non-breaking space, so match on \s.
+  check("keret-százalék", /28\s400\sFt\s\/\s100\s000\sFt\s\(28%\)/.test(text), text.split("Összes költés")[1]?.slice(0, 60));
+  check("vakfolt zsugorodott", !/META_ADS_TOKEN/.test(text) && /kreatívonkénti/.test(text));
+}
+
+// 11. Token missing → the brief names WHY the cost side is absent, so nobody
+//     reads its silence as "there was no spend".
+{
+  const { text } = renderBrief(brief({ cost: { ok: false, reason: "token_lacks_ads_read", totalSpendHuf: 0, totalPurchases: 0, days: [] } }));
+  check("hiányzó jog megnevezve", /nincs ads_read joga/.test(text));
+  check("nem tesz úgy, mintha nulla lenne", !/KÖLTSÉGOLDAL/.test(text));
+}
+
+// 12. Scheduled but not spending. On launch day this is the likeliest fault of
+//     all - a draft that was never published - so it must be an alert, not a
+//     row the reader is expected to notice in a table.
+{
+  const now = Date.parse("2026-09-21T20:00:00+02:00");
+  const cost: CostSide = { ok: true, totalSpendHuf: 0, totalPurchases: 0, days: [{ date: "2026-09-21", spendHuf: 0, impressions: 0, clicks: 0, ctr: 0, cpmHuf: 0, frequency: 0, purchases: 0 }] };
+  const b = buildBrief([], now, { pixel: true, capiToken: true, gtm: true, sendgrid: true }, cost);
+  check("no_spend riasztás", b.alerts.some((a) => a.key === "no_spend"), b.alerts.map((a) => a.key).join(","));
+  check("a publikálást említi", /publikálva/.test(b.alerts.find((a) => a.key === "no_spend")?.why ?? ""));
+}
+
+// 13. Attribution drift only fires once our own count can carry the ratio.
+{
+  const now = Date.parse("2026-09-25T20:00:00+02:00");
+  const rows: EventDoc[] = [];
+  for (let i = 0; i < 6; i++) {
+    rows.push({ name: "program_purchased", at: Date.parse("2026-09-23T12:00:00+02:00") + i * 1000, props: { sessionId: `cs_${i}`, amountHuf: 9990 } });
+    // The twin the webhook/confirm pair produces - must not inflate the count.
+    rows.push({ name: "program_purchased", at: Date.parse("2026-09-23T12:00:00+02:00") + i * 1000, props: { sessionId: `cs_${i}`, amountHuf: 9990 } });
+  }
+  const cfg = { pixel: true, capiToken: true, gtm: true, sendgrid: true };
+  const spend = (p: number): CostSide => ({ ok: true, totalSpendHuf: 40_000, totalPurchases: p, days: [{ date: "2026-09-25", spendHuf: 40_000, impressions: 1, clicks: 1, ctr: 1, cpmHuf: 1, frequency: 1, purchases: p }] });
+
+  const dedup = buildBrief(rows, now, cfg, spend(6));
+  check("12 sorból 6 vásárlás", dedup.total.purchases === 6, `kapott: ${dedup.total.purchases}`);
+  check("egyezésnél nincs drift", !dedup.alerts.some((a) => a.key === "attribution_drift"));
+
+  const drifted = buildBrief(rows, now, cfg, spend(2));
+  check("nagy eltérésnél van drift", drifted.alerts.some((a) => a.key === "attribution_drift"));
+}
+
 if (failures) {
   console.error(`\n${failures} hiba.`);
   process.exit(1);
 }
-console.log("  ✓ campaign brief (9 eset)\n\nAll self-tests passed.");
+console.log("  ✓ campaign brief (13 eset)\n\nAll self-tests passed.");
