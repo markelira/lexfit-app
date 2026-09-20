@@ -1,0 +1,138 @@
+/* /belepes - passwordless sign-in. Scoped under `.lxb`, the same convention as
+   the landing's `.lxl` and the lead magnet's `.lxu`: generic class names here
+   must never leak into the app screens, which share the global stylesheet. */
+
+.lxb {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #f1f6f4;
+  color: #18201d;
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.lxb-card {
+  width: min(420px, 100%);
+  background: #fff;
+  border: 1px solid #dde8e3;
+  border-radius: 20px;
+  padding: 32px 26px;
+  text-align: center;
+  box-shadow: 0 1px 2px rgb(24 32 29 / 0.04), 0 14px 40px -20px rgb(24 32 29 / 0.2);
+}
+
+.lxb-mark {
+  margin: 0 0 22px;
+  font-family: var(--mono, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #3f6354;
+}
+
+.lxb-ic {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  background: #e3efe9;
+  color: #3f6354;
+  margin-bottom: 16px;
+}
+
+.lxb h1 {
+  margin: 0 0 10px;
+  font-size: 25px;
+  line-height: 1.15;
+  /* Negative tracking as display type grows - letters read too far apart
+     otherwise. Body copy below stays at 0. */
+  letter-spacing: -0.018em;
+  font-weight: 750;
+  text-wrap: balance;
+}
+
+.lxb-sub {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #55685f;
+}
+.lxb-sub strong { color: #18201d; word-break: break-word; }
+
+.lxb form { display: grid; gap: 8px; text-align: left; }
+
+.lxb label {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: #44584f;
+}
+
+.lxb input {
+  font: inherit;
+  font-size: 16px; /* 16px or iOS zooms the page on focus */
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1px solid #cfdcd6;
+  background: #fbfdfc;
+  width: 100%;
+  transition: border-color 160ms, box-shadow 160ms;
+}
+.lxb input:focus {
+  outline: none;
+  border-color: #7a9b8d;
+  box-shadow: 0 0 0 3px rgb(122 155 141 / 0.22);
+}
+
+.lxb-cta {
+  margin-top: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: #3f6354;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 15px 20px;
+  cursor: pointer;
+  /* Feedback on pointer-DOWN, never on release - the moment lag appears the
+     sense of directness falls off a cliff. */
+  transition: transform 110ms cubic-bezier(0.22, 0.61, 0.36, 1), background 160ms;
+}
+.lxb-cta:active { transform: scale(0.975); background: #36554a; }
+.lxb-cta:disabled, .lxb-cta.busy { opacity: 0.62; cursor: default; transform: none; }
+.lxb-cta:focus-visible { outline: 3px solid #7a9b8d; outline-offset: 3px; }
+
+.lxb-err {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #8c3a2c;
+}
+
+.lxb-note {
+  margin: 18px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #7b8b84;
+}
+.lxb-note a { color: #3f6354; }
+
+.lxb-again {
+  margin-top: 16px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: #3f6354;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxb-cta, .lxb input { transition: none; }
+  .lxb-cta:active { transform: none; }
+}

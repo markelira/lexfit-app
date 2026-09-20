@@ -3,22 +3,26 @@ import { formatHuf } from "@/lib/pricing/display";
 
 // /start - the copy for the one-time programme purchase (P1).
 //
-// Every number here is DERIVED, never typed: prices come from the pricing
-// config (the F0.5 hard rule) and the session count from the programme's own
-// playlist, passed in at render. A page that promises "35 edzés" in a string
-// literal starts lying the day someone adds a thirty-sixth.
+// Voice and structure follow /ujrakezdes: short sentences, second person, no
+// hype, one idea per band. The visual system is literally the same one - the
+// page renders inside `.lxu lp`, so a change to the lead magnet's look carries
+// here rather than two designs drifting apart.
+//
+// Every number is DERIVED, never typed: prices from the pricing config (the
+// F0.5 hard rule), the session count from the programme's own playlist at
+// render, the programme length from ONE constant below.
 //
 // What is deliberately absent:
-//   - any deadline, countdown or "most" - offer v3 §2/§10, and the GVH's
-//     AboutYou decision is about exactly this pattern;
+//   - any deadline, countdown or manufactured urgency - offer v3 §2/§10, and
+//     the GVH's AboutYou decision is about exactly this pattern;
 //   - any inflated "X Ft értékben" bonus stack - the buyer can count;
 //   - any body measurement, weight or calorie claim - Art. 9 data and the
 //     body-positive guardrail both rule it out.
 //
-// What the page is FOR: the single objection that killed the subscription
-// funnel. 518 leads, 0 registrations - not because the product was wrong, but
-// because the first "yes" asked for an account, a password, a card AND a
-// recurring charge at once. This page asks for one payment and nothing else.
+// What the page is FOR: the objection that killed the subscription funnel. 518
+// leads, 0 registrations - not because the product was wrong, but because the
+// first "yes" asked for an account, a password, a card AND a recurring charge
+// at once. Here the only thing asked before the money is a card.
 
 const ROLE = "program_foundation" as const;
 
@@ -31,70 +35,100 @@ export const START = {
 
   // The programme's length in weeks. LEXFIT has positioned Lexfit Start as a
   // guided 8-week programme since the start, and the ad leads with it - the
-  // landing page has to say the same thing or the click lands on a different
-  // product. It stays a SINGLE constant here, paired with the honest cadence
-  // (35 sessions over 8 weeks = 4-5 a week) and with the FAQ answer that says
-  // outright what happens when someone trains less often: it takes longer, and
-  // that is fine. The promise is the programme, not the calendar.
+  // landing has to say the same thing or the click lands on a different
+  // product. It stays a SINGLE constant, paired with the honest cadence (35
+  // sessions over 8 weeks = 4-5 a week) and with an FAQ answer that says
+  // outright what happens when someone trains less often. The lead base says
+  // most will: 43% want three days a week, 32% want four.
   weeks: 8,
 
   meta: {
     title: "Lexfit Start - 8 hetes otthoni edzésprogram, egyszeri fizetéssel",
     description:
-      "Egy teljes otthoni edzésprogram, eszköz nélkül, Alexával. Egyszer fizetsz, örökre a tiéd - nem előfizetés.",
+      "8 hetes otthoni edzésprogram, eszköz nélkül, Alexával. Egyszer fizetsz, örökre a tiéd - nem előfizetés.",
   },
 
   hero: {
-    eyebrow: "Nem előfizetés",
-    // The whole offer in three beats. Clarity over cleverness: a cold visitor
-    // from a Meta feed has about five seconds, and every one of the three
-    // facts here is one they would otherwise have to hunt for.
-    h1: "8 hetes edzésprogram. Egyszer fizetsz. Örökre a tiéd.",
-    sub: "Otthonra, eszköz nélkül, Alexával. Megmondja, mikor mit csinálj - neked csak el kell indítanod.",
+    // Message match with the ad badge, word for word. The click and the page
+    // must say the same thing or the visitor spends their first second
+    // checking whether they are in the right place.
+    eyebrow: "Nincs havidíj",
+    hNum: "8 hét,",
+    hRest: "végig tervvel.",
+    lead: "Egy kész edzésprogram otthonra, eszköz nélkül. Sorrendbe rakott edzések - megmondja, mikor mit csinálj, neked csak el kell indítanod.",
+    anti: "Azoknak, akik már többször elkezdték, és mindig a tervezésnél akadtak el.",
+    chips: ["Otthon", "Eszköz nélkül", "Bármelyik nap"],
     cta: "Megveszem a programot",
-    // Sits directly under the button, where price anxiety peaks.
-    reassure: (price: string) => `${price}, egyetlen alkalommal. Nem újul meg, nem vonunk le többet.`,
-    trust: ["Otthon, eszköz nélkül", "Bármikor, bármelyik napon", "Telefonon, tableten, tévén"],
+    ctaSub: (price: string) => `${price}, egyetlen alkalommal. Nem újul meg, nem vonunk le többet.`,
+    mechanism: "Egyszer fizetsz, és örökre a tiéd.",
+    mechanismSub: "Nem előfizetés. Nincs mit lemondani.",
+    perSession: (per: string) => `${per} egy edzés - és nem havonta, hanem összesen.`,
   },
 
   // The four things the price actually buys. No invented bonuses: each one is
-  // a shipped feature the buyer will meet on their first day.
-  gets: [
-    {
-      icon: "dumbbell",
-      k: "A teljes 8 hét",
-      d: "Videós edzések sorrendbe rakva - az elsőtől az utolsóig. Nem kell kitalálnod, mi jön.",
-    },
-    {
-      icon: "house",
-      k: "Otthonra, eszköz nélkül",
-      d: "Egy szőnyegnyi hely elég. Nincs terem, nincs súlyzó, nincs bérlet.",
-    },
-    {
-      icon: "chart",
-      k: "Látod, hol tartasz",
-      d: "Minden befejezett edzés bejelölve, a heted egy pillantásra. A haladás nem érzés, hanem adat.",
-    },
-    {
-      icon: "calendarCheck",
-      k: "A saját tempódban",
-      d: "Nincs kezdés-dátum és nincs lemaradás. Ha kihagysz egy hetet, ott folytatod, ahol abbahagytad.",
-    },
-  ],
+  // a shipped feature the buyer meets on their first day.
+  gets: {
+    eyebrow: "Amit megveszel",
+    hd: "Nem egy videótár. Egy program.",
+    lead: "A különbség az, hogy ez megmondja, mi a következő. Nem neked kell kitalálnod.",
+    items: [
+      {
+        icon: "dumbbell",
+        k: "A teljes 8 hét",
+        d: "Videós edzések sorrendbe rakva, az elsőtől az utolsóig. Minden nap tudod, mi jön.",
+      },
+      {
+        icon: "house",
+        k: "Otthonra, eszköz nélkül",
+        d: "Egy szőnyegnyi hely elég. Nincs terem, nincs súlyzó, nincs bérlet.",
+      },
+      {
+        icon: "chart",
+        k: "Látod, hol tartasz",
+        d: "Minden befejezett edzés bejelölve, a heted egy pillantásra. A haladás nem érzés, hanem adat.",
+      },
+      {
+        icon: "calendarCheck",
+        k: "A saját tempódban",
+        d: "Nincs kezdés-dátum és nincs lemaradás. Ha kihagysz egy hetet, ott folytatod, ahol abbahagytad.",
+      },
+    ],
+  },
+
+  // The problem mirror. Says what they already believe, in their words, before
+  // claiming anything - the same move the lead magnet's S3 makes.
+  mirror: {
+    hd: "Nem az akarat fogy el.",
+    body: "A legtöbben nem azért hagyják abba, mert lusták. Hanem mert minden edzés előtt dönteni kell: mit csináljak ma, mennyit, meddig. Ez a döntés fárasztóbb, mint maga az edzés - és pár hét múlva egyszerűbb kihagyni.",
+    close: "Ezt a döntést veszi le rólad a program.",
+  },
 
   how: {
-    h: "Így működik",
+    eyebrow: "Így működik",
+    hd: "Két perc, és kezdheted.",
     steps: [
-      { n: "1", k: "Fizetsz egyszer", d: "Kártyával, két percben. Nem kell regisztrálnod előtte." },
-      { n: "2", k: "Megérkezik a belépőd", d: "Emailben, azonnal. Beállítasz egy jelszót, és bent vagy." },
+      { n: "1", k: "Fizetsz egyszer", d: "Kártyával, itt az oldalon. Nem kell regisztrálnod, nem kell jelszót kitalálnod." },
+      { n: "2", k: "Azonnal bent vagy", d: "A fizetés után beléptetünk. A belépőd emailben is megérkezik, ha később visszatérnél." },
       { n: "3", k: "Elindítod az elsőt", d: "Még ma. Az első edzés ott van, ahol belépsz." },
+    ],
+  },
+
+  inside: {
+    eyebrow: "Mi van benne",
+    hd: (n: number) => `${n} edzés, sorrendben.`,
+    lead: (n: number, weeks: number) =>
+      `A ${n} edzés egymásra épül: az elején a mozdulatokat tanulod, a végére már össze vannak fűzve. Heti 4-5 edzéssel ${weeks} hét - ha ritkábban edzel, egyszerűen tovább tart, és ez rendben van.`,
+    facts: [
+      { v: "~30", l: "perc egy edzés" },
+      { v: "0", l: "eszköz" },
+      { v: "∞", l: "meddig a tiéd" },
     ],
   },
 
   // Pratfall: saying plainly who this is NOT for buys more trust than another
   // benefit bullet, and it keeps the refund rate down.
   fit: {
-    h: "Kinek jó, és kinek nem",
+    hd: "Kinek jó, és kinek nem",
     yes: {
       k: "Neked való, ha",
       items: [
@@ -113,14 +147,21 @@ export const START = {
     },
   },
 
+  alexa: {
+    eyebrow: "Aki végigvisz",
+    hd: "Alexa.",
+    body: "Ő vezeti végig mind a nyolc hetet. Minden gyakorlatot megmutat, és megmondja, mire figyelj - nincs olyan mozdulat, amit magadtól kellene kitalálnod.",
+  },
+
   guarantee: {
+    eyebrow: "Semmit nem kockáztatsz",
     k: (days: number) => `${days} nap, feltétel nélkül`,
     d: (days: number) =>
       `Nézd meg belülről. Ha ${days} napon belül úgy érzed, nem a tiéd, írsz egy sort és visszautaljuk - nem kérdezünk semmit, nem kell indokolnod.`,
   },
 
   faq: {
-    h: "Amit ilyenkor kérdezni szoktak",
+    hd: "Amit ilyenkor kérdezni szoktak",
     items: [
       {
         q: "Tényleg nem előfizetés?",
@@ -131,16 +172,20 @@ export const START = {
         a: "Örökre. Nincs lejárat. Ha fél év múlva veszed elő újra, ugyanúgy ott lesz.",
       },
       {
+        q: "Kell hozzá regisztráció, jelszó?",
+        a: "Nem. Fizetés után azonnal beléptetünk, és a belépőd emailben is megérkezik. Ha később kilépnél, egy koppintással visszajutsz - jelszóra soha nem lesz szükséged.",
+      },
+      {
         q: "Kell hozzá bármilyen eszköz?",
         a: "Nem. A program végig eszköz nélküli, a saját testsúlyoddal. Egy szőnyeg kényelmesebbé teszi, de nem feltétel.",
       },
       {
         q: "Mennyi időt vesz el?",
-        a: "Edzésenként nagyjából fél órát, és te döntöd el, mely napokon. A 8 hét heti 4-5 edzéssel jön ki - ha ritkábban edzel, egyszerűen tovább tart, és ez rendben van. A program a tiéd, nem szalad el.",
+        a: "Edzésenként nagyjából fél órát, és te döntöd el, mely napokon. A 8 hét heti 4-5 edzéssel jön ki - ha ritkábban edzel, egyszerűen tovább tart. A program a tiéd, nem szalad el.",
       },
       {
         q: "Mi van, ha most kezdem?",
-        a: "Pont arra való. Az első edzések a legegyszerűbbek, és Alexa minden gyakorlatot megmutat - nincs olyan mozdulat, amit magadtól kellene kitalálnod.",
+        a: "Pont arra való. Az első edzések a legegyszerűbbek, és Alexa minden gyakorlatot megmutat.",
       },
       {
         q: "Számlát kapok?",
@@ -149,13 +194,29 @@ export const START = {
     ],
   },
 
-  finale: {
-    h: "Kezdjük el ma.",
-    d: "Egy fizetés, és a program a tiéd marad - akkor is, ha jövő héten kezded el, és akkor is, ha jövőre veszed elő újra.",
+  close: {
+    eyebrow: "Kezdjük",
+    hd: "Ma is el tudod kezdeni.",
+    body: "Egy fizetés, és a program a tiéd marad - akkor is, ha jövő héten kezded el, és akkor is, ha jövőre veszed elő újra.",
   },
 
   // The J2 consent. Mandatory for digital content delivered at once, and the
-  // wording has to say what the buyer is giving up, not just ask for a tick.
+  // wording has to say what the buyer gives up, not just ask for a tick.
   consent: (days: number) =>
     `Kérem, hogy a hozzáférés azonnal induljon. Tudomásul veszem, hogy a teljesítés megkezdése után a törvényi elállási jogom megszűnik - a ${days} napos pénzvisszafizetést a LEXFIT ettől függetlenül vállalja.`,
+
+  pay: {
+    hd: "Fizetés",
+    await: "Pipáld ki a fenti sort, és megnyílik a kártyás fizetés.",
+    back: "Mégsem",
+    // Shown instead of the embedded form inside a Meta in-app browser, where
+    // embedded Stripe has failed before. The wording promises the redirect so
+    // it does not look like an error when the page leaves.
+    webviewCta: "Tovább a biztonságos fizetéshez",
+    loading: "A fizetés betöltése…",
+    redirecting: "Átirányítás a fizetéshez…",
+    unavailable: "A fizetés jelenleg nem elérhető. Próbáld újra pár perc múlva.",
+    failed: "A fizetést most nem tudtuk elindítani. Próbáld újra - a kártyádat nem terheltük meg.",
+    trust: ["Stripe fizetés", "Nem tárolunk kártyaadatot", "Számlát küldünk"],
+  },
 } as const;

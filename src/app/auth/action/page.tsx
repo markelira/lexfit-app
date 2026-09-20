@@ -11,9 +11,12 @@ import { useSearchParams } from "next/navigation";
 import {
   applyActionCode,
   confirmPasswordReset,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
   verifyPasswordResetCode,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { SIGN_IN_EMAIL_KEY } from "@/lib/auth-link-config";
 
 const wrap: React.CSSProperties = {
   minHeight: "100dvh", display: "flex", flexDirection: "column",
@@ -37,7 +40,9 @@ function ActionHandler() {
   const mode = params.get("mode");
   const oobCode = params.get("oobCode");
 
-  const [state, setState] = useState<"working" | "reset-form" | "done" | "error">("working");
+  const [state, setState] = useState<
+    "working" | "reset-form" | "signin-email" | "done" | "error"
+  >("working");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [busy, setBusy] = useState(false);
@@ -48,6 +53,21 @@ function ActionHandler() {
     if (!mode || !oobCode) {
       setErr("Hiányos vagy sérült link. Kérj újat az appból.");
       setState("error");
+      return;
+    }
+    // P1 - passwordless sign-in. The address is NOT in the link on purpose:
+    // anyone who received a forwarded copy could otherwise take the session.
+    // It comes from the device that asked for the link; when that is missing
+    // (a different device, cleared storage) we ask for it, which is exactly
+    // the confirmation Firebase wants before completing.
+    if (mode === "signIn" && isSignInWithEmailLink(auth, window.location.href)) {
+      let stored: string | null = null;
+      try { stored = localStorage.getItem(SIGN_IN_EMAIL_KEY); } catch {}
+      if (!stored) {
+        setState("signin-email");
+        return;
+      }
+      void completeSignIn(stored);
       return;
     }
     if (mode === "resetPassword") {
@@ -80,6 +100,33 @@ function ActionHandler() {
     }
   }, [mode, oobCode]);
 
+  async function completeSignIn(mail: string) {
+    setBusy(true);
+    setErr("");
+    try {
+      await signInWithEmailLink(auth, mail.trim().toLowerCase(), window.location.href);
+      try { localStorage.removeItem(SIGN_IN_EMAIL_KEY); } catch {}
+      // continueUrl carries where they were headed; the link route restricts
+      // it to a same-site path, so this can only land inside the app.
+      const next = params.get("continueUrl");
+      let dest = "/app";
+      try {
+        if (next) {
+          const u = new URL(next, window.location.origin);
+          if (u.origin === window.location.origin) dest = u.pathname + u.search;
+        }
+      } catch {}
+      window.location.replace(dest);
+    } catch {
+      setErr(
+        "Ez a belépő link lejárt vagy már fel lett használva. Kérj újat - ugyanarra a címre küldjük.",
+      );
+      setState("error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function submitNewPassword() {
     if (pw.length < 6) {
       setErr("A jelszó legalább 6 karakter legyen.");
@@ -103,6 +150,28 @@ function ActionHandler() {
       <p style={mark}>LEXFIT</p>
 
       {state === "working" && <p style={{ opacity: 0.7 }}>Egy pillanat…</p>}
+
+      {state === "signin-email" && (
+        <>
+          <h1 style={{ fontSize: 22, margin: 0 }}>Erősítsd meg a címed</h1>
+          <p style={{ opacity: 0.7, margin: 0, maxWidth: 320 }}>
+            Add meg azt az e-mail címet, amire a belépő linket kérted.
+          </p>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="nev@example.com"
+            style={inputStyle}
+            autoFocus
+            autoComplete="email"
+            onKeyDown={(e) => e.key === "Enter" && completeSignIn(email)}
+          />
+          <button style={btn} disabled={busy} onClick={() => completeSignIn(email)}>
+            {busy ? "Egy pillanat…" : "Belépek"}
+          </button>
+        </>
+      )}
 
       {state === "reset-form" && (
         <>

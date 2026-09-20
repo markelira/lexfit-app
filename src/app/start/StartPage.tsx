@@ -1,214 +1,438 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
+import { inMetaWebview } from "@/lib/webview";
 import { marketingContext, trackProgramCheckout, trackProgramView } from "@/lib/track";
+import { formatHuf } from "@/lib/pricing/display";
 import { START } from "./copy";
-import "./start.css";
+import "../ujrakezdes/ujrakezdes.css"; // the shared look: .lxu / .lp-* bands
+import "./start.css";                  // only what the pay panel adds
+
+const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 /**
- * The product page for the one-time Foundation purchase (P1).
+ * Stripe.js, loaded lazily and retryably.
  *
- * One message, one action, no navigation - a landing page in the strict sense.
- * The only interaction before the money is the legally required consent tick;
- * there is no account form, because the account is built from the receipt.
+ * A module-scope promise is how the silent empty-checkout dead end happened:
+ * one flaky fetch poisoned it for the whole session and every later press
+ * mounted an empty frame. Clearing the memo on failure means the same tap
+ * retries.
+ */
+let stripeMemo: Promise<Stripe | null> | null = null;
+function getStripe(): Promise<Stripe | null> | null {
+  if (!pk) return null;
+  if (!stripeMemo) {
+    stripeMemo = loadStripe(pk).catch((e) => { stripeMemo = null; throw e; });
+  }
+  return stripeMemo;
+}
+
+/**
+ * /start - the product page for the one-time Foundation purchase (P1).
+ *
+ * Built inside `.lxu lp`, the lead magnet's own layer, so the two ad landings
+ * share one visual system instead of drifting apart. No navigation: a nav on an
+ * ad landing page is a row of exits.
+ *
+ * The shortest path to paid: press the CTA and the card form opens in place -
+ * no redirect, no account, no password. The only thing between the visitor and
+ * the money is the consent tick the law requires.
  */
 export function StartPage({ sessionCount }: { sessionCount: number }) {
   const [consented, setConsented] = useState(false);
+  const [webview, setWebview] = useState(false);
+  const [stripe, setStripe] = useState<Stripe | null>(null);
+  const [paying, setPaying] = useState(false);   // the pay panel is mounted
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [showConsent, setShowConsent] = useState(false);
+  const payRef = useRef<HTMLDivElement>(null);
+  const consentRef = useRef<HTMLLabelElement>(null);
 
   useEffect(() => { trackProgramView(START.slug); }, []);
+  // Detected after mount, never during render: the UA is not available on the
+  // server and a render-time read would hydrate-mismatch.
+  useEffect(() => { setWebview(inMetaWebview()); }, []);
 
-  const buy = useCallback(
+  const perSession = formatHuf(Math.round(START.priceHuf / Math.max(1, sessionCount)));
+
+  /** Ask the server for a checkout session; returns the embedded clientSecret. */
+  const createSession = useCallback(async (embedded: boolean, where: string) => {
+    const res = await fetch("/api/stripe/program-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        role: START.role,
+        immediateStart: true,
+        embedded,
+        where,
+        marketing: marketingContext(),
+      }),
+    });
+    const body = (await res.json()) as { clientSecret?: string; url?: string; error?: string };
+    if (!res.ok) throw new Error(body.error ?? "checkout_failed");
+    return body;
+  }, []);
+
+  const fetchClientSecret = useCallback(async () => {
+    const b = await createSession(true, "embed");
+    if (!b.clientSecret) throw new Error("no_client_secret");
+    return b.clientSecret;
+  }, [createSession]);
+
+  const go = useCallback(
     async (where: string) => {
-      // First press with no tick: reveal the consent row and point at it
-      // rather than refusing. The tick is a legal requirement, not a hurdle
-      // we chose, so the page should not wear it until it is needed.
-      if (!consented) {
-        setShowConsent(true);
-        setErr(null);
-        requestAnimationFrame(() => {
-          document.getElementById("s-consent")?.scrollIntoView({ block: "center", behavior: "smooth" });
-        });
-        return;
-      }
-      setBusy(true);
       setErr(null);
       trackProgramCheckout(START.role, where);
+
+      // Meta's in-app browser has failed embedded Stripe before, and this page
+      // is served almost entirely to it. There it gets the hosted page, which
+      // is a redirect but works.
+      if (webview) {
+        // The hosted page is a full navigation, so there is no panel to put the
+        // tick in - it has to be given before we leave.
+        if (!consented) {
+          requestAnimationFrame(() => {
+            consentRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+            consentRef.current?.classList.add("lxs-ask");
+          });
+          return;
+        }
+        setBusy(true);
+        try {
+          const b = await createSession(false, where);
+          if (!b.url) throw new Error("no_url");
+          window.location.href = b.url;
+        } catch {
+          setBusy(false);
+          setErr(START.pay.failed);
+        }
+        return;
+      }
+
+      // Stripe.js must be IN HAND before the panel opens. Opening first and
+      // letting the provider await a promise is how an empty checkout frame
+      // reaches a paying visitor.
+      const p = getStripe();
+      if (!p) { setErr(START.pay.unavailable); return; }
+      setBusy(true);
       try {
-        const res = await fetch("/api/stripe/program-checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            role: START.role,
-            immediateStart: true,
-            marketing: marketingContext(),
-            where,
-          }),
-        });
-        const body = (await res.json()) as { url?: string; error?: string };
-        if (!body.url) throw new Error(body.error ?? "no_url");
-        window.location.href = body.url;
+        const s = await p;
+        if (!s) throw new Error("stripe_null");
+        setStripe(s);
+        setPaying(true);
+        requestAnimationFrame(() =>
+          payRef.current?.scrollIntoView({ block: "start", behavior: "smooth" }),
+        );
       } catch {
+        setErr(START.pay.failed);
+      } finally {
         setBusy(false);
-        setErr("Nem sikerült megnyitni a fizetést. Próbáld újra - a kártyádat még nem terheltük meg.");
       }
     },
-    [consented],
+    [consented, webview, createSession],
   );
 
-  const Cta = ({ where, label }: { where: string; label?: string }) => (
-    <button type="button" className="s-cta" disabled={busy} onClick={() => void buy(where)}>
-      {busy ? "Egy pillanat…" : (label ?? START.hero.cta)}
+  const Cta = ({ where, small }: { where: string; small?: boolean }) => (
+    <button
+      type="button"
+      className={`lp-cta${small ? " lp-cta-s" : ""}`}
+      disabled={busy}
+      onClick={() => void go(where)}
+    >
+      {busy
+        ? webview ? START.pay.redirecting : START.pay.loading
+        : START.hero.cta}
     </button>
   );
 
+  // ── sticky mobile bar: arms on the first scroll, yields whenever an in-flow
+  // CTA is on screen, so two identical buttons are never visible at once.
+  const heroCtaRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLElement>(null);
+  const [stickyOn, setStickyOn] = useState(false);
+  useEffect(() => {
+    const h = heroCtaRef.current, c = closeRef.current;
+    if (!h || !c || typeof IntersectionObserver === "undefined") return;
+    let ctaVis = true, closeVis = false, scrolled = window.scrollY > 120;
+    const upd = () => setStickyOn(scrolled && !ctaVis && !closeVis && !paying);
+    // Read the LAST entry of each batch: a flick can cross "enters viewport"
+    // and "leaves above" between two frames, and the observer then delivers
+    // both crossings in ONE callback - entries[0] is the stale one.
+    const io1 = new IntersectionObserver((es) => {
+      const e = es[es.length - 1]; ctaVis = !!e && e.isIntersecting; upd();
+    });
+    const io2 = new IntersectionObserver((es) => {
+      const e = es[es.length - 1]; closeVis = !!e && e.isIntersecting; upd();
+    });
+    const onScroll = () => { scrolled = window.scrollY > 120; upd(); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    io1.observe(h); io2.observe(c);
+    return () => { io1.disconnect(); io2.disconnect(); window.removeEventListener("scroll", onScroll); };
+  }, [paying]);
+
+  const consentRow = (
+    <label className="lxs-consent" ref={consentRef}>
+      <input
+        type="checkbox"
+        checked={consented}
+        onChange={(e) => {
+          setConsented(e.target.checked);
+          setErr(null);
+          consentRef.current?.classList.remove("lxs-ask");
+        }}
+      />
+      <span>{START.consent(START.guaranteeDays)}</span>
+    </label>
+  );
+
   return (
-    <main className="lxs">
-      <section className="s-hero">
-        <p className="s-eyebrow">{START.hero.eyebrow}</p>
-        <h1 className="s-h1">{START.hero.h1}</h1>
-        <p className="s-sub">{START.hero.sub}</p>
+    <div className="lxu lp lxs">
+      {/* ── S0 · header: the wordmark, and deliberately nothing else. ────── */}
+      <header className="lp-head">
+        <span className="lp-mark">LEXFIT</span>
+      </header>
 
-        <div className="s-pricebox">
-          <div className="s-price">
-            <strong>{START.price}</strong>
-            <span>egyszer</span>
-          </div>
-          <Cta where="hero" />
-          <p className="s-reassure">{START.hero.reassure(START.price)}</p>
-        </div>
-
-        <ul className="s-trust">
-          {START.hero.trust.map((t) => (
-            <li key={t}>
-              <LxIcon d={lxPaths.check} size={15} sw={2.4} />
-              {t}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="s-gets">
-        <h2 className="s-h2">Mit kapsz {START.price}-ért</h2>
-        <ul className="s-getlist">
-          {START.gets.map((g) => (
-            <li key={g.k}>
-              <span className="s-ic">
-                <LxIcon d={lxPaths[g.icon]} size={22} sw={1.7} />
-              </span>
-              <div>
-                <strong>{g.k}</strong>
-                <p>{g.d}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-        {/* The one number the buyer weighs the price against, stated once and
-            read from the programme's own playlist - never a literal. */}
-        <p className="s-count">
-          <strong>{sessionCount} edzés</strong> a programban, az elsőtől az utolsóig.
-        </p>
-      </section>
-
-      <section className="s-how">
-        <h2 className="s-h2">{START.how.h}</h2>
-        <ol className="s-steps">
-          {START.how.steps.map((s) => (
-            <li key={s.n}>
-              <span className="s-n">{s.n}</span>
-              <div>
-                <strong>{s.k}</strong>
-                <p>{s.d}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="s-fit">
-        <h2 className="s-h2">{START.fit.h}</h2>
-        <div className="s-fitgrid">
-          <div className="s-fitcard yes">
-            <strong>{START.fit.yes.k}</strong>
-            <ul>
-              {START.fit.yes.items.map((i) => (
-                <li key={i}>
-                  <LxIcon d={lxPaths.check} size={14} sw={2.6} />
-                  {i}
-                </li>
-              ))}
+      {/* ── S1 · hero ───────────────────────────────────────────────────── */}
+      <section className="lp-hero">
+        <div className="lp-hero-grid">
+          <div className="lp-hero-copy">
+            <p className="lp-eyebrow lp-m1" style={{ ["--i" as string]: 0 }}>{START.hero.eyebrow}</p>
+            <h1 className="lp-m1" style={{ ["--i" as string]: 1 }}>
+              <span className="lp-h-num">{START.hero.hNum}</span>
+              <span className="lp-h-rest">{START.hero.hRest}</span>
+            </h1>
+            <p className="lp-lead lp-m1" style={{ ["--i" as string]: 2 }}>{START.hero.lead}</p>
+            <p className="lp-anti lp-m1" style={{ ["--i" as string]: 3 }}>{START.hero.anti}</p>
+            <ul className="lp-chips lp-m1" style={{ ["--i" as string]: 4 }}>
+              {START.hero.chips.map((c) => <li key={c}>{c}</li>)}
             </ul>
           </div>
-          <div className="s-fitcard no">
-            <strong>{START.fit.no.k}</strong>
-            <ul>
-              {START.fit.no.items.map((i) => (
-                <li key={i}>
-                  <LxIcon d={lxPaths.close} size={14} sw={2.6} />
-                  {i}
-                </li>
-              ))}
-            </ul>
+
+          {/* The price card stands where the lead magnet shows its week mock:
+              this page's proof is the offer itself, not a preview of output. */}
+          <div className="lp-pair lp-m1" style={{ ["--i" as string]: 5 }}>
+            <div className="lxs-pricecard">
+              <p className="lxs-price">
+                <strong>{START.price}</strong>
+                <span>egyszer</span>
+              </p>
+              <p className="lxs-per">{START.hero.perSession(perSession)}</p>
+              <ul className="lxs-tick">
+                {[
+                  `${sessionCount} edzés, sorrendbe rakva`,
+                  "Örökre a tiéd - nem jár le",
+                  `${START.guaranteeDays} nap pénzvisszafizetés`,
+                ].map((t) => (
+                  <li key={t}><LxIcon d={lxPaths.check} size={15} sw={2.4} />{t}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="lp-hero-after">
+            {webview && consentRow}
+            <div className="lp-ctarow lp-m1" style={{ ["--i" as string]: 6 }} ref={heroCtaRef}>
+              <Cta where="hero" />
+              <p className="lp-ctasub">{START.hero.ctaSub(START.price)}</p>
+            </div>
+            {err && <p className="lxs-err" role="alert">{err}</p>}
+            <div className="lp-mechrow lp-m1" style={{ ["--i" as string]: 7 }}>
+              <p><b>{START.hero.mechanism}</b></p>
+              <p className="lp-xs">{START.hero.mechanismSub}</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="s-guarantee">
-        <span className="s-gic">
-          <LxIcon d={lxPaths.shield} size={26} sw={1.6} />
-        </span>
-        <strong>{START.guarantee.k(START.guaranteeDays)}</strong>
-        <p>{START.guarantee.d(START.guaranteeDays)}</p>
-      </section>
+      {/* ── PAY · the card form, opened in place. Rendered directly under the
+          hero so the page never scrolls away from the decision. ─────────── */}
+      {paying && (
+        <section className="lxs-pay" ref={payRef}>
+          <div className="lp-col">
+            <div className="lxs-payhead">
+              <h2>{START.pay.hd}</h2>
+              <button type="button" className="lxs-payback" onClick={() => setPaying(false)}>
+                {START.pay.back}
+              </button>
+            </div>
+            {/* The J2 consent gates the form rather than the button. It is
+                required before performance begins, not before a panel opens,
+                and asking for it here puts it in context - inside a payment -
+                instead of parking a legal paragraph on the decision itself.
+                The provider is only mounted once ticked, so no checkout
+                session is created before the consent is recorded. */}
+            {consentRow}
+            {!stripe ? (
+              <p className="lxs-err">{START.pay.unavailable}</p>
+            ) : consented ? (
+              <div className="lxs-embed">
+                <EmbeddedCheckoutProvider stripe={stripe} options={{ fetchClientSecret }}>
+                  <EmbeddedCheckout />
+                </EmbeddedCheckoutProvider>
+              </div>
+            ) : (
+              <p className="lxs-await">{START.pay.await}</p>
+            )}
+            <div className="lxs-paytrust">
+              {START.pay.trust.map((t) => <span key={t}>{t}</span>)}
+            </div>
+          </div>
+        </section>
+      )}
 
-      <section className="s-faq">
-        <h2 className="s-h2">{START.faq.h}</h2>
-        <div className="s-faqlist">
-          {START.faq.items.map((f) => (
-            <details key={f.q}>
-              <summary>{f.q}</summary>
-              <p>{f.a}</p>
-            </details>
-          ))}
+      {/* ── S2 · what the price buys ────────────────────────────────────── */}
+      <section className="lp-band">
+        <div className="lp-col">
+          <p className="lp-eyebrow">{START.gets.eyebrow}</p>
+          <h2>{START.gets.hd}</h2>
+          <p className="lp-body">{START.gets.lead}</p>
+          <ul className="lxs-gets">
+            {START.gets.items.map((g) => (
+              <li key={g.k}>
+                <span className="lxs-ic"><LxIcon d={lxPaths[g.icon]} size={22} sw={1.7} /></span>
+                <div><strong>{g.k}</strong><p>{g.d}</p></div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="s-finale">
-        <h2 className="s-h2">{START.finale.h}</h2>
-        <p className="s-sub">{START.finale.d}</p>
+      {/* ── S3 · the problem mirror ─────────────────────────────────────── */}
+      <section className="lp-band lp-tight">
+        <div className="lp-col">
+          <h2>{START.mirror.hd}</h2>
+          <p className="lp-body">{START.mirror.body}</p>
+          <p className="lp-body"><b>{START.mirror.close}</b></p>
+        </div>
+      </section>
 
-        <label
-          id="s-consent"
-          className={`s-consent${showConsent ? " on" : ""}`}
-          data-testid="start-consent"
-        >
-          <input
-            type="checkbox"
-            checked={consented}
-            onChange={(e) => {
-              setConsented(e.target.checked);
-              setErr(null);
-            }}
-          />
-          <span>{START.consent(START.guaranteeDays)}</span>
-        </label>
+      {/* ── S4 · the mechanism (navy) ───────────────────────────────────── */}
+      <section className="lp-band lp-dark">
+        <div className="lp-col">
+          <p className="lp-eyebrow">{START.how.eyebrow}</p>
+          <h2>{START.how.hd}</h2>
+          <ol className="lxs-steps">
+            {START.how.steps.map((s) => (
+              <li key={s.n}>
+                <span className="lxs-n">{s.n}</span>
+                <div><strong>{s.k}</strong><p>{s.d}</p></div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
 
-        <Cta where="finale" />
-        <p className="s-reassure">{START.hero.reassure(START.price)}</p>
-        {err && (
-          <p className="s-err" role="alert">
-            {err}
+      {/* ── S5 · what is inside ─────────────────────────────────────────── */}
+      <section className="lp-band">
+        <div className="lp-col">
+          <p className="lp-eyebrow">{START.inside.eyebrow}</p>
+          <h2>{START.inside.hd(sessionCount)}</h2>
+          <p className="lp-body">{START.inside.lead(sessionCount, START.weeks)}</p>
+          <dl className="lp-bar3">
+            {START.inside.facts.map((f) => (
+              <div key={f.l}><dt>{f.v}</dt><dd>{f.l}</dd></div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {/* ── S6 · who it is and is not for ───────────────────────────────── */}
+      <section className="lp-band lp-tight">
+        <div className="lp-col">
+          <h2>{START.fit.hd}</h2>
+          <div className="lxs-fit">
+            {[START.fit.yes, START.fit.no].map((col, i) => (
+              <div key={col.k} className={`lxs-fitcard${i ? " no" : " yes"}`}>
+                <strong>{col.k}</strong>
+                <ul>
+                  {col.items.map((t) => (
+                    <li key={t}>
+                      <LxIcon d={lxPaths[i ? "close" : "check"]} size={14} sw={2.6} />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── S7 · Alexa (navy) ───────────────────────────────────────────── */}
+      <section className="lp-band lp-dark">
+        <div className="lp-col lp-alexa">
+          <div>
+            <p className="lp-eyebrow">{START.alexa.eyebrow}</p>
+            <h2>{START.alexa.hd}</h2>
+            <p className="lp-body">{START.alexa.body}</p>
+          </div>
+          <div className="lp-alexa-photo">
+            <Image
+              src="/hero-alexa.jpg"
+              alt="Alexa"
+              width={420}
+              height={520}
+              sizes="(max-width: 1023px) 80vw, 380px"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── S8 · guarantee ──────────────────────────────────────────────── */}
+      <section className="lp-band lp-tight">
+        <div className="lp-col lxs-guar">
+          <span className="lxs-gic"><LxIcon d={lxPaths.shield} size={26} sw={1.6} /></span>
+          <p className="lp-eyebrow">{START.guarantee.eyebrow}</p>
+          <h2>{START.guarantee.k(START.guaranteeDays)}</h2>
+          <p className="lp-body">{START.guarantee.d(START.guaranteeDays)}</p>
+        </div>
+      </section>
+
+      {/* ── S9 · FAQ ────────────────────────────────────────────────────── */}
+      <section className="lp-band">
+        <div className="lp-col">
+          <h2>{START.faq.hd}</h2>
+          <div className="lxs-faq">
+            {START.faq.items.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── S10 · the close (accent) ────────────────────────────────────── */}
+      <section className="lp-band lp-acc" ref={closeRef}>
+        <div className="lp-col lp-close">
+          <p className="lp-eyebrow">{START.close.eyebrow}</p>
+          <h2>{START.close.hd}</h2>
+          <p className="lp-body">{START.close.body}</p>
+          {webview && !consented && consentRow}
+          <Cta where="close" />
+          <p className="lp-xs">{START.hero.ctaSub(START.price)}</p>
+          <p className="lp-legal">
+            A vásárlással elfogadod az <Link href="/aszf">ÁSZF</Link>-et és az{" "}
+            <Link href="/adatvedelem" className="lp-privacy">Adatkezelési tájékoztatót</Link>.
           </p>
-        )}
-        <p className="s-legal">
-          A vásárlással elfogadod az <a href="/aszf">ÁSZF</a>-et és az{" "}
-          <a href="/adatvedelem">Adatkezelési tájékoztatót</a>.
-        </p>
+        </div>
       </section>
-    </main>
+
+      {/* ── sticky bar (mobile) ─────────────────────────────────────────── */}
+      <div className={`lp-sticky${stickyOn ? " on" : ""}`} aria-hidden={!stickyOn}>
+        <div className="lp-sticky-p">
+          <b>{START.price}, egyszer</b>
+          <span>{START.hero.mechanismSub}</span>
+        </div>
+        <Cta where="sticky" small />
+      </div>
+    </div>
   );
 }

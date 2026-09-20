@@ -27,13 +27,20 @@ export async function POST(req: Request) {
   }
 
   const ip = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
-  if (!(await allowRequest("program_confirm", ip.replace(/[^0-9a-zA-Z:.]/g, "-"), 30, HOUR_MS))) {
+  // Tighter than the other public routes: a successful call hands back a
+  // credential, so the window is small enough that guessing session ids is
+  // pointless even before Stripe's own entropy is considered.
+  if (!(await allowRequest("program_confirm", ip.replace(/[^0-9a-zA-Z:.]/g, "-"), 12, HOUR_MS))) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
   try {
     const r = await fulfilProgramSession(sessionId);
-    return NextResponse.json(r);
+    // The response carries a one-shot sign-in token, so it must never be
+    // cached by a proxy or the browser on its way back.
+    return NextResponse.json(r, {
+      headers: { "Cache-Control": "no-store, private" },
+    });
   } catch (e) {
     console.error("[program-confirm]", e);
     // The money is safe either way - the webhook retries for 3 days. Tell the

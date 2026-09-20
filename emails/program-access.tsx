@@ -15,26 +15,26 @@ export default function ProgramAccess({
   programTitle,
   sessionCount,
   priceLine,
-  setPasswordUrl,
+  signInUrl,
   guaranteeDays,
 }: {
   programTitle: string;
   sessionCount: number;
   priceLine: string;
-  /** Firebase password-set link - it is also how the address gets verified. */
-  setPasswordUrl: string;
+  /** Firebase passwordless sign-in link - these buyers never set a password. */
+  signInUrl: string;
   guaranteeDays: number;
 }) {
   return (
-    <EmailLayout preview={`${programTitle} - a tiéd, örökre. Állíts be egy jelszót, és kezdd el.`}>
+    <EmailLayout preview={`${programTitle} - a tiéd, örökre. Egy koppintás, és kezdheted.`}>
       <Text style={styles.eyebrow}>Megvan</Text>
       <Text style={styles.h1}>A {programTitle} a tiéd</Text>
       <Text style={styles.body}>
-        Köszönöm, hogy belevágtál. Egy dolog van hátra: állíts be egy jelszót,
-        és a program azonnal megnyílik. Nem kell regisztrálnod - a fiókod már
-        elkészült erre a címre.
+        Köszönöm, hogy belevágtál. A fiókod elkészült erre a címre, és ez a link
+        beléptet - jelszó nem kell, sem most, sem később. Tedd el ezt a levelet:
+        ha kilépnél, innen bármikor visszajutsz.
       </Text>
-      <Cta href={setPasswordUrl}>Jelszó beállítása és kezdés</Cta>
+      <Cta href={signInUrl}>Kezdjük az első edzést</Cta>
       <Facts
         rows={[
           { label: "Program", value: programTitle },
@@ -58,6 +58,6 @@ ProgramAccess.PreviewProps = {
   programTitle: "Lexfit Start",
   sessionCount: 35,
   priceLine: "9 990 Ft, egyszer",
-  setPasswordUrl: "https://lexfit.hu/",
+  signInUrl: "https://www.lexfit.hu/",
   guaranteeDays: 14,
 };

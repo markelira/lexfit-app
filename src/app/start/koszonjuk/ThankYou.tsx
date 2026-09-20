@@ -1,20 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { signInWithCustomToken, browserLocalPersistence, setPersistence } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
 import { trackProgramPurchase } from "@/lib/track";
 import { START } from "../copy";
 import "../start.css";
 
-type State = { phase: "working" | "done" | "slow"; email?: string | null };
+type Phase = "working" | "in" | "mailed" | "slow";
+type State = { phase: Phase; email?: string | null };
 
 /**
  * The moment the product is handed over (P1).
  *
- * The buyer has no account yet, so this screen has one job: tell them, in
- * their own address, where the way in just went. Anything else on the page
- * competes with the only instruction that matters.
+ * The buyer paid without an account, and the worst thing this screen can do is
+ * send them to their inbox. It signs them in with the one-shot token the
+ * fulfilment mints, so the next thing they touch is the first workout. The
+ * access email still goes out - that is how they get back in next week, not how
+ * they get in now.
  */
 export function ThankYou({ sessionId }: { sessionId: string | null }) {
   const [state, setState] = useState<State>({ phase: "working" });
@@ -32,45 +37,85 @@ export function ThankYou({ sessionId }: { sessionId: string | null }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId }),
         });
-        const b = (await res.json()) as { ok?: boolean; email?: string | null };
+        const b = (await res.json()) as {
+          ok?: boolean;
+          email?: string | null;
+          customToken?: string;
+        };
         if (!active) return;
-        // `slow`, not `failed`: the webhook retries for three days and the
-        // money is safe, so the honest message is "it is coming", not "it
-        // broke". Saying failed would send a paying customer to support for
-        // something that resolves itself.
-        setState({ phase: b.ok ? "done" : "slow", email: b.email });
-        if (b.ok) trackProgramPurchase(START.role, START.slug);
+        if (!b.ok) {
+          // `slow`, not `failed`: the webhook retries for three days and the
+          // money is safe, so the honest message is "it is coming", not "it
+          // broke". Saying failed would send a paying customer to support for
+          // something that resolves itself.
+          setState({ phase: "slow", email: b.email });
+          return;
+        }
+        trackProgramPurchase(START.role, START.slug);
+        if (!b.customToken) {
+          setState({ phase: "mailed", email: b.email });
+          return;
+        }
+        try {
+          await setPersistence(auth, browserLocalPersistence);
+          await signInWithCustomToken(auth, b.customToken);
+          if (active) setState({ phase: "in", email: b.email });
+        } catch {
+          // Signing in is the nicety; the email is the guarantee. If the token
+          // will not take (clock skew, a blocked third-party context), fall
+          // back to the path that always works rather than showing an error
+          // for something they already own.
+          if (active) setState({ phase: "mailed", email: b.email });
+        }
       } catch {
         if (active) setState({ phase: "slow" });
       }
     })();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [sessionId]);
+
+  const mail = state.email ? <strong>{state.email}</strong> : null;
 
   return (
     <main className="lxs">
       <section className="s-done">
         <span className="s-gic">
-          <LxIcon d={lxPaths[state.phase === "done" ? "check" : "mail"]} size={26} sw={2} />
+          <LxIcon
+            d={lxPaths[state.phase === "in" ? "check" : "mail"]}
+            size={26}
+            sw={2}
+          />
         </span>
         <p className="s-eyebrow">Megvan</p>
         <h1 className="s-h1">
-          {state.phase === "working" ? "Egy pillanat…" : "Köszönöm, hogy belevágtál"}
+          {state.phase === "working" ? "Egy pillanat…" : "A programod a tiéd"}
         </h1>
 
-        {state.phase === "done" && (
+        {state.phase === "in" && (
           <>
             <p className="s-sub">
-              A programod a tiéd. Elküldtük a belépőd{state.email ? " ide:" : " emailben."}
-              {state.email ? <> <strong>{state.email}</strong></> : null}
+              Be is léptettünk - nem kell se regisztrálnod, se jelszót kitalálnod.
+              Kezdheted az első edzést.
+            </p>
+            <a className="s-cta" href="/app">Kezdjük az első edzést</a>
+            <div className="s-mailrow">
+              <strong>És ha később kilépnél?</strong>
+              Elküldtük a belépőd {mail ?? "a megadott címre"} - abból bármikor
+              visszajutsz, egy koppintással. Jelszóra soha nem lesz szükséged.
+            </div>
+          </>
+        )}
+
+        {state.phase === "mailed" && (
+          <>
+            <p className="s-sub">
+              Elküldtük a belépőd {mail ?? "a megadott címre"}. Egy koppintás a
+              linkre, és bent vagy - jelszó nem kell.
             </p>
             <div className="s-mailrow">
               <strong>Mi a következő lépés?</strong>
-              Nyisd meg az emailt, állíts be egy jelszót, és a program azonnal megnyílik. Nem
-              kell regisztrálnod - a fiókod már elkészült erre a címre. Ha pár percen belül
-              nem látod, nézd meg a levélszemét mappát is.
+              Nyisd meg az emailt, és koppints a gombra. Ha pár percen belül nem
+              látod, nézd meg a levélszemét mappát is.
             </div>
           </>
         )}
@@ -78,13 +123,13 @@ export function ThankYou({ sessionId }: { sessionId: string | null }) {
         {state.phase === "slow" && (
           <>
             <p className="s-sub">
-              A fizetés megtörtént - a belépő emailed úton van. Néhány percet még kérhet.
+              A fizetés megtörtént - a belépőd úton van. Néhány percet még kérhet.
             </p>
             <div className="s-mailrow">
               <strong>Semmi teendőd</strong>
-              Ha negyedóra múlva sem látod a leveleinket (a levélszemét mappát is beleértve),
-              írj a <a href="mailto:hello@lexfit.hu">hello@lexfit.hu</a> címre, és kézzel
-              nyitjuk meg a hozzáférésed.
+              Ha negyedóra múlva sem látod a leveleinket (a levélszemét mappát is
+              beleértve), írj a <a href="mailto:hello@lexfit.hu">hello@lexfit.hu</a>{" "}
+              címre, és kézzel nyitjuk meg a hozzáférésed.
             </div>
           </>
         )}

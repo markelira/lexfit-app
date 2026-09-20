@@ -11,6 +11,7 @@ import {
   ROLE_BY_LOOKUP_KEY,
   WITHDRAWAL_DAYS,
 } from "@/lib/pricing/config";
+import { SIGN_IN_LINK_MINUTES } from "@/lib/auth-link-config";
 
 // ── The render+send layer for every system email. ───────────────────────────
 // Templates live in emails/ (react-email; `npm run email:dev` to preview) and
@@ -51,6 +52,7 @@ import QuizOffer, { subject as quizOfferSubject } from "../../emails/quiz-offer"
 import QuizObjections, { subject as quizObjectionsSubject } from "../../emails/quiz-objections";
 import QuizLastCall, { subject as quizLastCallSubject } from "../../emails/quiz-last-call";
 import QuizWinback, { subject as quizWinbackSubject } from "../../emails/quiz-winback";
+import LoginLink, { subject as loginLinkSubject } from "../../emails/login-link";
 import PasswordReset, { subject as pwResetSubject } from "../../emails/password-reset";
 import ProgramAccess, { subject as programAccessSubject } from "../../emails/program-access";
 import PauseResuming, { subject as pauseSubject } from "../../emails/pause-resuming";
@@ -181,6 +183,19 @@ export const sendPasswordReset = (to: string, resetUrl: string) =>
   deliver({ to, subject: pwResetSubject, category: "auth", make: () => PasswordReset({ resetUrl }) });
 
 /**
+ * Passwordless sign-in link (P1). Programme buyers never set a password, so
+ * this is their only way back into an account they have already paid for -
+ * transactional, never consent-gated, never carrying an unsubscribe.
+ */
+export const sendLoginLink = (to: string, signInUrl: string) =>
+  deliver({
+    to,
+    subject: loginLinkSubject,
+    category: "auth",
+    make: () => LoginLink({ signInUrl, validMinutes: SIGN_IN_LINK_MINUTES }),
+  });
+
+/**
  * P1 - hands over a purchased programme. Transactional in the strictest sense:
  * the buyer has no account yet and no other way in, so this send is the
  * delivery of a paid product, not marketing, and carries no unsubscribe.
@@ -188,7 +203,7 @@ export const sendPasswordReset = (to: string, resetUrl: string) =>
  */
 export const sendProgramAccess = (
   to: string,
-  p: { programTitle: string; sessionCount: number; amountHuf: number; setPasswordUrl: string },
+  p: { programTitle: string; sessionCount: number; amountHuf: number; signInUrl: string },
 ) =>
   deliver({
     to,
@@ -199,7 +214,7 @@ export const sendProgramAccess = (
         programTitle: p.programTitle,
         sessionCount: p.sessionCount,
         priceLine: `${formatHuf(p.amountHuf)}, egyszer`,
-        setPasswordUrl: p.setPasswordUrl,
+        signInUrl: p.signInUrl,
         guaranteeDays: WITHDRAWAL_DAYS,
       }),
   });

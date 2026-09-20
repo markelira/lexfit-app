@@ -31,8 +31,8 @@ const customerIdOf = (
  * Find or create the account a programme purchase belongs to.
  *
  * `emailVerified` stays false: Stripe verified a card, not that this person
- * controls this mailbox. The password link sent next is what proves that, and
- * completing it flips the flag through Firebase's own flow.
+ * controls this mailbox. The passwordless sign-in link sent next is what proves
+ * it, and completing it flips the flag through Firebase's own flow.
  */
 export async function ensureAccountForPurchase(
   session: Stripe.Checkout.Session,
@@ -58,12 +58,44 @@ export async function ensureAccountForPurchase(
       },
       { merge: true },
     );
+    await writeDefaultOnboarding(user.uid);
     await logEvent("program_account_created", { uid: user.uid, props: { sessionId: session.id } });
     return user.uid;
   } catch (e) {
     console.error("[program-fulfil] could not create account:", e);
     return undefined;
   }
+}
+
+/**
+ * Let a programme buyer past the onboarding gate (P1).
+ *
+ * `Protected` sends anyone without a completed onboarding profile to
+ * /onboarding, which for this buyer is a seven-question funnel about a
+ * subscription they did not buy - asked AFTER they paid. They get a default
+ * instead: three days a week, which is what 43% of the lead base chose and what
+ * DEFAULT_PREFS already assumes, so the week plan comes out identical to a
+ * hand-answered three-day week.
+ *
+ * `defaulted: true` is recorded rather than hidden. Nobody answered these
+ * questions, the app should be able to tell, and a later prompt can offer to
+ * refine them - at a moment of its choosing, not between the payment and the
+ * first workout.
+ */
+async function writeDefaultOnboarding(uid: string): Promise<void> {
+  const ref = adminDb.collection("users").doc(uid).collection("onboarding").doc("profile");
+  if ((await ref.get()).exists) return; // a real profile always wins
+  const now = Date.now();
+  await ref.set({
+    goal: null, level: null, age: null, height: "", weight: "", lifestage: null,
+    focus: [], motiv: "", obstacle: null,
+    days: 3,            // DEFAULT_PREFS derives weekdays [1,3,5] from this
+    weekdays: [], time: null, env: [],
+    defaulted: true,
+    source: "program_purchase",
+    completedAt: now,
+    updatedAt: now,
+  });
 }
 
 /**
@@ -93,10 +125,15 @@ export async function deliverProgramAccess(
   const title = (prog.data()?.title as string | undefined) ?? "programod";
   const sessionCount = (await prog.ref.collection("sessions").count().get()).data().count;
 
-  let setPasswordUrl: string;
+  // A SIGN-IN link, not a password link. These buyers never choose a password:
+  // the thank-you page signs them in the moment they pay, and this email is the
+  // way back in afterwards. Asking them to invent a password would be asking
+  // for something the product never needs.
+  let signInUrl: string;
   try {
-    setPasswordUrl = await getAuth(adminApp).generatePasswordResetLink(email, {
-      url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://lexfit.hu"}/app`,
+    signInUrl = await getAuth(adminApp).generateSignInWithEmailLink(email, {
+      url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://www.lexfit.hu"}/app`,
+      handleCodeInApp: true,
     });
   } catch (e) {
     console.error("[program-fulfil] could not generate access link:", e);
@@ -109,7 +146,7 @@ export async function deliverProgramAccess(
         programTitle: title,
         sessionCount,
         amountHuf: PRICES[role].amountHuf,
-        setPasswordUrl,
+        signInUrl,
       })
     ).sent
   ) {
@@ -135,6 +172,16 @@ export async function fulfilProgramSession(sessionId: string): Promise<{
   ok: boolean;
   email?: string | null;
   programSlug?: string;
+  /**
+   * A one-shot Firebase custom token for the buyer, so the thank-you page can
+   * sign them in without asking for anything (P1).
+   *
+   * The authorisation is the Stripe session id itself: it is unguessable, it
+   * reached the caller through their own return URL, and it is only honoured
+   * here after Stripe confirms the session was PAID and is a programme
+   * purchase. Nothing about the request is trusted except that id.
+   */
+  customToken?: string;
 }> {
   const session = await getStripe().checkout.sessions.retrieve(sessionId);
   if (session.payment_status !== "paid") return { ok: false };
@@ -162,5 +209,16 @@ export async function fulfilProgramSession(sessionId: string): Promise<{
     { merge: true },
   );
   await deliverProgramAccess(uid, session);
-  return { ok: true, email, programSlug: slug };
+
+  // Sign them straight in. The alternative - mailing a link and asking them to
+  // leave the browser - puts an inbox between the payment and the first
+  // workout, at the exact moment their intent peaks. The email still goes out;
+  // it is the way back in later, not the way in now.
+  let customToken: string | undefined;
+  try {
+    customToken = await getAuth(adminApp).createCustomToken(uid, { src: "program_purchase" });
+  } catch (e) {
+    console.error("[program-fulfil] could not mint a sign-in token:", e);
+  }
+  return { ok: true, email, programSlug: slug, customToken };
 }
