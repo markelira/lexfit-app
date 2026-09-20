@@ -264,6 +264,12 @@ export const START = {
 
   pay: {
     hd: "Fizetés",
+    backToPage: "Vissza",
+    orderHd: "Amit megveszel",
+    orderTitle: "Lexfit Start - a teljes program",
+    totalLabel: "Fizetendő",
+    onceNote: "Egyetlen alkalommal. Nem előfizetés, nem újul meg, nincs mit lemondani.",
+    webviewNote: "A fizetés a Stripe biztonságos oldalán zárul, onnan visszahozunk.",
     await: "Pipáld ki a fenti sort, és megnyílik a kártyás fizetés.",
     back: "Mégsem",
     // Shown instead of the embedded form inside a Meta in-app browser, where

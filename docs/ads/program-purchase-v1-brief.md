@@ -143,7 +143,7 @@ one breaks the rhythm and the reader has to re-read the heading to place it.
 | # | Band | Ground | Eyebrow | Job |
 |---|---|---|---|---|
 | 1 | Hero | sage | Nincs havidíj | Offer + price + CTA above the fold |
-| 2 | Pay panel | white | — | Opens in place on CTA press |
+| — | *(checkout moved to `/start/fizetes`)* | | | |
 | 3 | Amit megveszel | cream | Amit megveszel | Four things the price buys |
 | 4 | Problem mirror | cream, tight | Miért akad el | Say what they believe first |
 | 5 | Így működik | **navy** | Így működik | Three steps to being inside |
@@ -228,6 +228,24 @@ The exercise list carries more of the preview's weight than the footage does.
 It answers the question a visitor is actually asking - not "what does this look
 like" but "what will I be doing for twenty-six minutes" - and it comes from the
 same `blocks` the player uses, so it cannot drift from the workout.
+
+### The checkout is its own page
+
+`/start/fizetes`. It used to open as a panel inside the landing, which left the
+whole argument on screen behind the card form - and at the payment step every
+remaining element is a reason to stop. Its own page also makes the step a real
+funnel event (an arrival is intent, not an inferred click) and gives the back
+button something sane to do.
+
+The page carries four things and nothing else: what is being bought stated
+completely, the total, the J2 consent, and the card form. Stripe.js is warmed
+on mount rather than on a press - by the time someone is here they have
+decided, so the wait belongs before the tap. Meta's in-app browser still gets
+the hosted redirect, with the consent taken before the navigation because there
+is no panel to put it in afterwards.
+
+On a wide screen the summary sits beside the form and sticks, so a buyer can
+see what they are paying for while they type.
 
 ### CTA placement
 

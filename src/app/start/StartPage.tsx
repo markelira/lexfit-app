@@ -3,11 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import { useRouter } from "next/navigation";
 import { LxIcon } from "@/components/LxIcon";
 import { lxPaths } from "@/lib/icons";
-import { inMetaWebview } from "@/lib/webview";
 import { marketingContext, trackProgramCheckout, trackProgramPreview, trackProgramView } from "@/lib/track";
 import { formatHuf } from "@/lib/pricing/display";
 import type { WorkoutCardVideo } from "@/components/WorkoutCard";
@@ -18,24 +16,7 @@ import { START } from "./copy";
 import "../ujrakezdes/ujrakezdes.css"; // the shared look: .lxu / .lp-* bands
 import "./start.css";                  // only what the pay panel adds
 
-const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-
-/**
- * Stripe.js, loaded lazily and retryably.
- *
- * A module-scope promise is how the silent empty-checkout dead end happened:
- * one flaky fetch poisoned it for the whole session and every later press
- * mounted an empty frame. Clearing the memo on failure means the same tap
- * retries.
- */
-let stripeMemo: Promise<Stripe | null> | null = null;
-function getStripe(): Promise<Stripe | null> | null {
-  if (!pk) return null;
-  if (!stripeMemo) {
-    stripeMemo = loadStripe(pk).catch((e) => { stripeMemo = null; throw e; });
-  }
-  return stripeMemo;
-}
+const PAY = "/start/fizetes";
 
 /**
  * /start - the product page for the one-time Foundation purchase (P1).
@@ -44,117 +25,39 @@ function getStripe(): Promise<Stripe | null> | null {
  * share one visual system instead of drifting apart. No navigation: a nav on an
  * ad landing page is a row of exits.
  *
- * The shortest path to paid: press the CTA and the card form opens in place -
- * no redirect, no account, no password. The only thing between the visitor and
- * the money is the consent tick the law requires.
+ * Every CTA leads to /start/fizetes. The checkout used to open in a panel
+ * here, which left the whole argument on screen behind the card form - and at
+ * the payment step every remaining element is a reason to stop. A separate
+ * page also makes the step a real funnel event rather than an inferred one.
  */
 export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
   const sessionCount = workouts.length;
-  const [consented, setConsented] = useState(false);
-  const [webview, setWebview] = useState(false);
-  const [stripe, setStripe] = useState<Stripe | null>(null);
-  const [paying, setPaying] = useState(false);   // the pay panel is mounted
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const router = useRouter();
   /** Which workout is open for a look, if any. */
   const [preview, setPreview] = useState<string | null>(null);
-  const payRef = useRef<HTMLDivElement>(null);
-  const consentRef = useRef<HTMLLabelElement>(null);
 
   useEffect(() => { trackProgramView(START.slug); }, []);
-  // Detected after mount, never during render: the UA is not available on the
-  // server and a render-time read would hydrate-mismatch.
-  useEffect(() => { setWebview(inMetaWebview()); }, []);
 
   const perSession = formatHuf(Math.round(START.priceHuf / Math.max(1, sessionCount)));
 
-  /** Ask the server for a checkout session; returns the embedded clientSecret. */
-  const createSession = useCallback(async (embedded: boolean, where: string) => {
-    const res = await fetch("/api/stripe/program-checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        role: START.role,
-        immediateStart: true,
-        embedded,
-        where,
-        marketing: marketingContext(),
-      }),
-    });
-    const body = (await res.json()) as { clientSecret?: string; url?: string; error?: string };
-    if (!res.ok) throw new Error(body.error ?? "checkout_failed");
-    return body;
-  }, []);
-
-  const fetchClientSecret = useCallback(async () => {
-    const b = await createSession(true, "embed");
-    if (!b.clientSecret) throw new Error("no_client_secret");
-    return b.clientSecret;
-  }, [createSession]);
-
+  /** Every ask leads to the same place. The checkout, its consent and the
+   *  in-app-browser fallback all live on the pay page now, so this page has no
+   *  payment state to get wrong. */
   const go = useCallback(
-    async (where: string) => {
-      setErr(null);
+    (where: string) => {
       trackProgramCheckout(START.role, where);
-
-      // Meta's in-app browser has failed embedded Stripe before, and this page
-      // is served almost entirely to it. There it gets the hosted page, which
-      // is a redirect but works.
-      if (webview) {
-        // The hosted page is a full navigation, so there is no panel to put the
-        // tick in - it has to be given before we leave.
-        if (!consented) {
-          requestAnimationFrame(() => {
-            consentRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
-            consentRef.current?.classList.add("lxs-ask");
-          });
-          return;
-        }
-        setBusy(true);
-        try {
-          const b = await createSession(false, where);
-          if (!b.url) throw new Error("no_url");
-          window.location.href = b.url;
-        } catch {
-          setBusy(false);
-          setErr(START.pay.failed);
-        }
-        return;
-      }
-
-      // Stripe.js must be IN HAND before the panel opens. Opening first and
-      // letting the provider await a promise is how an empty checkout frame
-      // reaches a paying visitor.
-      const p = getStripe();
-      if (!p) { setErr(START.pay.unavailable); return; }
-      setBusy(true);
-      try {
-        const s = await p;
-        if (!s) throw new Error("stripe_null");
-        setStripe(s);
-        setPaying(true);
-        requestAnimationFrame(() =>
-          payRef.current?.scrollIntoView({ block: "start", behavior: "smooth" }),
-        );
-      } catch {
-        setErr(START.pay.failed);
-      } finally {
-        setBusy(false);
-      }
+      router.push(PAY);
     },
-    [consented, webview, createSession],
+    [router],
   );
 
   const Cta = ({ where, small }: { where: string; small?: boolean }) => (
     <button
       type="button"
       className={`lp-cta${small ? " lp-cta-s" : ""}`}
-      disabled={busy}
-      onClick={() => void go(where)}
+      onClick={() => go(where)}
     >
-      {busy
-        ? webview ? START.pay.redirecting : START.pay.loading
-        : START.hero.cta}
+      {START.hero.cta}
     </button>
   );
 
@@ -167,7 +70,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
     const h = heroCtaRef.current, c = closeRef.current;
     if (!h || !c || typeof IntersectionObserver === "undefined") return;
     let ctaVis = true, closeVis = false, scrolled = window.scrollY > 120;
-    const upd = () => setStickyOn(scrolled && !ctaVis && !closeVis && !paying);
+    const upd = () => setStickyOn(scrolled && !ctaVis && !closeVis);
     // Read the LAST entry of each batch: a flick can cross "enters viewport"
     // and "leaves above" between two frames, and the observer then delivers
     // both crossings in ONE callback - entries[0] is the stale one.
@@ -181,7 +84,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     io1.observe(h); io2.observe(c);
     return () => { io1.disconnect(); io2.disconnect(); window.removeEventListener("scroll", onScroll); };
-  }, [paying]);
+  }, []);
 
   /** The ask, repeated. A long page with two CTAs makes the reader carry their
    *  decision back up to the hero; one after every argument lets them act the
@@ -191,21 +94,6 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
       <Cta where={where} />
       <p className="lp-xs">{line ?? START.hero.ctaSub(START.price)}</p>
     </div>
-  );
-
-  const consentRow = (
-    <label className="lxs-consent" ref={consentRef}>
-      <input
-        type="checkbox"
-        checked={consented}
-        onChange={(e) => {
-          setConsented(e.target.checked);
-          setErr(null);
-          consentRef.current?.classList.remove("lxs-ask");
-        }}
-      />
-      <span>{START.consent(START.guaranteeDays)}</span>
-    </label>
   );
 
   return (
@@ -253,12 +141,10 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
           </div>
 
           <div className="lp-hero-after">
-            {webview && consentRow}
             <div className="lp-ctarow lp-m1" style={{ ["--i" as string]: 6 }} ref={heroCtaRef}>
               <Cta where="hero" />
               <p className="lp-ctasub">{START.hero.ctaSub(START.price)}</p>
             </div>
-            {err && <p className="lxs-err" role="alert">{err}</p>}
             <div className="lp-mechrow lp-m1" style={{ ["--i" as string]: 7 }}>
               <p><b>{START.hero.mechanism}</b></p>
               <p className="lp-xs">{START.hero.mechanismSub}</p>
@@ -266,44 +152,6 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
           </div>
         </div>
       </section>
-
-      {/* ── PAY · the card form, opened in place. Rendered directly under the
-          hero so the page never scrolls away from the decision. ─────────── */}
-      {paying && (
-        <section className="lxs-pay" ref={payRef}>
-          <div className="lp-col">
-            <div className="lxs-payhead">
-              <h2>{START.pay.hd}</h2>
-              <button type="button" className="lxs-payback" onClick={() => setPaying(false)}>
-                {START.pay.back}
-              </button>
-            </div>
-            {/* The J2 consent gates the form rather than the button. It is
-                required before performance begins, not before a panel opens,
-                and asking for it here puts it in context - inside a payment -
-                instead of parking a legal paragraph on the decision itself.
-                The provider is only mounted once ticked, so no checkout
-                session is created before the consent is recorded. */}
-            <div className="lxs-paybox">
-              {consentRow}
-              {!stripe ? (
-              <p className="lxs-err">{START.pay.unavailable}</p>
-              ) : consented ? (
-                <div className="lxs-embed">
-                  <EmbeddedCheckoutProvider stripe={stripe} options={{ fetchClientSecret }}>
-                    <EmbeddedCheckout />
-                  </EmbeddedCheckoutProvider>
-                </div>
-              ) : (
-                <p className="lxs-await">{START.pay.await}</p>
-              )}
-            </div>
-            <div className="lxs-paytrust">
-              {START.pay.trust.map((t) => <span key={t}>{t}</span>)}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── S2 · what the price buys ────────────────────────────────────── */}
       <section className="lp-band">
@@ -369,7 +217,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
         <ProgramShelf
           workouts={workouts}
           onPreview={(code) => { setPreview(code); trackProgramPreview(code); }}
-          onSave={() => void go("shelf-save")}
+          onSave={() => go("shelf-save")}
         />
 
         <div className="lp-col lp-col-wide">
@@ -452,7 +300,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
           <h2>{START.finish.hd}</h2>
           <p className="lp-body">{START.finish.body}</p>
         </div>
-        <FinishExamples onPick={() => void go("finish")} />
+        <FinishExamples onPick={() => go("finish")} />
         <div className="lp-col">
           <p className="lp-xs lxs-finnote">{START.finish.note}</p>
         </div>
@@ -491,7 +339,6 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
           <p className="lp-eyebrow">{START.close.eyebrow}</p>
           <h2>{START.close.hd}</h2>
           <p className="lp-body">{START.close.body}</p>
-          {webview && !consented && consentRow}
           <Cta where="close" />
           <p className="lp-xs">{START.hero.ctaSub(START.price)}</p>
           <p className="lp-legal">
@@ -505,7 +352,7 @@ export function StartPage({ workouts }: { workouts: WorkoutCardVideo[] }) {
       <PreviewModal
         code={preview}
         onClose={() => setPreview(null)}
-        onBuy={() => { setPreview(null); void go("preview"); }}
+        onBuy={() => { setPreview(null); go("preview"); }}
       />
 
       {/* ── sticky bar (mobile) ─────────────────────────────────────────── */}

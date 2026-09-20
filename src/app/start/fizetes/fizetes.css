@@ -1,0 +1,135 @@
+/* /start/fizetes - the checkout page, scoped `.lxf`.
+
+   Deliberately spare. The landing argues; this page only confirms what is
+   being bought and takes the card. Everything that could be added here is a
+   reason to stop, so the only link out is the one back. */
+
+.lxf {
+  min-height: 100dvh;
+  background: var(--u-cream, #f1f6f4);
+  color: var(--u-navy, #18201d);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 48px;
+}
+
+.lxf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px clamp(16px, 4vw, 32px);
+  max-width: 900px;
+  margin: 0 auto;
+}
+.lxf-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5c54;
+  text-decoration: none;
+  padding: 8px 10px 8px 4px;
+  margin-left: -4px;
+  border-radius: 10px;
+  transition: background 160ms;
+}
+.lxf-back:active { background: oklch(0 0 0 / 0.05); }
+
+.lxf-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 32px);
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── Order summary ────────────────────────────────────────────────────────
+   Stated once and completely. A summary that omits a fact the buyer would
+   have wanted is how a chargeback starts. */
+
+.lxf-order {
+  background: #fff;
+  border: 1px solid var(--u-line, #dde8e3);
+  border-radius: 18px;
+  padding: 22px;
+}
+.lxf-eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6d7f77;
+}
+.lxf-title {
+  margin: 0 0 16px;
+  font-size: clamp(20px, 4.6vw, 25px);
+  line-height: 1.16;
+  letter-spacing: -0.018em;   /* negative tracking as display type grows */
+  font-weight: 750;
+  text-wrap: balance;
+}
+.lxf-facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.lxf-facts li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: #2f4238;
+}
+.lxf-facts svg { margin-top: 2px; color: #3f6354; }
+
+.lxf-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--u-line, #dde8e3);
+}
+.lxf-total span { font-size: 14px; color: #55685f; }
+.lxf-total strong {
+  font-size: clamp(26px, 6vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.lxf-once { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: #6d7f77; }
+
+/* ── Payment ────────────────────────────────────────────────────────────── */
+
+.lxf-hosted { padding: 20px; display: grid; gap: 10px; }
+.lxf-hosted .lxs-cta { width: 100%; }
+.lxf-hostednote {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #6d7f77;
+  text-align: center;
+}
+
+.lxf-legal {
+  margin: 18px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #7b8b84;
+  text-align: center;
+}
+.lxf-legal a { color: #5d716a; }
+
+@media (min-width: 860px) {
+  /* The summary stays beside the form rather than above it: on a wide screen a
+     buyer should be able to see what they are paying for while they type. */
+  .lxf-wrap { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 28px; }
+  .lxf-order { position: sticky; top: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxf-back { transition: none; }
+}
