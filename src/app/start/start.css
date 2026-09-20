@@ -365,26 +365,18 @@
    640px is `.lp-col`'s max-width. If that ever changes, this follows it. */
 .lxs .lxs-shelf { --lxs-gut: max(0px, calc((100% - 640px) / 2)); }
 
-.lxs .lxs-cathead {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
+/* The category billboard. Padded by the shared gutter so its left edge lines
+   up with the copy above; the rail beneath starts on the same line and then
+   scrolls past the right edge, which is what marks it as scrollable. */
+.lxs .lxs-banner {
   padding-inline: var(--lxs-gut);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
-.lxs .lxs-cathead h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.012em;
-}
-.lxs .lxs-cathead span {
-  font-family: var(--mono, monospace);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3, #6d7f77);
-  font-variant-numeric: tabular-nums;
+/* Inside a landing band the billboard is a card, not a full-bleed wall - it
+   should read as a small hero, so it keeps a radius and a contained shadow. */
+.lxs .lxs-banner .pgs-hero {
+  border-radius: var(--r-lg, 20px);
+  box-shadow: 0 18px 44px -28px oklch(0 0 168 / 0.5);
 }
 
 .lxs .lxs-row {
