@@ -301,7 +301,36 @@ Two production notes recorded for next time:
 - Cloning background over an already-generated figure is not viable — the patch clipped
   the headline. Generate the ground without the figure instead.
 
+## Live state (2026-09-20)
+
+Deployed and verified against production:
+
+| | |
+|---|---|
+| `/start` · `/start/fizetes` · `/start/koszonjuk` · `/belepes` | 200 |
+| `/api/start/preview?code=F001` | real data, 6 blocks, 25 exercises, signed Mux media |
+| preview allowlist (`H001`, a challenge video) | 404 |
+| `/api/auth/login-link`, unknown address | `{ok:true}` — no account enumeration |
+| checkout, embedded | `cs_live_…` client secret |
+| checkout, hosted | real Stripe page, 200, shows 9 990 |
+| checkout without the J2 consent | 400 |
+| checkout with a subscription role | 400 |
+
+**Live Stripe catalogue seeded.** Product `prod_VIQz7BPXlqL6Ch` ("Lexfit Start
+program"), price `price_1UHq7TLAhGz5vxBainiMz0Mr`
+(`price_program_foundation_9990`, 9 990 Ft, one-time). Its own product rather
+than the membership one, so the Stripe page and the receipt name the single
+programme being bought.
+
 ## Still open
 
-- 1:1 and 9:16 recomposition (the composite recipe above re-runs against a square ground).
-- Map `lx_program_purchase` to Purchase in GTM before any spend.
+- **Map `lx_program_purchase` to Purchase in GTM.** The one that decides whether
+  the spend works: an ad set optimising for a conversion that never arrives
+  spends its whole learning budget on nothing, which is exactly what happened
+  with Lead. Worth mapping `lx_program_preview` to ViewContent at the same time —
+  it is the only way to see whether the 35-card section moves anything.
+- **One real purchase on three devices** before spend: a normal browser, and the
+  Facebook in-app browser on iOS and on Android. The last two take the hosted
+  redirect, and that is where payment died before.
+- 1:1 and 9:16 recomposition of the creatives (the composite recipe above
+  re-runs against a square ground).
