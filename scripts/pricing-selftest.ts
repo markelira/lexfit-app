@@ -6,7 +6,21 @@
  * Run:  node --import tsx scripts/pricing-selftest.ts
  */
 import assert from "node:assert/strict";
-import { hasAccessFromData, type SubscriptionDoc } from "../src/lib/pricing/types";
+import {
+  hasAccessFromData,
+  hasAnyAccessFromData,
+  hasProgramAccessFromData,
+  ownedPrograms,
+  type SubscriptionDoc,
+} from "../src/lib/pricing/types";
+import {
+  PRICES,
+  PROGRAM_PRODUCTS,
+  PROGRAM_PURCHASE_ROLES,
+  isCheckoutRole,
+  isProgramRole,
+  programRoleForSlug,
+} from "../src/lib/pricing/config";
 import { budapestDay, budapestHour, checkinDocId, offerDocId } from "../src/lib/pricing/keys";
 import { formatHuf, perWeekHuf, perMonthHuf, annualSavingsPct } from "../src/lib/pricing/display";
 import { nextChargeDay, formatHuDate } from "../src/lib/pricing/renewal";
@@ -325,7 +339,70 @@ function guaranteeRules() {
   console.log("✓ 10 edzés garancia (boundary, distinct codes, DST, full vs pro-rata)");
 }
 
+
+/**
+ * P1 - programme purchases. The rules that must not drift, because each one is
+ * a promise printed on a product page: membership opens everything, a purchase
+ * opens exactly one programme forever, and neither can quietly become the other.
+ */
+function programGrants() {
+  const grant = { grantedAt: past, via: "price_program_foundation_9990" };
+  const owner: SubscriptionDoc = { programs: { foundation: grant } };
+  const member: SubscriptionDoc = { status: "ACTIVE", accessUntil: future };
+  const lapsed: SubscriptionDoc = {
+    status: "EXPIRED",
+    accessUntil: past,
+    programs: { foundation: grant },
+  };
+
+  // A purchase is NOT a membership - this is the one confusion that would give
+  // away the whole library for 9 990 Ft.
+  assert.equal(hasAccessFromData(owner, now), false, "a grant never grants membership");
+  assert.equal(hasAnyAccessFromData(owner, now), true, "an owner may enter the app");
+  assert.equal(hasProgramAccessFromData(owner, "foundation", now), true, "owns what was bought");
+  assert.equal(
+    hasProgramAccessFromData(owner, "elsolepes", now),
+    false,
+    "owning one programme opens NOTHING adjacent",
+  );
+
+  // Membership outranks ownership, in both directions.
+  assert.equal(hasProgramAccessFromData(member, "elsolepes", now), true, "membership opens all");
+  assert.equal(hasAnyAccessFromData(null, now), false, "nothing bought, nothing open");
+
+  // The promise with the sharpest teeth: a purchase survives every membership
+  // state, including the two that hard-deny access.
+  assert.equal(
+    hasProgramAccessFromData(lapsed, "foundation", now),
+    true,
+    "an EXPIRED membership must not revoke a programme that was bought outright",
+  );
+  assert.deepEqual(ownedPrograms(lapsed), ["foundation"], "grants survive expiry");
+
+  // Catalog wiring: every programme role must be a real one-time price, must
+  // map to a slug and back, must have its own Stripe product, and must NOT be
+  // reachable from the subscription checkout (which grants a PERIOD, not a
+  // programme - buying one through it would open the whole library).
+  for (const [role, slug] of Object.entries(PROGRAM_PURCHASE_ROLES)) {
+    const spec = PRICES[role as keyof typeof PRICES];
+    assert.ok(spec, `${role} has a price spec`);
+    assert.equal(spec.type, "one_time", `${role} is a one-time price`);
+    assert.equal(spec.interval, null, `${role} has no billing interval`);
+    assert.ok(isProgramRole(role), `${role} is a programme role`);
+    assert.equal(programRoleForSlug(slug), role, `${slug} maps back to ${role}`);
+    assert.ok(PROGRAM_PRODUCTS[role as keyof typeof PROGRAM_PRODUCTS], `${role} has its own product`);
+    assert.equal(
+      isCheckoutRole(role),
+      false,
+      `${role} must NOT be a subscription-checkout role`,
+    );
+  }
+  assert.equal(programRoleForSlug("napindito"), null, "a programme not for sale has no role");
+  console.log("✓ programme purchases (scope, survival, catalog wiring)");
+}
+
 accessMatrix();
+programGrants();
 budapestDays();
 docIds();
 displayNumbers();

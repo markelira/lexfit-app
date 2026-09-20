@@ -14,7 +14,9 @@ import Stripe from "stripe";
 import {
   PRICE_LIST,
   PRODUCT,
+  PROGRAM_PRODUCTS,
   CURRENCY,
+  isProgramRole,
   stripeMinorAmount,
   type PriceSpec,
 } from "../src/lib/pricing/config";
@@ -26,21 +28,21 @@ if (!key) {
 }
 const stripe = new Stripe(key);
 
-/** Find the catalog Product by metadata, or create it. Idempotent — uses
+/** Find a catalog Product by metadata, or create it. Idempotent — uses
  *  products.list (strongly consistent) rather than products.search (index can
  *  lag right after creation, which would let a fast second run duplicate it). */
-async function ensureProduct(): Promise<Stripe.Product> {
+async function ensureProduct(name: string, lookupId: string): Promise<Stripe.Product> {
   for await (const p of stripe.products.list({ active: true, limit: 100 })) {
-    if (p.metadata?.lexfit_catalog === PRODUCT.lookupId) {
-      console.log(`✓ Product exists: ${p.id} (${PRODUCT.name})`);
+    if (p.metadata?.lexfit_catalog === lookupId) {
+      console.log(`✓ Product exists: ${p.id} (${name})`);
       return p;
     }
   }
   const product = await stripe.products.create({
-    name: PRODUCT.name,
-    metadata: { lexfit_catalog: PRODUCT.lookupId },
+    name,
+    metadata: { lexfit_catalog: lookupId },
   });
-  console.log(`+ Product created: ${product.id} (${PRODUCT.name})`);
+  console.log(`+ Product created: ${product.id} (${name})`);
   return product;
 }
 
@@ -93,9 +95,17 @@ async function ensurePrice(productId: string, spec: PriceSpec): Promise<void> {
 
 async function main() {
   console.log(`Seeding Stripe catalog (${PRICE_LIST.length} prices)…\n`);
-  const product = await ensureProduct();
+  const membership = await ensureProduct(PRODUCT.name, PRODUCT.lookupId);
   for (const spec of PRICE_LIST) {
-    await ensurePrice(product.id, spec);
+    // Programme purchases live under their own product so the payment page and
+    // the receipt name the one programme being bought, not the whole library.
+    if (isProgramRole(spec.role)) {
+      const meta = PROGRAM_PRODUCTS[spec.role];
+      const product = await ensureProduct(meta.name, meta.lookupId);
+      await ensurePrice(product.id, spec);
+      continue;
+    }
+    await ensurePrice(membership.id, spec);
   }
   console.log("\nDone.");
 }

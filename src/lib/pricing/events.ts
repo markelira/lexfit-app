@@ -22,7 +22,11 @@ export type PricingEvent =
   | "earned_unlocked"
   | "grand_slam_viewed"
   | "grand_slam_redeemed"
-  | "grand_slam_expired";
+  | "grand_slam_expired"
+  // P1 - programme purchases (pay once, own one programme forever)
+  | "program_checkout_started"
+  | "program_purchased"
+  | "program_account_created";
 
 /** Append an analytics event. Best-effort: never throw into the caller's flow. */
 export async function logEvent(

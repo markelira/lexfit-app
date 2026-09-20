@@ -22,6 +22,22 @@ export type OfferType =
 export type Tier = "standard" | "inner_circle";
 
 /**
+ * A permanent, programme-scoped grant bought with a single payment (P1).
+ *
+ * It has no expiry field ON PURPOSE. Every other access path in this system is
+ * a date (`accessUntil`) that some flow moves forward; this one is an owned
+ * thing. "Egyszer fizetsz, örökre a tiéd" is the promise the ad makes, and the
+ * data model has to be incapable of quietly breaking it.
+ */
+export interface ProgramGrant {
+  grantedAt: number; // epoch ms
+  /** Price lookup_key the grant came from - provenance for support/refunds. */
+  via: string;
+  paymentIntent?: string | null;
+  amountPaid?: number | null; // minor units
+}
+
+/**
  * `subscriptions/{uid}` - the ONE document that governs access.
  *
  * Timestamps are epoch **milliseconds** (comparable to `Date.now()` with no
@@ -50,6 +66,16 @@ export interface SubscriptionDoc {
   comp?: boolean;
   compReason?: string | null;
   compGrantedAt?: number | null; // epoch ms
+  /**
+   * Permanently owned programmes, keyed by `programs/{slug}` id (P1).
+   *
+   * Lives on THIS document rather than its own collection for the same reason
+   * `comp` does: the gate already reads `subscriptions/{uid}` on every video
+   * token, and the webhook writes here with `{ merge: true }`, so a map added
+   * alongside survives every subscription write without a second round trip.
+   * Never expires, never cleared by a cancellation - only a refund removes a key.
+   */
+  programs?: Record<string, ProgramGrant>;
   /** Total days spent paused - F4.3 founder-lock tenure is shifted by this. */
   pausedDaysTotal?: number;
   /** Pause bookkeeping (F2.3). Set while PAUSED, cleared on resume. */
@@ -109,4 +135,40 @@ export function hasAccessFromData(
   if (!sub || sub.accessUntil == null) return false;
   if (sub.status === "PAUSED" || sub.status === "EXPIRED") return false;
   return sub.accessUntil > nowMs;
+}
+
+/** The programmes this account owns outright, whatever its subscription state. */
+export function ownedPrograms(sub: SubscriptionDoc | null | undefined): string[] {
+  return Object.keys(sub?.programs ?? {});
+}
+
+/**
+ * Can this account open content belonging to `slug`?
+ *
+ * Membership outranks ownership: an active entitlement opens every programme,
+ * so a member who also bought one keeps full access and the grant simply sits
+ * there, waiting for the day the membership lapses. A programme buyer with no
+ * membership gets exactly what they paid for and nothing adjacent.
+ */
+export function hasProgramAccessFromData(
+  sub: SubscriptionDoc | null | undefined,
+  slug: string,
+  nowMs: number,
+): boolean {
+  if (hasAccessFromData(sub, nowMs)) return true;
+  return sub?.programs?.[slug] != null;
+}
+
+/**
+ * Is there ANY reason to let this account into the app?
+ *
+ * This is the door, not the rooms. A programme buyer must get past /login and
+ * the paid gate - otherwise they have paid for something they cannot reach -
+ * but every individual video is still decided by `hasProgramAccessFromData`.
+ */
+export function hasAnyAccessFromData(
+  sub: SubscriptionDoc | null | undefined,
+  nowMs: number,
+): boolean {
+  return hasAccessFromData(sub, nowMs) || ownedPrograms(sub).length > 0;
 }

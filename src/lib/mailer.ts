@@ -9,6 +9,7 @@ import {
   GRAND_SLAM_WINDOW_HOURS,
   PRICES,
   ROLE_BY_LOOKUP_KEY,
+  WITHDRAWAL_DAYS,
 } from "@/lib/pricing/config";
 
 // ── The render+send layer for every system email. ───────────────────────────
@@ -51,6 +52,7 @@ import QuizObjections, { subject as quizObjectionsSubject } from "../../emails/q
 import QuizLastCall, { subject as quizLastCallSubject } from "../../emails/quiz-last-call";
 import QuizWinback, { subject as quizWinbackSubject } from "../../emails/quiz-winback";
 import PasswordReset, { subject as pwResetSubject } from "../../emails/password-reset";
+import ProgramAccess, { subject as programAccessSubject } from "../../emails/program-access";
 import PauseResuming, { subject as pauseSubject } from "../../emails/pause-resuming";
 import StreakRisk, { subjectFor as streakSubject } from "../../emails/streak-risk";
 import SubscriptionStarted, { subject as subStartedSubject } from "../../emails/subscription-started";
@@ -177,6 +179,30 @@ export const sendVerifyEmail = (to: string, verifyUrl: string) =>
 
 export const sendPasswordReset = (to: string, resetUrl: string) =>
   deliver({ to, subject: pwResetSubject, category: "auth", make: () => PasswordReset({ resetUrl }) });
+
+/**
+ * P1 - hands over a purchased programme. Transactional in the strictest sense:
+ * the buyer has no account yet and no other way in, so this send is the
+ * delivery of a paid product, not marketing, and carries no unsubscribe.
+ * The price is composed here from config, never written into the template.
+ */
+export const sendProgramAccess = (
+  to: string,
+  p: { programTitle: string; sessionCount: number; amountHuf: number; setPasswordUrl: string },
+) =>
+  deliver({
+    to,
+    subject: programAccessSubject,
+    category: "auth",
+    make: () =>
+      ProgramAccess({
+        programTitle: p.programTitle,
+        sessionCount: p.sessionCount,
+        priceLine: `${formatHuf(p.amountHuf)}, egyszer`,
+        setPasswordUrl: p.setPasswordUrl,
+        guaranteeDays: WITHDRAWAL_DAYS,
+      }),
+  });
 
 // ── Lead magnet quiz ────────────────────────────────────────────────────────
 //

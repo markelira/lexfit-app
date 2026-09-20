@@ -3,13 +3,14 @@ import type Stripe from "stripe";
 import { adminDb } from "@/lib/firebase-admin";
 import { getStripe, uidForCustomer } from "@/lib/stripe";
 import { COLLECTIONS, milestoneDocId, webhookEventDocId } from "@/lib/pricing/keys";
-import { ROLE_BY_LOOKUP_KEY } from "@/lib/pricing/config";
+import { ROLE_BY_LOOKUP_KEY, PROGRAM_PURCHASE_ROLES, isProgramRole } from "@/lib/pricing/config";
 import {
   ensureWeeklySchedule,
   ensureEarnedAnnualSchedule,
 } from "@/lib/pricing/checkout-server";
 import { markOfferRedeemed } from "@/lib/pricing/earning-server";
 import { logEvent } from "@/lib/pricing/events";
+import { deliverProgramAccess, ensureAccountForPurchase } from "@/lib/pricing/program-fulfil";
 import { issueInvoice, type InvoiceParty } from "@/lib/pricing/invoice";
 import { budapestDay } from "@/lib/pricing/keys";
 import { planDisplay, sendCheckoutResume, sendDunningDay0, sendSubscriptionStarted } from "@/lib/mailer";
@@ -24,6 +25,7 @@ import { getAuth } from "firebase-admin/auth";
 import { adminApp } from "@/lib/firebase-admin";
 import {
   buildOneOffData,
+  buildProgramGrantData,
   buildSubscriptionData,
   subscriptionRef,
 } from "@/lib/pricing/subscription";
@@ -127,6 +129,18 @@ async function maybeSubscriptionStarted(
     if (!(await sendSubscriptionStarted(email, display)).sent) return;
   }
   await mRef.set({ userId: write.uid, kind: "sub_started", sessionId: session.id, firedAt: Date.now() });
+}
+
+/**
+ * P1 - deliver a purchased programme. The work lives in lib/pricing/
+ * program-fulfil so the thank-you page can run the exact same steps when a
+ * webhook delivery is late or lost; this is only the event filter.
+ */
+async function maybeProgramAccess(event: Stripe.Event, write: PendingWrite): Promise<void> {
+  if (event.type !== "checkout.session.completed" || !write) return;
+  const session = event.data.object as Stripe.Checkout.Session;
+  if (session.metadata?.kind !== "program") return;
+  await deliverProgramAccess(write.uid, session);
 }
 
 /**
@@ -281,8 +295,14 @@ async function resolveWrite(event: Stripe.Event): Promise<PendingWrite> {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      // A programme purchase may arrive with no account behind it at all - that
+      // is the point of it (P1). Everything else still requires one up front.
       const uid =
-        session.client_reference_id ?? (session.metadata?.uid as string | undefined);
+        session.client_reference_id ??
+        (session.metadata?.uid as string | undefined) ??
+        (session.metadata?.kind === "program"
+          ? await ensureAccountForPurchase(session)
+          : undefined);
       if (!uid) return null;
 
       if (session.mode === "subscription" && session.subscription) {
@@ -309,6 +329,22 @@ async function resolveWrite(event: Stripe.Event): Promise<PendingWrite> {
         });
         const lookup = items.data[0]?.price?.lookup_key ?? undefined;
         const role = lookup ? ROLE_BY_LOOKUP_KEY[lookup] : undefined;
+        if (role && isProgramRole(role)) {
+          const pi =
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : (session.payment_intent?.id ?? null);
+          return {
+            uid,
+            data: buildProgramGrantData(
+              PROGRAM_PURCHASE_ROLES[role],
+              PRICES[role].lookupKey,
+              customerId(session.customer),
+              Date.now(),
+              { paymentIntent: pi, amountPaid: session.amount_total },
+            ),
+          };
+        }
         if (role === "week_oneoff" || role === "month_oneoff") {
           const pi =
             typeof session.payment_intent === "string"
@@ -543,6 +579,8 @@ export async function POST(req: Request) {
     await maybeDunning(event);
     // "Elindult az előfizetésed" (gated once per checkout session).
     await maybeSubscriptionStarted(event, write);
+    // P1: hand over a purchased programme - this email is the only way in.
+    await maybeProgramAccess(event, write);
     // Meta Conversions API - consent-gated, best-effort (never throws).
     await maybeReportPurchase(event);
   } catch (e) {

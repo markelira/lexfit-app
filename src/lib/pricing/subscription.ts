@@ -135,3 +135,38 @@ export function buildOneOffData(
     updatedAt: nowMs,
   };
 }
+
+/**
+ * Map a completed PROGRAMME purchase into the subscription doc (P1).
+ *
+ * Note what this deliberately does NOT set: `status`, `plan`, `accessUntil`.
+ * A programme purchase is not a subscription in any state, and writing those
+ * fields would either fake a membership or - worse - let a later subscription
+ * write flip the owned programme's fate. The grant lives only under
+ * `programs[slug]` and is merged in, so it coexists with whatever the
+ * membership side of the document is doing now or later.
+ */
+export function buildProgramGrantData(
+  slug: string,
+  lookupKey: string,
+  customerId: string,
+  nowMs: number,
+  opts?: { paymentIntent?: string | null; amountPaid?: number | null },
+): SubscriptionDoc {
+  return {
+    stripeCustomerId: customerId,
+    programs: {
+      [slug]: {
+        grantedAt: nowMs,
+        via: lookupKey,
+        paymentIntent: opts?.paymentIntent ?? null,
+        amountPaid: opts?.amountPaid ?? null,
+      },
+    },
+    // Provenance for support and the 14-day refund window; harmless to the
+    // membership fields, which this write never touches.
+    lastPaymentIntent: opts?.paymentIntent ?? null,
+    amountPaid: opts?.amountPaid ?? null,
+    updatedAt: nowMs,
+  };
+}

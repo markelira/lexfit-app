@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { hasOnboarded } from "@/lib/user";
-import { getSubscription, isSubscribed } from "@/lib/billing";
+import { getSubscription, hasAnyAccess } from "@/lib/billing";
 
 /** Full-screen branded loader shown while auth/onboarding state resolves -
  *  a quiet pulsing brand mark, no text (the label feeds screen readers only). */
@@ -96,7 +96,9 @@ export function Protected({
         if (!exempt) {
           let paid = true; // fail-open on read errors - the server re-validates anyway
           try {
-            paid = isSubscribed(await getSubscription(user.uid));
+            // The door, not the rooms (P1): owning one programme is enough to
+            // enter; the Mux token route still decides each individual video.
+            paid = hasAnyAccess(await getSubscription(user.uid));
           } catch {}
           if (!active) return;
           if (!paid) {

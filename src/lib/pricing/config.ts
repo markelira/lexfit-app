@@ -53,7 +53,8 @@ export type PriceRole =
   | "month_founder"
   | "annual_renew"
   | "biennial_renew"
-  | "annual_winback";
+  | "annual_winback"
+  | "program_foundation";
 
 export interface PriceSpec {
   role: PriceRole;
@@ -168,6 +169,17 @@ export const PRICES: Record<PriceRole, PriceSpec> = {
     intervalCount: 1,
     nickname: "Éves - win-back (első év)",
   },
+  // Programme purchase - NOT a period of access like week_oneoff/month_oneoff.
+  // It grants one programme permanently (see PROGRAM_PURCHASE_ROLES below).
+  program_foundation: {
+    role: "program_foundation",
+    lookupKey: "price_program_foundation_9990",
+    amountHuf: envInt("PRICE_PROGRAM_FOUNDATION", 9990),
+    type: "one_time",
+    interval: null,
+    intervalCount: 1,
+    nickname: "Lexfit Start program - egyszeri, örök hozzáférés",
+  },
 };
 
 /** All specs as a list - the seed script iterates this. */
@@ -184,6 +196,21 @@ export const PRODUCT = {
   name: "Lexfit teljes hozzáférés",
   lookupId: "lexfit_full_access", // metadata key so the seed script finds it idempotently
 } as const;
+
+/**
+ * Programme purchases get their OWN Stripe product (P1).
+ *
+ * Not tidiness: the product name is what the buyer reads on the Stripe payment
+ * page and on the receipt. Billing 9 990 Ft for one programme under a product
+ * called "Lexfit teljes hozzáférés" would tell them, in writing, that they were
+ * buying the whole library.
+ */
+export const PROGRAM_PRODUCTS: Record<ProgramRole, { name: string; lookupId: string }> = {
+  program_foundation: {
+    name: "Lexfit Start program",
+    lookupId: "lexfit_program_foundation",
+  },
+};
 
 // ── One-off access durations (days) ────────────────────────────────────────
 // One-off purchases have no recurring period; accessUntil = now + these days.
@@ -280,6 +307,36 @@ export const ONEOFF_CHECKOUT_ROLES = ["week_oneoff", "month_oneoff"] as const;
 export type CheckoutRole =
   | (typeof RECURRING_CHECKOUT_ROLES)[number]
   | (typeof ONEOFF_CHECKOUT_ROLES)[number];
+
+/**
+ * Programme purchases (P1) - pay once, own that programme forever.
+ *
+ * Deliberately NOT part of CheckoutRole: the /subscribe checkout grants a
+ * PERIOD of full access (`accessUntil`), while these grant ONE PROGRAMME with
+ * no expiry (`programs[slug]`). Mixing them in one role union is how a
+ * programme buyer would silently get the whole library for a week.
+ *
+ * Extending to another programme is two lines: a PriceSpec above, and a row
+ * here mapping its role to the `programs/{slug}` document id. Nothing else in
+ * the checkout, webhook, gate, or product page needs to know the difference.
+ */
+export const PROGRAM_PURCHASE_ROLES = {
+  program_foundation: "foundation",
+} as const;
+
+export type ProgramRole = keyof typeof PROGRAM_PURCHASE_ROLES;
+
+export function isProgramRole(role: string): role is ProgramRole {
+  return Object.prototype.hasOwnProperty.call(PROGRAM_PURCHASE_ROLES, role);
+}
+
+/** Reverse lookup: which role buys a given programme (null if it is not for sale). */
+export function programRoleForSlug(slug: string): ProgramRole | null {
+  const hit = (Object.keys(PROGRAM_PURCHASE_ROLES) as ProgramRole[]).find(
+    (r) => PROGRAM_PURCHASE_ROLES[r] === slug,
+  );
+  return hit ?? null;
+}
 
 export function isRecurringRole(role: string): role is (typeof RECURRING_CHECKOUT_ROLES)[number] {
   return (RECURRING_CHECKOUT_ROLES as readonly string[]).includes(role);

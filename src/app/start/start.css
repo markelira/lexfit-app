@@ -1,0 +1,480 @@
+/* /start - the one-time programme purchase page (P1).
+
+   Scoped under `.lxs`, the same convention as the landing's `.lxl` and the
+   lead magnet's `.lxu`: the generic class names below must never leak into the
+   app screens, which share the global stylesheet layer.
+
+   Mobile-first by construction. This page is served almost entirely to phones
+   arriving from a Meta ad, so the phone layout is the base and desktop is the
+   exception. The page has no navigation at all - one message, one action - so
+   every section either advances the argument or gets cut. */
+
+.lxs {
+  --s-max: 560px;
+  --s-cream: #f1f6f4;
+  --s-sage: #7a9b8d;
+  --s-deep: #3f6354;
+  --s-navy: #18201d;
+  --s-line: #dde8e3;
+
+  min-height: 100dvh;
+  background: var(--s-cream);
+  color: var(--s-navy);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  padding: 0 20px 64px;
+}
+
+.lxs section {
+  max-width: var(--s-max);
+  margin: 0 auto;
+  padding: 44px 0;
+}
+.lxs section + section {
+  border-top: 1px solid var(--s-line);
+}
+
+/* ── Type ─────────────────────────────────────────────────────────────────── */
+
+.lxs .s-eyebrow {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--s-deep);
+}
+.lxs .s-h1 {
+  margin: 0 0 14px;
+  font-size: clamp(30px, 8.5vw, 42px);
+  line-height: 1.08;
+  /* Negative tracking as the display size grows - letters read too far apart
+     otherwise. Body copy below stays at 0. */
+  letter-spacing: -0.022em;
+  font-weight: 800;
+  text-wrap: balance;
+}
+.lxs .s-h2 {
+  margin: 0 0 20px;
+  font-size: clamp(21px, 5.5vw, 26px);
+  line-height: 1.15;
+  letter-spacing: -0.014em;
+  font-weight: 750;
+  text-wrap: balance;
+}
+.lxs .s-sub {
+  margin: 0 0 22px;
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: #44584f;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+
+.lxs .s-hero {
+  padding-top: 52px;
+}
+
+.lxs .s-pricebox {
+  background: #fff;
+  border: 1px solid var(--s-line);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 1px 2px rgb(24 32 29 / 0.04), 0 10px 30px -14px rgb(24 32 29 / 0.16);
+}
+.lxs .s-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.lxs .s-price strong {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.lxs .s-price span {
+  font-size: 15px;
+  color: #5d716a;
+}
+
+.lxs .s-cta {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  background: var(--s-deep);
+  color: #fff;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  padding: 17px 20px;
+  cursor: pointer;
+  /* Feedback on pointer-DOWN, never on release - the instant lag appears the
+     sense of directness falls off a cliff. */
+  transition: transform 110ms cubic-bezier(0.22, 0.61, 0.36, 1), background 160ms;
+}
+.lxs .s-cta:active {
+  transform: scale(0.975);
+  background: #36554a;
+}
+.lxs .s-cta:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+.lxs .s-cta:focus-visible {
+  outline: 3px solid var(--s-sage);
+  outline-offset: 3px;
+}
+
+.lxs .s-reassure {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #5d716a;
+  text-align: center;
+}
+
+.lxs .s-trust {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.lxs .s-trust li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: #44584f;
+}
+.lxs .s-trust svg {
+  color: var(--s-deep);
+  flex: none;
+}
+
+/* ── What you get ─────────────────────────────────────────────────────────── */
+
+.lxs .s-getlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+.lxs .s-getlist li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.lxs .s-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #e3efe9;
+  color: var(--s-deep);
+  display: grid;
+  place-items: center;
+}
+.lxs .s-getlist strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.lxs .s-getlist p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #55685f;
+}
+
+.lxs .s-count {
+  margin: 24px 0 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #e3efe9;
+  font-size: 15px;
+  color: #34493f;
+}
+.lxs .s-count strong {
+  font-weight: 750;
+}
+
+/* ── How it works ─────────────────────────────────────────────────────────── */
+
+.lxs .s-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+.lxs .s-steps li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.lxs .s-n {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--s-deep);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+.lxs .s-steps strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.lxs .s-steps p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #55685f;
+}
+
+/* ── Who it is / is not for ───────────────────────────────────────────────── */
+
+.lxs .s-fitgrid {
+  display: grid;
+  gap: 14px;
+}
+.lxs .s-fitcard {
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid var(--s-line);
+  background: #fff;
+}
+.lxs .s-fitcard.no {
+  background: transparent;
+}
+.lxs .s-fitcard strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 750;
+  margin-bottom: 12px;
+}
+.lxs .s-fitcard ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.lxs .s-fitcard li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #44584f;
+}
+.lxs .s-fitcard li svg {
+  margin-top: 4px;
+}
+.lxs .s-fitcard.yes li svg {
+  color: var(--s-deep);
+}
+.lxs .s-fitcard.no li svg {
+  color: #a3b3ac;
+}
+
+/* ── Guarantee ────────────────────────────────────────────────────────────── */
+
+.lxs .s-guarantee {
+  text-align: center;
+}
+.lxs .s-gic {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  background: #e3efe9;
+  color: var(--s-deep);
+  margin-bottom: 14px;
+}
+.lxs .s-guarantee strong {
+  display: block;
+  font-size: 19px;
+  font-weight: 750;
+  margin-bottom: 8px;
+}
+.lxs .s-guarantee p {
+  margin: 0 auto;
+  max-width: 44ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #55685f;
+}
+
+/* ── FAQ ──────────────────────────────────────────────────────────────────── */
+
+.lxs .s-faqlist {
+  display: grid;
+  gap: 2px;
+}
+.lxs .s-faqlist details {
+  border-top: 1px solid var(--s-line);
+  padding: 4px 0;
+}
+.lxs .s-faqlist details:last-child {
+  border-bottom: 1px solid var(--s-line);
+}
+.lxs .s-faqlist summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 28px 14px 0;
+  font-size: 15.5px;
+  font-weight: 650;
+  position: relative;
+}
+.lxs .s-faqlist summary::-webkit-details-marker {
+  display: none;
+}
+.lxs .s-faqlist summary::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--s-deep);
+  border-bottom: 2px solid var(--s-deep);
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.lxs .s-faqlist details[open] summary::after {
+  transform: translateY(-20%) rotate(-135deg);
+}
+.lxs .s-faqlist p {
+  margin: 0 0 14px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #55685f;
+  padding-right: 20px;
+}
+
+/* ── Finale + consent ─────────────────────────────────────────────────────── */
+
+.lxs .s-consent {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin: 0 0 18px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #55685f;
+  cursor: pointer;
+  transition: border-color 200ms, background 200ms;
+}
+/* Turned on only once a press needed it - the tick is a legal requirement, not
+   a hurdle we chose, so the page does not wear it until it matters. */
+.lxs .s-consent.on {
+  border-color: var(--s-sage);
+  background: #fff;
+}
+.lxs .s-consent input {
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  accent-color: var(--s-deep);
+}
+
+.lxs .s-err {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #8c3a2c;
+  text-align: center;
+}
+.lxs .s-legal {
+  margin: 20px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #7b8b84;
+  text-align: center;
+}
+.lxs .s-legal a {
+  color: #5d716a;
+}
+
+/* ── Thank-you page ───────────────────────────────────────────────────────── */
+
+.lxs .s-done {
+  min-height: 70dvh;
+  display: grid;
+  align-content: safe center;
+  text-align: center;
+  gap: 4px;
+}
+.lxs .s-done .s-gic {
+  justify-self: center;
+}
+.lxs .s-mailrow {
+  margin: 18px auto 0;
+  max-width: 46ch;
+  padding: 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--s-line);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #44584f;
+  text-align: left;
+}
+.lxs .s-mailrow strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ── Desktop ──────────────────────────────────────────────────────────────── */
+
+@media (min-width: 720px) {
+  .lxs {
+    padding-bottom: 88px;
+  }
+  .lxs section {
+    padding: 56px 0;
+  }
+  .lxs .s-hero {
+    padding-top: 72px;
+  }
+  .lxs .s-fitgrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lxs .s-cta {
+    width: auto;
+    min-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxs .s-cta,
+  .lxs .s-faqlist summary::after,
+  .lxs .s-consent {
+    transition: none;
+  }
+  .lxs .s-cta:active {
+    transform: none;
+  }
+}

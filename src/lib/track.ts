@@ -339,3 +339,37 @@ export function marketingContext(): MarketingContext {
     ttclid: readCookie("ttclid") ?? readCookie("_ttclid") ?? snapshot.ttclid,
   };
 }
+
+// ── Programme purchase (/start) ─────────────────────────────────────────────
+//
+// This funnel optimises for PURCHASE, not Lead - which is the whole reason it
+// exists. `lx_program_purchase` is the event the Meta campaign should be
+// mapped to, and it is the only one here that carries a value, because a
+// value-based bid needs one. Prices come from PRICES so the number reported to
+// the ad platform can never drift from what we actually charge.
+
+/** The product page was seen. (Meta: ViewContent) */
+export function trackProgramView(slug: string): void {
+  push("lx_program_view", { program: slug });
+}
+
+/** A buy button was pressed - before Stripe, so it measures intent, not money.
+ *  (Meta: InitiateCheckout) */
+export function trackProgramCheckout(role: PriceRole, where: string): void {
+  const spec = role in PRICES ? PRICES[role] : undefined;
+  push("lx_program_checkout", {
+    role,
+    where,
+    ...(spec ? { value: spec.amountHuf, currency: "HUF" } : {}),
+  });
+}
+
+/** Payment confirmed by Stripe. THE optimisation event. (Meta: Purchase) */
+export function trackProgramPurchase(role: PriceRole, slug: string): void {
+  const spec = role in PRICES ? PRICES[role] : undefined;
+  push("lx_program_purchase", {
+    role,
+    program: slug,
+    ...(spec ? { value: spec.amountHuf, currency: "HUF" } : {}),
+  });
+}

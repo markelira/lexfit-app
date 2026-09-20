@@ -3,7 +3,13 @@
 import { doc, getDoc, getDocs, query, where, collection } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { COLLECTIONS, subscriptionDocId, checkinDocId } from "@/lib/pricing/keys";
-import { hasAccessFromData, type SubscriptionDoc } from "@/lib/pricing/types";
+import {
+  hasAccessFromData,
+  hasAnyAccessFromData,
+  hasProgramAccessFromData,
+  ownedPrograms,
+  type SubscriptionDoc,
+} from "@/lib/pricing/types";
 import { marketingContext } from "@/lib/track";
 
 async function postJson(
@@ -161,13 +167,35 @@ export const isSubscribed = (sub: Subscription | null): boolean =>
   hasAccessFromData(sub, Date.now());
 
 /**
+ * May this account through the door at all? (P1)
+ *
+ * `isSubscribed` answers "is there a membership" - that is the question the
+ * membership screen and the pricing page ask. This one answers "is there
+ * anything they paid for in here", which is the question the paid gate asks,
+ * and a programme owner must pass it or they have bought something they cannot
+ * open. Which videos they may then play is decided per programme, below.
+ */
+export const hasAnyAccess = (sub: Subscription | null): boolean =>
+  hasAnyAccessFromData(sub, Date.now());
+
+/** Does this account own (or have membership covering) one programme? */
+export const canOpenProgram = (sub: Subscription | null, slug: string): boolean =>
+  hasProgramAccessFromData(sub, slug, Date.now());
+
+/** Programme slugs owned outright - drives the "megvetted" state on cards. */
+export const purchasedPrograms = (sub: Subscription | null): string[] => ownedPrograms(sub);
+
+/**
  * Where an onboarded user belongs (40 §40.8 truth table): the app if they have
  * an active entitlement, else checkout. On a read failure default to /app rather
  * than trapping them at /subscribe - the server re-validates access anyway.
  */
 export async function paidDestination(uid: string): Promise<"/app" | "/subscribe"> {
   try {
-    return isSubscribed(await getSubscription(uid)) ? "/app" : "/subscribe";
+    // hasAnyAccess, not isSubscribed: a programme buyer has no membership and
+    // would otherwise be routed to the pricing page at the end of onboarding -
+    // asked to pay again, minutes after paying.
+    return hasAnyAccess(await getSubscription(uid)) ? "/app" : "/subscribe";
   } catch {
     return "/app";
   }

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Protected, Loader } from "@/components/Protected";
-import { getSubscription, isSubscribed, type Subscription } from "@/lib/billing";
+import { getSubscription, isSubscribed, purchasedPrograms, type Subscription } from "@/lib/billing";
 import { BrandPanel } from "@/components/onboarding/BrandPanel";
 import { PaywallOffer, PAYWALL_PLANS } from "@/components/onboarding/paywall";
 import { EmbeddedPay } from "@/components/onboarding/EmbeddedPay";
@@ -37,6 +37,12 @@ function SubscribeScreen() {
   }, [user]);
 
   const subscribed = useMemo(() => isSubscribed(sub ?? null), [sub]);
+  // P1: a programme owner arrives here by clicking content their purchase does
+  // not cover. Telling them "nincs előfizetésed" minutes after they paid reads
+  // as a broken product; the honest frame is that they own one thing and this
+  // is the other. This screen is the membership upsell for exactly that person.
+  const owns = useMemo(() => purchasedPrograms(sub ?? null), [sub]);
+  const isOwner = owns.length > 0;
 
   // Subscribed users don't belong on the paywall - send them into the app.
   useEffect(() => {
@@ -57,9 +63,17 @@ function SubscribeScreen() {
         <main className="fnl-col">
           <div className="fnl-main fnl">
             <div className="fnl-top">
-              <button className="fnl-later" onClick={logout}>Kilépés</button>
+              <button className="fnl-later" onClick={isOwner ? () => router.push("/app") : logout}>
+                {isOwner ? "Vissza a programomhoz" : "Kilépés"}
+              </button>
             </div>
             <div className="fnl-scroll pw-scroll">
+              {isOwner && (
+                <p className="pw-fine" role="status">
+                  A megvásárolt programod a tiéd marad - ez nem változik. Ez a videó a
+                  többi programhoz és a heti kihívásokhoz tartozik, amit a tagság nyit meg.
+                </p>
+              )}
               <PaywallOffer />
               {canceled && (
                 <p className="pw-fine" role="status">

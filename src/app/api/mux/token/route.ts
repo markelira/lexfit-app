@@ -1,7 +1,7 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { verifyRequest } from "@/lib/auth-server";
-import { hasAccess } from "@/lib/entitlement";
+import { canPlayVideo } from "@/lib/program-gate";
 import { signPlaybackTokens } from "@/lib/mux";
 import { adminDb } from "@/lib/firebase-admin";
 
@@ -16,10 +16,13 @@ export async function GET(req: Request) {
   const params = new URL(req.url).searchParams;
   const code = params.get("code");
   // Kihívások day videos live in challengeVideos/ - same signed-playback gating.
-  const collection = params.get("type") === "challenge" ? "challengeVideos" : "videos";
+  const kind = params.get("type") === "challenge" ? "challenge" : "video";
+  const collection = kind === "challenge" ? "challengeVideos" : "videos";
   if (!code) return NextResponse.json({ error: "missing code" }, { status: 400 });
 
-  if (!(await hasAccess(token.uid))) {
+  // Membership opens everything; a programme purchase opens only the videos in
+  // that programme's playlist (P1).
+  if (!(await canPlayVideo(token.uid, code, kind))) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
