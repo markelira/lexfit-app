@@ -56,6 +56,13 @@ const GATE_MIN_PURCHASES = 20;
  *  chance of being variance - so it is a break, and worth waking someone for. */
 const STALL_STARTS = 8;
 
+/** How long the campaign must have been running before "nothing is happening"
+ *  counts as a fault. The watchdog's first run lands four minutes after the
+ *  start time, when zero traffic and zero spend are simply the truth - Meta has
+ *  not begun delivering yet. An alert there would be wrong on day one, which is
+ *  exactly when the reader decides whether this mail is worth opening. */
+const QUIET_GRACE_H = 6;
+
 const H = 3600_000;
 
 export type Severity = "critical" | "high" | "medium";
@@ -221,12 +228,21 @@ export function buildBrief(
         : `${dayIndex}. nap / ${total.purchases} vásárlás - a kapu ${GATE_MIN_DAYS}. napnál vagy ${GATE_MIN_PURCHASES} vásárlásnál nyílik.`,
     },
     cost,
-    alerts: findAlerts({ live, last12h, total, config, cost, todayKey }),
+      alerts: findAlerts({
+      live,
+      hoursLive: (nowMs - CAMPAIGN.startMs) / H,
+      last12h,
+      total,
+      config,
+      cost,
+      todayKey,
+    }),
   };
 }
 
 function findAlerts(b: {
   live: boolean;
+  hoursLive: number;
   last12h: { starts: number; purchases: number };
   total: DayRow;
   config: Brief["config"];
@@ -262,7 +278,7 @@ function findAlerts(b: {
   }
 
   // Money is going out and nobody reaches the checkout.
-  if (b.last12h.starts === 0) {
+  if (b.last12h.starts === 0 && b.hoursLive >= QUIET_GRACE_H) {
     out.push({
       severity: "medium",
       key: "no_traffic",
@@ -274,7 +290,7 @@ function findAlerts(b: {
 
   // Scheduled to run, but Meta is not spending. On launch day the usual cause
   // is the most boring one: the draft was never published.
-  if (b.cost?.ok) {
+  if (b.cost?.ok && b.hoursLive >= QUIET_GRACE_H) {
     const today = b.cost.days.find((d) => d.date.slice(5) === b.todayKey);
     if (!today || today.spendHuf === 0) {
       out.push({

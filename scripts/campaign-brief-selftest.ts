@@ -155,7 +155,21 @@ check("zárás okt 1. 19:00 CEST", CAMPAIGN.endMs === Date.parse("2026-10-01T19:
   check("a publikálást említi", /publikálva/.test(b.alerts.find((a) => a.key === "no_spend")?.why ?? ""));
 }
 
-// 13. Attribution drift only fires once our own count can carry the ratio.
+// 13. The first watchdog run is four minutes after launch. Zero traffic and
+//     zero spend are the truth then, not a fault - and a false alarm on day
+//     one is how a monitoring mail teaches its reader to ignore it.
+{
+  const cfg = { pixel: true, capiToken: true, gtm: true, sendgrid: true };
+  const noSpendYet: CostSide = { ok: true, totalSpendHuf: 0, totalPurchases: 0, days: [{ date: "2026-09-21", spendHuf: 0, impressions: 0, clicks: 0, ctr: 0, cpmHuf: 0, frequency: 0, purchases: 0 }] };
+
+  const justStarted = buildBrief([], Date.parse("2026-09-21T06:04:00+02:00"), cfg, noSpendYet);
+  check("4 perccel indulás után néma", justStarted.alerts.length === 0, justStarted.alerts.map((a) => a.key).join(","));
+
+  const sixHoursIn = buildBrief([], Date.parse("2026-09-21T12:10:00+02:00"), cfg, noSpendYet);
+  check("6 óra után már szól", sixHoursIn.alerts.some((a) => a.key === "no_traffic") && sixHoursIn.alerts.some((a) => a.key === "no_spend"));
+}
+
+// 14. Attribution drift only fires once our own count can carry the ratio.
 {
   const now = Date.parse("2026-09-25T20:00:00+02:00");
   const rows: EventDoc[] = [];
@@ -179,4 +193,4 @@ if (failures) {
   console.error(`\n${failures} hiba.`);
   process.exit(1);
 }
-console.log("  ✓ campaign brief (13 eset)\n\nAll self-tests passed.");
+console.log("  ✓ campaign brief (15 eset)\n\nAll self-tests passed.");
