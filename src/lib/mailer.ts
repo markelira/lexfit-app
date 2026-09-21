@@ -71,6 +71,11 @@ import UjrakezdesD3, { subject as ujraD3Subject } from "../../emails/ujrakezdes-
 import UjrakezdesD6, { subject as ujraD6Subject } from "../../emails/ujrakezdes-d6";
 import UjrakezdesD9, { subject as ujraD9Subject } from "../../emails/ujrakezdes-d9";
 import WorkoutReminder, { subject as workoutSubject } from "../../emails/workout-reminder";
+import StartC1, { subject as startC1Subject } from "../../emails/start-c1";
+import StartC2, { subject as startC2Subject } from "../../emails/start-c2";
+import StartC3, { subjectFor as startC3SubjectFor } from "../../emails/start-c3";
+import StartC4, { subject as startC4Subject } from "../../emails/start-c4";
+import type { Anchor } from "@/lib/ujrakezdes/types";
 import type { DayState } from "../../emails/components/Bits";
 import type { Anchor as UjraAnchor } from "@/lib/ujrakezdes/types";
 import type { EmailWorkout as UjraEmailWorkout } from "../../emails/components/WorkoutCards";
@@ -511,6 +516,45 @@ export const sendUjrakezdesD6 = (to: string, leadId: string, p?: { ctaHref?: str
   return deliver({
     to, subject: ujraD6Subject, category: "marketing", unsub: u.unsub,
     make: () => UjrakezdesD6({ unsubHref: u.href, ctaHref: p?.ctaHref }),
+  });
+};
+
+// ── Lexfit Start campaign (2026-09) ────────────────────────────────────────
+// Four marketing mails to the quiz list. Every one carries the lead unsubscribe
+// link: these people have no account, so the in-app settings link would be a
+// dead end, and Grtv. §6 makes a working opt-out non-negotiable.
+
+export const sendStartC1 = (to: string, leadId: string, p: { ctaHref: string }) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: startC1Subject, category: "marketing", unsub: u.unsub,
+    make: () => StartC1({ unsubHref: u.href, ctaHref: p.ctaHref }),
+  });
+};
+
+export const sendStartC2 = (to: string, leadId: string, p: { ctaHref: string }) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: startC2Subject, category: "marketing", unsub: u.unsub,
+    make: () => StartC2({ unsubHref: u.href, ctaHref: p.ctaHref }),
+  });
+};
+
+export const sendStartC3 = (
+  to: string, leadId: string, p: { ctaHref: string; segment: Exclude<Anchor, "browsing"> },
+) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: startC3SubjectFor(p.segment), category: "marketing", unsub: u.unsub,
+    make: () => StartC3({ unsubHref: u.href, ctaHref: p.ctaHref, segment: p.segment }),
+  });
+};
+
+export const sendStartC4 = (to: string, leadId: string, p: { ctaHref: string }) => {
+  const u = leadUnsub(leadId);
+  return deliver({
+    to, subject: startC4Subject, category: "marketing", unsub: u.unsub,
+    make: () => StartC4({ unsubHref: u.href, ctaHref: p.ctaHref }),
   });
 };
 

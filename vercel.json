@@ -29,6 +29,10 @@
       "schedule": "4 16 * * *"
     },
     {
+      "path": "/api/cron/start-campaign",
+      "schedule": "30 15 * * *"
+    },
+    {
       "path": "/api/cron/campaign-brief?mode=brief",
       "schedule": "3 18 * * *"
     }

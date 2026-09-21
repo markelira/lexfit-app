@@ -24,6 +24,7 @@
     "test:ujrakezdes": "node --import tsx scripts/ujrakezdes-selftest.ts",
     "test:schema": "node --import tsx scripts/schema-selftest.ts",
     "test:campaign": "node --import tsx scripts/campaign-brief-selftest.ts",
+    "test:startmail": "node --import tsx scripts/start-campaign-selftest.ts",
     "audit:content": "node --env-file=.env.local scripts/content-audit.mjs",
     "healthcheck": "node --env-file=.env.local scripts/firebase-healthcheck.mjs",
     "email:dev": "email dev --dir emails --port 3001",
