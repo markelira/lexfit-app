@@ -51,9 +51,15 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const now = Date.now();
+  const url = new URL(req.url);
+  const dry = url.searchParams.get("dry") === "1";
+  // A dry run may pretend it is a later moment, so the gate can be PROVEN
+  // before the first real send rather than after it. Honoured only when dry:
+  // a real send always uses the real clock, so no query string can make the
+  // campaign go out early.
+  const at = Number(url.searchParams.get("at"));
+  const now = dry && Number.isFinite(at) && at > 0 ? at : Date.now();
   const openUpTo = dueStep(now);
-  const dry = new URL(req.url).searchParams.get("dry") === "1";
   if (openUpTo == null) {
     return NextResponse.json({ ok: true, sent: 0, reason: "not_started", startsAt: CAMPAIGN_START_MS });
   }
@@ -103,7 +109,7 @@ export async function GET(req: Request) {
     // "checkout starts" with sends. A log line is the right weight for this.
     console.log("[start-campaign]", JSON.stringify({ dry, openUpTo, ...stats }));
 
-    return NextResponse.json({ ok: true, dry, openUpTo, ...stats });
+    return NextResponse.json({ ok: true, dry, at: dry ? now : undefined, openUpTo, ...stats });
   } catch (e) {
     console.error("[start-campaign] failed:", e);
     Sentry.captureException(e, { tags: { cron: "start-campaign" } });
